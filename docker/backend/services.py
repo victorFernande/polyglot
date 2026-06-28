@@ -109,6 +109,13 @@ class WaveService:
 class ExerciseService:
     LANGUAGE_TO_WAVE = {"de": "german", "fr": "french", "ru": "russian", "jp": "japanese", "en": "english"}
     LANGUAGE_NAMES = {"de": "Alemão", "fr": "Francês", "ru": "Russo", "jp": "Japonês", "en": "Inglês"}
+    VISUAL_VOCAB = {
+        "de": [("ambulância", "Krankenwagen", "ambulance"), ("café", "Kaffee", "coffee"), ("bola", "Ball", "ball"), ("garfo", "Gabel", "fork"), ("trem", "Zug", "train"), ("casa", "Haus", "house"), ("camisa", "Hemd", "shirt"), ("telefone", "Telefon", "phone"), ("livro", "Buch", "book"), ("água", "Wasser", "water")],
+        "fr": [("ambulância", "ambulance", "ambulance"), ("café", "café", "coffee"), ("bola", "ballon", "ball"), ("garfo", "fourchette", "fork"), ("trem", "train", "train"), ("casa", "maison", "house"), ("camisa", "chemise", "shirt"), ("telefone", "téléphone", "phone"), ("livro", "livre", "book"), ("água", "eau", "water")],
+        "ru": [("ambulância", "скорая помощь", "ambulance"), ("café", "кофе", "coffee"), ("bola", "мяч", "ball"), ("garfo", "вилка", "fork"), ("trem", "поезд", "train"), ("casa", "дом", "house"), ("camisa", "рубашка", "shirt"), ("telefone", "телефон", "phone"), ("livro", "книга", "book"), ("água", "вода", "water")],
+        "jp": [("ambulância", "救急車", "ambulance"), ("café", "コーヒー", "coffee"), ("bola", "ボール", "ball"), ("garfo", "フォーク", "fork"), ("trem", "電車", "train"), ("casa", "家", "house"), ("camisa", "シャツ", "shirt"), ("telefone", "電話", "phone"), ("livro", "本", "book"), ("água", "水", "water")],
+        "en": [("ambulância", "ambulance", "ambulance"), ("café", "coffee", "coffee"), ("bola", "ball", "ball"), ("garfo", "fork", "fork"), ("trem", "train", "train"), ("casa", "house", "house"), ("camisa", "shirt", "shirt"), ("telefone", "phone", "phone"), ("livro", "book", "book"), ("água", "water", "water")],
+    }
 
     TOPICS = [
         ("fundamentos", "Fundamentos"),
@@ -203,6 +210,38 @@ class ExerciseService:
         return {"type":"match","prompt":prompt,"answer":{"pairs":pairs},"options":None,"tiles":None,"pairs":pairs,"hint":"Combine pelo significado, não pela aparência da palavra.","explanation":"Matching fortalece reconhecimento rápido de vocabulário.","xp_reward":12 + (idx % 4)}
 
     @staticmethod
+    def _icon_svg(icon_key: str, idx: int):
+        bg = ["#dbeafe", "#ffedd5", "#dcfce7", "#fae8ff", "#fef9c3", "#fee2e2"][idx % 6]
+        icons = {
+            "ambulance": '<rect x="16" y="38" width="58" height="26" rx="6" fill="#fff" stroke="#ef4444" stroke-width="4"/><rect x="55" y="30" width="18" height="34" rx="4" fill="#fff" stroke="#ef4444" stroke-width="4"/><path d="M33 44v14M26 51h14" stroke="#ef4444" stroke-width="5"/><circle cx="29" cy="70" r="7" fill="#111827"/><circle cx="65" cy="70" r="7" fill="#111827"/>' ,
+            "coffee": '<rect x="25" y="38" width="36" height="30" rx="8" fill="#92400e"/><path d="M61 45h8a8 8 0 0 1 0 16h-8" fill="none" stroke="#92400e" stroke-width="5"/><path d="M34 30c-5-6 5-8 0-14M47 30c-5-6 5-8 0-14" stroke="#6b7280" stroke-width="4" fill="none"/><rect x="22" y="70" width="50" height="6" rx="3" fill="#fb923c"/>',
+            "ball": '<circle cx="48" cy="48" r="30" fill="#fff" stroke="#111827" stroke-width="4"/><path d="M48 18v60M18 48h60M28 28c14 12 26 12 40 0M28 68c14-12 26-12 40 0" stroke="#2563eb" stroke-width="4" fill="none"/>',
+            "fork": '<path d="M32 18v32M42 18v32M52 18v32M32 50c0 10 20 10 20 0" stroke="#64748b" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M42 50v30" stroke="#64748b" stroke-width="7" stroke-linecap="round"/>',
+            "train": '<rect x="24" y="18" width="48" height="52" rx="10" fill="#2563eb"/><rect x="32" y="28" width="32" height="16" rx="3" fill="#bfdbfe"/><circle cx="36" cy="56" r="5" fill="#fff"/><circle cx="60" cy="56" r="5" fill="#fff"/><path d="M34 78h28" stroke="#111827" stroke-width="5"/>',
+            "house": '<path d="M18 45l30-25 30 25" fill="#f97316"/><rect x="26" y="44" width="44" height="34" rx="4" fill="#fb923c"/><rect x="42" y="56" width="12" height="22" fill="#7c2d12"/>',
+            "shirt": '<path d="M30 24l10 8h16l10-8 14 14-10 12-6-5v33H32V45l-6 5-10-12 14-14z" fill="#22c55e" stroke="#166534" stroke-width="3"/>',
+            "phone": '<rect x="32" y="14" width="32" height="68" rx="8" fill="#111827"/><rect x="37" y="22" width="22" height="46" rx="3" fill="#38bdf8"/><circle cx="48" cy="74" r="3" fill="#fff"/>',
+            "book": '<path d="M18 22h28c7 0 10 4 10 10v44H28c-6 0-10-4-10-10V22z" fill="#8b5cf6"/><path d="M56 32c0-6 4-10 10-10h12v54H56V32z" fill="#a78bfa"/><path d="M30 36h16M30 48h16" stroke="#fff" stroke-width="4"/>',
+            "water": '<path d="M48 16c16 20 24 32 24 45a24 24 0 0 1-48 0c0-13 8-25 24-45z" fill="#38bdf8"/><circle cx="40" cy="56" r="7" fill="#bae6fd"/>',
+        }
+        shape = icons.get(icon_key, icons["book"])
+        return f'<svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg"><rect width="96" height="96" rx="22" fill="{bg}"/>{shape}</svg>'
+
+    @staticmethod
+    def _image_choice(prompt, answer, options, idx):
+        unique = []
+        seen = set()
+        for portuguese, foreign, icon_key in [(answer[0], answer[1], answer[2])] + options:
+            key = str(foreign).casefold()
+            if key in seen:
+                continue
+            unique.append({"label_pt": portuguese, "value": foreign, "icon_key": icon_key, "svg": ExerciseService._icon_svg(icon_key, len(unique))})
+            seen.add(key)
+            if len(unique) == 4:
+                break
+        return {"type":"image_choice","prompt":prompt,"answer":{"value":answer[1]},"options":unique,"tiles":None,"pairs":None,"hint":"Olhe o ícone, leia o significado em português e escolha a palavra/frase correta no idioma estudado.","explanation":f"A imagem correta representa: {answer[0]} = {answer[1]}.","xp_reward":9 + (idx % 3)}
+
+    @staticmethod
     def _matching_sample(vocab, start, size=4):
         sample = []
         seen_foreign = set()
@@ -253,7 +292,12 @@ class ExerciseService:
                     hint = f"Mini-aula: {unit['goal']} Foque na situação comunicativa antes de decorar palavras isoladas."
                     explanation = f"{unit['title']}: “{target}” corresponde a “{pt}”. Use esta frase pronta como bloco real de comunicação em {name}."
                     mode = question_index % 3
-                    if mode == 1:
+                    if question_index == 4:
+                        visual_bank = ExerciseService.VISUAL_VOCAB[code]
+                        visual_answer = visual_bank[((unit_index - 1) * 10 + topic_index - 1) % len(visual_bank)]
+                        distractors = [entry for entry in visual_bank if entry[1] != visual_answer[1]][:3]
+                        item = ExerciseService._image_choice(f"{prefix}: escolha a imagem que combina com “{visual_answer[1]}”", visual_answer, distractors, idx)
+                    elif mode == 1:
                         wrong = [x for x in all_foreign if x != target][:3]
                         item = ExerciseService._choice(f"{prefix}: como dizer “{pt}” em {name}?", target, wrong, idx)
                     elif mode == 2:
@@ -265,7 +309,8 @@ class ExerciseService:
                         pairs = [[foreign, portuguese] for portuguese, foreign in sample]
                         item = ExerciseService._match(f"{prefix}: combine frases úteis", pairs, idx)
                     item["hint"] = hint
-                    item["explanation"] = explanation
+                    if item["type"] != "image_choice":
+                        item["explanation"] = explanation
                     items.append(item)
         return items[:ExerciseService.TARGET_ITEMS]
 

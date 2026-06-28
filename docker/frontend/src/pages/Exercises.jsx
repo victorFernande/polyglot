@@ -5,6 +5,7 @@ import LanguageFlag from '../components/LanguageFlag'
 import { answerExerciseSession, bootstrapUser, completeExerciseSession, loadExerciseLessons, loadExercisePath, startExerciseSession, apiFetch } from '../lib/api'
 import { handleExerciseKeyDown } from '../lib/exerciseKeyboard.mjs'
 import { buildTilesForItem, matchRightOptions, stableShuffleOptions } from '../lib/exerciseOptions.mjs'
+import { speak, voiceTextForFeedback, voiceTextForItem } from '../lib/voiceMode.mjs'
 
 const LANG_META = {
   de: { accent: 'Rammstein', color: 'from-red-600 to-red-900' },
@@ -13,6 +14,8 @@ const LANG_META = {
   jp: { accent: 'Anime/Manga', color: 'from-pink-600 to-pink-900' },
   en: { accent: 'Pop/Internet', color: 'from-emerald-600 to-emerald-900' },
 }
+
+const SPEECH_LANG = { de: 'de-DE', fr: 'fr-FR', ru: 'ru-RU', jp: 'ja-JP', en: 'en-US' }
 
 function answerValue(answer) {
   if (answer && typeof answer === 'object' && 'value' in answer) return answer.value
@@ -51,6 +54,7 @@ export default function Exercises() {
   const [built, setBuilt] = useState([])
   const [matched, setMatched] = useState({})
   const [summary, setSummary] = useState(null)
+  const [voiceMode, setVoiceMode] = useState(false)
 
   useEffect(() => {
     async function boot() {
@@ -79,7 +83,7 @@ export default function Exercises() {
   const progress = session?.total_count ? (currentIndex / session.total_count) * 100 : 0
   const langCode = lesson?.language_code || lesson?.language || 'de'
   const activePath = pathData.find((p) => (p.language_code || p.language) === langCode)
-  const choiceOptions = useMemo(() => (item?.type === 'choice' ? stableShuffleOptions(item.options || [], item.id ?? item.prompt) : []), [item])
+  const choiceOptions = useMemo(() => ((item?.type === 'choice' || item?.type === 'image_choice') ? stableShuffleOptions(item.options || [], item.id ?? item.prompt) : []), [item])
 
   function resetExerciseState() {
     setFeedback(null)
@@ -110,6 +114,7 @@ export default function Exercises() {
   const normalizedPayload = useMemo(() => {
     if (!item) return null
     if (item.type === 'choice') return selected
+    if (item.type === 'image_choice') return selected
     if (item.type === 'build') return built
     if (item.type === 'match') return matched
     return selected
@@ -118,6 +123,7 @@ export default function Exercises() {
   const canCheck = useMemo(() => {
     if (!item) return false
     if (item.type === 'choice') return !!selected
+    if (item.type === 'image_choice') return !!selected
     if (item.type === 'build') return built.length === (answerValue(item.answer)?.length || 0)
     if (item.type === 'match') return Object.keys(matched).length === matchPairs(item).length
     return false
@@ -176,6 +182,18 @@ export default function Exercises() {
     if (current) await openLesson(current)
   }
 
+  function speakCurrent(text = voiceTextForItem(item)) {
+    speak(text, SPEECH_LANG[langCode] || 'pt-BR')
+  }
+
+  useEffect(() => {
+    if (voiceMode && item && !feedback) speakCurrent()
+  }, [voiceMode, item?.id, feedback])
+
+  useEffect(() => {
+    if (voiceMode && feedback) speakCurrent(voiceTextForFeedback(feedback))
+  }, [voiceMode, feedback])
+
   useEffect(() => {
     function onKeyDown(event) {
       handleExerciseKeyDown(event, {
@@ -186,7 +204,7 @@ export default function Exercises() {
         hasFeedback: !!feedback,
         selectChoice: (option) => {
           setFeedback(null)
-          setSelected(option)
+          setSelected(typeof option === 'object' && option?.value ? option.value : option)
         },
         check,
         next,
@@ -259,10 +277,14 @@ export default function Exercises() {
               <p className="text-sm text-gray-400">{lesson.language_name} · questão {displayIndex + 1}/{session.total_count} · {session.xp_earned} XP na sessão</p>
               <h2 className="text-2xl font-bold">{item.prompt}</h2>
             </div>
-            <button className="ml-auto btn-secondary" title="Ouvir exemplo"><Volume2 size={18} /></button>
+            <div className="ml-auto flex gap-2">
+              <button className="btn-secondary" title="Ouvir pergunta/correção" onClick={() => speakCurrent(feedback ? voiceTextForFeedback(feedback) : voiceTextForItem(item))}><Volume2 size={18} /></button>
+              <button className={`btn-secondary text-xs ${voiceMode ? 'ring-2 ring-polyglot-accent' : ''}`} onClick={() => setVoiceMode(!voiceMode)}>{voiceMode ? 'Voz ligada' : 'Modo voz'}</button>
+            </div>
           </div>
 
           {item.type === 'choice' && <Choice options={choiceOptions} selected={selected} onInteract={() => setFeedback(null)} setSelected={setSelected} />}
+          {item.type === 'image_choice' && <ImageChoice options={choiceOptions} selected={selected} onInteract={() => setFeedback(null)} setSelected={setSelected} />}
           {item.type === 'build' && <Build item={item} built={built} onInteract={() => setFeedback(null)} setBuilt={setBuilt} />}
           {item.type === 'match' && <Match item={item} matched={matched} onInteract={() => setFeedback(null)} setMatched={setMatched} />}
 
@@ -320,6 +342,20 @@ function SkillTrail({ path }) {
 
 function Choice({ options, selected, setSelected, onInteract }) {
   return <div className="grid gap-3 sm:grid-cols-2">{options.map((option) => <button key={option} onClick={() => { onInteract(); setSelected(option) }} className={`rounded-xl border p-4 text-left text-lg font-semibold transition ${selected === option ? 'border-polyglot-accent bg-polyglot-accent/20' : 'border-white/10 bg-white/5 hover:bg-white/10'}`}>{option}</button>)}</div>
+}
+
+function ImageChoice({ options, selected, setSelected, onInteract }) {
+  return (
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {options.map((option) => (
+        <button key={option.value} onClick={() => { onInteract(); setSelected(option.value) }} className={`rounded-2xl border p-4 text-center transition ${selected === option.value ? 'border-polyglot-accent bg-polyglot-accent/20' : 'border-white/10 bg-white/5 hover:bg-white/10'}`}>
+          <div className="mx-auto mb-3 h-24 w-24 overflow-hidden rounded-2xl bg-white/90 p-2" dangerouslySetInnerHTML={{ __html: option.svg }} />
+          <div className="text-sm text-gray-300">{option.label_pt}</div>
+          <div className="mt-1 text-lg font-bold">{option.value}</div>
+        </button>
+      ))}
+    </div>
+  )
 }
 
 function Build({ item, built, setBuilt, onInteract }) {

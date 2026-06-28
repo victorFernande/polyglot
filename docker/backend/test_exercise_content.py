@@ -25,7 +25,7 @@ def test_seed_lessons_is_long_varied_and_idempotent():
         for lesson in lessons:
             items = db.query(ExerciseItem).filter(ExerciseItem.lesson_id == lesson.id).all()
             assert len(items) == ExerciseService.TARGET_ITEMS
-            assert {item.type for item in items} >= {"choice", "build", "match"}
+            assert {item.type for item in items} >= {"choice", "build", "match", "image_choice"}
             assert all(item.hint for item in items)
             assert all(item.explanation for item in items)
             assert any("Unidade 1/10 — Fazendo um pedido no café" in item.prompt for item in items)
@@ -42,6 +42,15 @@ def test_seed_lessons_is_long_varied_and_idempotent():
             for item in items:
                 if item.type == "choice":
                     assert item.answer["value"] in item.options
+                elif item.type == "image_choice":
+                    assert item.answer["value"] in [option["value"] for option in item.options]
+                    assert len(item.options) == 4
+                    assert all(option["label_pt"] for option in item.options)
+                    assert all(option["icon_key"] for option in item.options)
+                    assert all(option["svg"].startswith("<svg") for option in item.options)
+                    assert all("viewBox" in option["svg"] for option in item.options)
+                    correct = next(option for option in item.options if option["value"] == item.answer["value"])
+                    assert correct["label_pt"] in item.explanation
                 elif item.type == "build":
                     assert all(word in item.tiles for word in item.answer["value"])
                 elif item.type == "match":
@@ -94,3 +103,17 @@ def test_matching_payload_from_frontend_is_accepted_for_german_fundamentals():
     canonical_answer = {"pairs": expected_pairs}
 
     assert ExerciseService.normalize(frontend_payload) == ExerciseService.normalize(canonical_answer)
+
+
+def test_image_choice_payload_accepts_selected_foreign_value():
+    item = next(item for item in ExerciseService.generate_items("de") if item["type"] == "image_choice")
+    selected_value = item["options"][0]["value"]
+
+    assert ExerciseService.normalize(selected_value) == ExerciseService.normalize({"value": selected_value})
+
+
+def test_image_choice_uses_semantic_svg_icon_bank():
+    image_items = [item for item in ExerciseService.generate_items("de") if item["type"] == "image_choice"]
+    icon_keys = {option["icon_key"] for item in image_items for option in item["options"]}
+
+    assert {"ambulance", "coffee", "ball", "fork"}.issubset(icon_keys)
