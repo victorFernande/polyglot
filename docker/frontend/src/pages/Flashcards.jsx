@@ -85,7 +85,7 @@ export default function Flashcards() {
               <LanguageFlag code={lang.code} className="h-10 w-10" />
               <div>
                 <div className="font-bold">{lang.name}</div>
-                <div className="text-xs text-gray-400">100 cards temáticos</div>
+                <div className="text-xs text-gray-400">1000 cards situacionais A1</div>
               </div>
             </div>
           </button>

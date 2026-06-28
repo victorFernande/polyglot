@@ -221,7 +221,7 @@ export default function Exercises() {
     <div className="mx-auto max-w-5xl space-y-6">
       <div>
         <h1 className="text-3xl font-bold mb-2">🎮 Exercícios por trilha</h1>
-        <p className="text-gray-400">100 questões por idioma, separadas em 10 temas de estudo. Cada sessão tem 10 perguntas para manter o ritmo rápido.</p>
+        <p className="text-gray-400">1000 questões por idioma: 10 unidades situacionais, 10 tópicos por unidade e 10 perguntas por tópico. Cada sessão continua com 10 perguntas para manter o ritmo rápido.</p>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">

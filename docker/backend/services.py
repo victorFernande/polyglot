@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
 from models import Achievement, ExerciseAnswer, ExerciseItem, ExerciseLesson, ExerciseSession, Phase, SessionLocal, StudyLog, Task, User, UserAchievement, Wave
 from schemas import *
+from curriculum import A1_UNITS
 
 
 class GamificationService:
@@ -185,7 +186,7 @@ class ExerciseService:
         },
     }
     SESSION_SIZE = 10
-    TARGET_ITEMS = 100
+    TARGET_ITEMS = 1000
 
     @staticmethod
     def _choice(prompt, answer, options, idx):
@@ -242,49 +243,44 @@ class ExerciseService:
     def generate_items(code: str):
         name = ExerciseService.LANGUAGE_NAMES[code]
         items = []
-        for block, (topic_key, topic_name) in enumerate(ExerciseService.TOPICS):
-            vocab = ExerciseService.THEMES[code][topic_key]
-            all_foreign = [foreign for _pt, foreign in vocab]
-            for j, (pt, target) in enumerate(vocab):
-                idx = block * 10 + j + 1
-                mode = idx % 3
-                prefix = f"Tema {block+1}/10 — {topic_name}"
-                if mode == 1:
-                    wrong = [x for x in all_foreign if x != target][:3]
-                    items.append(ExerciseService._choice(f"{prefix}: como dizer “{pt}” em {name}?", target, wrong, idx))
-                elif mode == 2:
-                    if topic_key == "numeros":
-                        words = [target]
-                        prompt = f"{prefix}: selecione/monte o número “{pt}”"
-                    elif topic_key == "perguntas":
-                        words = [target]
-                        prompt = f"{prefix}: monte a pergunta “{pt}”"
+        for unit_index, unit in enumerate(A1_UNITS, 1):
+            phrases = unit["phrases"][code]
+            all_foreign = [foreign for _pt, foreign in phrases]
+            for topic_index, topic_name in enumerate(unit["topics"], 1):
+                for question_index, (pt, target) in enumerate(phrases, 1):
+                    idx = (unit_index - 1) * 100 + (topic_index - 1) * 10 + question_index
+                    prefix = f"Unidade {unit_index}/10 — {unit['title']} · Tópico {topic_index}/10 — {topic_name}"
+                    hint = f"Mini-aula: {unit['goal']} Foque na situação comunicativa antes de decorar palavras isoladas."
+                    explanation = f"{unit['title']}: “{target}” corresponde a “{pt}”. Use esta frase pronta como bloco real de comunicação em {name}."
+                    mode = question_index % 3
+                    if mode == 1:
+                        wrong = [x for x in all_foreign if x != target][:3]
+                        item = ExerciseService._choice(f"{prefix}: como dizer “{pt}” em {name}?", target, wrong, idx)
+                    elif mode == 2:
+                        words = target.split()
+                        extras = [word for foreign in all_foreign[:5] for word in foreign.split()]
+                        item = ExerciseService._build(f"{prefix}: monte a frase “{pt}”", words, extras, idx)
                     else:
-                        # frase curta com vocabulário do tema, adequada para fixação tipo SRS
-                        pronoun = {"de":"Ich", "fr":"Je", "ru":"Я", "jp":"私", "en":"I"}[code]
-                        want = {"de":"will", "fr":"veux", "ru":"хочу", "jp":"ほしい", "en":"want"}[code]
-                        words = [pronoun, want, target]
-                        prompt = f"{prefix}: monte uma frase com “{pt}”"
-                    extras = all_foreign[:5]
-                    items.append(ExerciseService._build(prompt, words, extras, idx))
-                else:
-                    sample = ExerciseService._matching_sample(vocab, j)
-                    pairs = [[foreign, portuguese] for portuguese, foreign in sample]
-                    items.append(ExerciseService._match(f"{prefix}: combine vocabulário de {topic_name.lower()}", pairs, idx))
+                        sample = ExerciseService._matching_sample(phrases, question_index - 1)
+                        pairs = [[foreign, portuguese] for portuguese, foreign in sample]
+                        item = ExerciseService._match(f"{prefix}: combine frases úteis", pairs, idx)
+                    item["hint"] = hint
+                    item["explanation"] = explanation
+                    items.append(item)
         return items[:ExerciseService.TARGET_ITEMS]
 
     @staticmethod
     def ensure_seed_lessons(db: Session):
         canonical_slugs = set()
         for order, code in enumerate(["de", "fr", "ru", "jp", "en"], 1):
-            slug = f"{code}-trilha-100"
+            slug = f"{code}-trilha-a1-situacional-1000"
             canonical_slugs.add(slug)
             lesson = db.query(ExerciseLesson).filter(ExerciseLesson.language_code == code, ExerciseLesson.slug == slug).first()
             if not lesson:
-                lesson = ExerciseLesson(language_code=code, language_name=ExerciseService.LANGUAGE_NAMES[code], slug=slug, title=f"Trilha 100 Temática — {ExerciseService.LANGUAGE_NAMES[code]}", description="100 cards/exercícios em 10 temas: fundamentos, números, pronomes, comidas, família, viagem, tempo, verbos, perguntas e cultura.", order_index=order, xp_base=20, active=True)
+                lesson = ExerciseLesson(language_code=code, language_name=ExerciseService.LANGUAGE_NAMES[code], slug=slug, title=f"Trilha A1 Situacional 1000 — {ExerciseService.LANGUAGE_NAMES[code]}", description="1000 exercícios em 10 unidades comunicativas: café, apresentação, viagem, restaurante, contato, família, trabalho no presente, roupas, hábitos e preferências. Cada unidade tem 10 tópicos e cada tópico tem 10 questões.", order_index=order, xp_base=20, active=True)
                 db.add(lesson); db.flush()
             else:
-                lesson.active = True; lesson.order_index = order; lesson.language_name = ExerciseService.LANGUAGE_NAMES[code]
+                lesson.active = True; lesson.order_index = order; lesson.language_name = ExerciseService.LANGUAGE_NAMES[code]; lesson.title = f"Trilha A1 Situacional 1000 — {ExerciseService.LANGUAGE_NAMES[code]}"; lesson.description = "1000 exercícios em 10 unidades comunicativas: café, apresentação, viagem, restaurante, contato, família, trabalho no presente, roupas, hábitos e preferências. Cada unidade tem 10 tópicos e cada tópico tem 10 questões."
             generated = ExerciseService.generate_items(code)
             if ExerciseService._items_need_regeneration(lesson, generated):
                 db.query(ExerciseItem).filter(ExerciseItem.lesson_id == lesson.id).delete(); db.flush()

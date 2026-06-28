@@ -34,7 +34,7 @@ def test_bootstrap_lists_lessons_and_persists_full_session_flow():
         lessons = lessons_response.json()
         assert len(lessons) == 5
         assert {lesson["language"] for lesson in lessons} == {"de", "fr", "ru", "jp", "en"}
-        assert all(lesson["items_count"] == 100 for lesson in lessons)
+        assert all(lesson["items_count"] == 1000 for lesson in lessons)
 
         lesson_id = lessons[0]["id"]
         session_response = client.post(f"/exercise-lessons/{lesson_id}/sessions", params={"user_id": 1})

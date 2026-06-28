@@ -28,6 +28,17 @@ def test_seed_lessons_is_long_varied_and_idempotent():
             assert {item.type for item in items} >= {"choice", "build", "match"}
             assert all(item.hint for item in items)
             assert all(item.explanation for item in items)
+            assert any("Unidade 1/10 — Fazendo um pedido no café" in item.prompt for item in items)
+            assert any("Unidade 2/10 — Apresente-se" in item.prompt for item in items)
+            assert any("Unidade 10/10 — Exponha preferências" in item.prompt for item in items)
+            assert any("Mini-aula" in item.hint for item in items)
+            invalid_phrases = ["Ich will er", "Je veux il", "Я хочу он", "私 ほしい 彼", "I want he"]
+            assert not any(
+                bad in " ".join(item.answer.get("value", []))
+                for item in items
+                if item.type == "build"
+                for bad in invalid_phrases
+            )
             for item in items:
                 if item.type == "choice":
                     assert item.answer["value"] in item.options
@@ -65,11 +76,11 @@ def test_seed_lessons_deactivates_legacy_prototype_lessons():
         active_lessons = db.query(ExerciseLesson).filter(ExerciseLesson.active == True).all()
         assert len(active_lessons) == len(LANGUAGES)
         assert {lesson.slug for lesson in active_lessons} == {
-            "de-trilha-100",
-            "fr-trilha-100",
-            "ru-trilha-100",
-            "jp-trilha-100",
-            "en-trilha-100",
+            "de-trilha-a1-situacional-1000",
+            "fr-trilha-a1-situacional-1000",
+            "ru-trilha-a1-situacional-1000",
+            "jp-trilha-a1-situacional-1000",
+            "en-trilha-a1-situacional-1000",
         }
         db.refresh(legacy)
         assert legacy.active is False
