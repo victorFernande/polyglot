@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { Check, Heart, X, Volume2, RotateCcw, Trophy, ArrowRight, Loader2, Star } from 'lucide-react'
 import LanguageFlag from '../components/LanguageFlag'
 import { answerExerciseSession, bootstrapUser, completeExerciseSession, loadExerciseLessons, loadExercisePath, startExerciseSession, apiFetch } from '../lib/api'
+import { handleExerciseKeyDown } from '../lib/exerciseKeyboard.mjs'
 import { buildTilesForItem, matchRightOptions, stableShuffleOptions } from '../lib/exerciseOptions.mjs'
 
 const LANG_META = {
@@ -78,6 +79,7 @@ export default function Exercises() {
   const progress = session?.total_count ? (currentIndex / session.total_count) * 100 : 0
   const langCode = lesson?.language_code || lesson?.language || 'de'
   const activePath = pathData.find((p) => (p.language_code || p.language) === langCode)
+  const choiceOptions = useMemo(() => (item?.type === 'choice' ? stableShuffleOptions(item.options || [], item.id ?? item.prompt) : []), [item])
 
   function resetExerciseState() {
     setFeedback(null)
@@ -174,6 +176,28 @@ export default function Exercises() {
     if (current) await openLesson(current)
   }
 
+  useEffect(() => {
+    function onKeyDown(event) {
+      handleExerciseKeyDown(event, {
+        hasItem: !!item && !!session,
+        busy,
+        choiceOptions,
+        canCheck,
+        hasFeedback: !!feedback,
+        selectChoice: (option) => {
+          setFeedback(null)
+          setSelected(option)
+        },
+        check,
+        next,
+        clear: resetExerciseState,
+      })
+    }
+
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [item, session, busy, choiceOptions, canCheck, feedback])
+
   if (loading) return <div className="flex h-64 items-center justify-center"><Loader2 className="animate-spin text-polyglot-accent" size={42} /></div>
   if (error) return <div className="card border-red-500/30 bg-red-500/10 text-red-200">Erro: {error}</div>
 
@@ -238,11 +262,12 @@ export default function Exercises() {
             <button className="ml-auto btn-secondary" title="Ouvir exemplo"><Volume2 size={18} /></button>
           </div>
 
-          {item.type === 'choice' && <Choice item={item} selected={selected} onInteract={() => setFeedback(null)} setSelected={setSelected} />}
+          {item.type === 'choice' && <Choice options={choiceOptions} selected={selected} onInteract={() => setFeedback(null)} setSelected={setSelected} />}
           {item.type === 'build' && <Build item={item} built={built} onInteract={() => setFeedback(null)} setBuilt={setBuilt} />}
           {item.type === 'match' && <Match item={item} matched={matched} onInteract={() => setFeedback(null)} setMatched={setMatched} />}
 
           <div className="mt-6 rounded-xl bg-white/5 p-4 text-sm text-gray-300"><strong>Dica:</strong> {item.hint}</div>
+          <div className="mt-3 text-xs text-gray-500">Atalhos: 1-4 selecionar · Enter verificar/continuar · Esc limpar</div>
 
           {feedback && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className={`mt-6 rounded-xl p-4 ${feedback.type === 'correct' ? 'bg-polyglot-green/20 text-polyglot-green' : 'bg-red-500/20 text-red-300'}`}>
@@ -293,8 +318,7 @@ function SkillTrail({ path }) {
   )
 }
 
-function Choice({ item, selected, setSelected, onInteract }) {
-  const options = stableShuffleOptions(item.options || [], item.id ?? item.prompt)
+function Choice({ options, selected, setSelected, onInteract }) {
   return <div className="grid gap-3 sm:grid-cols-2">{options.map((option) => <button key={option} onClick={() => { onInteract(); setSelected(option) }} className={`rounded-xl border p-4 text-left text-lg font-semibold transition ${selected === option ? 'border-polyglot-accent bg-polyglot-accent/20' : 'border-white/10 bg-white/5 hover:bg-white/10'}`}>{option}</button>)}</div>
 }
 
