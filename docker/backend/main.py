@@ -4,9 +4,9 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 from typing import List, Optional
 
-from models import init_db, SessionLocal, User, Wave, Phase, Task, StudyLog, Achievement
+from models import init_db, SessionLocal, User, Wave, Phase, Task, StudyLog, Achievement, ExerciseLesson, ExerciseSession
 from schemas import *
-from services import GamificationService, WaveService
+from services import GamificationService, WaveService, ExerciseService
 
 app = FastAPI(
     title="Polyglot API",
@@ -328,6 +328,56 @@ def get_level(user_id: int, db: Session = Depends(get_db)):
 @app.get("/health")
 def health():
     return {"status": "ok", "service": "polyglot-api"}
+
+
+
+
+# ============== EXERCISES ==============
+@app.post("/users/{user_id}/bootstrap")
+def bootstrap_user(user_id: int, db: Session = Depends(get_db)):
+    user = ExerciseService.bootstrap_user(db, user_id)
+    return {"id": user.id, "username": user.username, "email": user.email, "created_at": user.created_at, "total_xp": user.total_xp, "level": user.level, "current_streak": user.current_streak, "best_streak": user.best_streak, "last_study_date": user.last_study_date, "user": UserResponse.model_validate(user), "lessons_count": len(ExerciseService.list_lessons(db, user.id))}
+
+@app.post("/users/bootstrap")
+def bootstrap_default_user(db: Session = Depends(get_db)):
+    return bootstrap_user(1, db)
+
+@app.get("/exercise-lessons", response_model=List[ExerciseLessonResponse])
+def list_exercise_lessons(user_id: int = 1, db: Session = Depends(get_db)):
+    if not db.query(User).filter(User.id == user_id).first(): ExerciseService.bootstrap_user(db, user_id)
+    return ExerciseService.list_lessons(db, user_id)
+
+@app.get("/exercise-sessions/{session_id}")
+def get_exercise_session(session_id: int, db: Session = Depends(get_db)):
+    session = db.query(ExerciseSession).filter(ExerciseSession.id == session_id).first()
+    if not session: raise HTTPException(status_code=404, detail="Exercise session not found")
+    return ExerciseService.session_payload(session, include_items=True)
+
+@app.get("/exercise-lessons/{lesson_id}")
+def get_exercise_lesson(lesson_id: int, db: Session = Depends(get_db)):
+    payload = ExerciseService.get_lesson_payload(db, lesson_id)
+    if not payload:
+        raise HTTPException(status_code=404, detail="Lesson not found")
+    return payload
+
+@app.post("/exercise-lessons/{lesson_id}/sessions")
+def start_exercise_session(lesson_id: int, user_id: int = 1, db: Session = Depends(get_db)):
+    if not db.query(User).filter(User.id == user_id).first(): ExerciseService.bootstrap_user(db, user_id)
+    session = ExerciseService.start_session(db, user_id=user_id, lesson_id=lesson_id)
+    if not session: raise HTTPException(status_code=404, detail="Exercise lesson not found")
+    return ExerciseService.session_payload(session, include_items=True)
+
+@app.post("/exercise-sessions/{session_id}/answer", response_model=ExerciseAnswerResult)
+def answer_exercise_session(session_id: int, answer: ExerciseAnswerCreate, db: Session = Depends(get_db)):
+    result = ExerciseService.answer_session(db, session_id=session_id, item_id=answer.item_id, payload=answer.payload)
+    if not result: raise HTTPException(status_code=400, detail="Exercise session or item not available")
+    return result
+
+@app.post("/exercise-sessions/{session_id}/complete")
+def complete_exercise_session(session_id: int, db: Session = Depends(get_db)):
+    result = ExerciseService.complete_session(db, session_id=session_id)
+    if not result: raise HTTPException(status_code=404, detail="Exercise session not found")
+    return result
 
 if __name__ == "__main__":
     import uvicorn

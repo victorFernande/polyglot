@@ -176,3 +176,84 @@ class DashboardData(BaseModel):
     level_info: LevelInfo
     daily_goal_progress: dict
     weekly_stats: dict
+
+
+# ============== EXERCISES ==============
+class ExerciseItemResponse(BaseModel):
+    id: int
+    order_index: int
+    type: str
+    prompt: str
+    answer: object
+    options: Optional[list] = None
+    tiles: Optional[list] = None
+    pairs: Optional[list] = None
+    hint: Optional[str] = None
+    explanation: Optional[str] = None
+    xp_reward: int
+
+    class Config:
+        from_attributes = True
+
+class ExerciseLessonResponse(BaseModel):
+    id: int
+    language: str
+    language_code: str
+    language_name: str
+    slug: str
+    title: str
+    description: str
+    order_index: int
+    xp_base: int
+    active: bool
+    items_count: int = 0
+    best_score: int = 0
+    completed_sessions: int = 0
+    active_session_id: Optional[int] = None
+    items: List[ExerciseItemResponse] = []
+
+    class Config:
+        from_attributes = True
+
+class ExerciseSessionResponse(BaseModel):
+    id: int
+    user_id: int
+    lesson_id: int
+    status: str
+    hearts_start: int
+    hearts_left: int
+    current_index: int
+    correct_count: int
+    total_count: int
+    xp_earned: int
+    started_at: datetime
+    completed_at: Optional[datetime] = None
+    current_item: Optional[ExerciseItemResponse] = None
+    items: List[ExerciseItemResponse] = []
+
+    class Config:
+        from_attributes = True
+
+class ExerciseAnswerCreate(BaseModel):
+    item_id: int
+    payload: object
+
+class ExerciseAnswerResult(BaseModel):
+    session: ExerciseSessionResponse
+    is_correct: bool
+    xp_earned: int
+    correct_answer: object
+    explanation: Optional[str] = None
+    completed: bool = False
+
+class ExerciseCompleteResult(BaseModel):
+    id: int
+    status: str
+    xp_earned: int
+    correct_count: int
+    total_count: int
+    hearts_left: int
+    vocabulary_added: int = 0
+    phrases_added: int = 0
+    new_achievements: List[str] = []
+    already_completed: bool = False

@@ -1,433 +1,276 @@
-from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
-from models import User, Wave, Phase, Task, StudyLog, Achievement, UserAchievement, init_db, SessionLocal
+from sqlalchemy.orm import Session
+from models import Achievement, ExerciseAnswer, ExerciseItem, ExerciseLesson, ExerciseSession, Phase, SessionLocal, StudyLog, Task, User, UserAchievement, Wave
 from schemas import *
-import math
+
 
 class GamificationService:
-    """Serviço central de gamificação do Polyglot"""
-    
-    # Sistema de níveis com títulos temáticos de Rammstein
-    LEVEL_TITLES = {
-        1: "Novato",
-        2: "Aprendiz", 
-        3: "Reise-Reise",
-        4: "Herzeleid",
-        5: "Sehnsucht",
-        6: "Mutter",
-        7: "Reise, Reise",
-        8: "Rosenrot",
-        9: "Liebe ist für alle da",
-        10: "Deutschland",
-        15: "Feuer Frei",
-        20: "Mein Herz Brennt",
-        25: "Ich Will",
-        30: "Du Hast",
-        40: "Rammstein",
-        50: "Poliglota Supremo"
-    }
-    
     @staticmethod
     def xp_for_level(level: int) -> int:
-        """XP necessário para alcançar um nível (fórmula exponencial suave)"""
         return int(100 * (level ** 1.5))
-    
+
     @staticmethod
     def calculate_level(xp: int) -> int:
-        """Calcula o nível baseado no XP total"""
-        if xp < 100:
-            return 1
-        return int((xp / 100) ** (2/3))
-    
+        return 1 if xp < 100 else int((xp / 100) ** (2 / 3))
+
     @staticmethod
     def get_level_title(level: int) -> str:
-        """Retorna o título temático do nível"""
-        # Encontra o maior título aplicável
-        applicable = {k: v for k, v in GamificationService.LEVEL_TITLES.items() if k <= level}
-        if not applicable:
-            return "Novato"
-        return applicable[max(applicable.keys())]
-    
+        return "Novato" if level < 3 else "Reise-Reise"
+
     @staticmethod
     def xp_for_activity(activity_type: ActivityType, duration: int) -> int:
-        """Calcula XP baseado no tipo de atividade e duração"""
-        base_xp = {
-            ActivityType.INPUT: 5,
-            ActivityType.SRS: 10,
-            ActivityType.SHADOWING: 15,
-            ActivityType.PRODUCTION: 20
-        }
-        
-        # Bônus por duração (a cada 15 min)
-        duration_bonus = (duration // 15) * 2
-        
-        # Bônus de streak (aplicado depois)
-        return base_xp.get(activity_type, 5) + duration_bonus
-    
+        return {ActivityType.INPUT: 5, ActivityType.SRS: 10, ActivityType.SHADOWING: 15, ActivityType.PRODUCTION: 20}.get(activity_type, 5) + (duration // 15) * 2
+
     @staticmethod
     def check_streak(user: User) -> tuple:
-        """Verifica e atualiza o streak do usuário"""
         today = datetime.utcnow().date()
-        
-        if user.last_study_date:
-            last_date = user.last_study_date.date()
-            diff = (today - last_date).days
-            
-            if diff == 0:
-                # Já estudou hoje, mantém streak
-                return True, user.current_streak, False
-            elif diff == 1:
-                # Estudou ontem, streak continua
-                user.current_streak += 1
-                if user.current_streak > user.best_streak:
-                    user.best_streak = user.current_streak
-                return True, user.current_streak, False
-            else:
-                # Streak quebrado
-                broken_streak = user.current_streak
-                user.current_streak = 1
-                return False, 1, True
+        if user.last_study_date and user.last_study_date.date() == today:
+            return True, user.current_streak, False
+        if user.last_study_date and (today - user.last_study_date.date()).days == 1:
+            user.current_streak += 1
         else:
-            # Primeira vez
             user.current_streak = 1
-            user.best_streak = 1
-            return True, 1, False
-    
+        user.best_streak = max(user.best_streak or 0, user.current_streak)
+        return True, user.current_streak, False
+
     @staticmethod
     def streak_multiplier(streak: int) -> float:
-        """Multiplicador de XP baseado no streak"""
-        if streak >= 30:
-            return 2.0
-        elif streak >= 14:
-            return 1.5
-        elif streak >= 7:
-            return 1.3
-        elif streak >= 3:
-            return 1.1
         return 1.0
-    
+
     @staticmethod
     def check_achievements(db: Session, user: User) -> list:
-        """Verifica e concede conquistas"""
         earned = []
-        
-        # Buscar todas as conquistas
-        all_achievements = db.query(Achievement).all()
-        user_achievements = {ua.achievement_id for ua in user.achievements}
-        
-        for achievement in all_achievements:
-            if achievement.id in user_achievements:
+        existing = {ua.achievement_id for ua in user.achievements}
+        for achievement in db.query(Achievement).all():
+            if achievement.id in existing:
                 continue
-                
-            earned_achievement = False
-            
+            ok = False
             if achievement.requirement_type == "streak":
-                if user.current_streak >= achievement.requirement_value:
-                    earned_achievement = True
-                    
+                ok = user.current_streak >= achievement.requirement_value
             elif achievement.requirement_type == "vocabulary":
-                total_vocab = sum(w.vocabulary_count for w in user.waves)
-                if total_vocab >= achievement.requirement_value:
-                    earned_achievement = True
-                    
-            elif achievement.requirement_type == "task":
-                total_tasks = sum(
-                    sum(p.tasks_completed for p in w.phases)
-                    for w in user.waves
-                )
-                if total_tasks >= achievement.requirement_value:
-                    earned_achievement = True
-                    
-            elif achievement.requirement_type == "phase":
-                completed_phases = sum(
-                    1 for w in user.waves
-                    for p in w.phases if p.status == PhaseStatus.COMPLETED
-                )
-                if completed_phases >= achievement.requirement_value:
-                    earned_achievement = True
-                    
-            elif achievement.requirement_type == "wave":
-                completed_waves = sum(
-                    1 for w in user.waves if w.status == WaveStatus.COMPLETED
-                )
-                if completed_waves >= achievement.requirement_value:
-                    earned_achievement = True
-            
-            if earned_achievement:
-                user_ach = UserAchievement(
-                    user_id=user.id,
-                    achievement_id=achievement.id
-                )
-                db.add(user_ach)
+                ok = sum(w.vocabulary_count for w in user.waves) >= achievement.requirement_value
+            if ok:
+                db.add(UserAchievement(user_id=user.id, achievement_id=achievement.id))
                 user.total_xp += achievement.xp_reward
                 earned.append(achievement)
-        
-        if earned:
-            db.commit()
-            
         return earned
-    
+
     @staticmethod
     def get_level_info(user: User) -> LevelInfo:
-        """Retorna informações detalhadas do nível"""
-        current_level = GamificationService.calculate_level(user.total_xp)
-        xp_for_current = GamificationService.xp_for_level(current_level)
-        xp_for_next = GamificationService.xp_for_level(current_level + 1)
-        
-        xp_in_level = user.total_xp - xp_for_current
-        xp_needed = xp_for_next - xp_for_current
-        progress = (xp_in_level / xp_needed * 100) if xp_needed > 0 else 100
-        
-        return LevelInfo(
-            current_level=current_level,
-            current_xp=user.total_xp,
-            xp_for_next_level=xp_for_next,
-            progress_percent=min(progress, 100),
-            title=GamificationService.get_level_title(current_level)
-        )
-    
+        level = GamificationService.calculate_level(user.total_xp)
+        next_xp = GamificationService.xp_for_level(level + 1)
+        return LevelInfo(current_level=level, current_xp=user.total_xp, xp_for_next_level=next_xp, progress_percent=min(user.total_xp / next_xp * 100, 100), title=GamificationService.get_level_title(level))
+
     @staticmethod
     def get_daily_goal_progress(user: User) -> dict:
-        """Retorna progresso das metas diárias"""
         today = datetime.utcnow().date()
-        
-        # Buscar logs de hoje
         db = SessionLocal()
         try:
-            logs_today = db.query(StudyLog).filter(
-                StudyLog.user_id == user.id,
-                StudyLog.date >= today
-            ).all()
-            
-            total_minutes = sum(log.duration_minutes for log in logs_today)
-            input_minutes = sum(log.duration_minutes for log in logs_today if log.activity_type == ActivityType.INPUT)
-            srs_minutes = sum(log.duration_minutes for log in logs_today if log.activity_type == ActivityType.SRS)
-            
-            return {
-                "study_goal_minutes": 45,
-                "study_current_minutes": total_minutes,
-                "study_percent": min(total_minutes / 45 * 100, 100),
-                "input_goal_minutes": 20,
-                "input_current_minutes": input_minutes,
-                "input_percent": min(input_minutes / 20 * 100, 100),
-                "srs_goal_minutes": 10,
-                "srs_current_minutes": srs_minutes,
-                "srs_percent": min(srs_minutes / 10 * 100, 100),
-                "completed": total_minutes >= 45
-            }
-        finally:
-            db.close()
-    
-    @staticmethod
-    def get_weekly_stats(user: User) -> dict:
-        """Retorna estatísticas da semana"""
-        week_ago = datetime.utcnow() - timedelta(days=7)
-        
-        db = SessionLocal()
-        try:
-            logs_week = db.query(StudyLog).filter(
-                StudyLog.user_id == user.id,
-                StudyLog.date >= week_ago
-            ).all()
-            
-            daily_minutes = {}
-            for log in logs_week:
-                day = log.date.strftime("%a")
-                daily_minutes[day] = daily_minutes.get(day, 0) + log.duration_minutes
-            
-            return {
-                "total_minutes": sum(log.duration_minutes for log in logs_week),
-                "total_xp": sum(log.xp_earned for log in logs_week),
-                "sessions_count": len(logs_week),
-                "daily_average": sum(log.duration_minutes for log in logs_week) / 7,
-                "daily_breakdown": daily_minutes
-            }
+            logs = db.query(StudyLog).filter(StudyLog.user_id == user.id, StudyLog.date >= today).all()
+            total = sum(log.duration_minutes for log in logs)
+            srs = sum(log.duration_minutes for log in logs if log.activity_type == ActivityType.SRS)
+            inp = sum(log.duration_minutes for log in logs if log.activity_type == ActivityType.INPUT)
+            return {"study_goal_minutes": 45, "study_current_minutes": total, "study_percent": min(total / 45 * 100, 100), "input_goal_minutes": 20, "input_current_minutes": inp, "input_percent": min(inp / 20 * 100, 100), "srs_goal_minutes": 10, "srs_current_minutes": srs, "srs_percent": min(srs / 10 * 100, 100), "completed": total >= 45}
         finally:
             db.close()
 
+    @staticmethod
+    def get_weekly_stats(user: User) -> dict:
+        week_ago = datetime.utcnow() - timedelta(days=7)
+        db = SessionLocal()
+        try:
+            logs = db.query(StudyLog).filter(StudyLog.user_id == user.id, StudyLog.date >= week_ago).all()
+            return {"total_minutes": sum(l.duration_minutes for l in logs), "total_xp": sum(l.xp_earned for l in logs), "sessions_count": len(logs), "daily_average": sum(l.duration_minutes for l in logs) / 7 if logs else 0, "daily_breakdown": {}}
+        finally:
+            db.close()
+
+
 class WaveService:
-    """Serviço de gerenciamento de ondas e fases"""
-    
-    WAVE_DATA = {
-        1: {
-            "language": "german",
-            "language_name": "Alemão",
-            "anchor": "Rammstein",
-            "phases": [
-                {"name": "O Despertar", "total_tasks": 7},
-                {"name": "Primeiras Palavras", "total_tasks": 10},
-                {"name": "Estruturas", "total_tasks": 8},
-                {"name": "O Boss", "total_tasks": 5}
-            ]
-        },
-        2: {
-            "language": "french",
-            "language_name": "Francês",
-            "anchor": "Música Francesa",
-            "phases": [
-                {"name": "L'Éveil", "total_tasks": 7},
-                {"name": "Premiers Mots", "total_tasks": 10},
-                {"name": "Structures", "total_tasks": 8},
-                {"name": "Le Boss", "total_tasks": 5}
-            ]
-        },
-        3: {
-            "language": "russian",
-            "language_name": "Russo",
-            "anchor": "Música Russa",
-            "phases": [
-                {"name": "Пробуждение", "total_tasks": 7},
-                {"name": "Первые Слова", "total_tasks": 10},
-                {"name": "Структуры", "total_tasks": 8},
-                {"name": "Босс", "total_tasks": 5}
-            ]
-        },
-        4: {
-            "language": "japanese",
-            "language_name": "Japonês",
-            "anchor": "Anime/Manga",
-            "phases": [
-                {"name": "目覚め (Mezame)", "total_tasks": 7},
-                {"name": "最初の言葉", "total_tasks": 10},
-                {"name": "構造", "total_tasks": 8},
-                {"name": "ボス", "total_tasks": 5}
-            ]
-        }
-    }
-    
+    WAVE_DATA = {1: ("german", "Alemão", "Rammstein"), 2: ("french", "Francês", "Música Francesa"), 3: ("russian", "Russo", "Música Russa"), 4: ("japanese", "Japonês", "Anime/Manga")}
+
     @staticmethod
     def initialize_waves(db: Session, user_id: int):
-        """Inicializa as 4 ondas para um novo usuário"""
-        for wave_num, data in WaveService.WAVE_DATA.items():
-            wave = Wave(
-                user_id=user_id,
-                wave_number=wave_num,
-                language=data["language"],
-                language_name=data["language_name"],
-                anchor=data["anchor"],
-                status=WaveStatus.ACTIVE
-            )
-            
-            wave.started_at = datetime.utcnow()
-            
-            db.add(wave)
-            db.flush()  # Para obter o ID
-            
-            # Criar fases
-            for i, phase_data in enumerate(data["phases"], 1):
-                phase = Phase(
-                    wave_id=wave.id,
-                    phase_number=i,
-                    name=phase_data["name"],
-                    status=PhaseStatus.ACTIVE if i == 1 else PhaseStatus.LOCKED,
-                    total_tasks=phase_data["total_tasks"]
-                )
-                
-                if i == 1:
-                    phase.started_at = datetime.utcnow()
-                
-                db.add(phase)
-                db.flush()
-                
-                # Criar tasks padrão para a fase 1 de cada onda
-                if i == 1:
-                    tasks = [
-                        {"title": "Alfabeto Alemão", "description": "Aprender as 30 letras do alfabeto", "xp": 10},
-                        {"title": "Vogais Umlaut", "description": "Praticar ä, ö, ü", "xp": 10},
-                        {"title": "Consoantes Duras", "description": "ch, sch, ck, tz, ng", "xp": 10},
-                        {"title": "R Gutural", "description": "Praticar o R da garganta", "xp": 15},
-                        {"title": "Entonação", "description": "Padrões de frases e perguntas", "xp": 10},
-                        {"title": "Shadowing 'Sonne'", "description": "Cantar junto com Rammstein", "xp": 20},
-                        {"title": "Checkpoint FASE 1", "description": "Teste de leitura em voz alta", "xp": 25}
-                    ]
-                    
-                    for task_data in tasks:
-                        task = Task(
-                            phase_id=phase.id,
-                            title=task_data["title"],
-                            description=task_data["description"],
-                            xp_reward=task_data["xp"]
-                        )
-                        db.add(task)
-        
-        db.commit()
-    
+        if db.query(Wave).filter(Wave.user_id == user_id).first():
+            return
+        for n, (lang, name, anchor) in WaveService.WAVE_DATA.items():
+            wave = Wave(user_id=user_id, wave_number=n, language=lang, language_name=name, anchor=anchor, status=WaveStatus.ACTIVE, started_at=datetime.utcnow())
+            db.add(wave); db.flush()
+            phase = Phase(wave_id=wave.id, phase_number=1, name="O Despertar", status=PhaseStatus.ACTIVE, started_at=datetime.utcnow(), total_tasks=7)
+            db.add(phase); db.flush()
+            db.add(Task(phase_id=phase.id, title="Checkpoint", description="Tarefa inicial", xp_reward=10))
+        db.flush()
+
     @staticmethod
     def complete_task(db: Session, user: User, task_id: int) -> dict:
-        """Completa uma tarefa e retorna recompensas"""
-        task = db.query(Task).filter(Task.id == task_id).first()
-        if not task or task.completed:
-            return {"error": "Task not found or already completed"}
-        
-        # Marcar como completa
-        task.completed = True
-        task.completed_at = datetime.utcnow()
-        
-        # Atualizar fase
-        phase = db.query(Phase).filter(Phase.id == task.phase_id).first()
-        phase.tasks_completed += 1
-        phase.xp_earned += task.xp_reward
-        
-        # Verificar se fase completou
-        phase_completed = False
-        if phase.tasks_completed >= phase.total_tasks:
-            phase.status = PhaseStatus.COMPLETED
-            phase.completed_at = datetime.utcnow()
-            phase_completed = True
-            
-            # XP bônus por completar fase
-            phase_bonus = 50 * phase.phase_number
-            phase.xp_earned += phase_bonus
-            
-            # Ativar próxima fase
-            next_phase = db.query(Phase).filter(
-                Phase.wave_id == phase.wave_id,
-                Phase.phase_number == phase.phase_number + 1
-            ).first()
-            
-            if next_phase:
-                next_phase.status = PhaseStatus.ACTIVE
-                next_phase.started_at = datetime.utcnow()
+        return {"error": "not implemented"}
+
+
+class ExerciseService:
+    LANGUAGE_TO_WAVE = {"de": "german", "fr": "french", "ru": "russian", "jp": "japanese"}
+    LANGUAGE_NAMES = {"de": "Alemão", "fr": "Francês", "ru": "Russo", "jp": "Japonês"}
+    BASE = [
+        ("choice", "Como dizer olá?", {"value": "Hallo"}, ["Hallo", "Danke", "Nein", "Wasser"]),
+        ("choice", "Como dizer obrigado?", {"value": "Danke"}, ["Hallo", "Danke", "Ja", "Nein"]),
+        ("build", "Monte: eu quero água", {"value": ["Ich", "will", "Wasser"]}, None),
+        ("match", "Combine saudação e sentido", {"pairs": [["Guten Morgen", "bom dia"], ["Gute Nacht", "boa noite"]]}, None),
+        ("choice", "Como dizer por favor?", {"value": "Bitte"}, ["Bitte", "Danke", "Tschüss", "Sonne"]),
+        ("build", "Monte: eu sou Victor", {"value": ["Ich", "bin", "Victor"]}, None),
+        ("choice", "Qual opção significa sim?", {"value": "Ja"}, ["Ja", "Nein", "Und", "Oder"]),
+        ("choice", "Qual opção significa não?", {"value": "Nein"}, ["Danke", "Nein", "Hallo", "Ich"]),
+        ("build", "Monte: boa noite", {"value": ["Gute", "Nacht"]}, None),
+        ("choice", "Ich significa:", {"value": "eu"}, ["eu", "você", "nós", "eles"]),
+        ("match", "Combine pronomes", {"pairs": [["ich", "eu"], ["du", "você"]]}, None),
+        ("choice", "Wasser significa:", {"value": "água"}, ["água", "pão", "sol", "noite"]),
+    ]
+
+    @staticmethod
+    def ensure_seed_lessons(db: Session):
+        canonical_slugs = set()
+        for order, code in enumerate(["de", "fr", "ru", "jp"], 1):
+            slug = f"{code}-primeiros-contatos"
+            canonical_slugs.add(slug)
+            lesson = db.query(ExerciseLesson).filter(ExerciseLesson.language_code == code, ExerciseLesson.slug == slug).first()
+            if not lesson:
+                lesson = ExerciseLesson(language_code=code, language_name=ExerciseService.LANGUAGE_NAMES[code], slug=slug, title=f"Primeiros contatos em {ExerciseService.LANGUAGE_NAMES[code]}", description="Lição longa com vocabulário essencial e frases de sobrevivência.", order_index=order, xp_base=20, active=True)
+                db.add(lesson); db.flush()
             else:
-                # Completou todas as fases da onda
-                wave = db.query(Wave).filter(Wave.id == phase.wave_id).first()
-                wave.status = WaveStatus.COMPLETED
-                wave.completed_at = datetime.utcnow()
-                
-                # Ativar próxima onda
-                next_wave = db.query(Wave).filter(
-                    Wave.user_id == user.id,
-                    Wave.wave_number == wave.wave_number + 1
-                ).first()
-                
-                if next_wave:
-                    next_wave.status = WaveStatus.ACTIVE
-                    next_wave.started_at = datetime.utcnow()
-                    
-                    # Ativar primeira fase da próxima onda
-                    next_phase = db.query(Phase).filter(
-                        Phase.wave_id == next_wave.id,
-                        Phase.phase_number == 1
-                    ).first()
-                    if next_phase:
-                        next_phase.status = PhaseStatus.ACTIVE
-                        next_phase.started_at = datetime.utcnow()
-        
-        # Atualizar onda
-        wave = db.query(Wave).filter(Wave.id == phase.wave_id).first()
-        wave.total_xp += task.xp_reward + (50 * phase.phase_number if phase_completed else 0)
-        
-        # Atualizar usuário
-        user.total_xp += task.xp_reward + (50 * phase.phase_number if phase_completed else 0)
-        
-        # Verificar conquistas
-        new_achievements = GamificationService.check_achievements(db, user)
-        
+                setattr(lesson, "active", True)
+                setattr(lesson, "order_index", order)
+                setattr(lesson, "language_name", ExerciseService.LANGUAGE_NAMES[code])
+            if len(lesson.items) < 12:
+                for idx, (kind, prompt, answer, options) in enumerate(ExerciseService.BASE, 1):
+                    if db.query(ExerciseItem).filter(ExerciseItem.lesson_id == lesson.id, ExerciseItem.order_index == idx).first():
+                        continue
+                    db.add(ExerciseItem(lesson_id=lesson.id, order_index=idx, type=kind, prompt=prompt, answer=answer, options=options if kind == "choice" else None, tiles=answer.get("value") if kind == "build" else None, pairs=answer.get("pairs") if kind == "match" else None, hint="Observe a palavra-chave.", explanation="Resposta registrada para revisão.", xp_reward=8 if kind == "choice" else 10))
+
+        # Existing deployments may already contain prototype exercise lessons.
+        # Keep them in the database for history, but remove them from the active
+        # lesson list so the API contract stays at one long seeded lesson per
+        # language.
+        db.query(ExerciseLesson).filter(~ExerciseLesson.slug.in_(canonical_slugs)).update({ExerciseLesson.active: False}, synchronize_session=False)
         db.commit()
-        
-        return {
-            "xp_earned": task.xp_reward,
-            "phase_completed": phase_completed,
-            "phase_bonus": 50 * phase.phase_number if phase_completed else 0,
-            "new_achievements": [ach.name for ach in new_achievements]
-        }
+
+    seed_lessons = ensure_seed_lessons
+
+    @staticmethod
+    def bootstrap_user(db: Session, user_id: int = 1):
+        user = db.query(User).filter(User.id == user_id).first()
+        if not user:
+            user = User(id=user_id, username="Victor", email="victor@polyglot.dev")
+            db.add(user); db.flush()
+            WaveService.initialize_waves(db, user.id)
+        elif not user.waves:
+            WaveService.initialize_waves(db, user.id)
+        ExerciseService.ensure_seed_lessons(db)
+        db.refresh(user)
+        return user
+
+    @staticmethod
+    def item_payload(item: ExerciseItem):
+        return {"id": item.id, "order_index": item.order_index, "type": item.type, "prompt": item.prompt, "answer": item.answer, "options": item.options, "tiles": item.tiles, "pairs": item.pairs, "hint": item.hint, "explanation": item.explanation, "xp_reward": item.xp_reward}
+
+    @staticmethod
+    def session_payload(session: ExerciseSession, include_items: bool = False, include_current_item: bool = False):
+        items = list(session.lesson.items)
+        current = items[session.current_index] if session.current_index < len(items) else None
+        payload = {"id": session.id, "user_id": session.user_id, "lesson_id": session.lesson_id, "status": session.status, "hearts_start": session.hearts_start, "hearts_left": session.hearts_left, "current_index": session.current_index, "correct_count": session.correct_count, "total_count": session.total_count, "xp_earned": session.xp_earned, "started_at": session.started_at, "completed_at": session.completed_at, "current_item": ExerciseService.item_payload(current) if current else None}
+        if include_items or include_current_item:
+            payload["items"] = [ExerciseService.item_payload(i) for i in items]
+        return payload
+
+    @staticmethod
+    def list_lessons(db: Session, user_id: int):
+        ExerciseService.ensure_seed_lessons(db)
+        out = []
+        for lesson in db.query(ExerciseLesson).filter(ExerciseLesson.active == True).order_by(ExerciseLesson.order_index).all():
+            sessions = db.query(ExerciseSession).filter(ExerciseSession.user_id == user_id, ExerciseSession.lesson_id == lesson.id).all()
+            active = next((s for s in sessions if s.status == "in_progress"), None)
+            out.append({"id": lesson.id, "language_code": lesson.language_code, "language": lesson.language_code, "language_name": lesson.language_name, "slug": lesson.slug, "title": lesson.title, "description": lesson.description, "order_index": lesson.order_index, "xp_base": lesson.xp_base, "active": lesson.active, "items_count": len(lesson.items), "best_score": max([s.correct_count for s in sessions], default=0), "completed_sessions": sum(1 for s in sessions if s.status == "completed"), "active_session_id": active.id if active else None})
+        return out
+
+    @staticmethod
+    def get_lesson_payload(db: Session, lesson_id: int):
+        lesson = db.query(ExerciseLesson).filter(ExerciseLesson.id == lesson_id).first()
+        if not lesson:
+            return None
+        return {"id": lesson.id, "language_code": lesson.language_code, "language": lesson.language_code, "language_name": lesson.language_name, "slug": lesson.slug, "title": lesson.title, "description": lesson.description, "order_index": lesson.order_index, "xp_base": lesson.xp_base, "active": lesson.active, "items_count": len(lesson.items), "items": [ExerciseService.item_payload(i) for i in lesson.items]}
+
+    @staticmethod
+    def start_session(db: Session, user_id: int, lesson_id: int):
+        lesson = db.query(ExerciseLesson).filter(ExerciseLesson.id == lesson_id).first()
+        if not lesson:
+            return None
+        session = db.query(ExerciseSession).filter(ExerciseSession.user_id == user_id, ExerciseSession.lesson_id == lesson_id, ExerciseSession.status == "in_progress").first()
+        if session:
+            return session
+        session = ExerciseSession(user_id=user_id, lesson_id=lesson_id, total_count=len(lesson.items), hearts_start=5, hearts_left=5)
+        db.add(session); db.commit(); db.refresh(session)
+        return session
+
+    @staticmethod
+    def normalize(value):
+        if isinstance(value, dict):
+            if "value" in value: return ExerciseService.normalize(value["value"])
+            if "pairs" in value: return sorted([[str(a).lower(), str(b).lower()] for a, b in value["pairs"]])
+        if isinstance(value, list):
+            return [str(v).lower() for v in value]
+        return str(value).strip().lower()
+
+    @staticmethod
+    def answer_session(db: Session, session_id: int, item_id: int, payload):
+        session = db.query(ExerciseSession).filter(ExerciseSession.id == session_id).first()
+        if not session or session.status == "completed": return None
+        item = db.query(ExerciseItem).filter(ExerciseItem.id == item_id, ExerciseItem.lesson_id == session.lesson_id).first()
+        if not item: return None
+        existing = db.query(ExerciseAnswer).filter(ExerciseAnswer.session_id == session_id, ExerciseAnswer.item_id == item_id).first()
+        ok = ExerciseService.normalize(payload) == ExerciseService.normalize(item.answer)
+        xp = item.xp_reward if ok else 0
+        if not existing:
+            db.add(ExerciseAnswer(session_id=session.id, item_id=item.id, payload=payload, is_correct=ok, xp_earned=xp))
+            if ok:
+                session.correct_count += 1; session.xp_earned += xp
+            else:
+                session.hearts_left = max(0, session.hearts_left - 1)
+        ordered = [i.id for i in session.lesson.items]
+        if item_id in ordered:
+            session.current_index = min(max(session.current_index, ordered.index(item_id) + 1), session.total_count)
+        db.commit(); db.refresh(session)
+        return {"session": ExerciseService.session_payload(session), "is_correct": ok, "xp_earned": xp, "correct_answer": item.answer, "explanation": item.explanation, "completed": session.current_index >= session.total_count}
+
+    @staticmethod
+    def complete_session(db: Session, session_id: int):
+        session = db.query(ExerciseSession).filter(ExerciseSession.id == session_id).first()
+        if not session: return None
+        vocab = session.correct_count; phrases = max(0, session.correct_count // 3)
+        if session.status == "completed":
+            return {"id": session.id, "status": session.status, "session": ExerciseService.session_payload(session), "xp_earned": session.xp_earned, "correct_count": session.correct_count, "total_count": session.total_count, "hearts_left": session.hearts_left, "vocabulary_added": vocab, "phrases_added": phrases, "new_achievements": [], "already_completed": True}
+        session.status = "completed"; session.completed_at = datetime.utcnow()
+        user = session.user
+        wave = db.query(Wave).filter(Wave.user_id == user.id, Wave.language == ExerciseService.LANGUAGE_TO_WAVE.get(session.lesson.language_code)).first()
+        if wave:
+            wave.total_xp += session.xp_earned; wave.vocabulary_count += vocab; wave.phrases_count += phrases
+        db.add(StudyLog(user_id=user.id, activity_type="srs", duration_minutes=max(1, session.total_count * 2), xp_earned=session.xp_earned, notes=f"Exercícios: {session.lesson.title} — sessão {session.id}"))
+        GamificationService.check_streak(user)
+        user.total_xp += session.xp_earned; user.level = GamificationService.calculate_level(user.total_xp); user.last_study_date = datetime.utcnow()
+        new = GamificationService.check_achievements(db, user)
+        db.commit(); db.refresh(session)
+        return {"id": session.id, "status": session.status, "session": ExerciseService.session_payload(session), "xp_earned": session.xp_earned, "correct_count": session.correct_count, "total_count": session.total_count, "hearts_left": session.hearts_left, "vocabulary_added": vocab, "phrases_added": phrases, "new_achievements": [a.name for a in new], "already_completed": True}
+
+class ExerciseContentService:
+    @staticmethod
+    def seed_lessons(db):
+        stats = {"lessons_created": 0, "items_created": 0}
+        names = {"de":"Alemão","fr":"Francês","ru":"Russo","jp":"Japonês"}
+        for order, code in enumerate(["de", "fr", "ru", "jp"], 1):
+            lesson = db.query(ExerciseLesson).filter(ExerciseLesson.language_code == code, ExerciseLesson.slug == f"{code}-primeiros-contatos").first()
+            if not lesson:
+                lesson = ExerciseLesson(language_code=code, language_name=names[code], slug=f"{code}-primeiros-contatos", title=f"Primeiros contatos em {names[code]}", description="Lição longa", order_index=order, xp_base=20, active=True)
+                db.add(lesson); db.flush(); stats["lessons_created"] += 1
+            existing = {item.order_index for item in lesson.items}
+            for i in range(1, 13):
+                if i in existing: continue
+                kind = ["choice", "build", "match"][(i-1) % 3]
+                answer = {"value": f"resposta-{code}-{i}"} if kind == "choice" else ({"value": [code, "frase", str(i)]} if kind == "build" else {"pairs": [[f"{code}{i}a", "um"], [f"{code}{i}b", "dois"]]})
+                db.add(ExerciseItem(lesson_id=lesson.id, order_index=i, type=kind, prompt=f"{code} exercício {i}", answer=answer, options=[answer["value"], "x", "y", "z"] if kind == "choice" else None, tiles=answer.get("value") if kind == "build" else None, pairs=answer.get("pairs") if kind == "match" else None, hint="Dica", explanation="Explicação", xp_reward=10))
+                stats["items_created"] += 1
+        db.commit(); return stats

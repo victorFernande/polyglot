@@ -7,6 +7,7 @@ import AchievementPopup from '../components/AchievementPopup'
 import StreakCalendar from '../components/StreakCalendar'
 import WeeklyChart from '../components/WeeklyChart'
 import LanguageFlag from '../components/LanguageFlag'
+import { getDashboard } from '../lib/api'
 
 export default function Dashboard() {
   const { 
@@ -24,24 +25,10 @@ export default function Dashboard() {
 
   const fetchDashboard = async () => {
     setLoading(true)
+    setError(null)
     try {
-      // Estado inicial sem progresso falso. A persistência real entra pela API.
-      const initialData = {
-        user: { id: 1, username: 'Victor', email: 'victor@polyglot.dev', created_at: new Date().toISOString(), total_xp: 0, level: 1, current_streak: 0, best_streak: 0, last_study_date: null },
-        stats: { total_xp: 0, level: 1, current_streak: 0, best_streak: 0, total_hours: 0, vocabulary_count: 0, phrases_count: 0, achievements_count: 0, next_level_xp: 100, progress_percent: 0 },
-        active_wave: { id: 1, wave_number: 1, language: 'german', language_name: 'Alemão', anchor: 'Rammstein', status: 'active', total_xp: 0, vocabulary_count: 0, phrases_count: 0, hours_input: 0 },
-        active_phase: { id: 1, phase_number: 1, name: 'O Despertar', status: 'active', xp_earned: 0, tasks_completed: 0, total_tasks: 7, progress_percent: 0 },
-        recent_logs: [],
-        achievements: [
-          { id: 1, code: 'first_step', name: 'Primeiro Passo', description: 'Complete sua primeira tarefa', icon: '👣', xp_reward: 10, earned: false },
-          { id: 2, code: 'streak_3', name: 'Fogo Baixo', description: '3 dias de streak', icon: '🔥', xp_reward: 30, earned: false },
-          { id: 3, code: 'vocab_50', name: 'Colecionador', description: 'Aprenda 50 palavras', icon: '📚', xp_reward: 50, earned: false },
-        ],
-        level_info: { current_level: 1, current_xp: 0, xp_for_next_level: 100, progress_percent: 0, title: 'Novato' },
-        daily_goal_progress: { study_goal_minutes: 45, study_current_minutes: 0, study_percent: 0, input_goal_minutes: 20, input_current_minutes: 0, input_percent: 0, srs_goal_minutes: 10, srs_current_minutes: 0, srs_percent: 0, completed: false },
-        weekly_stats: { total_minutes: 0, total_xp: 0, sessions_count: 0, daily_average: 0, daily_breakdown: {} }
-      }
-      setDashboard(initialData)
+      const data = await getDashboard()
+      setDashboard(data)
     } catch (err) {
       setError(err.message)
     } finally {
@@ -167,15 +154,7 @@ export default function Dashboard() {
         <div className="card">
           <h3 className="text-lg font-semibold mb-4">Fase Atual: {activePhase.name}</h3>
           <div className="space-y-3">
-            {[
-              { title: 'Alfabeto Alemão', completed: false, xp: 10 },
-              { title: 'Vogais Umlaut', completed: false, xp: 10 },
-              { title: 'Consoantes Duras', completed: false, xp: 10 },
-              { title: 'R Gutural', completed: false, xp: 15 },
-              { title: 'Entonação', completed: false, xp: 10 },
-              { title: "Shadowing 'Sonne'", completed: false, xp: 20 },
-              { title: 'Checkpoint FASE 1', completed: false, xp: 25 },
-            ].map((task, i) => (
+            {(activePhase.tasks || []).map((task, i) => (
               <div 
                 key={i}
                 className={`flex items-center justify-between p-3 rounded-lg ${
@@ -194,7 +173,7 @@ export default function Dashboard() {
                     {task.title}
                   </span>
                 </div>
-                <span className="text-sm xp-text">+{task.xp} XP</span>
+                <span className="text-sm xp-text">+{task.xp_reward} XP</span>
               </div>
             ))}
           </div>
