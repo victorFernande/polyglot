@@ -6,6 +6,7 @@ import { answerExerciseSession, bootstrapUser, completeExerciseSession, loadExer
 import { handleExerciseKeyDown } from '../lib/exerciseKeyboard.mjs'
 import { buildTilesForItem, matchRightOptions, stableShuffleOptions } from '../lib/exerciseOptions.mjs'
 import { speak, voiceTextForFeedback, voiceTextForItem } from '../lib/voiceMode.mjs'
+import { svgToDataUri } from '../lib/imageChoice.mjs'
 
 const LANG_META = {
   de: { accent: 'Rammstein', color: 'from-red-600 to-red-900' },
@@ -86,6 +87,7 @@ export default function Exercises() {
   const choiceOptions = useMemo(() => ((item?.type === 'choice' || item?.type === 'image_choice') ? stableShuffleOptions(item.options || [], item.id ?? item.prompt) : []), [item])
 
   function resetExerciseState() {
+    setSummary(null)
     setFeedback(null)
     setSelected(null)
     setBuilt([])
@@ -219,28 +221,32 @@ export default function Exercises() {
   if (loading) return <div className="flex h-64 items-center justify-center"><Loader2 className="animate-spin text-polyglot-accent" size={42} /></div>
   if (error) return <div className="card border-red-500/30 bg-red-500/10 text-red-200">Erro: {error}</div>
 
-  if (summary) {
-    return (
-      <div className="mx-auto max-w-3xl space-y-6">
-        <div className="card text-center py-12">
-          <Trophy className="mx-auto mb-4 text-polyglot-gold" size={72} />
-          <h1 className="text-3xl font-bold mb-2">Sessão concluída!</h1>
-          <p className="text-gray-300 mb-2">Você acertou {summary.correct_count} de {summary.total_count}.</p>
-          <p className="text-polyglot-gold text-2xl font-bold mb-6">+{summary.xp_earned} XP gravados</p>
-          <button className="btn-primary inline-flex items-center gap-2" onClick={restart} disabled={busy}>
-            <RotateCcw size={18} /> Próxima sessão de 10 questões
-          </button>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className="mx-auto max-w-5xl space-y-6">
       <div>
         <h1 className="text-3xl font-bold mb-2">🎮 Exercícios por trilha</h1>
         <p className="text-gray-400">1000 questões por idioma: 10 unidades situacionais, 10 tópicos por unidade e 10 perguntas por tópico. Cada sessão continua com 10 perguntas para manter o ritmo rápido.</p>
       </div>
+
+      {summary && (
+        <div className="card border-polyglot-gold/30 bg-polyglot-gold/10">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div className="flex items-center gap-4">
+              <Trophy className="text-polyglot-gold" size={48} />
+              <div>
+                <h2 className="text-2xl font-bold">Sessão concluída!</h2>
+                <p className="text-gray-300">Você acertou {summary.correct_count} de {summary.total_count} · +{summary.xp_earned} XP gravados</p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <button className="btn-secondary" onClick={() => setSummary(null)}>Fechar resumo</button>
+              <button className="btn-primary inline-flex items-center gap-2" onClick={restart} disabled={busy}>
+                <RotateCcw size={18} /> Próxima sessão
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {lessons.map((l) => {
@@ -349,7 +355,9 @@ function ImageChoice({ options, selected, setSelected, onInteract }) {
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {options.map((option) => (
         <button key={option.value} onClick={() => { onInteract(); setSelected(option.value) }} className={`rounded-2xl border p-4 text-center transition ${selected === option.value ? 'border-polyglot-accent bg-polyglot-accent/20' : 'border-white/10 bg-white/5 hover:bg-white/10'}`}>
-          <div className="mx-auto mb-3 h-24 w-24 overflow-hidden rounded-2xl bg-white/90 p-2" dangerouslySetInnerHTML={{ __html: option.svg }} />
+          <div className="mx-auto mb-3 flex h-24 w-24 items-center justify-center overflow-hidden rounded-2xl bg-white/90 p-2">
+            <img src={svgToDataUri(option.svg)} alt={option.label_pt} className="h-full w-full object-contain" />
+          </div>
           <div className="text-sm text-gray-300">{option.label_pt}</div>
           <div className="mt-1 text-lg font-bold">{option.value}</div>
         </button>
