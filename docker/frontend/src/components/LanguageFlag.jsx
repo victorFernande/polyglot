@@ -5,6 +5,7 @@ const FLAGS = {
   fr: { src: 'https://flagcdn.com/fr.svg', emoji: '🇫🇷', label: 'França' },
   ru: { src: 'https://flagcdn.com/ru.svg', emoji: '🇷🇺', label: 'Rússia' },
   jp: { src: 'https://flagcdn.com/jp.svg', emoji: '🇯🇵', label: 'Japão' },
+  en: { src: 'https://flagcdn.com/us.svg', emoji: '🇺🇸', label: 'Inglês' },
 }
 
 export default function LanguageFlag({ code, className = 'w-12 h-12' }) {

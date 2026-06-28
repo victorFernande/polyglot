@@ -9,9 +9,10 @@ const flagByLanguage = {
   french: 'fr',
   russian: 'ru',
   japanese: 'jp',
+  english: 'en',
 }
 
-const waveGradients = ['from-red-600 to-red-900', 'from-blue-600 to-blue-900', 'from-yellow-600 to-yellow-900', 'from-pink-600 to-pink-900']
+const waveGradients = ['from-red-600 to-red-900', 'from-blue-600 to-blue-900', 'from-yellow-600 to-yellow-900', 'from-pink-600 to-pink-900', 'from-emerald-600 to-emerald-900']
 const phaseIcons = ['🌅', '💬', '🏗️', '⚔️']
 
 export default function Waves() {

@@ -1,11 +1,12 @@
 import React, { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Globe, Waves, BookOpen, Trophy, Users, User, Menu, X, Gamepad2 } from 'lucide-react'
+import { Globe, Waves, BookOpen, Trophy, Users, User, Menu, X, Gamepad2, Layers } from 'lucide-react'
 
 const navItems = [
   { path: '/', label: 'Dashboard', icon: Globe },
   { path: '/waves', label: 'Ondas', icon: Waves },
   { path: '/exercises', label: 'Exercícios', icon: Gamepad2 },
+  { path: '/flashcards', label: 'Flashcards', icon: Layers },
   { path: '/study', label: 'Estudar', icon: BookOpen },
   { path: '/achievements', label: 'Conquistas', icon: Trophy },
   { path: '/leaderboard', label: 'Ranking', icon: Users },

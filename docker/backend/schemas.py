@@ -197,8 +197,8 @@ class ExerciseItemResponse(BaseModel):
 
 class ExerciseLessonResponse(BaseModel):
     id: int
-    language: str
     language_code: str
+    language: Optional[str] = None
     language_name: str
     slug: str
     title: str
@@ -207,6 +207,8 @@ class ExerciseLessonResponse(BaseModel):
     xp_base: int
     active: bool
     items_count: int = 0
+    session_size: int = 10
+    total_sessions: int = 0
     best_score: int = 0
     completed_sessions: int = 0
     active_session_id: Optional[int] = None

@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard'
 import Waves from './pages/Waves'
 import Study from './pages/Study'
 import Exercises from './pages/Exercises'
+import Flashcards from './pages/Flashcards'
 import Achievements from './pages/Achievements'
 import Leaderboard from './pages/Leaderboard'
 import Profile from './pages/Profile'
@@ -16,6 +17,7 @@ function App() {
         <Route path="/" element={<Dashboard />} />
         <Route path="/waves" element={<Waves />} />
         <Route path="/exercises" element={<Exercises />} />
+        <Route path="/flashcards" element={<Flashcards />} />
         <Route path="/study" element={<Study />} />
         <Route path="/achievements" element={<Achievements />} />
         <Route path="/leaderboard" element={<Leaderboard />} />

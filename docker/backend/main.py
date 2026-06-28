@@ -353,6 +353,16 @@ def get_exercise_session(session_id: int, db: Session = Depends(get_db)):
     if not session: raise HTTPException(status_code=404, detail="Exercise session not found")
     return ExerciseService.session_payload(session, include_items=True)
 
+@app.get("/exercise-path")
+def get_exercise_path(user_id: int = 1, db: Session = Depends(get_db)):
+    if not db.query(User).filter(User.id == user_id).first(): ExerciseService.bootstrap_user(db, user_id)
+    return ExerciseService.learning_path(db, user_id)
+
+@app.get("/flashcards")
+def get_flashcards(language: Optional[str] = None, limit: int = 100, db: Session = Depends(get_db)):
+    ExerciseService.seed_lessons(db)
+    return ExerciseService.flashcards(db, language=language, limit=limit)
+
 @app.get("/exercise-lessons/{lesson_id}")
 def get_exercise_lesson(lesson_id: int, db: Session = Depends(get_db)):
     payload = ExerciseService.get_lesson_payload(db, lesson_id)

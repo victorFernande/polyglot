@@ -68,6 +68,17 @@ export async function loadExerciseLessons(userId = getStoredUserId()) {
   return apiFetch(`/exercise-lessons?user_id=${encodeURIComponent(userId)}`)
 }
 
+export async function loadExercisePath(userId = getStoredUserId()) {
+  return apiFetch(`/exercise-path?user_id=${encodeURIComponent(userId)}`)
+}
+
+export async function loadFlashcards(language = '', limit = 100) {
+  const params = new URLSearchParams()
+  if (language) params.set('language', language)
+  params.set('limit', String(limit))
+  return apiFetch(`/flashcards?${params.toString()}`)
+}
+
 export async function startExerciseSession(lessonId, userId = getStoredUserId()) {
   return apiFetch(`/exercise-lessons/${lessonId}/sessions?user_id=${encodeURIComponent(userId)}`, {
     method: 'POST',
