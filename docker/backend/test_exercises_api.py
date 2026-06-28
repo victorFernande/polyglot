@@ -44,6 +44,7 @@ def test_bootstrap_lists_lessons_and_persists_full_session_flow():
         assert answer["is_correct"] is True
         assert answer["session"]["correct_count"] == 1
         assert answer["session"]["current_index"] == 1
+        assert len(answer["session"]["items"]) == answer["session"]["total_count"]
 
         complete_response = client.post(f"/exercise-sessions/{session['id']}/complete")
         assert complete_response.status_code == 200, complete_response.text
@@ -79,6 +80,7 @@ def test_wrong_answer_records_mistake_advances_and_returns_teaching_feedback():
         assert result["session"]["hearts_left"] == session["hearts_left"] - 1
         assert result["session"]["correct_count"] == 0
         assert result["session"]["current_index"] == 1
+        assert len(result["session"]["items"]) == result["session"]["total_count"]
         assert result["mistake_feedback"]["your_answer"] == "resposta errada"
         assert result["mistake_feedback"]["correct_answer"] == result["correct_answer"]
         assert "Você respondeu" in result["mistake_feedback"]["message"]

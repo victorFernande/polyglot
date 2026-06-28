@@ -75,7 +75,10 @@ export default function Exercises() {
   }, [])
 
   const currentIndex = session?.current_index || 0
-  const item = lesson?.items?.[currentIndex]
+  const sessionItems = session?.items?.length ? session.items : (lesson?.items || [])
+  const currentItem = sessionItems?.[currentIndex]
+  const item = feedback?.itemSnapshot || currentItem
+  const displayIndex = feedback?.answeredIndex ?? currentIndex
   const progress = session?.total_count ? (currentIndex / session.total_count) * 100 : 0
   const langCode = lesson?.language_code || lesson?.language || 'de'
   const activePath = pathData.find((p) => (p.language_code || p.language) === langCode)
@@ -128,7 +131,7 @@ export default function Exercises() {
     try {
       const result = await answerExerciseSession(session.id, { item_id: item.id, payload: normalizedPayload })
       setSession(result.session)
-      setFeedback(result.is_correct ? { type: 'correct', explanation: result.explanation } : { type: 'wrong', explanation: result.explanation, correctAnswer: result.correct_answer, mistake: result.mistake_feedback })
+      setFeedback(result.is_correct ? { type: 'correct', explanation: result.explanation, itemSnapshot: item, answeredIndex: currentIndex } : { type: 'wrong', explanation: result.explanation, correctAnswer: result.correct_answer, mistake: result.mistake_feedback, itemSnapshot: item, answeredIndex: currentIndex })
     } catch (err) {
       setError(err.message)
     } finally {
@@ -221,7 +224,7 @@ export default function Exercises() {
           <div className="mb-6 flex items-center gap-3">
             <LanguageFlag code={langCode} className="h-12 w-12" />
             <div>
-              <p className="text-sm text-gray-400">{lesson.language_name} · questão {currentIndex + 1}/{session.total_count} · {session.xp_earned} XP na sessão</p>
+              <p className="text-sm text-gray-400">{lesson.language_name} · questão {displayIndex + 1}/{session.total_count} · {session.xp_earned} XP na sessão</p>
               <h2 className="text-2xl font-bold">{item.prompt}</h2>
             </div>
             <button className="ml-auto btn-secondary" title="Ouvir exemplo"><Volume2 size={18} /></button>

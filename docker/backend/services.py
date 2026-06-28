@@ -436,7 +436,7 @@ class ExerciseService:
             session.current_index = min(max(session.current_index, allowed.index(item_id) + 1), session.total_count)
         db.commit(); db.refresh(session)
         feedback = None if ok else ExerciseService.mistake_feedback(payload, item.answer, item.explanation)
-        return {"session": ExerciseService.session_payload(session, db=db), "is_correct": ok, "xp_earned": xp, "correct_answer": item.answer, "explanation": item.explanation, "mistake_feedback": feedback, "completed": session.current_index >= session.total_count}
+        return {"session": ExerciseService.session_payload(session, include_items=True, db=db), "is_correct": ok, "xp_earned": xp, "correct_answer": item.answer, "explanation": item.explanation, "mistake_feedback": feedback, "completed": session.current_index >= session.total_count}
 
     @staticmethod
     def complete_session(db: Session, session_id: int):
