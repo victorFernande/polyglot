@@ -1,8 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { RotateCcw, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react'
+import { RotateCcw, ChevronLeft, ChevronRight, Loader2, Shuffle } from 'lucide-react'
 import LanguageFlag from '../components/LanguageFlag'
 import { bootstrapUser, loadFlashcards } from '../lib/api'
 import { handleFlashcardKeyDown } from '../lib/flashcardKeyboard.mjs'
+import { shuffleFlashcards } from '../lib/flashcardOrder.mjs'
 
 const LANGS = [
   { code: 'de', name: 'Alemão' },
@@ -50,6 +51,12 @@ export default function Flashcards() {
 
   function prev() {
     setIndex((i) => Math.max(0, i - 1))
+    setFlipped(false)
+  }
+
+  function shuffleDeck() {
+    setCards((currentCards) => shuffleFlashcards(currentCards))
+    setIndex(0)
     setFlipped(false)
   }
 
@@ -119,6 +126,7 @@ export default function Flashcards() {
         <div className="mt-6 flex flex-wrap justify-between gap-3">
           <button className="btn-secondary inline-flex items-center gap-2" onClick={prev} disabled={index === 0}><ChevronLeft size={18} /> Anterior</button>
           <button className="btn-secondary inline-flex items-center gap-2" onClick={() => setFlipped(false)}><RotateCcw size={18} /> Frente</button>
+          <button className="btn-secondary inline-flex items-center gap-2" onClick={shuffleDeck} disabled={cards.length < 2}><Shuffle size={18} /> Misturar</button>
           <button className="btn-primary inline-flex items-center gap-2" onClick={next} disabled={index + 1 >= cards.length}>Próximo <ChevronRight size={18} /></button>
         </div>
       </div>
