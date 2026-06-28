@@ -60,6 +60,32 @@ def test_bootstrap_lists_lessons_and_persists_full_session_flow():
         assert repeated["correct_count"] == complete["correct_count"]
 
 
+def test_wrong_answer_records_mistake_advances_and_returns_teaching_feedback():
+    with TestClient(app) as client:
+        user_id = 93001
+        client.post(f"/users/{user_id}/bootstrap")
+        lesson = client.get("/exercise-lessons", params={"user_id": user_id}).json()[0]
+        session = client.post(f"/exercise-lessons/{lesson['id']}/sessions", params={"user_id": user_id}).json()
+        item = session["current_item"]
+
+        response = client.post(
+            f"/exercise-sessions/{session['id']}/answer",
+            json={"item_id": item["id"], "payload": "resposta errada"},
+        )
+
+        assert response.status_code == 200, response.text
+        result = response.json()
+        assert result["is_correct"] is False
+        assert result["session"]["hearts_left"] == session["hearts_left"] - 1
+        assert result["session"]["correct_count"] == 0
+        assert result["session"]["current_index"] == 1
+        assert result["mistake_feedback"]["your_answer"] == "resposta errada"
+        assert result["mistake_feedback"]["correct_answer"] == result["correct_answer"]
+        assert "Você respondeu" in result["mistake_feedback"]["message"]
+        assert "Resposta correta" in result["mistake_feedback"]["message"]
+        assert result["mistake_feedback"]["explanation"]
+
+
 def test_bootstrap_allows_independent_test_users():
     with TestClient(app) as client:
         first = client.post("/users/91001/bootstrap")

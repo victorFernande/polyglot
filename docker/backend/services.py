@@ -382,6 +382,29 @@ class ExerciseService:
         return str(value).strip().casefold()
 
     @staticmethod
+    def readable_answer(value):
+        if isinstance(value, dict):
+            if "value" in value:
+                return ExerciseService.readable_answer(value["value"])
+            if "pairs" in value:
+                return "; ".join([f"{left} = {right}" for left, right in value["pairs"]])
+            return "; ".join([f"{left} = {right}" for left, right in value.items()])
+        if isinstance(value, list):
+            return " ".join([str(v) for v in value])
+        return str(value)
+
+    @staticmethod
+    def mistake_feedback(payload, correct_answer, explanation):
+        your_answer = ExerciseService.readable_answer(payload)
+        expected = ExerciseService.readable_answer(correct_answer)
+        return {
+            "your_answer": payload,
+            "correct_answer": correct_answer,
+            "message": f"Você respondeu: {your_answer}. Resposta correta: {expected}.",
+            "explanation": explanation or "Compare sua resposta com a forma correta antes de seguir para fixar o padrão.",
+        }
+
+    @staticmethod
     def answer_session(db: Session, session_id: int, item_id: int, payload):
         session = db.query(ExerciseSession).filter(ExerciseSession.id == session_id).first()
         if not session or session.status == "completed": return None
@@ -400,6 +423,7 @@ class ExerciseService:
                 session.current_index = min(max(session.current_index, allowed.index(item_id) + 1), session.total_count)
             else:
                 session.hearts_left = max(0, session.hearts_left - 1)
+                session.current_index = min(max(session.current_index, allowed.index(item_id) + 1), session.total_count)
         elif not existing.is_correct and ok:
             existing.payload = payload
             existing.is_correct = True
@@ -411,7 +435,8 @@ class ExerciseService:
             xp = 0
             session.current_index = min(max(session.current_index, allowed.index(item_id) + 1), session.total_count)
         db.commit(); db.refresh(session)
-        return {"session": ExerciseService.session_payload(session, db=db), "is_correct": ok, "xp_earned": xp, "correct_answer": item.answer, "explanation": item.explanation, "completed": session.current_index >= session.total_count}
+        feedback = None if ok else ExerciseService.mistake_feedback(payload, item.answer, item.explanation)
+        return {"session": ExerciseService.session_payload(session, db=db), "is_correct": ok, "xp_earned": xp, "correct_answer": item.answer, "explanation": item.explanation, "mistake_feedback": feedback, "completed": session.current_index >= session.total_count}
 
     @staticmethod
     def complete_session(db: Session, session_id: int):

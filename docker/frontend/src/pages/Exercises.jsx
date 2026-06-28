@@ -17,6 +17,17 @@ function answerValue(answer) {
   return answer
 }
 
+function readableAnswer(value) {
+  if (value == null) return '—'
+  if (Array.isArray(value)) return value.join(' ')
+  if (typeof value === 'object') {
+    if ('value' in value) return readableAnswer(value.value)
+    if ('pairs' in value && Array.isArray(value.pairs)) return value.pairs.map(([left, right]) => `${left} = ${right}`).join('; ')
+    return Object.entries(value).map(([left, right]) => `${left} = ${right}`).join('; ')
+  }
+  return String(value)
+}
+
 function matchPairs(item) {
   if (Array.isArray(item.pairs)) return item.pairs
   if (item.answer?.pairs) return item.answer.pairs
@@ -116,7 +127,7 @@ export default function Exercises() {
     try {
       const result = await answerExerciseSession(session.id, { item_id: item.id, payload: normalizedPayload })
       setSession(result.session)
-      setFeedback(result.is_correct ? { type: 'correct', explanation: result.explanation } : { type: 'wrong', explanation: result.explanation })
+      setFeedback(result.is_correct ? { type: 'correct', explanation: result.explanation } : { type: 'wrong', explanation: result.explanation, correctAnswer: result.correct_answer, mistake: result.mistake_feedback })
     } catch (err) {
       setError(err.message)
     } finally {
@@ -223,14 +234,21 @@ export default function Exercises() {
 
           {feedback && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className={`mt-6 rounded-xl p-4 ${feedback.type === 'correct' ? 'bg-polyglot-green/20 text-polyglot-green' : 'bg-red-500/20 text-red-300'}`}>
-              <div className="flex items-center gap-2 font-bold">{feedback.type === 'correct' ? <Check size={20} /> : <X size={20} />}{feedback.type === 'correct' ? 'Correto!' : 'Quase! Escolha outra resposta ou tente de novo.'}</div>
-              {feedback.explanation && <p className="mt-2 text-sm opacity-90">{feedback.explanation}</p>}
+              <div className="flex items-center gap-2 font-bold">{feedback.type === 'correct' ? <Check size={20} /> : <X size={20} />}{feedback.type === 'correct' ? 'Correto!' : 'Marcado como erro — veja a correção antes de seguir.'}</div>
+              {feedback.type === 'wrong' && (
+                <div className="mt-3 space-y-2 rounded-lg bg-black/20 p-3 text-sm text-red-100">
+                  <p><strong>Sua resposta:</strong> {readableAnswer(feedback.mistake?.your_answer)}</p>
+                  <p><strong>Resposta correta:</strong> {readableAnswer(feedback.mistake?.correct_answer || feedback.correctAnswer)}</p>
+                  {feedback.mistake?.message && <p className="opacity-90">{feedback.mistake.message}</p>}
+                </div>
+              )}
+              {feedback.explanation && <p className="mt-2 text-sm opacity-90"><strong>Explicação:</strong> {feedback.explanation}</p>}
             </motion.div>
           )}
 
           <div className="mt-6 flex justify-end gap-3">
             {!feedback && <button className="btn-primary disabled:opacity-40" disabled={!canCheck || busy} onClick={check}>{busy ? 'Salvando...' : 'Verificar'}</button>}
-            {feedback?.type === 'wrong' && <button className="btn-secondary" onClick={resetExerciseState}>Limpar tentativa</button>}
+            {feedback?.type === 'wrong' && (session.current_index >= session.total_count ? <button className="btn-primary" onClick={finish}>Concluir e salvar XP</button> : <button className="btn-primary inline-flex items-center gap-2" onClick={next}>Entendi, continuar <ArrowRight size={18} /></button>)}
             {feedback?.type === 'correct' && (session.current_index >= session.total_count ? <button className="btn-primary" onClick={finish}>Concluir e salvar XP</button> : <button className="btn-primary inline-flex items-center gap-2" onClick={next}>Continuar <ArrowRight size={18} /></button>)}
           </div>
         </div>

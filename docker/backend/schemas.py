@@ -246,6 +246,7 @@ class ExerciseAnswerResult(BaseModel):
     xp_earned: int
     correct_answer: object
     explanation: Optional[str] = None
+    mistake_feedback: Optional[dict] = None
     completed: bool = False
 
 class ExerciseCompleteResult(BaseModel):
