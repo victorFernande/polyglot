@@ -116,4 +116,27 @@ def test_image_choice_uses_semantic_svg_icon_bank():
     image_items = [item for item in ExerciseService.generate_items("de") if item["type"] == "image_choice"]
     icon_keys = {option["icon_key"] for item in image_items for option in item["options"]}
 
-    assert {"ambulance", "coffee", "ball", "fork"}.issubset(icon_keys)
+    assert {"book", "coffee", "water", "train", "house", "person", "phone", "fork"}.issubset(icon_keys)
+    assert "ambulance" not in icon_keys
+
+
+def test_first_cafe_image_choice_uses_topic_phrase_not_unrelated_visual_vocabulary():
+    items = ExerciseService.generate_items("de")
+    item = next(item for item in items if item["type"] == "image_choice")
+
+    assert "Krankenwagen" not in item["prompt"]
+    assert item["answer"]["value"] == "Hallo"
+    assert "Olá" in item["prompt"]
+    assert "Tópico 1/10 — cumprimentar" in item["prompt"]
+    icon_by_label = {option["label_pt"]: option["icon_key"] for option in item["options"]}
+    assert icon_by_label["Olá"] == "person"
+    assert icon_by_label["Eu gostaria de um café."] == "coffee"
+    assert icon_by_label["Uma água, por favor."] == "water"
+    assert icon_by_label["Eu gostaria de um pão."] == "bread"
+
+
+def test_image_choice_options_include_frontend_ready_image_src():
+    item = next(item for item in ExerciseService.generate_items("de") if item["type"] == "image_choice")
+
+    assert all(option["image_src"].startswith("data:image/svg+xml;charset=UTF-8,") for option in item["options"])
+    assert all("%3Csvg" in option["image_src"] for option in item["options"])

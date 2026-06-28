@@ -1,4 +1,6 @@
 from datetime import datetime, timedelta
+from urllib.parse import quote
+
 from sqlalchemy.orm import Session
 from models import Achievement, ExerciseAnswer, ExerciseItem, ExerciseLesson, ExerciseSession, Phase, SessionLocal, StudyLog, Task, User, UserAchievement, Wave
 from schemas import *
@@ -223,9 +225,39 @@ class ExerciseService:
             "phone": '<rect x="32" y="14" width="32" height="68" rx="8" fill="#111827"/><rect x="37" y="22" width="22" height="46" rx="3" fill="#38bdf8"/><circle cx="48" cy="74" r="3" fill="#fff"/>',
             "book": '<path d="M18 22h28c7 0 10 4 10 10v44H28c-6 0-10-4-10-10V22z" fill="#8b5cf6"/><path d="M56 32c0-6 4-10 10-10h12v54H56V32z" fill="#a78bfa"/><path d="M30 36h16M30 48h16" stroke="#fff" stroke-width="4"/>',
             "water": '<path d="M48 16c16 20 24 32 24 45a24 24 0 0 1-48 0c0-13 8-25 24-45z" fill="#38bdf8"/><circle cx="40" cy="56" r="7" fill="#bae6fd"/>',
+            "bread": '<path d="M20 50c0-17 12-30 28-30s28 13 28 30v12c0 8-6 14-14 14H34c-8 0-14-6-14-14V50z" fill="#d97706"/><path d="M32 40c6-8 14-8 20 0M48 38c6-7 13-7 18 0" stroke="#fef3c7" stroke-width="5" fill="none" stroke-linecap="round"/>',
+            "person": '<circle cx="48" cy="30" r="13" fill="#f59e0b"/><path d="M24 78c3-17 13-27 24-27s21 10 24 27" fill="#2563eb"/><path d="M34 62h28" stroke="#bfdbfe" stroke-width="4"/>',
+            "clock": '<circle cx="48" cy="48" r="31" fill="#fff" stroke="#0f172a" stroke-width="5"/><path d="M48 28v22l15 9" stroke="#0f172a" stroke-width="5" fill="none" stroke-linecap="round"/>',
         }
         shape = icons.get(icon_key, icons["book"])
         return f'<svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg"><rect width="96" height="96" rx="22" fill="{bg}"/>{shape}</svg>'
+
+    @staticmethod
+    def _svg_data_uri(svg: str) -> str:
+        return f"data:image/svg+xml;charset=UTF-8,{quote(svg, safe='')}"
+
+    @staticmethod
+    def _icon_key_for_phrase(portuguese: str, foreign: str, topic: str = "") -> str:
+        text = f"{portuguese} {foreign}".casefold()
+        keyword_icons = [
+            (("olá", "hallo", "hello", "bonjour", "привет", "здравствуйте", "こんにちは", "cumprimentar"), "person"),
+            (("café", "kaffee", "coffee", "кофе", "コーヒー"), "coffee"),
+            (("água", "wasser", "water", "eau", "воду", "вода", "水"), "water"),
+            (("pão", "brot", "bread", "pain", "хлеб", "パン"), "bread"),
+            (("trem", "estação", "bahnhof", "station", "gare", "вокзал", "駅"), "train"),
+            (("casa", "moro", "moradia", "wohne", "home", "house", "maison", "дом", "家"), "house"),
+            (("camisa", "casaco", "roup", "hemd", "shirt", "chemise", "рубаш", "シャツ"), "shirt"),
+            (("telefone", "phone", "téléphone", "телефон", "電話"), "phone"),
+            (("livro", "estudo", "learn", "lerne", "study", "уч", "勉強", "本"), "book"),
+            (("conta", "preço", "custa", "quanto", "bill", "price", "combien", "сколько", "いくら"), "clock"),
+            (("nome", "professor", "irmã", "irmão", "mãe", "pai", "família", "victor", "teacher", "sister", "brother", "名前", "先生"), "person"),
+            (("comida", "prato", "garfo", "frango", "restaurante", "gabel", "fork", "fourchette", "вилка", "フォーク"), "fork"),
+            (("bola", "esporte", "futebol", "ball", "football", "футбол", "サッカー"), "ball"),
+        ]
+        for keywords, icon_key in keyword_icons:
+            if any(keyword in text for keyword in keywords):
+                return icon_key
+        return "book"
 
     @staticmethod
     def _image_choice(prompt, answer, options, idx):
@@ -235,11 +267,26 @@ class ExerciseService:
             key = str(foreign).casefold()
             if key in seen:
                 continue
-            unique.append({"label_pt": portuguese, "value": foreign, "icon_key": icon_key, "svg": ExerciseService._icon_svg(icon_key, len(unique))})
+            svg = ExerciseService._icon_svg(icon_key, len(unique))
+            unique.append({"label_pt": portuguese, "value": foreign, "icon_key": icon_key, "svg": svg, "image_src": ExerciseService._svg_data_uri(svg)})
             seen.add(key)
             if len(unique) == 4:
                 break
         return {"type":"image_choice","prompt":prompt,"answer":{"value":answer[1]},"options":unique,"tiles":None,"pairs":None,"hint":"Olhe o ícone, leia o significado em português e escolha a palavra/frase correta no idioma estudado.","explanation":f"A imagem correta representa: {answer[0]} = {answer[1]}.","xp_reward":9 + (idx % 3)}
+
+    @staticmethod
+    def _image_choice_from_phrases(prefix, phrases, answer_index, idx, topic_name):
+        answer_pt, answer_foreign = phrases[answer_index]
+        answer = (answer_pt, answer_foreign, ExerciseService._icon_key_for_phrase(answer_pt, answer_foreign, topic_name))
+        distractors = []
+        for option_index, (pt, foreign) in enumerate(phrases):
+            if option_index == answer_index:
+                continue
+            distractors.append((pt, foreign, ExerciseService._icon_key_for_phrase(pt, foreign, topic_name)))
+            if len(distractors) == 3:
+                break
+        prompt = f"{prefix}: escolha a imagem/frase que representa “{answer_pt}” ({answer_foreign})"
+        return ExerciseService._image_choice(prompt, answer, distractors, idx)
 
     @staticmethod
     def _matching_sample(vocab, start, size=4):
@@ -293,10 +340,7 @@ class ExerciseService:
                     explanation = f"{unit['title']}: “{target}” corresponde a “{pt}”. Use esta frase pronta como bloco real de comunicação em {name}."
                     mode = question_index % 3
                     if question_index == 4:
-                        visual_bank = ExerciseService.VISUAL_VOCAB[code]
-                        visual_answer = visual_bank[((unit_index - 1) * 10 + topic_index - 1) % len(visual_bank)]
-                        distractors = [entry for entry in visual_bank if entry[1] != visual_answer[1]][:3]
-                        item = ExerciseService._image_choice(f"{prefix}: escolha a imagem que combina com “{visual_answer[1]}”", visual_answer, distractors, idx)
+                        item = ExerciseService._image_choice_from_phrases(prefix, phrases, topic_index - 1, idx, topic_name)
                     elif mode == 1:
                         wrong = [x for x in all_foreign if x != target][:3]
                         item = ExerciseService._choice(f"{prefix}: como dizer “{pt}” em {name}?", target, wrong, idx)
