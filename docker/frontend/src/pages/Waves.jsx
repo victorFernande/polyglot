@@ -1,12 +1,13 @@
 import React from 'react'
 import { motion } from 'framer-motion'
 import { Lock, CheckCircle, Play, Star } from 'lucide-react'
+import LanguageFlag from '../components/LanguageFlag'
 
 const waves = [
-  { id: 1, number: 1, flag: '🇩🇪', language: 'Alemão', anchor: 'Rammstein', status: 'active', color: 'from-red-600 to-red-900' },
-  { id: 2, number: 2, flag: '🇫🇷', language: 'Francês', anchor: 'Música Francesa', status: 'locked', color: 'from-blue-600 to-blue-900' },
-  { id: 3, number: 3, flag: '🇷🇺', language: 'Russo', anchor: 'Música Russa', status: 'locked', color: 'from-yellow-600 to-yellow-900' },
-  { id: 4, number: 4, flag: '🇯🇵', language: 'Japonês', anchor: 'Anime/Manga', status: 'locked', color: 'from-pink-600 to-pink-900' },
+  { id: 1, number: 1, flagCode: 'de', language: 'Alemão', anchor: 'Rammstein', status: 'active', color: 'from-red-600 to-red-900' },
+  { id: 2, number: 2, flagCode: 'fr', language: 'Francês', anchor: 'Música Francesa', status: 'locked', color: 'from-blue-600 to-blue-900' },
+  { id: 3, number: 3, flagCode: 'ru', language: 'Russo', anchor: 'Música Russa', status: 'locked', color: 'from-yellow-600 to-yellow-900' },
+  { id: 4, number: 4, flagCode: 'jp', language: 'Japonês', anchor: 'Anime/Manga', status: 'locked', color: 'from-pink-600 to-pink-900' },
 ]
 
 const phases = [
@@ -44,7 +45,7 @@ export default function Waves() {
                 {/* Wave Header */}
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-4">
-                    <span className="text-5xl">{wave.flag}</span>
+                    <LanguageFlag code={wave.flagCode} className="h-14 w-14" />
                     <div>
                       <h2 className="text-2xl font-bold">Onda {wave.number}: {wave.language}</h2>
                       <p className="text-gray-400">🎸 Âncora: {wave.anchor}</p>

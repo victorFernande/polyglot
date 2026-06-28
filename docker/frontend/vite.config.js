@@ -13,6 +13,16 @@ export default defineConfig({
       }
     }
   },
+  preview: {
+    host: '0.0.0.0',
+    port: 3000,
+    allowedHosts: [
+      'localhost',
+      '127.0.0.1',
+      '100.100.218.96',
+      'cortexai.tailb76d32.ts.net'
+    ]
+  },
   build: {
     outDir: 'dist',
     sourcemap: true

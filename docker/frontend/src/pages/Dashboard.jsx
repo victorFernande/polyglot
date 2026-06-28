@@ -2,10 +2,11 @@ import React, { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Flame, TrendingUp, Target, Award, Clock, BookOpen, Zap } from 'lucide-react'
 import { useStore } from '../stores/useStore'
-import XPAnimation from './XPAnimation'
-import AchievementPopup from './AchievementPopup'
-import StreakCalendar from './StreakCalendar'
-import WeeklyChart from './WeeklyChart'
+import XPAnimation from '../components/XPAnimation'
+import AchievementPopup from '../components/AchievementPopup'
+import StreakCalendar from '../components/StreakCalendar'
+import WeeklyChart from '../components/WeeklyChart'
+import LanguageFlag from '../components/LanguageFlag'
 
 export default function Dashboard() {
   const { 
@@ -138,7 +139,7 @@ export default function Dashboard() {
           </div>
           <h3 className="text-lg font-semibold mb-2">Onda Atual</h3>
           <div className="flex items-center gap-4 mb-4">
-            <span className="text-4xl">🇩🇪</span>
+            <LanguageFlag code="de" className="h-12 w-12" />
             <div>
               <p className="text-xl font-bold">{activeWave.language_name}</p>
               <p className="text-sm text-gray-400">Âncora: 🎸 {activeWave.anchor}</p>

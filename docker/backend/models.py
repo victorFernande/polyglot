@@ -1,3 +1,5 @@
+import os
+
 from sqlalchemy import create_engine, Column, Integer, String, Float, Boolean, DateTime, ForeignKey, Text, Enum
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
@@ -127,7 +129,7 @@ class StudyLog(Base):
     user = relationship("User", back_populates="study_logs")
 
 # Database setup
-DATABASE_URL = "sqlite:///./polyglot.db"
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./polyglot.db")
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

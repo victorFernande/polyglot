@@ -55,7 +55,7 @@ export default function Layout({ children }) {
         
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-white/10">
           <div className="text-xs text-gray-500 text-center">
-            🎸 Powered by Rammstein
+            @victorFernande
           </div>
         </div>
       </aside>
