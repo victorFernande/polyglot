@@ -5,9 +5,9 @@ import LanguageFlag from '../components/LanguageFlag'
 
 const waves = [
   { id: 1, number: 1, flagCode: 'de', language: 'Alemão', anchor: 'Rammstein', status: 'active', color: 'from-red-600 to-red-900' },
-  { id: 2, number: 2, flagCode: 'fr', language: 'Francês', anchor: 'Música Francesa', status: 'locked', color: 'from-blue-600 to-blue-900' },
-  { id: 3, number: 3, flagCode: 'ru', language: 'Russo', anchor: 'Música Russa', status: 'locked', color: 'from-yellow-600 to-yellow-900' },
-  { id: 4, number: 4, flagCode: 'jp', language: 'Japonês', anchor: 'Anime/Manga', status: 'locked', color: 'from-pink-600 to-pink-900' },
+  { id: 2, number: 2, flagCode: 'fr', language: 'Francês', anchor: 'Chanson Française', status: 'active', color: 'from-blue-600 to-blue-900' },
+  { id: 3, number: 3, flagCode: 'ru', language: 'Russo', anchor: 'Música Russa', status: 'active', color: 'from-yellow-600 to-yellow-900' },
+  { id: 4, number: 4, flagCode: 'jp', language: 'Japonês', anchor: 'Anime/Manga', status: 'active', color: 'from-pink-600 to-pink-900' },
 ]
 
 const phases = [
@@ -22,7 +22,7 @@ export default function Waves() {
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-bold mb-2">🌊 Ondas de Aprendizado</h1>
-        <p className="text-gray-400">Complete cada onda para desbloquear a próxima. Derrote o Boss para avançar!</p>
+        <p className="text-gray-400">Todas as línguas estão liberadas. Escolha uma onda, faça exercícios curtos e derrote o Boss quando estiver pronto.</p>
       </div>
 
       {/* Waves Map */}
@@ -61,7 +61,7 @@ export default function Waves() {
                       'bg-polyglot-green/20 text-polyglot-green'
                     }`}>
                       {wave.status === 'locked' ? 'Bloqueada' : 
-                       wave.status === 'active' ? 'Em Progresso' : 'Completada'}
+                       wave.status === 'active' ? 'Liberada' : 'Completada'}
                     </span>
                   </div>
                 </div>
@@ -91,9 +91,9 @@ export default function Waves() {
                       {wave.status === 'active' && phase.number === 1 && (
                         <div className="mt-3">
                           <div className="progress-bar">
-                            <div className="progress-fill" style={{ width: '43%' }} />
+                            <div className="progress-fill" style={{ width: '0%' }} />
                           </div>
-                          <p className="text-xs text-gray-400 mt-1">3/7 completas</p>
+                          <p className="text-xs text-gray-400 mt-1">0/{phase.tasks} completas</p>
                         </div>
                       )}
                     </div>
@@ -127,7 +127,7 @@ export default function Waves() {
       <div className="card flex flex-wrap gap-6 text-sm">
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 rounded bg-polyglot-accent/20 border border-polyglot-accent" />
-          <span>Onda Ativa</span>
+          <span>Onda Liberada</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 rounded bg-gray-700 border border-gray-600" />

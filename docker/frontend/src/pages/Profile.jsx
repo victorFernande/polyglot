@@ -6,15 +6,15 @@ export default function Profile() {
     username: 'Victor',
     github: 'victorFernande',
     email: 'victor@polyglot.dev',
-    level: 2,
-    title: 'Aprendiz',
-    totalXp: 150,
-    currentStreak: 3,
-    bestStreak: 5,
-    achievements: 2,
+    level: 1,
+    title: 'Novato',
+    totalXp: 0,
+    currentStreak: 0,
+    bestStreak: 0,
+    achievements: 0,
     joinedAt: '2026-06-28',
-    activeLanguage: 'Alemão',
-    anchor: 'Rammstein'
+    activeLanguage: 'Escolha livre',
+    anchor: 'Rammstein / Chanson / Música Russa / Anime'
   }
 
   return (

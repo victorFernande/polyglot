@@ -7,8 +7,8 @@ export default function Achievements() {
   const { achievements } = useStore()
 
   const allAchievements = [
-    { id: 1, code: 'first_step', name: 'Primeiro Passo', description: 'Complete sua primeira tarefa', icon: '👣', xp_reward: 10, earned: true },
-    { id: 2, code: 'streak_3', name: 'Fogo Baixo', description: '3 dias de streak', icon: '🔥', xp_reward: 30, earned: true },
+    { id: 1, code: 'first_step', name: 'Primeiro Passo', description: 'Complete sua primeira tarefa', icon: '👣', xp_reward: 10, earned: false },
+    { id: 2, code: 'streak_3', name: 'Fogo Baixo', description: '3 dias de streak', icon: '🔥', xp_reward: 30, earned: false },
     { id: 3, code: 'streak_7', name: 'Fogo Médio', description: '7 dias de streak', icon: '🔥', xp_reward: 70, earned: false },
     { id: 4, code: 'streak_14', name: 'Fogo Alto', description: '14 dias de streak', icon: '🔥', xp_reward: 150, earned: false },
     { id: 5, code: 'streak_30', name: 'Fogo Infernal', description: '30 dias de streak', icon: '🔥', xp_reward: 500, earned: false },

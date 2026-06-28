@@ -3,11 +3,7 @@ import { motion } from 'framer-motion'
 import { Trophy, Medal, Award } from 'lucide-react'
 
 const leaderboardData = [
-  { rank: 1, username: 'Victor', level: 2, total_xp: 150, current_streak: 3, achievements_count: 2 },
-  { rank: 2, username: 'PolyglotMaster', level: 5, total_xp: 450, current_streak: 7, achievements_count: 5 },
-  { rank: 3, username: 'LanguageNinja', level: 3, total_xp: 280, current_streak: 4, achievements_count: 3 },
-  { rank: 4, username: 'RammsteinFan', level: 4, total_xp: 380, current_streak: 5, achievements_count: 4 },
-  { rank: 5, username: 'DeutschLerner', level: 1, total_xp: 80, current_streak: 1, achievements_count: 1 },
+  { rank: 1, username: 'Victor', level: 1, total_xp: 0, current_streak: 0, achievements_count: 0 },
 ]
 
 export default function Leaderboard() {
@@ -109,12 +105,12 @@ export default function Leaderboard() {
             <div className="text-4xl font-bold text-polyglot-accent">#1</div>
             <div>
               <p className="font-semibold">Victor</p>
-              <p className="text-sm text-gray-400">Nível 2 - Aprendiz</p>
+              <p className="text-sm text-gray-400">Nível 1 - Novato</p>
             </div>
           </div>
           <div className="text-right">
-            <p className="text-2xl font-bold text-polyglot-gold">150 XP</p>
-            <p className="text-sm text-gray-400">3 dias de streak</p>
+            <p className="text-2xl font-bold text-polyglot-gold">0 XP</p>
+            <p className="text-sm text-gray-400">0 dias de streak</p>
           </div>
         </div>
       </div>

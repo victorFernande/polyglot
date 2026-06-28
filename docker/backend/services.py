@@ -305,11 +305,10 @@ class WaveService:
                 language=data["language"],
                 language_name=data["language_name"],
                 anchor=data["anchor"],
-                status=WaveStatus.LOCKED if wave_num > 1 else WaveStatus.ACTIVE
+                status=WaveStatus.ACTIVE
             )
             
-            if wave_num == 1:
-                wave.started_at = datetime.utcnow()
+            wave.started_at = datetime.utcnow()
             
             db.add(wave)
             db.flush()  # Para obter o ID
@@ -320,18 +319,18 @@ class WaveService:
                     wave_id=wave.id,
                     phase_number=i,
                     name=phase_data["name"],
-                    status=PhaseStatus.ACTIVE if (wave_num == 1 and i == 1) else PhaseStatus.LOCKED,
+                    status=PhaseStatus.ACTIVE if i == 1 else PhaseStatus.LOCKED,
                     total_tasks=phase_data["total_tasks"]
                 )
                 
-                if wave_num == 1 and i == 1:
+                if i == 1:
                     phase.started_at = datetime.utcnow()
                 
                 db.add(phase)
                 db.flush()
                 
-                # Criar tasks padrão para a fase 1 da onda 1
-                if wave_num == 1 and i == 1:
+                # Criar tasks padrão para a fase 1 de cada onda
+                if i == 1:
                     tasks = [
                         {"title": "Alfabeto Alemão", "description": "Aprender as 30 letras do alfabeto", "xp": 10},
                         {"title": "Vogais Umlaut", "description": "Praticar ä, ö, ü", "xp": 10},

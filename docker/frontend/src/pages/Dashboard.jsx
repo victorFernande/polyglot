@@ -25,27 +25,23 @@ export default function Dashboard() {
   const fetchDashboard = async () => {
     setLoading(true)
     try {
-      // Simulando dados para desenvolvimento
-      // Em produção: const response = await fetch('/api/users/1/dashboard')
-      const mockData = {
-        user: { id: 1, username: 'Victor', email: 'victor@polyglot.dev', created_at: new Date().toISOString(), total_xp: 150, level: 2, current_streak: 3, best_streak: 5, last_study_date: new Date().toISOString() },
-        stats: { total_xp: 150, level: 2, current_streak: 3, best_streak: 5, total_hours: 2.5, vocabulary_count: 25, phrases_count: 10, achievements_count: 2, next_level_xp: 283, progress_percent: 53 },
-        active_wave: { id: 1, wave_number: 1, language: 'german', language_name: 'Alemão', anchor: 'Rammstein', status: 'active', total_xp: 150, vocabulary_count: 25, phrases_count: 10, hours_input: 2.5 },
-        active_phase: { id: 1, phase_number: 1, name: 'O Despertar', status: 'active', xp_earned: 150, tasks_completed: 3, total_tasks: 7, progress_percent: 43 },
-        recent_logs: [
-          { id: 1, date: new Date().toISOString(), activity_type: 'srs', duration_minutes: 15, xp_earned: 12, notes: 'Revisão de vocabulário' },
-          { id: 2, date: new Date(Date.now() - 86400000).toISOString(), activity_type: 'shadowing', duration_minutes: 20, xp_earned: 15, notes: 'Shadowing "Sonne"' },
-        ],
+      // Estado inicial sem progresso falso. A persistência real entra pela API.
+      const initialData = {
+        user: { id: 1, username: 'Victor', email: 'victor@polyglot.dev', created_at: new Date().toISOString(), total_xp: 0, level: 1, current_streak: 0, best_streak: 0, last_study_date: null },
+        stats: { total_xp: 0, level: 1, current_streak: 0, best_streak: 0, total_hours: 0, vocabulary_count: 0, phrases_count: 0, achievements_count: 0, next_level_xp: 100, progress_percent: 0 },
+        active_wave: { id: 1, wave_number: 1, language: 'german', language_name: 'Alemão', anchor: 'Rammstein', status: 'active', total_xp: 0, vocabulary_count: 0, phrases_count: 0, hours_input: 0 },
+        active_phase: { id: 1, phase_number: 1, name: 'O Despertar', status: 'active', xp_earned: 0, tasks_completed: 0, total_tasks: 7, progress_percent: 0 },
+        recent_logs: [],
         achievements: [
-          { id: 1, code: 'first_step', name: 'Primeiro Passo', description: 'Complete sua primeira tarefa', icon: '👣', xp_reward: 10, earned: true, earned_at: new Date().toISOString() },
-          { id: 2, code: 'streak_3', name: 'Fogo Baixo', description: '3 dias de streak', icon: '🔥', xp_reward: 30, earned: true, earned_at: new Date().toISOString() },
+          { id: 1, code: 'first_step', name: 'Primeiro Passo', description: 'Complete sua primeira tarefa', icon: '👣', xp_reward: 10, earned: false },
+          { id: 2, code: 'streak_3', name: 'Fogo Baixo', description: '3 dias de streak', icon: '🔥', xp_reward: 30, earned: false },
           { id: 3, code: 'vocab_50', name: 'Colecionador', description: 'Aprenda 50 palavras', icon: '📚', xp_reward: 50, earned: false },
         ],
-        level_info: { current_level: 2, current_xp: 150, xp_for_next_level: 283, progress_percent: 53, title: 'Aprendiz' },
-        daily_goal_progress: { study_goal_minutes: 45, study_current_minutes: 35, study_percent: 78, input_goal_minutes: 20, input_current_minutes: 15, input_percent: 75, srs_goal_minutes: 10, srs_current_minutes: 15, srs_percent: 100, completed: false },
-        weekly_stats: { total_minutes: 180, total_xp: 95, sessions_count: 8, daily_average: 25.7, daily_breakdown: { Mon: 30, Tue: 45, Wed: 20, Thu: 35, Fri: 25, Sat: 15, Sun: 10 } }
+        level_info: { current_level: 1, current_xp: 0, xp_for_next_level: 100, progress_percent: 0, title: 'Novato' },
+        daily_goal_progress: { study_goal_minutes: 45, study_current_minutes: 0, study_percent: 0, input_goal_minutes: 20, input_current_minutes: 0, input_percent: 0, srs_goal_minutes: 10, srs_current_minutes: 0, srs_percent: 0, completed: false },
+        weekly_stats: { total_minutes: 0, total_xp: 0, sessions_count: 0, daily_average: 0, daily_breakdown: {} }
       }
-      setDashboard(mockData)
+      setDashboard(initialData)
     } catch (err) {
       setError(err.message)
     } finally {
@@ -172,9 +168,9 @@ export default function Dashboard() {
           <h3 className="text-lg font-semibold mb-4">Fase Atual: {activePhase.name}</h3>
           <div className="space-y-3">
             {[
-              { title: 'Alfabeto Alemão', completed: true, xp: 10 },
-              { title: 'Vogais Umlaut', completed: true, xp: 10 },
-              { title: 'Consoantes Duras', completed: true, xp: 10 },
+              { title: 'Alfabeto Alemão', completed: false, xp: 10 },
+              { title: 'Vogais Umlaut', completed: false, xp: 10 },
+              { title: 'Consoantes Duras', completed: false, xp: 10 },
               { title: 'R Gutural', completed: false, xp: 15 },
               { title: 'Entonação', completed: false, xp: 10 },
               { title: "Shadowing 'Sonne'", completed: false, xp: 20 },
