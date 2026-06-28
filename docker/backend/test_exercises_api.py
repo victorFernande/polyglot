@@ -58,3 +58,13 @@ def test_bootstrap_lists_lessons_and_persists_full_session_flow():
         assert repeated["already_completed"] is True
         assert repeated["xp_earned"] == complete["xp_earned"]
         assert repeated["correct_count"] == complete["correct_count"]
+
+
+def test_bootstrap_allows_independent_test_users():
+    with TestClient(app) as client:
+        first = client.post("/users/91001/bootstrap")
+        second = client.post("/users/91002/bootstrap")
+
+        assert first.status_code == 200, first.text
+        assert second.status_code == 200, second.text
+        assert first.json()["user"]["email"] != second.json()["user"]["email"]

@@ -299,7 +299,9 @@ class ExerciseService:
     def bootstrap_user(db: Session, user_id: int = 1):
         user = db.query(User).filter(User.id == user_id).first()
         if not user:
-            user = User(id=user_id, username="Victor", email="victor@polyglot.dev")
+            username = "Victor" if user_id == 1 else f"Victor{user_id}"
+            email = "victor@polyglot.dev" if user_id == 1 else f"victor+{user_id}@polyglot.dev"
+            user = User(id=user_id, username=username, email=email)
             db.add(user); db.flush(); WaveService.initialize_waves(db, user.id)
         elif not user.waves:
             WaveService.initialize_waves(db, user.id)
