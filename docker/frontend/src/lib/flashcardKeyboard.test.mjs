@@ -1,0 +1,88 @@
+import test from 'node:test'
+import assert from 'node:assert/strict'
+
+import { handleFlashcardKeyDown } from './flashcardKeyboard.mjs'
+
+function recorder() {
+  const calls = []
+  return {
+    calls,
+    handlers: {
+      next: () => calls.push('next'),
+      prev: () => calls.push('prev'),
+      flip: () => calls.push('flip'),
+      showFront: () => calls.push('showFront'),
+    },
+  }
+}
+
+function press(key, cardsLength = 3) {
+  const event = {
+    key,
+    defaultPrevented: false,
+    preventDefault() {
+      this.defaultPrevented = true
+    },
+  }
+  const { calls, handlers } = recorder()
+  const handled = handleFlashcardKeyDown(event, { cardsLength, ...handlers })
+  return { handled, calls, defaultPrevented: event.defaultPrevented }
+}
+
+test('ArrowRight advances to the next flashcard', () => {
+  assert.deepEqual(press('ArrowRight'), {
+    handled: true,
+    calls: ['next'],
+    defaultPrevented: true,
+  })
+})
+
+test('ArrowLeft returns to the previous flashcard', () => {
+  assert.deepEqual(press('ArrowLeft'), {
+    handled: true,
+    calls: ['prev'],
+    defaultPrevented: true,
+  })
+})
+
+test('Space and Enter flip the current flashcard', () => {
+  assert.deepEqual(press(' '), {
+    handled: true,
+    calls: ['flip'],
+    defaultPrevented: true,
+  })
+  assert.deepEqual(press('Enter'), {
+    handled: true,
+    calls: ['flip'],
+    defaultPrevented: true,
+  })
+})
+
+test('R returns the current flashcard to the front side', () => {
+  assert.deepEqual(press('r'), {
+    handled: true,
+    calls: ['showFront'],
+    defaultPrevented: true,
+  })
+  assert.deepEqual(press('R'), {
+    handled: true,
+    calls: ['showFront'],
+    defaultPrevented: true,
+  })
+})
+
+test('keys are ignored until flashcards are loaded', () => {
+  assert.deepEqual(press('ArrowRight', 0), {
+    handled: false,
+    calls: [],
+    defaultPrevented: false,
+  })
+})
+
+test('unmapped keys are ignored', () => {
+  assert.deepEqual(press('Escape'), {
+    handled: false,
+    calls: [],
+    defaultPrevented: false,
+  })
+})
