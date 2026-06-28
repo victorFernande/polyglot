@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { Check, Heart, X, Volume2, RotateCcw, Trophy, ArrowRight, Loader2, Star } from 'lucide-react'
 import LanguageFlag from '../components/LanguageFlag'
 import { answerExerciseSession, bootstrapUser, completeExerciseSession, loadExerciseLessons, loadExercisePath, startExerciseSession, apiFetch } from '../lib/api'
+import { stableShuffleOptions } from '../lib/exerciseOptions.mjs'
 
 const LANG_META = {
   de: { accent: 'Rammstein', color: 'from-red-600 to-red-900' },
@@ -282,7 +283,8 @@ function SkillTrail({ path }) {
 }
 
 function Choice({ item, selected, setSelected, onInteract }) {
-  return <div className="grid gap-3 sm:grid-cols-2">{(item.options || []).map((option) => <button key={option} onClick={() => { onInteract(); setSelected(option) }} className={`rounded-xl border p-4 text-left text-lg font-semibold transition ${selected === option ? 'border-polyglot-accent bg-polyglot-accent/20' : 'border-white/10 bg-white/5 hover:bg-white/10'}`}>{option}</button>)}</div>
+  const options = stableShuffleOptions(item.options || [], item.id ?? item.prompt)
+  return <div className="grid gap-3 sm:grid-cols-2">{options.map((option) => <button key={option} onClick={() => { onInteract(); setSelected(option) }} className={`rounded-xl border p-4 text-left text-lg font-semibold transition ${selected === option ? 'border-polyglot-accent bg-polyglot-accent/20' : 'border-white/10 bg-white/5 hover:bg-white/10'}`}>{option}</button>)}</div>
 }
 
 function Build({ item, built, setBuilt, onInteract }) {
