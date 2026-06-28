@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: polyglot-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - polyglot-data:/app/data
+    environment:
+      - DATABASE_URL=sqlite:///./data/polyglot.db
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: polyglot-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    container_name: polyglot-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./frontend/dist:/usr/share/nginx/html
+    depends_on:
+      - backend
+      - frontend
+    restart: unless-stopped
+
+volumes:
+  polyglot-data:
