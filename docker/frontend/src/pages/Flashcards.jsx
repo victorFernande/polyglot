@@ -4,6 +4,7 @@ import LanguageFlag from '../components/LanguageFlag'
 import { bootstrapUser, loadFlashcards } from '../lib/api'
 import { handleFlashcardKeyDown } from '../lib/flashcardKeyboard.mjs'
 import { shuffleFlashcards } from '../lib/flashcardOrder.mjs'
+import { getFlashcardSupportVisibility } from '../lib/flashcardReveal.mjs'
 
 const LANGS = [
   { code: 'de', name: 'Alemão' },
@@ -43,6 +44,7 @@ export default function Flashcards() {
   const card = cards[index]
   const progress = cards.length ? ((index + 1) / cards.length) * 100 : 0
   const currentLang = useMemo(() => LANGS.find((l) => l.code === language), [language])
+  const supportVisibility = getFlashcardSupportVisibility({ flipped })
 
   function next() {
     setIndex((i) => Math.min(cards.length - 1, i + 1))
@@ -116,10 +118,14 @@ export default function Flashcards() {
           </button>
         )}
 
-        {card && (
+        {card && (supportVisibility.hint || supportVisibility.explanation) && (
           <div className="mt-6 grid gap-4 md:grid-cols-2">
-            <div className="rounded-xl bg-white/5 p-4 text-sm text-gray-300"><strong>Dica:</strong> {card.hint}</div>
-            <div className="rounded-xl bg-white/5 p-4 text-sm text-gray-300"><strong>Explicação:</strong> {card.explanation}</div>
+            {supportVisibility.hint && (
+              <div className="rounded-xl bg-white/5 p-4 text-sm text-gray-300"><strong>Dica:</strong> {card.hint}</div>
+            )}
+            {supportVisibility.explanation && (
+              <div className="rounded-xl bg-white/5 p-4 text-sm text-gray-300"><strong>Explicação:</strong> {card.explanation}</div>
+            )}
           </div>
         )}
 
