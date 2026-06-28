@@ -7,6 +7,9 @@ from models import Base, engine, SessionLocal, ExerciseLesson, ExerciseItem  # n
 from services import ExerciseService  # noqa: E402
 
 
+LANGUAGES = {"de", "fr", "ru", "jp", "en"}
+
+
 def test_seed_lessons_is_long_varied_and_idempotent():
     Base.metadata.create_all(bind=engine)
     db = SessionLocal()
@@ -17,17 +20,25 @@ def test_seed_lessons_is_long_varied_and_idempotent():
         db.commit()
 
         lessons = db.query(ExerciseLesson).all()
-        assert {lesson.language_code for lesson in lessons} == {"de", "fr", "ru", "jp"}
+        assert {lesson.language_code for lesson in lessons} == LANGUAGES
 
         for lesson in lessons:
             items = db.query(ExerciseItem).filter(ExerciseItem.lesson_id == lesson.id).all()
-            assert len(items) >= 12
+            assert len(items) == ExerciseService.TARGET_ITEMS
             assert {item.type for item in items} >= {"choice", "build", "match"}
             assert all(item.hint for item in items)
             assert all(item.explanation for item in items)
+            for item in items:
+                if item.type == "choice":
+                    assert item.answer["value"] in item.options
+                elif item.type == "build":
+                    assert all(word in item.tiles for word in item.answer["value"])
+                elif item.type == "match":
+                    assert item.answer["pairs"] == item.pairs
+                    assert len(item.pairs) == 4
 
-        assert db.query(ExerciseLesson).count() == 4
-        assert db.query(ExerciseItem).count() == 48
+        assert db.query(ExerciseLesson).count() == len(LANGUAGES)
+        assert db.query(ExerciseItem).count() == len(LANGUAGES) * ExerciseService.TARGET_ITEMS
     finally:
         db.close()
 
@@ -52,14 +63,23 @@ def test_seed_lessons_deactivates_legacy_prototype_lessons():
         ExerciseService.seed_lessons(db)
 
         active_lessons = db.query(ExerciseLesson).filter(ExerciseLesson.active == True).all()
-        assert len(active_lessons) == 4
+        assert len(active_lessons) == len(LANGUAGES)
         assert {lesson.slug for lesson in active_lessons} == {
-            "de-primeiros-contatos",
-            "fr-primeiros-contatos",
-            "ru-primeiros-contatos",
-            "jp-primeiros-contatos",
+            "de-trilha-100",
+            "fr-trilha-100",
+            "ru-trilha-100",
+            "jp-trilha-100",
+            "en-trilha-100",
         }
         db.refresh(legacy)
         assert legacy.active is False
     finally:
         db.close()
+
+
+def test_matching_payload_from_frontend_is_accepted_for_german_fundamentals():
+    expected_pairs = [["Bitte", "por favor"], ["Ja", "sim"], ["Nein", "não"], ["Wasser", "água"]]
+    frontend_payload = {left: right for left, right in expected_pairs}
+    canonical_answer = {"pairs": expected_pairs}
+
+    assert ExerciseService.normalize(frontend_payload) == ExerciseService.normalize(canonical_answer)

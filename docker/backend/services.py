@@ -202,6 +202,43 @@ class ExerciseService:
         return {"type":"match","prompt":prompt,"answer":{"pairs":pairs},"options":None,"tiles":None,"pairs":pairs,"hint":"Combine pelo significado, não pela aparência da palavra.","explanation":"Matching fortalece reconhecimento rápido de vocabulário.","xp_reward":12 + (idx % 4)}
 
     @staticmethod
+    def _matching_sample(vocab, start, size=4):
+        sample = []
+        seen_foreign = set()
+        seen_portuguese = set()
+        for portuguese, foreign in vocab[start:] + vocab[:start]:
+            foreign_key = str(foreign).casefold()
+            portuguese_key = str(portuguese).casefold()
+            if foreign_key in seen_foreign or portuguese_key in seen_portuguese:
+                continue
+            sample.append((portuguese, foreign))
+            seen_foreign.add(foreign_key)
+            seen_portuguese.add(portuguese_key)
+            if len(sample) == size:
+                break
+        return sample
+
+    @staticmethod
+    def _items_need_regeneration(lesson: ExerciseLesson, generated: list[dict]) -> bool:
+        existing = sorted(list(lesson.items), key=lambda item: item.order_index)
+        if len(existing) != len(generated):
+            return True
+        for item, expected in zip(existing, generated):
+            if (
+                item.type != expected["type"]
+                or item.prompt != expected["prompt"]
+                or item.answer != expected["answer"]
+                or item.options != expected["options"]
+                or item.tiles != expected["tiles"]
+                or item.pairs != expected["pairs"]
+                or item.hint != expected["hint"]
+                or item.explanation != expected["explanation"]
+                or item.xp_reward != expected["xp_reward"]
+            ):
+                return True
+        return False
+
+    @staticmethod
     def generate_items(code: str):
         name = ExerciseService.LANGUAGE_NAMES[code]
         items = []
@@ -231,7 +268,7 @@ class ExerciseService:
                     extras = all_foreign[:5]
                     items.append(ExerciseService._build(prompt, words, extras, idx))
                 else:
-                    sample = (vocab[j:] + vocab[:j])[:4]
+                    sample = ExerciseService._matching_sample(vocab, j)
                     pairs = [[foreign, portuguese] for portuguese, foreign in sample]
                     items.append(ExerciseService._match(f"{prefix}: combine vocabulário de {topic_name.lower()}", pairs, idx))
         return items[:ExerciseService.TARGET_ITEMS]
@@ -249,7 +286,7 @@ class ExerciseService:
             else:
                 lesson.active = True; lesson.order_index = order; lesson.language_name = ExerciseService.LANGUAGE_NAMES[code]
             generated = ExerciseService.generate_items(code)
-            if len(lesson.items) != ExerciseService.TARGET_ITEMS or not (lesson.items and lesson.items[0].prompt.startswith("Tema")):
+            if ExerciseService._items_need_regeneration(lesson, generated):
                 db.query(ExerciseItem).filter(ExerciseItem.lesson_id == lesson.id).delete(); db.flush()
                 for idx, item in enumerate(generated, 1):
                     db.add(ExerciseItem(lesson_id=lesson.id, order_index=idx, type=item["type"], prompt=item["prompt"], answer=item["answer"], options=item["options"], tiles=item["tiles"], pairs=item["pairs"], hint=item["hint"], explanation=item["explanation"], xp_reward=item["xp_reward"]))
@@ -338,6 +375,7 @@ class ExerciseService:
         if isinstance(value, dict):
             if "value" in value: return ExerciseService.normalize(value["value"])
             if "pairs" in value: return sorted([[str(a).casefold(), str(b).casefold()] for a, b in value["pairs"]])
+            return sorted([[str(a).casefold(), str(b).casefold()] for a, b in value.items()])
         if isinstance(value, list): return [str(v).casefold() for v in value]
         return str(value).strip().casefold()
 

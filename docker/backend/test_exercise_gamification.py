@@ -6,6 +6,16 @@ from pathlib import Path
 from fastapi.testclient import TestClient
 
 
+def ui_payload_for_item(item):
+    if item["type"] == "choice":
+        return item["answer"]["value"]
+    if item["type"] == "build":
+        return item["answer"]["value"]
+    if item["type"] == "match":
+        return {left: right for left, right in item["answer"]["pairs"]}
+    return item["answer"]
+
+
 def make_client(tmp_path):
     os.environ["DATABASE_URL"] = f"sqlite:///{tmp_path / 'polyglot-test.db'}"
     for name in ["main", "services", "schemas", "models"]:
@@ -29,10 +39,9 @@ def test_completing_exercise_session_updates_gamification_once(tmp_path):
 
     expected_xp = 0
     for item in detail["items"][:3]:
-        answer = item["answer"]["value"]
         response = client.post(
             f"/exercise-sessions/{session_id}/answer",
-            json={"item_id": item["id"], "payload": {"value": answer}},
+            json={"item_id": item["id"], "payload": ui_payload_for_item(item)},
         )
         assert response.status_code == 200, response.text
         assert response.json()["is_correct"] is True

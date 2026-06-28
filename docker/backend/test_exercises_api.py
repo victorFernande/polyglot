@@ -17,14 +17,14 @@ def test_bootstrap_lists_lessons_and_persists_full_session_flow():
         assert bootstrap.status_code == 200, bootstrap.text
         boot_payload = bootstrap.json()
         assert boot_payload["user"]["id"] == 1
-        assert boot_payload["lessons_count"] == 4
+        assert boot_payload["lessons_count"] == 5
 
         lessons_response = client.get("/exercise-lessons", params={"user_id": 1})
         assert lessons_response.status_code == 200, lessons_response.text
         lessons = lessons_response.json()
-        assert len(lessons) == 4
-        assert {lesson["language"] for lesson in lessons} == {"de", "fr", "ru", "jp"}
-        assert all(lesson["items_count"] >= 1 for lesson in lessons)
+        assert len(lessons) == 5
+        assert {lesson["language"] for lesson in lessons} == {"de", "fr", "ru", "jp", "en"}
+        assert all(lesson["items_count"] == 100 for lesson in lessons)
 
         lesson_id = lessons[0]["id"]
         session_response = client.post(f"/exercise-lessons/{lesson_id}/sessions", params={"user_id": 1})
@@ -54,4 +54,7 @@ def test_bootstrap_lists_lessons_and_persists_full_session_flow():
 
         repeat_response = client.post(f"/exercise-sessions/{session['id']}/complete")
         assert repeat_response.status_code == 200, repeat_response.text
-        assert repeat_response.json() == complete
+        repeated = repeat_response.json()
+        assert repeated["already_completed"] is True
+        assert repeated["xp_earned"] == complete["xp_earned"]
+        assert repeated["correct_count"] == complete["correct_count"]
