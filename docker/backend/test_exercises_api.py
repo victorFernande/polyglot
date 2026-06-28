@@ -11,6 +11,16 @@ from fastapi.testclient import TestClient  # noqa: E402
 from main import app  # noqa: E402
 
 
+def ui_payload(item):
+    if item["type"] == "choice":
+        return item["answer"]["value"]
+    if item["type"] == "build":
+        return item["answer"]["value"]
+    if item["type"] == "match":
+        return {left: right for left, right in item["answer"]["pairs"]}
+    return item["answer"]
+
+
 def test_bootstrap_lists_lessons_and_persists_full_session_flow():
     with TestClient(app) as client:
         bootstrap = client.post("/users/1/bootstrap")
@@ -86,6 +96,37 @@ def test_wrong_answer_records_mistake_advances_and_returns_teaching_feedback():
         assert "Você respondeu" in result["mistake_feedback"]["message"]
         assert "Resposta correta" in result["mistake_feedback"]["message"]
         assert result["mistake_feedback"]["explanation"]
+
+
+def test_starting_after_exhausted_session_returns_next_10_item_session():
+    with TestClient(app) as client:
+        user_id = 93011
+        client.post(f"/users/{user_id}/bootstrap")
+        lesson = client.get("/exercise-lessons", params={"user_id": user_id}).json()[0]
+        session = client.post(f"/exercise-lessons/{lesson['id']}/sessions", params={"user_id": user_id}).json()
+        first_session_id = session["id"]
+        first_item_ids = [item["id"] for item in session["items"]]
+
+        for _ in range(session["total_count"]):
+            item = session["items"][session["current_index"]]
+            result = client.post(
+                f"/exercise-sessions/{session['id']}/answer",
+                json={"item_id": item["id"], "payload": ui_payload(item)},
+            )
+            assert result.status_code == 200, result.text
+            session = result.json()["session"]
+
+        assert session["current_index"] == session["total_count"]
+        assert session["status"] == "in_progress"
+
+        next_session = client.post(f"/exercise-lessons/{lesson['id']}/sessions", params={"user_id": user_id}).json()
+
+        assert next_session["id"] != first_session_id
+        assert next_session["status"] == "in_progress"
+        assert next_session["current_index"] == 0
+        assert next_session["current_item"] is not None
+        assert len(next_session["items"]) == next_session["total_count"] == 10
+        assert [item["id"] for item in next_session["items"]] != first_item_ids
 
 
 def test_bootstrap_allows_independent_test_users():

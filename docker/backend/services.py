@@ -364,7 +364,10 @@ class ExerciseService:
         lesson = db.query(ExerciseLesson).filter(ExerciseLesson.id == lesson_id).first()
         if not lesson: return None
         session = db.query(ExerciseSession).filter(ExerciseSession.user_id == user_id, ExerciseSession.lesson_id == lesson_id, ExerciseSession.status == "in_progress").first()
-        if session: return session
+        if session:
+            if int(session.current_index or 0) < int(session.total_count or 0):
+                return session
+            ExerciseService.complete_session(db, session.id)
         completed_count = db.query(ExerciseSession).filter(ExerciseSession.user_id == user_id, ExerciseSession.lesson_id == lesson_id, ExerciseSession.status == "completed").count()
         total_sessions = max(1, (len(lesson.items) + ExerciseService.SESSION_SIZE - 1) // ExerciseService.SESSION_SIZE)
         offset = (completed_count % total_sessions) * ExerciseService.SESSION_SIZE

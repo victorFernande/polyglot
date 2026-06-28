@@ -137,19 +137,31 @@ export default function Exercises() {
 
   async function next() {
     resetExerciseState()
-    if (session?.current_index >= session?.total_count) await finish()
+    if (session?.current_index >= session?.total_count) await finish(true)
   }
 
-  async function finish() {
+  async function finish(continueNext = false) {
     if (!session) return
     setBusy(true)
     try {
       const done = await completeExerciseSession(session.id)
-      setSummary(done)
       setSession(done.session)
       const refreshed = await loadExerciseLessons(user?.id || 1)
       setLessons(refreshed)
       setPathData(await loadExercisePath(user?.id || 1))
+      if (continueNext) {
+        const currentLesson = refreshed.find((l) => l.id === lesson?.id) || lessons.find((l) => l.id === lesson?.id) || lesson
+        if (currentLesson?.id) {
+          const started = await startExerciseSession(currentLesson.id, user?.id || 1)
+          const full = await apiFetch(`/exercise-lessons/${currentLesson.id}`)
+          resetExerciseState()
+          setLesson(full)
+          setSession(started)
+          setSummary(null)
+          return
+        }
+      }
+      setSummary(done)
     } catch (err) {
       setError(err.message)
     } finally {
@@ -248,8 +260,8 @@ export default function Exercises() {
 
           <div className="mt-6 flex justify-end gap-3">
             {!feedback && <button className="btn-primary disabled:opacity-40" disabled={!canCheck || busy} onClick={check}>{busy ? 'Salvando...' : 'Verificar'}</button>}
-            {feedback?.type === 'wrong' && (session.current_index >= session.total_count ? <button className="btn-primary" onClick={finish}>Concluir e salvar XP</button> : <button className="btn-primary inline-flex items-center gap-2" onClick={next}>Entendi, continuar <ArrowRight size={18} /></button>)}
-            {feedback?.type === 'correct' && (session.current_index >= session.total_count ? <button className="btn-primary" onClick={finish}>Concluir e salvar XP</button> : <button className="btn-primary inline-flex items-center gap-2" onClick={next}>Continuar <ArrowRight size={18} /></button>)}
+            {feedback?.type === 'wrong' && (session.current_index >= session.total_count ? <button className="btn-primary inline-flex items-center gap-2" onClick={() => finish(true)}>Salvar e ir para questão 11 <ArrowRight size={18} /></button> : <button className="btn-primary inline-flex items-center gap-2" onClick={next}>Entendi, continuar <ArrowRight size={18} /></button>)}
+            {feedback?.type === 'correct' && (session.current_index >= session.total_count ? <button className="btn-primary inline-flex items-center gap-2" onClick={() => finish(true)}>Salvar e ir para questão 11 <ArrowRight size={18} /></button> : <button className="btn-primary inline-flex items-center gap-2" onClick={next}>Continuar <ArrowRight size={18} /></button>)}
           </div>
         </div>
       )}
