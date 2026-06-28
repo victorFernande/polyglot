@@ -254,7 +254,7 @@ class ExerciseService:
         user.total_xp += session.xp_earned; user.level = GamificationService.calculate_level(user.total_xp); user.last_study_date = datetime.utcnow()
         new = GamificationService.check_achievements(db, user)
         db.commit(); db.refresh(session)
-        return {"id": session.id, "status": session.status, "session": ExerciseService.session_payload(session), "xp_earned": session.xp_earned, "correct_count": session.correct_count, "total_count": session.total_count, "hearts_left": session.hearts_left, "vocabulary_added": vocab, "phrases_added": phrases, "new_achievements": [a.name for a in new], "already_completed": True}
+        return {"id": session.id, "status": session.status, "session": ExerciseService.session_payload(session), "xp_earned": session.xp_earned, "correct_count": session.correct_count, "total_count": session.total_count, "hearts_left": session.hearts_left, "vocabulary_added": vocab, "phrases_added": phrases, "new_achievements": [a.name for a in new], "already_completed": False}
 
 class ExerciseContentService:
     @staticmethod
