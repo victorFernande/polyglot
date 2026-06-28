@@ -28,3 +28,29 @@ export function stableShuffleOptions(options, seed) {
 
   return shuffled
 }
+
+function optionSeed(item, suffix) {
+  return `${item?.id ?? item?.prompt ?? ''}:${suffix}`
+}
+
+function answerValue(answer) {
+  if (answer && typeof answer === 'object' && 'value' in answer) return answer.value
+  return answer
+}
+
+function matchPairs(item) {
+  if (Array.isArray(item?.pairs)) return item.pairs
+  if (item?.answer?.pairs) return item.answer.pairs
+  if (item?.answer && typeof item.answer === 'object') return Object.entries(item.answer)
+  return []
+}
+
+export function buildTilesForItem(item) {
+  if (item?.tiles?.length) return [...item.tiles]
+  return stableShuffleOptions(answerValue(item?.answer) || [], optionSeed(item, 'build'))
+}
+
+export function matchRightOptions(item) {
+  const rights = matchPairs(item).map(([, right]) => right)
+  return stableShuffleOptions(rights, optionSeed(item, 'match-rights'))
+}

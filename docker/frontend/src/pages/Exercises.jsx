@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 import { Check, Heart, X, Volume2, RotateCcw, Trophy, ArrowRight, Loader2, Star } from 'lucide-react'
 import LanguageFlag from '../components/LanguageFlag'
 import { answerExerciseSession, bootstrapUser, completeExerciseSession, loadExerciseLessons, loadExercisePath, startExerciseSession, apiFetch } from '../lib/api'
-import { stableShuffleOptions } from '../lib/exerciseOptions.mjs'
+import { buildTilesForItem, matchRightOptions, stableShuffleOptions } from '../lib/exerciseOptions.mjs'
 
 const LANG_META = {
   de: { accent: 'Rammstein', color: 'from-red-600 to-red-900' },
@@ -34,10 +34,6 @@ function matchPairs(item) {
   if (item.answer?.pairs) return item.answer.pairs
   if (item.answer && typeof item.answer === 'object') return Object.entries(item.answer)
   return []
-}
-
-function shuffle(list) {
-  return [...list].sort(() => Math.random() - 0.5)
 }
 
 export default function Exercises() {
@@ -291,13 +287,12 @@ function Choice({ item, selected, setSelected, onInteract }) {
 }
 
 function Build({ item, built, setBuilt, onInteract }) {
-  const target = answerValue(item.answer) || []
-  const tiles = item.tiles?.length ? item.tiles : shuffle(target)
+  const tiles = buildTilesForItem(item)
   return <div className="space-y-4"><div className="min-h-16 rounded-xl border border-dashed border-white/20 bg-white/5 p-4">{built.length === 0 ? <span className="text-gray-500">Toque nas palavras para montar a frase...</span> : built.map((word, i) => <button key={`${word}-${i}`} onClick={() => { onInteract(); setBuilt(built.filter((_, idx) => idx !== i)) }} className="mr-2 mb-2 rounded-lg bg-polyglot-accent px-3 py-2 font-semibold">{word}</button>)}</div><div className="flex flex-wrap gap-2">{tiles.map((tile, i) => <button key={`${tile}-${i}`} disabled={built.includes(tile)} onClick={() => { onInteract(); setBuilt([...built, tile]) }} className="rounded-lg bg-white/10 px-4 py-3 font-semibold hover:bg-white/20 disabled:opacity-30">{tile}</button>)}</div></div>
 }
 
 function Match({ item, matched, setMatched, onInteract }) {
   const pairs = matchPairs(item)
-  const rights = pairs.map(([, right]) => right)
+  const rights = matchRightOptions(item)
   return <div className="grid gap-3 md:grid-cols-2">{pairs.map(([left]) => <div key={left} className="rounded-xl bg-white/5 p-4"><div className="mb-3 text-xl font-bold">{left}</div><div className="flex flex-wrap gap-2">{rights.map((right) => <button key={right} onClick={() => { onInteract(); setMatched({ ...matched, [left]: right }) }} className={`rounded-lg px-3 py-2 text-sm font-semibold ${matched[left] === right ? 'bg-polyglot-accent' : 'bg-white/10 hover:bg-white/20'}`}>{right}</button>)}</div></div>)}</div>
 }
