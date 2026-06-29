@@ -100,6 +100,19 @@ test('Exercises page imports trail helpers used by the rendered trail', () => {
   assert.match(importLine, /trailNodeStateClasses/)
 })
 
+test('mobile trail nodes render only the inner marker and label, without card button wrapper', () => {
+  const source = readFileSync(new URL('../pages/Exercises.jsx', import.meta.url), 'utf8')
+  const mobileStart = source.indexOf('function renderMobileNode')
+  const mobileEnd = source.indexOf('\n\n  return (', mobileStart)
+  const mobileNode = source.slice(mobileStart, mobileEnd)
+
+  assert.notEqual(mobileStart, -1)
+  assert.notEqual(mobileEnd, -1)
+  assert.doesNotMatch(mobileNode, /rounded-2xl border border-white\/10 bg-white\/5 p-2/)
+  assert.match(mobileNode, /trailNodeStateClasses/)
+  assert.match(mobileNode, /S\{node\.number\}/)
+})
+
 test('Tailwind scans mjs helpers that provide exercise trail classes', () => {
   const config = readFileSync(new URL('../../tailwind.config.js', import.meta.url), 'utf8')
 

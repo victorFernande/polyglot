@@ -475,12 +475,12 @@ function SkillTrail({ path, lessonContext, page, mobilePage, onPageChange, onMob
     const isGreenConnector = node.status === 'completed' || isActiveSession
     return (
       <React.Fragment key={node.number}>
-        <button type="button" disabled={!isEnabled} onClick={() => onSessionClick?.(node.number)} className="min-w-0 flex-1 rounded-2xl border border-white/10 bg-white/5 p-2 text-center disabled:cursor-not-allowed" title={isEnabled ? `Abrir sessão ${node.number}` : 'Sessão bloqueada'}>
+        <div role={isEnabled ? 'button' : undefined} tabIndex={isEnabled ? 0 : undefined} onClick={isEnabled ? () => onSessionClick?.(node.number) : undefined} onKeyDown={isEnabled ? (event) => { if (event.key === 'Enter' || event.key === ' ') onSessionClick?.(node.number) } : undefined} className="min-w-0 flex-1 text-center" title={isEnabled ? `Abrir sessão ${node.number}` : 'Sessão bloqueada'}>
           <div className={`mx-auto flex h-10 w-10 items-center justify-center rounded-full border-2 text-sm font-bold transition ${trailNodeStateClasses(node, isActiveSession)}`}>
             {node.status === 'completed' ? '✓' : <Star size={16} />}
           </div>
           <span className={`mt-1 block truncate text-[11px] font-semibold ${isActiveSession ? 'text-polyglot-accent' : 'text-gray-400'}`}>S{node.number}</span>
-        </button>
+        </div>
         {index < nodes.length - 1 && <div className={`${layout.mobileConnector} ${isGreenConnector ? 'bg-polyglot-green' : 'bg-white/15'}`} />}
       </React.Fragment>
     )
