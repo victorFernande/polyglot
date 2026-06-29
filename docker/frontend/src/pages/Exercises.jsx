@@ -206,6 +206,10 @@ export default function Exercises() {
     speechPlaybackRef.current?.speakSegments(segments)
   }
 
+  function replayCurrentAudio() {
+    speakCurrent(feedback ? voiceSegmentsForFeedback(feedback, langCode) : voiceSegmentsForItem(item, langCode))
+  }
+
   useEffect(() => {
     if (voiceMode && item && !feedback) speakCurrent()
   }, [voiceMode, item?.id, feedback])
@@ -225,6 +229,7 @@ export default function Exercises() {
         check,
         next,
         clear: resetExerciseState,
+        speakCurrent: replayCurrentAudio,
       })
     }
 
@@ -299,7 +304,7 @@ export default function Exercises() {
               <h2 className="text-2xl font-bold">{item.prompt}</h2>
             </div>
             <div className="ml-auto flex gap-2">
-              <button className="btn-secondary" title="Ouvir pergunta/correção" onClick={() => speakCurrent(feedback ? voiceSegmentsForFeedback(feedback, langCode) : voiceSegmentsForItem(item, langCode))}><Volume2 size={18} /></button>
+              <button className="btn-secondary" title="Ouvir pergunta/correção" onClick={replayCurrentAudio}><Volume2 size={18} /></button>
               <button className={`btn-secondary text-xs ${voiceMode ? 'ring-2 ring-polyglot-accent' : ''}`} onClick={() => setVoiceMode(!voiceMode)}>{voiceMode ? 'Voz ligada' : 'Modo voz'}</button>
             </div>
           </div>
@@ -318,7 +323,7 @@ export default function Exercises() {
           {item.type === 'match' && <Match item={item} matched={matched} onInteract={() => setFeedback(null)} setMatched={setMatched} />}
 
           <div className="mt-6 rounded-xl bg-white/5 p-4 text-sm text-gray-300"><strong>Dica:</strong> {item.hint}</div>
-          <div className="mt-3 text-xs text-gray-500">Atalhos: 1-4 selecionar · Enter verificar/continuar · Esc limpar</div>
+          <div className="mt-3 text-xs text-gray-500">Atalhos: 1-4 selecionar · O ouvir · Enter verificar/continuar · Esc limpar</div>
 
           {feedback && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className={`mt-6 rounded-xl p-4 ${feedback.type === 'correct' ? 'bg-polyglot-green/20 text-polyglot-green' : 'bg-red-500/20 text-red-300'}`}>

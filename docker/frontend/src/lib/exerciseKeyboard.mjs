@@ -15,6 +15,7 @@ export function handleExerciseKeyDown(event, {
   check,
   next,
   clear,
+  speakCurrent,
 }) {
   if (!hasItem || busy || isEditableTarget(event.target)) return false
 
@@ -29,6 +30,8 @@ export function handleExerciseKeyDown(event, {
     else if (canCheck) action = check
   } else if (key === 'Escape') {
     action = clear
+  } else if (key.toLowerCase() === 'o') {
+    action = speakCurrent
   }
 
   if (!action) return false

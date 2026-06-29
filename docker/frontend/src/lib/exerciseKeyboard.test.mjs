@@ -23,6 +23,7 @@ function recorder() {
       check: () => calls.push(['check']),
       next: () => calls.push(['next']),
       clear: () => calls.push(['clear']),
+      speakCurrent: () => calls.push(['speakCurrent']),
     },
   }
 }
@@ -82,6 +83,19 @@ test('Escape clears the local answer state', () => {
   assert.deepEqual(press('Escape'), {
     handled: true,
     calls: [['clear']],
+    defaultPrevented: true,
+  })
+})
+
+test('O key replays the current question or feedback audio', () => {
+  assert.deepEqual(press('o'), {
+    handled: true,
+    calls: [['speakCurrent']],
+    defaultPrevented: true,
+  })
+  assert.deepEqual(press('O', { hasFeedback: true }), {
+    handled: true,
+    calls: [['speakCurrent']],
     defaultPrevented: true,
   })
 })
