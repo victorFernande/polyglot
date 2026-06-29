@@ -96,3 +96,13 @@ export async function completeExerciseSession(sessionId) {
     method: 'POST',
   })
 }
+
+export async function synthesizeSpeech(text, lang = 'pt-BR') {
+  const response = await fetch(normalizePath('/tts'), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text, lang }),
+  })
+  if (!response.ok) throw new Error(`TTS failed: ${response.status}`)
+  return response.blob()
+}

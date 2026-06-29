@@ -203,6 +203,20 @@ class ExerciseService:
         return {"type":"choice","prompt":prompt,"answer":{"value":answer},"options":opts,"tiles":None,"pairs":None,"hint":"Escolha a opção correta e fale em voz alta antes de confirmar.","explanation":f"Resposta correta: {answer}.","xp_reward":8 + (idx % 3)}
 
     @staticmethod
+    def _listen_choice(prompt, answer, options, idx):
+        item = ExerciseService._choice(prompt, answer, options, idx)
+        item["type"] = "listen_choice"
+        item["hint"] = "Ouça o áudio, repita em voz alta e escolha o que foi dito. O áudio alterna português e idioma estudado quando necessário."
+        return item
+
+    @staticmethod
+    def _context_choice(prompt, answer, options, idx):
+        item = ExerciseService._choice(prompt, answer, options, idx)
+        item["type"] = "context_choice"
+        item["hint"] = "Pense na situação real antes de escolher: o objetivo é comunicar, não só traduzir palavra por palavra."
+        return item
+
+    @staticmethod
     def _build(prompt, words, extras, idx):
         tiles = list(dict.fromkeys(extras + words))
         return {"type":"build","prompt":prompt,"answer":{"value":words},"options":None,"tiles":tiles,"pairs":None,"hint":"Monte a frase na ordem natural do idioma.","explanation":"Frases curtas ajudam a fixar padrões sem decorar regras isoladas.","xp_reward":10 + (idx % 4)}
@@ -268,7 +282,7 @@ class ExerciseService:
             if key in seen:
                 continue
             svg = ExerciseService._icon_svg(icon_key, len(unique))
-            unique.append({"label_pt": portuguese, "value": foreign, "icon_key": icon_key, "svg": svg, "image_src": ExerciseService._svg_data_uri(svg)})
+            unique.append({"label_pt": portuguese, "display_text": foreign, "value": foreign, "icon_key": icon_key, "svg": svg, "image_src": ExerciseService._svg_data_uri(svg)})
             seen.add(key)
             if len(unique) == 4:
                 break
@@ -338,20 +352,31 @@ class ExerciseService:
                     prefix = f"Unidade {unit_index}/10 — {unit['title']} · Tópico {topic_index}/10 — {topic_name}"
                     hint = f"Mini-aula: {unit['goal']} Foque na situação comunicativa antes de decorar palavras isoladas."
                     explanation = f"{unit['title']}: “{target}” corresponde a “{pt}”. Use esta frase pronta como bloco real de comunicação em {name}."
-                    mode = question_index % 3
-                    if question_index == 4:
-                        item = ExerciseService._image_choice_from_phrases(prefix, phrases, topic_index - 1, idx, topic_name)
-                    elif mode == 1:
-                        wrong = [x for x in all_foreign if x != target][:3]
+                    wrong = [x for x in all_foreign if x != target][:3]
+                    if question_index == 1:
                         item = ExerciseService._choice(f"{prefix}: como dizer “{pt}” em {name}?", target, wrong, idx)
-                    elif mode == 2:
+                    elif question_index == 2:
+                        item = ExerciseService._listen_choice(f"{prefix}: ouça e escolha a frase que corresponde a “{pt}”", target, wrong, idx)
+                    elif question_index == 3:
+                        item = ExerciseService._image_choice_from_phrases(prefix, phrases, topic_index - 1, idx, topic_name)
+                    elif question_index == 4:
                         words = target.split()
                         extras = [word for foreign in all_foreign[:5] for word in foreign.split()]
                         item = ExerciseService._build(f"{prefix}: monte a frase “{pt}”", words, extras, idx)
-                    else:
+                    elif question_index == 5:
+                        item = ExerciseService._context_choice(f"{prefix}: situação — qual frase você usaria para “{pt}”?", target, wrong, idx)
+                    elif question_index == 6:
                         sample = ExerciseService._matching_sample(phrases, question_index - 1)
                         pairs = [[foreign, portuguese] for portuguese, foreign in sample]
                         item = ExerciseService._match(f"{prefix}: combine frases úteis", pairs, idx)
+                    elif question_index in {7, 9}:
+                        item = ExerciseService._listen_choice(f"{prefix}: ouça/reconheça “{pt}”", target, wrong, idx)
+                    elif question_index == 8:
+                        words = target.split()
+                        extras = [word for foreign in all_foreign[5:] for word in foreign.split()]
+                        item = ExerciseService._build(f"{prefix}: organize a frase “{pt}”", words, extras, idx)
+                    else:
+                        item = ExerciseService._context_choice(f"{prefix}: escolha a melhor frase para a situação “{pt}”", target, wrong, idx)
                     item["hint"] = hint
                     if item["type"] != "image_choice":
                         item["explanation"] = explanation

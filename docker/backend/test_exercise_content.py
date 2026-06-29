@@ -46,6 +46,7 @@ def test_seed_lessons_is_long_varied_and_idempotent():
                     assert item.answer["value"] in [option["value"] for option in item.options]
                     assert len(item.options) == 4
                     assert all(option["label_pt"] for option in item.options)
+                    assert all(option["display_text"] == option["value"] for option in item.options)
                     assert all(option["icon_key"] for option in item.options)
                     assert all(option["svg"].startswith("<svg") for option in item.options)
                     assert all("viewBox" in option["svg"] for option in item.options)
@@ -140,3 +141,14 @@ def test_image_choice_options_include_frontend_ready_image_src():
 
     assert all(option["image_src"].startswith("data:image/svg+xml;charset=UTF-8,") for option in item["options"])
     assert all("%3Csvg" in option["image_src"] for option in item["options"])
+
+
+def test_first_five_exercises_are_not_repetitive_variations_of_same_task():
+    first_five = ExerciseService.generate_items("de")[:5]
+    types = [item["type"] for item in first_five]
+    prompts = [item["prompt"] for item in first_five]
+
+    assert types == ["choice", "listen_choice", "image_choice", "build", "context_choice"]
+    assert any("ouça" in prompt.casefold() for prompt in prompts)
+    assert any("imagem" in prompt.casefold() for prompt in prompts)
+    assert any("complete" in prompt.casefold() or "situação" in prompt.casefold() for prompt in prompts)

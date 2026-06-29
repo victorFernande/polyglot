@@ -2,10 +2,10 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Check, Heart, X, Volume2, RotateCcw, Trophy, ArrowRight, Loader2, Star } from 'lucide-react'
 import LanguageFlag from '../components/LanguageFlag'
-import { answerExerciseSession, bootstrapUser, completeExerciseSession, loadExerciseLessons, loadExercisePath, startExerciseSession, apiFetch } from '../lib/api'
+import { answerExerciseSession, bootstrapUser, completeExerciseSession, loadExerciseLessons, loadExercisePath, startExerciseSession, apiFetch, synthesizeSpeech } from '../lib/api'
 import { handleExerciseKeyDown } from '../lib/exerciseKeyboard.mjs'
 import { buildTilesForItem, matchRightOptions, stableShuffleOptions } from '../lib/exerciseOptions.mjs'
-import { speak, voiceTextForFeedback, voiceTextForItem } from '../lib/voiceMode.mjs'
+import { speakSegmentsWithBrowser, voiceSegmentsForFeedback, voiceSegmentsForItem } from '../lib/voiceMode.mjs'
 import { selectableImageChoiceOptions } from '../lib/imageChoice.mjs'
 import { lessonContextForExercise } from '../lib/exerciseLessonContext.mjs'
 
@@ -16,8 +16,6 @@ const LANG_META = {
   jp: { accent: 'Anime/Manga', color: 'from-pink-600 to-pink-900' },
   en: { accent: 'Pop/Internet', color: 'from-emerald-600 to-emerald-900' },
 }
-
-const SPEECH_LANG = { de: 'de-DE', fr: 'fr-FR', ru: 'ru-RU', jp: 'ja-JP', en: 'en-US' }
 
 function answerValue(answer) {
   if (answer && typeof answer === 'object' && 'value' in answer) return answer.value
@@ -85,7 +83,8 @@ export default function Exercises() {
   const progress = session?.total_count ? (currentIndex / session.total_count) * 100 : 0
   const langCode = lesson?.language_code || lesson?.language || 'de'
   const activePath = pathData.find((p) => (p.language_code || p.language) === langCode)
-  const choiceOptions = useMemo(() => ((item?.type === 'choice' || item?.type === 'image_choice') ? stableShuffleOptions(item.options || [], item.id ?? item.prompt) : []), [item])
+  const choiceLikeTypes = ['choice', 'listen_choice', 'context_choice', 'image_choice']
+  const choiceOptions = useMemo(() => (choiceLikeTypes.includes(item?.type) ? stableShuffleOptions(item.options || [], item.id ?? item.prompt) : []), [item])
   const lessonContext = useMemo(() => lessonContextForExercise(lesson), [lesson])
 
   function resetExerciseState() {
@@ -117,7 +116,7 @@ export default function Exercises() {
 
   const normalizedPayload = useMemo(() => {
     if (!item) return null
-    if (item.type === 'choice') return selected
+    if (['choice', 'listen_choice', 'context_choice'].includes(item.type)) return selected
     if (item.type === 'image_choice') return selected
     if (item.type === 'build') return built
     if (item.type === 'match') return matched
@@ -126,7 +125,7 @@ export default function Exercises() {
 
   const canCheck = useMemo(() => {
     if (!item) return false
-    if (item.type === 'choice') return !!selected
+    if (['choice', 'listen_choice', 'context_choice'].includes(item.type)) return !!selected
     if (item.type === 'image_choice') return !!selected
     if (item.type === 'build') return built.length === (answerValue(item.answer)?.length || 0)
     if (item.type === 'match') return Object.keys(matched).length === matchPairs(item).length
@@ -186,8 +185,35 @@ export default function Exercises() {
     if (current) await openLesson(current)
   }
 
-  function speakCurrent(text = voiceTextForItem(item)) {
-    speak(text, SPEECH_LANG[langCode] || 'pt-BR')
+  async function playAudioBlob(blob) {
+    const url = URL.createObjectURL(blob)
+    try {
+      const audio = new Audio(url)
+      await new Promise((resolve, reject) => {
+        audio.onended = resolve
+        audio.onerror = reject
+        audio.play().catch(reject)
+      })
+    } finally {
+      URL.revokeObjectURL(url)
+    }
+  }
+
+  async function speakSegments(segments) {
+    const cleanSegments = (segments || []).filter((segment) => segment?.text)
+    if (!cleanSegments.length) return
+    try {
+      for (const segment of cleanSegments) {
+        const blob = await synthesizeSpeech(segment.text, segment.lang)
+        await playAudioBlob(blob)
+      }
+    } catch (_err) {
+      speakSegmentsWithBrowser(cleanSegments)
+    }
+  }
+
+  function speakCurrent(segments = voiceSegmentsForItem(item, langCode)) {
+    speakSegments(segments)
   }
 
   useEffect(() => {
@@ -195,7 +221,7 @@ export default function Exercises() {
   }, [voiceMode, item?.id, feedback])
 
   useEffect(() => {
-    if (voiceMode && feedback) speakCurrent(voiceTextForFeedback(feedback))
+    if (voiceMode && feedback) speakCurrent(voiceSegmentsForFeedback(feedback, langCode))
   }, [voiceMode, feedback])
 
   useEffect(() => {
@@ -286,7 +312,7 @@ export default function Exercises() {
               <h2 className="text-2xl font-bold">{item.prompt}</h2>
             </div>
             <div className="ml-auto flex gap-2">
-              <button className="btn-secondary" title="Ouvir pergunta/correção" onClick={() => speakCurrent(feedback ? voiceTextForFeedback(feedback) : voiceTextForItem(item))}><Volume2 size={18} /></button>
+              <button className="btn-secondary" title="Ouvir pergunta/correção" onClick={() => speakCurrent(feedback ? voiceSegmentsForFeedback(feedback, langCode) : voiceSegmentsForItem(item, langCode))}><Volume2 size={18} /></button>
               <button className={`btn-secondary text-xs ${voiceMode ? 'ring-2 ring-polyglot-accent' : ''}`} onClick={() => setVoiceMode(!voiceMode)}>{voiceMode ? 'Voz ligada' : 'Modo voz'}</button>
             </div>
           </div>
@@ -299,7 +325,7 @@ export default function Exercises() {
             </div>
           )}
 
-          {item.type === 'choice' && <Choice options={choiceOptions} selected={selected} onInteract={() => setFeedback(null)} setSelected={setSelected} />}
+          {['choice', 'listen_choice', 'context_choice'].includes(item.type) && <Choice options={choiceOptions} selected={selected} onInteract={() => setFeedback(null)} setSelected={setSelected} />}
           {item.type === 'image_choice' && <ImageChoice options={choiceOptions} selected={selected} onInteract={() => setFeedback(null)} setSelected={setSelected} />}
           {item.type === 'build' && <Build item={item} built={built} onInteract={() => setFeedback(null)} setBuilt={setBuilt} />}
           {item.type === 'match' && <Match item={item} matched={matched} onInteract={() => setFeedback(null)} setMatched={setMatched} />}
@@ -369,8 +395,7 @@ function ImageChoice({ options, selected, setSelected, onInteract }) {
           <div className="mx-auto mb-3 flex h-24 w-24 items-center justify-center overflow-hidden rounded-2xl bg-white/90 p-2">
             <img src={option.imageSrc} alt={option.label} className="h-full w-full object-contain" />
           </div>
-          <div className="text-sm text-gray-300">{option.label}</div>
-          <div className="mt-1 text-lg font-bold text-white">{option.selectValue}</div>
+          <div className="mt-1 text-lg font-bold text-white">{option.displayText}</div>
         </button>
       ))}
     </div>

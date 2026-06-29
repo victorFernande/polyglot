@@ -260,3 +260,8 @@ class ExerciseCompleteResult(BaseModel):
     phrases_added: int = 0
     new_achievements: List[str] = []
     already_completed: bool = False
+
+
+class TTSRequest(BaseModel):
+    text: str = Field(..., min_length=1, max_length=1000)
+    lang: str = Field(default="pt-BR", max_length=12)

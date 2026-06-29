@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from datetime import datetime
 from typing import List, Optional
@@ -7,6 +8,7 @@ from typing import List, Optional
 from models import init_db, SessionLocal, User, Wave, Phase, Task, StudyLog, Achievement, ExerciseLesson, ExerciseSession
 from schemas import *
 from services import GamificationService, WaveService, ExerciseService
+from tts_service import TTSService
 
 app = FastAPI(
     title="Polyglot API",
@@ -324,12 +326,22 @@ def get_level(user_id: int, db: Session = Depends(get_db)):
     
     return GamificationService.get_level_info(user)
 
+# ============== TTS ==============
+@app.post("/tts")
+async def synthesize_tts(request: TTSRequest):
+    try:
+        audio_path = await TTSService.synthesize(request.text, request.lang)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    except Exception as exc:
+        raise HTTPException(status_code=503, detail=f"TTS unavailable: {exc}")
+    return FileResponse(audio_path, media_type="audio/mpeg", filename=audio_path.name)
+
+
 # ============== HEALTH ==============
 @app.get("/health")
 def health():
     return {"status": "ok", "service": "polyglot-api"}
-
-
 
 
 # ============== EXERCISES ==============

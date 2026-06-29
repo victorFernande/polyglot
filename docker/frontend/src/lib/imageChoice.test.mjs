@@ -20,5 +20,6 @@ const options = selectableImageChoiceOptions([
 assert.equal(options.length, 2)
 assert.deepEqual(options.map((option) => option.selectValue), ['Hallo', 'Kaffee'])
 assert.deepEqual(options.map((option) => option.label), ['Olá', 'café'])
+assert.deepEqual(options.map((option) => option.displayText), ['Hallo', 'Kaffee'])
 assert.ok(options.every((option) => option.imageSrc.startsWith('data:image/svg+xml')))
 assert.ok(options.every((option) => option.key))

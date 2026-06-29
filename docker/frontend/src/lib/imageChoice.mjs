@@ -11,6 +11,7 @@ export function selectableImageChoiceOptions(options) {
       key: String(option.value),
       selectValue: option.value,
       label: option.label_pt,
+      displayText: option.display_text || option.value,
       imageSrc: option.image_src || svgToDataUri(option.svg),
     }))
     .filter((option) => option.imageSrc)
