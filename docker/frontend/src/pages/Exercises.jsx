@@ -7,6 +7,7 @@ import { handleExerciseKeyDown } from '../lib/exerciseKeyboard.mjs'
 import { buildTilesForItem, matchRightOptions, stableShuffleOptions } from '../lib/exerciseOptions.mjs'
 import { speak, voiceTextForFeedback, voiceTextForItem } from '../lib/voiceMode.mjs'
 import { selectableImageChoiceOptions } from '../lib/imageChoice.mjs'
+import { lessonContextForExercise } from '../lib/exerciseLessonContext.mjs'
 
 const LANG_META = {
   de: { accent: 'Rammstein', color: 'from-red-600 to-red-900' },
@@ -85,6 +86,7 @@ export default function Exercises() {
   const langCode = lesson?.language_code || lesson?.language || 'de'
   const activePath = pathData.find((p) => (p.language_code || p.language) === langCode)
   const choiceOptions = useMemo(() => ((item?.type === 'choice' || item?.type === 'image_choice') ? stableShuffleOptions(item.options || [], item.id ?? item.prompt) : []), [item])
+  const lessonContext = useMemo(() => lessonContextForExercise(lesson), [lesson])
 
   function resetExerciseState() {
     setSummary(null)
@@ -288,6 +290,14 @@ export default function Exercises() {
               <button className={`btn-secondary text-xs ${voiceMode ? 'ring-2 ring-polyglot-accent' : ''}`} onClick={() => setVoiceMode(!voiceMode)}>{voiceMode ? 'Voz ligada' : 'Modo voz'}</button>
             </div>
           </div>
+
+          {lessonContext && (
+            <div className="mb-6 rounded-2xl border border-polyglot-accent/20 bg-polyglot-accent/10 p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-polyglot-accent">{lessonContext.label}</p>
+              <h3 className="mt-1 text-lg font-bold text-white">{lessonContext.title}</h3>
+              {lessonContext.description && <p className="mt-1 text-sm text-gray-300">{lessonContext.description}</p>}
+            </div>
+          )}
 
           {item.type === 'choice' && <Choice options={choiceOptions} selected={selected} onInteract={() => setFeedback(null)} setSelected={setSelected} />}
           {item.type === 'image_choice' && <ImageChoice options={choiceOptions} selected={selected} onInteract={() => setFeedback(null)} setSelected={setSelected} />}
