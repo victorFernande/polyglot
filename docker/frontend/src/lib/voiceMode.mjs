@@ -96,24 +96,20 @@ export function voiceSegmentsForFeedback(feedback, languageCode = 'pt') {
   if (!feedback) return []
   const targetLang = speechLangForLanguage(languageCode)
   const correct = readableAnswer(feedback.correctAnswer || feedback.correct_answer || feedback.mistake?.correct_answer)
+
+  // Spoken feedback should be short. The visual card may keep the full
+  // explanation, but audio should only reinforce the result and the phrase.
   if (feedback.type === 'correct') {
-    const explanation = feedback.explanation || (correct ? `Resposta correta: ${correct}` : '')
     return compactSegments([
       { text: 'Correto.', lang: 'pt-BR' },
-      ...segmentsReplacingCorrectAnswer(explanation, correct, targetLang),
-    ])
+      correct ? { text: correct, lang: targetLang } : null,
+    ].filter(Boolean))
   }
   if (feedback.type === 'wrong') {
-    const message = feedback.mistake?.message || 'Resposta incorreta.'
-    const explanation = feedback.explanation || ''
-    const combined = [message, explanation].filter(Boolean).join(' ')
-    const spokenFeedback = correct && !combined.includes(correct)
-      ? `${combined} A resposta correta é ${correct}`
-      : combined
     return compactSegments([
-      { text: 'Marcado como erro.', lang: 'pt-BR' },
-      ...segmentsReplacingCorrectAnswer(spokenFeedback, correct, targetLang),
-    ])
+      { text: 'Resposta correta:', lang: 'pt-BR' },
+      correct ? { text: correct, lang: targetLang } : null,
+    ].filter(Boolean))
   }
   return compactSegments([{ text: feedback.explanation || '', lang: 'pt-BR' }])
 }

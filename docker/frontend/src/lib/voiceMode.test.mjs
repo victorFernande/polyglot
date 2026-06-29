@@ -57,10 +57,23 @@ assert.deepEqual(
 assert.deepEqual(
   voiceSegmentsForFeedback({ type: 'correct', explanation: 'Resposta correta: Hallo.', correctAnswer: { value: 'Hallo' } }, 'de'),
   [
-    { text: 'Correto. Resposta correta:', lang: 'pt-BR' },
+    { text: 'Correto.', lang: 'pt-BR' },
     { text: 'Hallo', lang: 'de-DE' },
   ],
-  'after a correct answer, the correct answer should be spoken in the target language'
+  'after a correct answer, speak only Correct plus the correct answer in the target language'
+)
+
+assert.deepEqual(
+  voiceSegmentsForFeedback({
+    type: 'correct',
+    explanation: 'Fazendo um pedido no café: “Wie viel kostet das?” corresponde a “Quanto custa?”. Use esta frase pronta como bloco real de comunicação em Alemão.',
+    correctAnswer: { value: 'Wie viel kostet das?' },
+  }, 'de'),
+  [
+    { text: 'Correto.', lang: 'pt-BR' },
+    { text: 'Wie viel kostet das?', lang: 'de-DE' },
+  ],
+  'correct feedback must not read long explanations aloud'
 )
 
 assert.deepEqual(
@@ -71,11 +84,10 @@ assert.deepEqual(
     correctAnswer: { value: 'Hallo' },
   }, 'de'),
   [
-    { text: 'Marcado como erro. Você respondeu: Guten Morgen. Resposta correta:', lang: 'pt-BR' },
+    { text: 'Resposta correta:', lang: 'pt-BR' },
     { text: 'Hallo', lang: 'de-DE' },
-    { text: 'Use Hallo para olá.', lang: 'pt-BR' },
   ],
-  'after a wrong answer, the feedback should say the correct answer and speak it in the target language'
+  'after a wrong answer, speak only the correct answer without the long explanation'
 )
 
 assert.deepEqual(
@@ -86,8 +98,8 @@ assert.deepEqual(
     correctAnswer: { value: 'Ich möchte ein Brot.' },
   }, 'de'),
   [
-    { text: 'Marcado como erro. Resposta incorreta. A resposta correta é', lang: 'pt-BR' },
+    { text: 'Resposta correta:', lang: 'pt-BR' },
     { text: 'Ich möchte ein Brot.', lang: 'de-DE' },
   ],
-  'wrong feedback should handle the correct answer even when it appears in the explanation instead of the mistake message'
+  'wrong feedback should stay short even when the explanation is long'
 )

@@ -21,8 +21,8 @@ assert.equal(feedback.type, 'correct')
 assert.deepEqual(
   voiceSegmentsForFeedback(feedback, 'de'),
   [
-    { text: 'Correto. Resposta correta:', lang: 'pt-BR' },
+    { text: 'Correto.', lang: 'pt-BR' },
     { text: 'Hallo', lang: 'de-DE' },
   ],
-  'correct pronunciation/listening feedback must include the correct answer and speak it in the studied language'
+  'correct pronunciation/listening feedback must stay short and speak the correct answer in the studied language'
 )
