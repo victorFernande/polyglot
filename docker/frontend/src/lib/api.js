@@ -58,11 +58,6 @@ export async function getLeaderboard(limit = 10) {
   return apiFetch(`/leaderboard?limit=${encodeURIComponent(limit)}`)
 }
 
-export async function getWaves(userId = getStoredUserId()) {
-  const user = await bootstrapUser()
-  return apiFetch(`/users/${encodeURIComponent(user?.id || userId)}/waves`)
-}
-
 export async function loadExerciseLessons(userId = getStoredUserId()) {
   return apiFetch(`/exercise-lessons?user_id=${encodeURIComponent(userId)}`)
 }

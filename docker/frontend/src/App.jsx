@@ -2,8 +2,6 @@ import React from 'react'
 import { Routes, Route } from 'react-router-dom'
 import Layout from './components/Layout'
 import Dashboard from './pages/Dashboard'
-import Waves from './pages/Waves'
-import Study from './pages/Study'
 import Exercises from './pages/Exercises'
 import Flashcards from './pages/Flashcards'
 import Achievements from './pages/Achievements'
@@ -15,10 +13,8 @@ function App() {
     <Layout>
       <Routes>
         <Route path="/" element={<Dashboard />} />
-        <Route path="/waves" element={<Waves />} />
         <Route path="/exercises" element={<Exercises />} />
         <Route path="/flashcards" element={<Flashcards />} />
-        <Route path="/study" element={<Study />} />
         <Route path="/achievements" element={<Achievements />} />
         <Route path="/leaderboard" element={<Leaderboard />} />
         <Route path="/profile" element={<Profile />} />
