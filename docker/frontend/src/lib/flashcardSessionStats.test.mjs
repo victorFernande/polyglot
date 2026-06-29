@@ -1,7 +1,53 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import { getFlashcardReviewJumpState, getFlashcardSessionStats } from './flashcardSessionStats.mjs'
+import { getFlashcardMicroGoalState, getFlashcardReviewJumpState, getFlashcardSessionStats } from './flashcardSessionStats.mjs'
+
+test('getFlashcardMicroGoalState reports progress toward the default ten-card quick goal', () => {
+  assert.deepEqual(
+    getFlashcardMicroGoalState({ studiedCount: 4 }),
+    {
+      studiedCount: 4,
+      goalSize: 10,
+      displayedCount: 4,
+      remainingCount: 6,
+      isComplete: false,
+      label: 'Meta rápida: 4/10 cards',
+      message: 'Faltam 6 cards para concluir a meta rápida.',
+    },
+  )
+})
+
+test('getFlashcardMicroGoalState caps display at the goal and marks completion', () => {
+  assert.deepEqual(
+    getFlashcardMicroGoalState({ studiedCount: 12 }),
+    {
+      studiedCount: 12,
+      goalSize: 10,
+      displayedCount: 10,
+      remainingCount: 0,
+      isComplete: true,
+      label: 'Meta rápida: 10/10 cards',
+      message: 'Meta rápida concluída.',
+    },
+  )
+})
+
+test('getFlashcardMicroGoalState supports smaller safe goals and clamps invalid progress', () => {
+  assert.deepEqual(
+    getFlashcardMicroGoalState({ studiedCount: -3, goalSize: 3 }),
+    {
+      studiedCount: 0,
+      goalSize: 3,
+      displayedCount: 0,
+      remainingCount: 3,
+      isComplete: false,
+      label: 'Meta rápida: 0/3 cards',
+      message: 'Faltam 3 cards para concluir a meta rápida.',
+    },
+  )
+})
+
 
 test('getFlashcardSessionStats reports studied review queue and remaining counts for the visible deck', () => {
   assert.deepEqual(

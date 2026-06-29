@@ -6,7 +6,7 @@ import { handleFlashcardKeyDown } from '../lib/flashcardKeyboard.mjs'
 import { shuffleFlashcards } from '../lib/flashcardOrder.mjs'
 import { getFlashcardSupportVisibility } from '../lib/flashcardReveal.mjs'
 import { addFlashcardToReviewQueue, mergeFlashcardsWithReviewQueue } from '../lib/flashcardReviewQueue.mjs'
-import { getFlashcardReviewJumpState, getFlashcardSessionStats } from '../lib/flashcardSessionStats.mjs'
+import { getFlashcardMicroGoalState, getFlashcardReviewJumpState, getFlashcardSessionStats } from '../lib/flashcardSessionStats.mjs'
 
 const LANGS = [
   { code: 'de', name: 'Alemão' },
@@ -59,6 +59,7 @@ export default function Flashcards() {
     reviewQueueCount: reviewQueue.length,
     currentIndex: index,
   })
+  const microGoalState = getFlashcardMicroGoalState({ studiedCount: sessionStats.studiedCount })
   const reviewJumpState = useMemo(
     () => getFlashcardReviewJumpState({
       deckCount: cards.length,
@@ -159,6 +160,18 @@ export default function Flashcards() {
           <span>{Math.round(progress)}%</span>
         </div>
         <div className="progress-bar mb-6"><div className="progress-fill" style={{ width: `${progress}%` }} /></div>
+
+        <div className={`mb-6 rounded-2xl border p-4 text-sm ${microGoalState.isComplete ? 'border-polyglot-accent/30 bg-polyglot-accent/10 text-gray-200' : 'border-white/10 bg-white/5 text-gray-300'}`}>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <p className="text-xs uppercase tracking-[0.25em] text-gray-500">Meta rápida</p>
+              <p className="mt-1 font-semibold text-white">{microGoalState.label}</p>
+            </div>
+            <span className={microGoalState.isComplete ? 'text-polyglot-accent' : 'text-gray-400'}>
+              {microGoalState.message}
+            </span>
+          </div>
+        </div>
 
         <div className="mb-6 grid gap-3 text-sm sm:grid-cols-3">
           <div className="rounded-xl bg-white/5 p-3 text-gray-300">
