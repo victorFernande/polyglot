@@ -38,6 +38,7 @@ const LESSON_LANGUAGE_FILTERS = [
 ]
 
 const BUILD_LIKE_TYPES = ['build', 'listen_build']
+const ANSWER_FEEDBACK_SPEECH_DELAY_MS = 420
 
 function answerValue(answer) {
   if (answer && typeof answer === 'object' && 'value' in answer) return answer.value
@@ -205,7 +206,7 @@ export default function Exercises() {
       setSession(result.session)
       setFeedback(nextFeedback)
       playAnswerFeedbackSound(nextFeedback.type)
-      speakCurrent(voiceSegmentsForFeedback(nextFeedback, langCode))
+      setTimeout(() => speakCurrent(voiceSegmentsForFeedback(nextFeedback, langCode)), ANSWER_FEEDBACK_SPEECH_DELAY_MS)
     } catch (err) {
       setError(err.message)
     } finally {

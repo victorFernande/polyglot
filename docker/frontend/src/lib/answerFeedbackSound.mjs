@@ -1,12 +1,12 @@
 const SOUND_SEQUENCES = {
   correct: [
-    { frequency: 523.25, start: 0, duration: 0.075, gain: 0.055, type: 'sine' },
-    { frequency: 659.25, start: 0.055, duration: 0.08, gain: 0.06, type: 'sine' },
-    { frequency: 783.99, start: 0.115, duration: 0.12, gain: 0.052, type: 'triangle' },
+    { frequency: 523.25, start: 0, duration: 0.11, gain: 0.12, type: 'sine' },
+    { frequency: 659.25, start: 0.075, duration: 0.12, gain: 0.14, type: 'sine' },
+    { frequency: 783.99, start: 0.155, duration: 0.16, gain: 0.12, type: 'triangle' },
   ],
   wrong: [
-    { frequency: 196, start: 0, duration: 0.11, gain: 0.045, type: 'triangle' },
-    { frequency: 146.83, start: 0.085, duration: 0.13, gain: 0.038, type: 'triangle' },
+    { frequency: 196, start: 0, duration: 0.14, gain: 0.095, type: 'triangle' },
+    { frequency: 146.83, start: 0.105, duration: 0.17, gain: 0.08, type: 'triangle' },
   ],
 }
 

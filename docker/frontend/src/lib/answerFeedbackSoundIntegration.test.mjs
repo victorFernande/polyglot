@@ -20,6 +20,11 @@ assert.match(
 )
 assert.match(
   exercisesSource,
-  /speakCurrent\(voiceSegmentsForFeedback\(nextFeedback, langCode\)\)/,
-  'voice feedback must remain available after adding the short sound effect'
+  /setTimeout\(\(\) => speakCurrent\(voiceSegmentsForFeedback\(nextFeedback, langCode\)\),\s*ANSWER_FEEDBACK_SPEECH_DELAY_MS\)/,
+  'spoken feedback must wait for the short chime instead of masking it immediately'
+)
+assert.match(
+  exercisesSource,
+  /const ANSWER_FEEDBACK_SPEECH_DELAY_MS = 420/,
+  'speech delay should leave enough time for the correct/wrong sound to be heard first'
 )
