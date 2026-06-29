@@ -92,6 +92,14 @@ test('active trail node uses a stable highlight, not a loading animation', () =>
   assert.doesNotMatch(classes, /animate-pulse/)
 })
 
+test('Exercises page imports trail helpers used by the rendered trail', () => {
+  const source = readFileSync(new URL('../pages/Exercises.jsx', import.meta.url), 'utf8')
+  const importLine = source.split('\n').find((line) => line.includes("../lib/exerciseTrailLayout.mjs")) || ''
+
+  assert.match(importLine, /isTrailSessionEnabled/)
+  assert.match(importLine, /trailNodeStateClasses/)
+})
+
 test('Tailwind scans mjs helpers that provide exercise trail classes', () => {
   const config = readFileSync(new URL('../../tailwind.config.js', import.meta.url), 'utf8')
 

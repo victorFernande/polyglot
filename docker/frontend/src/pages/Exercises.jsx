@@ -15,7 +15,7 @@ import { choiceShortcutLabels } from '../lib/exerciseChoiceShortcuts.mjs'
 import { exerciseSessionProgress } from '../lib/exerciseSessionProgress.mjs'
 import { filterExerciseLessonsByLanguage, summarizeExerciseLessonProgressByLanguage } from '../lib/exerciseLessonFilters.mjs'
 import { reorderBuiltWords } from '../lib/buildWordOrder.mjs'
-import { cleanExercisePrompt, pageForSessionNumber, sessionWindowForPage, trailHeaderLayoutClasses } from '../lib/exerciseTrailLayout.mjs'
+import { cleanExercisePrompt, isTrailSessionEnabled, pageForSessionNumber, sessionWindowForPage, trailHeaderLayoutClasses, trailNodeStateClasses } from '../lib/exerciseTrailLayout.mjs'
 import { nextExerciseActionLabel, sessionNumberForExerciseSession } from '../lib/exerciseSessionLabels.mjs'
 import { parseMicroDialoguePrompt } from '../lib/microDialoguePrompt.mjs'
 
