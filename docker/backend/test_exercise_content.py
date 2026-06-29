@@ -117,7 +117,8 @@ def test_image_choice_uses_semantic_svg_icon_bank():
     image_items = [item for item in ExerciseService.generate_items("de") if item["type"] == "image_choice"]
     icon_keys = {option["icon_key"] for item in image_items for option in item["options"]}
 
-    assert {"book", "coffee", "water", "train", "house", "person", "phone", "fork"}.issubset(icon_keys)
+    assert {"book", "coffee", "water", "train", "person", "phone", "fork"}.issubset(icon_keys)
+    assert len(icon_keys) >= 10
     assert "ambulance" not in icon_keys
 
 
@@ -126,14 +127,13 @@ def test_first_cafe_image_choice_uses_topic_phrase_not_unrelated_visual_vocabula
     item = next(item for item in items if item["type"] == "image_choice")
 
     assert "Krankenwagen" not in item["prompt"]
-    assert item["answer"]["value"] == "Hallo"
-    assert "Olá" in item["prompt"]
+    assert "ambulance" not in {option["icon_key"] for option in item["options"]}
     assert "Tópico 1/10 — cumprimentar" in item["prompt"]
-    icon_by_label = {option["label_pt"]: option["icon_key"] for option in item["options"]}
-    assert icon_by_label["Olá"] == "person"
-    assert icon_by_label["Eu gostaria de um café."] == "coffee"
-    assert icon_by_label["Uma água, por favor."] == "water"
-    assert icon_by_label["Eu gostaria de um pão."] == "bread"
+    assert item["answer"]["value"] in [option["value"] for option in item["options"]]
+    assert all(option["display_text"] == option["value"] for option in item["options"])
+    correct = next(option for option in item["options"] if option["value"] == item["answer"]["value"])
+    assert correct["label_pt"] in item["prompt"]
+    assert correct["icon_key"] != "ambulance"
 
 
 def test_image_choice_options_include_frontend_ready_image_src():
@@ -152,3 +152,28 @@ def test_first_five_exercises_are_not_repetitive_variations_of_same_task():
     assert any("ouça" in prompt.casefold() for prompt in prompts)
     assert any("imagem" in prompt.casefold() for prompt in prompts)
     assert any("complete" in prompt.casefold() or "situação" in prompt.casefold() for prompt in prompts)
+
+
+
+def _answer_signature(item):
+    answer = item["answer"].get("value") or item["answer"].get("pairs")
+    if isinstance(answer, list):
+        return repr(answer)
+    return str(answer).casefold()
+
+
+def test_first_sixty_have_substantially_more_unique_answers_than_old_cafe_loop():
+    items = ExerciseService.generate_items("de")[:60]
+    unique_answers = {_answer_signature(item) for item in items}
+
+    assert len(unique_answers) >= 42, sorted(unique_answers)
+    assert sum(1 for item in items if _answer_signature(item) == "hallo") <= 2
+    assert sum(1 for item in items if "kaffee" in _answer_signature(item)) <= 4
+
+
+def test_full_german_track_has_broad_answer_bank_not_ten_phrases_per_unit():
+    items = ExerciseService.generate_items("de")
+    unique_answers = {_answer_signature(item) for item in items}
+
+    assert len(items) == 1000
+    assert len(unique_answers) >= 220

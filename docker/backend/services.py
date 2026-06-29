@@ -259,7 +259,7 @@ class ExerciseService:
             (("água", "wasser", "water", "eau", "воду", "вода", "水"), "water"),
             (("pão", "brot", "bread", "pain", "хлеб", "パン"), "bread"),
             (("trem", "estação", "bahnhof", "station", "gare", "вокзал", "駅"), "train"),
-            (("casa", "moro", "moradia", "wohne", "home", "house", "maison", "дом", "家"), "house"),
+            (("casa", "moro", "moradia", "wohne", "haus", "home", "house", "maison", "дом", "家"), "house"),
             (("camisa", "casaco", "roup", "hemd", "shirt", "chemise", "рубаш", "シャツ"), "shirt"),
             (("telefone", "phone", "téléphone", "телефон", "電話"), "phone"),
             (("livro", "estudo", "learn", "lerne", "study", "уч", "勉強", "本"), "book"),
@@ -340,43 +340,132 @@ class ExerciseService:
         return False
 
     @staticmethod
+    def _expanded_practice_bank(code: str, unit: dict, unit_index: int):
+        # Start with real communicative phrases from the current unit.
+        expanded = list(unit["phrases"][code])
+        seen = {foreign.casefold() for _pt, foreign in expanded}
+
+        # Then add a large rotating vocabulary bank. Vocabulary variants are
+        # metalinguistic and broadly natural ("the word X", "I hear X", "I read X"),
+        # avoiding nonsense like "I need hello" or duplicated full sentences.
+        vocab_templates = {
+            "de": [("{}", "{}"), ("a palavra {}", "das Wort {}"), ("eu ouço {}", "Ich höre {}"), ("eu leio {}", "Ich lese {}")],
+            "fr": [("{}", "{}"), ("a palavra {}", "le mot {}"), ("eu ouço {}", "J'entends {}"), ("eu leio {}", "Je lis {}")],
+            "ru": [("{}", "{}"), ("a palavra {}", "слово {}"), ("eu ouço {}", "Я слышу {}"), ("eu leio {}", "Я читаю {}")],
+            "jp": [("{}", "{}"), ("a palavra {}", "{}という言葉"), ("eu ouço {}", "{}を聞きます"), ("eu leio {}", "{}を読みます")],
+            "en": [("{}", "{}"), ("a palavra {}", "the word {}"), ("eu ouço {}", "I hear {}"), ("eu leio {}", "I read {}")],
+        }[code]
+
+        vocabulary_sources = [
+            [(pt, foreign) for pt, foreign, icon in ExerciseService.VISUAL_VOCAB[code] if icon != "ambulance"]
+        ]
+        theme_keys = list(ExerciseService.THEMES[code].keys())
+        for shift in range(len(theme_keys)):
+            key = theme_keys[(unit_index + shift - 1) % len(theme_keys)]
+            vocabulary_sources.append(ExerciseService.THEMES[code][key])
+
+        for source in vocabulary_sources:
+            for pt, foreign in source:
+                for pt_template, foreign_template in vocab_templates:
+                    item = (pt_template.format(pt), foreign_template.format(foreign))
+                    foreign_key = item[1].casefold()
+                    if foreign_key not in seen:
+                        expanded.append(item)
+                        seen.add(foreign_key)
+        return expanded
+
+    @staticmethod
+    def _windowed_pairs(bank, start, size):
+        return [bank[(start + offset) % len(bank)] for offset in range(size)]
+
+    @staticmethod
+    def _wrong_options(bank, target, start, size=3):
+        wrong = []
+        seen = {str(target).casefold()}
+        for offset in range(len(bank)):
+            _pt, foreign = bank[(start + offset) % len(bank)]
+            key = str(foreign).casefold()
+            if key in seen:
+                continue
+            wrong.append(foreign)
+            seen.add(key)
+            if len(wrong) == size:
+                break
+        return wrong
+
+    @staticmethod
+    def _prompt_for_question(prefix, question_index, pt, target, name, topic_name):
+        templates = [
+            f"{prefix}: como dizer “{pt}” em {name}?",
+            f"{prefix}: ouça o áudio e identifique “{pt}”",
+            f"{prefix}: escolha a imagem/frase que representa “{pt}” ({target})",
+            f"{prefix}: monte em ordem natural — “{pt}”",
+            f"{prefix}: situação no cenário “{topic_name}” — qual opção comunica “{pt}”?",
+            f"{prefix}: combine itens do contexto “{topic_name}”",
+            f"{prefix}: responda rápido — “{pt}”",
+            f"{prefix}: organize as palavras para expressar “{pt}”",
+            f"{prefix}: placa/cardápio — selecione o equivalente de “{pt}”",
+            f"{prefix}: conversa real — escolha como falar “{pt}”",
+            f"{prefix}: pergunta curta — qual é “{pt}”?",
+            f"{prefix}: áudio de revisão — reconheça “{pt}”",
+            f"{prefix}: microfrase — construa “{pt}”",
+            f"{prefix}: situação prática — você precisa dizer “{pt}”",
+            f"{prefix}: leitura rápida — encontre “{pt}”",
+        ]
+        return templates[(question_index - 1) % len(templates)]
+
+    @staticmethod
     def generate_items(code: str):
         name = ExerciseService.LANGUAGE_NAMES[code]
         items = []
+        type_patterns = [
+            ["choice", "listen_choice", "image_choice", "build", "context_choice", "match", "choice", "build", "listen_choice", "context_choice"],
+            ["listen_choice", "choice", "build", "context_choice", "image_choice", "choice", "match", "listen_choice", "build", "context_choice"],
+            ["context_choice", "image_choice", "choice", "listen_choice", "build", "match", "choice", "context_choice", "listen_choice", "build"],
+            ["choice", "build", "listen_choice", "image_choice", "context_choice", "match", "build", "choice", "context_choice", "listen_choice"],
+            ["image_choice", "choice", "context_choice", "build", "listen_choice", "match", "choice", "listen_choice", "build", "context_choice"],
+        ]
         for unit_index, unit in enumerate(A1_UNITS, 1):
-            phrases = unit["phrases"][code]
-            all_foreign = [foreign for _pt, foreign in phrases]
+            bank = ExerciseService._expanded_practice_bank(code, unit, unit_index)
             for topic_index, topic_name in enumerate(unit["topics"], 1):
-                for question_index, (pt, target) in enumerate(phrases, 1):
+                start = ((unit_index - 1) * 37 + (topic_index - 1) * 10) % len(bank)
+                topic_pairs = ExerciseService._windowed_pairs(bank, start, 10)
+                all_foreign = [foreign for _pt, foreign in bank]
+                pattern = type_patterns[(topic_index - 1) % len(type_patterns)]
+                for question_index, (pt, target) in enumerate(topic_pairs, 1):
                     idx = (unit_index - 1) * 100 + (topic_index - 1) * 10 + question_index
                     prefix = f"Unidade {unit_index}/10 — {unit['title']} · Tópico {topic_index}/10 — {topic_name}"
-                    hint = f"Mini-aula: {unit['goal']} Foque na situação comunicativa antes de decorar palavras isoladas."
-                    explanation = f"{unit['title']}: “{target}” corresponde a “{pt}”. Use esta frase pronta como bloco real de comunicação em {name}."
-                    wrong = [x for x in all_foreign if x != target][:3]
-                    if question_index == 1:
-                        item = ExerciseService._choice(f"{prefix}: como dizer “{pt}” em {name}?", target, wrong, idx)
-                    elif question_index == 2:
-                        item = ExerciseService._listen_choice(f"{prefix}: ouça e escolha a frase que corresponde a “{pt}”", target, wrong, idx)
-                    elif question_index == 3:
-                        item = ExerciseService._image_choice_from_phrases(prefix, phrases, topic_index - 1, idx, topic_name)
-                    elif question_index == 4:
+                    hint = f"Mini-aula: {unit['goal']} Este item usa vocabulário variado do contexto, não só as frases fixas da unidade."
+                    explanation = f"{unit['title']}: “{target}” corresponde a “{pt}”. Use como bloco real de comunicação em {name}."
+                    wrong = ExerciseService._wrong_options(bank, target, start + question_index, 3)
+                    prompt = ExerciseService._prompt_for_question(prefix, question_index + topic_index - 1, pt, target, name, topic_name)
+                    item_type = pattern[question_index - 1]
+                    if item_type == "choice":
+                        item = ExerciseService._choice(prompt, target, wrong, idx)
+                    elif item_type == "listen_choice":
+                        item = ExerciseService._listen_choice(prompt, target, wrong, idx)
+                    elif item_type == "image_choice":
+                        image_options = []
+                        for opt_pt, opt_foreign in ExerciseService._windowed_pairs(bank, start + question_index, 8):
+                            if opt_foreign == target:
+                                continue
+                            image_options.append((opt_pt, opt_foreign, ExerciseService._icon_key_for_phrase(opt_pt, opt_foreign, topic_name)))
+                            if len(image_options) == 3:
+                                break
+                        answer = (pt, target, ExerciseService._icon_key_for_phrase(pt, target, topic_name))
+                        item = ExerciseService._image_choice(prompt, answer, image_options, idx)
+                    elif item_type == "build":
                         words = target.split()
-                        extras = [word for foreign in all_foreign[:5] for word in foreign.split()]
-                        item = ExerciseService._build(f"{prefix}: monte a frase “{pt}”", words, extras, idx)
-                    elif question_index == 5:
-                        item = ExerciseService._context_choice(f"{prefix}: situação — qual frase você usaria para “{pt}”?", target, wrong, idx)
-                    elif question_index == 6:
-                        sample = ExerciseService._matching_sample(phrases, question_index - 1)
+                        extras = [word for foreign in all_foreign[start % len(all_foreign):(start % len(all_foreign)) + 12] for word in foreign.split()]
+                        if len(extras) < 8:
+                            extras.extend([word for foreign in all_foreign[:12] for word in foreign.split()])
+                        item = ExerciseService._build(prompt, words, extras, idx)
+                    elif item_type == "match":
+                        sample = ExerciseService._windowed_pairs(bank, start + question_index, 4)
                         pairs = [[foreign, portuguese] for portuguese, foreign in sample]
-                        item = ExerciseService._match(f"{prefix}: combine frases úteis", pairs, idx)
-                    elif question_index in {7, 9}:
-                        item = ExerciseService._listen_choice(f"{prefix}: ouça/reconheça “{pt}”", target, wrong, idx)
-                    elif question_index == 8:
-                        words = target.split()
-                        extras = [word for foreign in all_foreign[5:] for word in foreign.split()]
-                        item = ExerciseService._build(f"{prefix}: organize a frase “{pt}”", words, extras, idx)
+                        item = ExerciseService._match(prompt, pairs, idx)
                     else:
-                        item = ExerciseService._context_choice(f"{prefix}: escolha a melhor frase para a situação “{pt}”", target, wrong, idx)
+                        item = ExerciseService._context_choice(prompt, target, wrong, idx)
                     item["hint"] = hint
                     if item["type"] != "image_choice":
                         item["explanation"] = explanation

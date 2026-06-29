@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { voiceSegmentsForFeedback, voiceSegmentsForItem, voiceTextForItem, voiceTextForFeedback } from './voiceMode.mjs'
+import { voiceSegmentsForAnswerOnly, voiceSegmentsForFeedback, voiceSegmentsForItem, voiceTextForItem, voiceTextForFeedback } from './voiceMode.mjs'
 
 const item = {
   prompt: 'Unidade 1/10 — Café: como dizer “Olá” em Alemão?',
@@ -102,4 +102,21 @@ assert.deepEqual(
     { text: 'Ich möchte ein Brot.', lang: 'de-DE' },
   ],
   'wrong feedback should stay short even when the explanation is long'
+)
+
+
+assert.deepEqual(
+  voiceSegmentsForAnswerOnly({ correctAnswer: { value: 'Wie viel kostet das?' } }, 'de'),
+  [
+    { text: 'Wie viel kostet das?', lang: 'de-DE' },
+  ],
+  'answer-only replay should speak only the correct answer in the studied language'
+)
+
+assert.deepEqual(
+  voiceSegmentsForAnswerOnly({ mistake: { correct_answer: { value: 'Bonjour' } } }, 'fr'),
+  [
+    { text: 'Bonjour', lang: 'fr-FR' },
+  ],
+  'answer-only replay should also work after wrong answers'
 )

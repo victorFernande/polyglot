@@ -5,7 +5,7 @@ import LanguageFlag from '../components/LanguageFlag'
 import { answerExerciseSession, bootstrapUser, completeExerciseSession, loadExerciseLessons, loadExercisePath, startExerciseSession, apiFetch, synthesizeSpeech } from '../lib/api'
 import { handleExerciseKeyDown } from '../lib/exerciseKeyboard.mjs'
 import { buildTilesForItem, matchRightOptions, stableShuffleOptions } from '../lib/exerciseOptions.mjs'
-import { speakSegmentsWithBrowser, voiceSegmentsForFeedback, voiceSegmentsForItem } from '../lib/voiceMode.mjs'
+import { speakSegmentsWithBrowser, voiceSegmentsForAnswerOnly, voiceSegmentsForFeedback, voiceSegmentsForItem } from '../lib/voiceMode.mjs'
 import { createSpeechPlaybackController } from '../lib/speechPlayback.mjs'
 import { buildExerciseFeedback } from '../lib/exerciseFeedback.mjs'
 import { selectableImageChoiceOptions } from '../lib/imageChoice.mjs'
@@ -335,6 +335,7 @@ export default function Exercises() {
 
           <div className="mt-6 flex justify-end gap-3">
             {!feedback && <button className="btn-primary disabled:opacity-40" disabled={!canCheck || busy} onClick={check}>{busy ? 'Salvando...' : 'Verificar'}</button>}
+            {feedback && <button className="btn-secondary inline-flex items-center gap-2" onClick={() => speakCurrent(voiceSegmentsForAnswerOnly(feedback, langCode))}><Volume2 size={18} /> Repetir resposta</button>}
             {feedback?.type === 'wrong' && (session.current_index >= session.total_count ? <button className="btn-primary inline-flex items-center gap-2" onClick={() => finish(true)}>Salvar e ir para questão 11 <ArrowRight size={18} /></button> : <button className="btn-primary inline-flex items-center gap-2" onClick={next}>Entendi, continuar <ArrowRight size={18} /></button>)}
             {feedback?.type === 'correct' && (session.current_index >= session.total_count ? <button className="btn-primary inline-flex items-center gap-2" onClick={() => finish(true)}>Salvar e ir para questão 11 <ArrowRight size={18} /></button> : <button className="btn-primary inline-flex items-center gap-2" onClick={next}>Continuar <ArrowRight size={18} /></button>)}
           </div>

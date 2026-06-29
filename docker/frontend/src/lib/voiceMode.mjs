@@ -92,24 +92,34 @@ export function voiceTextForFeedback(feedback) {
   return feedback.explanation || ''
 }
 
+function correctAnswerFromFeedback(feedback) {
+  return readableAnswer(feedback?.correctAnswer || feedback?.correct_answer || feedback?.mistake?.correct_answer)
+}
+
+export function voiceSegmentsForAnswerOnly(feedback, languageCode = 'pt') {
+  const correct = correctAnswerFromFeedback(feedback)
+  return compactSegments([
+    correct ? { text: correct, lang: speechLangForLanguage(languageCode) } : null,
+  ].filter(Boolean))
+}
+
 export function voiceSegmentsForFeedback(feedback, languageCode = 'pt') {
   if (!feedback) return []
-  const targetLang = speechLangForLanguage(languageCode)
-  const correct = readableAnswer(feedback.correctAnswer || feedback.correct_answer || feedback.mistake?.correct_answer)
+  const correctSegments = voiceSegmentsForAnswerOnly(feedback, languageCode)
 
   // Spoken feedback should be short. The visual card may keep the full
   // explanation, but audio should only reinforce the result and the phrase.
   if (feedback.type === 'correct') {
     return compactSegments([
       { text: 'Correto.', lang: 'pt-BR' },
-      correct ? { text: correct, lang: targetLang } : null,
-    ].filter(Boolean))
+      ...correctSegments,
+    ])
   }
   if (feedback.type === 'wrong') {
     return compactSegments([
       { text: 'Resposta correta:', lang: 'pt-BR' },
-      correct ? { text: correct, lang: targetLang } : null,
-    ].filter(Boolean))
+      ...correctSegments,
+    ])
   }
   return compactSegments([{ text: feedback.explanation || '', lang: 'pt-BR' }])
 }
