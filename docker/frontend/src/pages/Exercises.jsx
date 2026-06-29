@@ -18,7 +18,7 @@ import { reorderBuiltWords } from '../lib/buildWordOrder.mjs'
 import { cleanExercisePrompt, isTrailSessionEnabled, pageForSessionNumber, sessionWindowForPage, trailConnectorStateClasses, trailHeaderLayoutClasses, trailNodeStateClasses } from '../lib/exerciseTrailLayout.mjs'
 import { nextExerciseActionLabel, sessionNumberForExerciseSession } from '../lib/exerciseSessionLabels.mjs'
 import { parseMicroDialoguePrompt } from '../lib/microDialoguePrompt.mjs'
-import { playAnswerFeedbackSound } from '../lib/answerFeedbackSound.mjs'
+import { playAnswerFeedbackSound, unlockAnswerFeedbackSound } from '../lib/answerFeedbackSound.mjs'
 
 const LANG_META = {
   de: { accent: 'Rammstein', color: 'from-red-600 to-red-900' },
@@ -197,6 +197,7 @@ export default function Exercises() {
 
   async function check() {
     if (!item || !session) return
+    unlockAnswerFeedbackSound()
     setBusy(true)
     try {
       const result = await answerExerciseSession(session.id, { item_id: item.id, payload: normalizedPayload })

@@ -5,8 +5,13 @@ const exercisesSource = readFileSync(new URL('../pages/Exercises.jsx', import.me
 
 assert.match(
   exercisesSource,
-  /import \{ playAnswerFeedbackSound \} from ['"]\.\.\/lib\/answerFeedbackSound\.mjs['"]/,
-  'Exercises page must import the short answer feedback sound helper'
+  /import \{ playAnswerFeedbackSound, unlockAnswerFeedbackSound \} from ['"]\.\.\/lib\/answerFeedbackSound\.mjs['"]/,
+  'Exercises page must import helpers to unlock on click and play after feedback'
+)
+assert.match(
+  exercisesSource,
+  /unlockAnswerFeedbackSound\(\)[\s\S]*?await answerExerciseSession/,
+  'checking an answer must unlock Web Audio during the user gesture before awaiting the API response'
 )
 assert.match(
   exercisesSource,
