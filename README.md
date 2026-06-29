@@ -16,6 +16,7 @@ Cada idioma é uma **temporada** de 8 semanas. Você joga uma de cada vez.
 | 🌊 2 | 🇫🇷 Francês | 8 semanas | Entender uma cena de *Amélie* | Música francesa |
 | 🌊 3 | 🇷🇺 Russo | 8 semanas | Ler um tweet em cirílico | Música russa |
 | 🌊 4 | 🇯🇵 Japonês | 8 semanas | Entender um anime sem legenda | Anime/manga |
+| 🔁 Base | 🇬🇧 Inglês | contínuo | Explicar conceitos das outras línguas | Pop/internet/tecnologia |
 
 **Regra de ouro:** Não pular ondas. Terminar uma para desbloquear a próxima.
 
@@ -79,6 +80,12 @@ polyglot/
 │   ├── grammar/
 │   ├── vocabulary/
 │   ├── immersion/anime/
+│   └── progress/
+├── english/         # 🇬🇧 Base/Manutenção — Ponte comparativa
+│   ├── alphabet/
+│   ├── grammar/
+│   ├── vocabulary/
+│   ├── immersion/media/
 │   └── progress/
 ├── shared/
 │   ├── anki-decks/      # Decks gerados por onda

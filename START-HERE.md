@@ -14,6 +14,7 @@
 | 🌊 2 | 🇫🇷 **Francês** | 🌹 **Chanson Française** | 8 semanas | Cena de *Amélie* sem legenda | 🔓 Livre |
 | 🌊 3 | 🇷🇺 **Russo** | 🪗 **Música Russa** | 8 semanas | Ler um tweet em cirílico | 🔓 Livre |
 | 🌊 4 | 🇯🇵 **Japonês** | 🗾 **Anime/Manga** | 8 semanas | Entender anime sem legenda | 🔓 Livre |
+| 🔁 Base | 🇬🇧 **Inglês** | 🌐 **Pop/Internet/Tecnologia** | contínuo | Usar inglês como ponte entre línguas | ✅ Já fala |
 
 **Regra:** Escolha UMA onda para começar. Complete-a para desbloquear a próxima (ou ignore e escolha outra — você manda! 😄).
 
@@ -63,6 +64,9 @@ Semana 7-8: FASE 4 — "O Boss" (Imersão com âncora cultural)
 
 ### Opção D: Quero começar pelo Japonês (Anime)
 → Leia [`waves/wave-04-japanese.md`](waves/wave-04-japanese.md)
+
+### Base: Quero manter/usar Inglês como ponte
+→ Leia [`english/README.md`](english/README.md)
 
 ---
 
