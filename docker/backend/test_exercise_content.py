@@ -26,7 +26,7 @@ def test_seed_lessons_is_long_varied_and_idempotent():
         for lesson in lessons:
             items = db.query(ExerciseItem).filter(ExerciseItem.lesson_id == lesson.id).all()
             assert len(items) == ExerciseService.TARGET_ITEMS
-            assert {item.type for item in items} >= {"choice", "build", "match", "image_choice"}
+            assert {item.type for item in items} >= {"choice", "listen_choice", "image_choice", "build", "context_choice", "match", "listen_build"}
             assert all(item.hint for item in items)
             assert all(item.explanation for item in items)
             assert any("Unidade 1/10 — Fazendo um pedido no café" in item.prompt for item in items)
@@ -53,7 +53,7 @@ def test_seed_lessons_is_long_varied_and_idempotent():
                     assert all("viewBox" in option["svg"] for option in item.options)
                     correct = next(option for option in item.options if option["value"] == item.answer["value"])
                     assert correct["label_pt"] in item.explanation
-                elif item.type == "build":
+                elif item.type in {"build", "listen_build"}:
                     assert all(word in item.tiles for word in item.answer["value"])
                 elif item.type == "match":
                     assert item.answer["pairs"] == item.pairs
@@ -153,6 +153,21 @@ def test_first_five_exercises_are_not_repetitive_variations_of_same_task():
     assert any("ouça" in prompt.casefold() for prompt in prompts)
     assert any("imagem" in prompt.casefold() for prompt in prompts)
     assert any("complete" in prompt.casefold() or "situação" in prompt.casefold() for prompt in prompts)
+
+
+def test_listen_build_items_have_audio_build_payload_shape():
+    items = ExerciseService.generate_items("de")
+    listen_builds = [item for item in items if item["type"] == "listen_build"]
+
+    assert listen_builds, "expected at least one listen_build item in generated track"
+    item = listen_builds[0]
+    assert "ouça" in f"{item['prompt']} {item['hint']}".casefold()
+    assert isinstance(item["answer"]["value"], list)
+    assert item["answer"]["value"]
+    assert item["tiles"]
+    assert item["options"] is None
+    assert item["pairs"] is None
+    assert all(word in item["tiles"] for word in item["answer"]["value"])
 
 
 def test_context_choice_includes_microdialogue_with_target_language_options():

@@ -46,6 +46,18 @@ assert.deepEqual(
 
 assert.deepEqual(
   voiceSegmentsForItem({
+    type: 'listen_build',
+    prompt: 'Unidade 1/10 — Café: ouça e monte a frase correta.',
+    answer: { value: ['Ich', 'höre', 'Musik'] },
+  }, 'de'),
+  [
+    { text: 'Ich höre Musik', lang: 'de-DE' },
+  ],
+  'listen-build question audio should speak the target answer in the studied language before answering'
+)
+
+assert.deepEqual(
+  voiceSegmentsForItem({
     type: 'choice',
     prompt: 'Unidade 1/10 — Café: como dizer “Olá” em Alemão?',
     answer: { value: 'Hallo' },

@@ -223,6 +223,13 @@ class ExerciseService:
         return {"type":"build","prompt":prompt,"answer":{"value":words},"options":None,"tiles":tiles,"pairs":None,"hint":"Monte a frase na ordem natural do idioma.","explanation":"Frases curtas ajudam a fixar padrões sem decorar regras isoladas.","xp_reward":10 + (idx % 4)}
 
     @staticmethod
+    def _listen_build(prompt, words, extras, idx):
+        item = ExerciseService._build(prompt, words, extras, idx)
+        item["type"] = "listen_build"
+        item["hint"] = "Ouça a frase, repita em voz alta e monte as palavras na ordem correta."
+        return item
+
+    @staticmethod
     def _match(prompt, pairs, idx):
         return {"type":"match","prompt":prompt,"answer":{"pairs":pairs},"options":None,"tiles":None,"pairs":pairs,"hint":"Combine pelo significado, não pela aparência da palavra.","explanation":"Matching fortalece reconhecimento rápido de vocabulário.","xp_reward":12 + (idx % 4)}
 
@@ -444,11 +451,11 @@ class ExerciseService:
         name = ExerciseService.LANGUAGE_NAMES[code]
         items = []
         type_patterns = [
-            ["choice", "listen_choice", "image_choice", "build", "context_choice", "match", "choice", "build", "listen_choice", "context_choice"],
-            ["listen_choice", "choice", "build", "context_choice", "image_choice", "choice", "match", "listen_choice", "build", "context_choice"],
-            ["context_choice", "image_choice", "choice", "listen_choice", "build", "match", "choice", "context_choice", "listen_choice", "build"],
-            ["choice", "build", "listen_choice", "image_choice", "context_choice", "match", "build", "choice", "context_choice", "listen_choice"],
-            ["image_choice", "choice", "context_choice", "build", "listen_choice", "match", "choice", "listen_choice", "build", "context_choice"],
+            ["choice", "listen_choice", "image_choice", "build", "context_choice", "match", "choice", "listen_build", "listen_choice", "context_choice"],
+            ["listen_choice", "choice", "build", "context_choice", "image_choice", "choice", "match", "listen_choice", "listen_build", "context_choice"],
+            ["context_choice", "image_choice", "choice", "listen_choice", "build", "match", "choice", "context_choice", "listen_choice", "listen_build"],
+            ["choice", "build", "listen_choice", "image_choice", "context_choice", "match", "listen_build", "choice", "context_choice", "listen_choice"],
+            ["image_choice", "choice", "context_choice", "build", "listen_choice", "match", "choice", "listen_choice", "listen_build", "context_choice"],
         ]
         for unit_index, unit in enumerate(A1_UNITS, 1):
             bank = ExerciseService._expanded_practice_bank(code, unit, unit_index)
@@ -484,12 +491,16 @@ class ExerciseService:
                                 break
                         answer = (pt, target, ExerciseService._icon_key_for_phrase(pt, target, topic_name))
                         item = ExerciseService._image_choice(prompt, answer, image_options, idx)
-                    elif item_type == "build":
+                    elif item_type in {"build", "listen_build"}:
                         words = target.split()
                         extras = [word for foreign in all_foreign[start % len(all_foreign):(start % len(all_foreign)) + 12] for word in foreign.split()]
                         if len(extras) < 8:
                             extras.extend([word for foreign in all_foreign[:12] for word in foreign.split()])
-                        item = ExerciseService._build(prompt, words, extras, idx)
+                        if item_type == "listen_build":
+                            prompt = f"{prefix}: ouça e monte em ordem natural — “{pt}”"
+                            item = ExerciseService._listen_build(prompt, words, extras, idx)
+                        else:
+                            item = ExerciseService._build(prompt, words, extras, idx)
                     elif item_type == "match":
                         sample = ExerciseService._windowed_pairs(bank, start + question_index, 4)
                         pairs = [[foreign, portuguese] for portuguese, foreign in sample]
@@ -499,7 +510,7 @@ class ExerciseService:
                             _context_pt, opening_line = bank[(start + question_index - 2) % len(bank)]
                             prompt = ExerciseService._microdialogue_prompt(prefix, topic_name, pt, opening_line)
                         item = ExerciseService._context_choice(prompt, target, wrong, idx)
-                    item["hint"] = hint
+                    item["hint"] = f"{hint} Ouça a frase, repita em voz alta e monte as palavras na ordem correta." if item["type"] == "listen_build" else hint
                     if item["type"] != "image_choice":
                         item["explanation"] = explanation
                     items.append(item)

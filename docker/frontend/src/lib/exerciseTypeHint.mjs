@@ -4,6 +4,7 @@ const EXERCISE_TYPE_HINTS = {
   context_choice: 'Use o contexto para escolher.',
   image_choice: 'Escolha a imagem correta.',
   build: 'Monte a frase na ordem correta.',
+  listen_build: 'Ouça e monte a frase.',
   match: 'Relacione cada item ao par correto.',
 }
 

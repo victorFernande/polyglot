@@ -9,6 +9,7 @@ test('hintForExerciseType returns concise guidance for known exercise types', ()
   assert.equal(hintForExerciseType('context_choice'), 'Use o contexto para escolher.')
   assert.equal(hintForExerciseType('image_choice'), 'Escolha a imagem correta.')
   assert.equal(hintForExerciseType('build'), 'Monte a frase na ordem correta.')
+  assert.equal(hintForExerciseType('listen_build'), 'Ouça e monte a frase.')
   assert.equal(hintForExerciseType('match'), 'Relacione cada item ao par correto.')
 })
 

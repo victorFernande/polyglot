@@ -54,7 +54,7 @@ export function voiceTextForItem(item) {
 export function voiceSegmentsForItem(item, languageCode = 'pt') {
   if (!item?.prompt) return []
   const targetAnswer = readableAnswer(item.answer)
-  if (item.type === 'listen_choice' && targetAnswer) {
+  if (['listen_choice', 'listen_build'].includes(item.type) && targetAnswer) {
     return compactSegments([{ text: targetAnswer, lang: speechLangForLanguage(languageCode) }])
   }
   let prompt = item.prompt

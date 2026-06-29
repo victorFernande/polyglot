@@ -33,6 +33,8 @@ const LESSON_LANGUAGE_FILTERS = [
   { code: 'en', label: 'Inglês' },
 ]
 
+const BUILD_LIKE_TYPES = ['build', 'listen_build']
+
 function answerValue(answer) {
   if (answer && typeof answer === 'object' && 'value' in answer) return answer.value
   return answer
@@ -149,7 +151,7 @@ export default function Exercises() {
     if (!item) return null
     if (['choice', 'listen_choice', 'context_choice'].includes(item.type)) return selected
     if (item.type === 'image_choice') return selected
-    if (item.type === 'build') return built
+    if (BUILD_LIKE_TYPES.includes(item.type)) return built
     if (item.type === 'match') return matched
     return selected
   }, [item, selected, built, matched])
@@ -158,7 +160,7 @@ export default function Exercises() {
     if (!item) return false
     if (['choice', 'listen_choice', 'context_choice'].includes(item.type)) return !!selected
     if (item.type === 'image_choice') return !!selected
-    if (item.type === 'build') return built.length === (answerValue(item.answer)?.length || 0)
+    if (BUILD_LIKE_TYPES.includes(item.type)) return built.length === (answerValue(item.answer)?.length || 0)
     if (item.type === 'match') return Object.keys(matched).length === matchPairs(item).length
     return false
   }, [item, selected, built, matched])
@@ -359,7 +361,7 @@ export default function Exercises() {
 
           {['choice', 'listen_choice', 'context_choice'].includes(item.type) && <Choice options={choiceOptions} selected={selected} onInteract={() => setFeedback(null)} setSelected={setSelected} />}
           {item.type === 'image_choice' && <ImageChoice options={choiceOptions} selected={selected} onInteract={() => setFeedback(null)} setSelected={setSelected} />}
-          {item.type === 'build' && <Build item={item} built={built} onInteract={() => setFeedback(null)} setBuilt={setBuilt} />}
+          {BUILD_LIKE_TYPES.includes(item.type) && <Build item={item} built={built} onInteract={() => setFeedback(null)} setBuilt={setBuilt} />}
           {item.type === 'match' && <Match item={item} matched={matched} onInteract={() => setFeedback(null)} setMatched={setMatched} />}
 
           <div className="mt-6 rounded-xl bg-white/5 p-4 text-sm text-gray-300"><strong>Dica:</strong> {item.hint}</div>
