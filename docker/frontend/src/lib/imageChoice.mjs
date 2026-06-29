@@ -10,8 +10,9 @@ export function selectableImageChoiceOptions(options) {
       ...option,
       key: String(option.value),
       selectValue: option.value,
-      label: option.label_pt,
+      label: option.display_text || option.value,
       displayText: option.display_text || option.value,
+      portugueseLabel: option.label_pt,
       imageSrc: option.image_src || svgToDataUri(option.svg),
     }))
     .filter((option) => option.imageSrc)

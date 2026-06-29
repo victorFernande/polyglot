@@ -19,7 +19,9 @@ const options = selectableImageChoiceOptions([
 
 assert.equal(options.length, 2)
 assert.deepEqual(options.map((option) => option.selectValue), ['Hallo', 'Kaffee'])
-assert.deepEqual(options.map((option) => option.label), ['Olá', 'café'])
+assert.deepEqual(options.map((option) => option.label), ['Hallo', 'Kaffee'])
 assert.deepEqual(options.map((option) => option.displayText), ['Hallo', 'Kaffee'])
+assert.deepEqual(options.map((option) => option.portugueseLabel), ['Olá', 'café'])
 assert.ok(options.every((option) => option.imageSrc.startsWith('data:image/svg+xml')))
 assert.ok(options.every((option) => option.key))
+assert.ok(options.every((option) => option.label !== option.portugueseLabel), 'clickable image options should not expose Portuguese as their visible/alt label')
