@@ -11,6 +11,7 @@ import { buildExerciseFeedback } from '../lib/exerciseFeedback.mjs'
 import { selectableImageChoiceOptions } from '../lib/imageChoice.mjs'
 import { lessonContextForExercise } from '../lib/exerciseLessonContext.mjs'
 import { hintForExerciseType } from '../lib/exerciseTypeHint.mjs'
+import { choiceShortcutLabels } from '../lib/exerciseChoiceShortcuts.mjs'
 
 const LANG_META = {
   de: { accent: 'Rammstein', color: 'from-red-600 to-red-900' },
@@ -370,15 +371,18 @@ function SkillTrail({ path }) {
 }
 
 function Choice({ options, selected, setSelected, onInteract }) {
-  return <div className="grid gap-3 sm:grid-cols-2">{options.map((option) => <button key={option} onClick={() => { onInteract(); setSelected(option) }} className={`rounded-xl border p-4 text-left text-lg font-semibold transition ${selected === option ? 'border-polyglot-accent bg-polyglot-accent/20' : 'border-white/10 bg-white/5 hover:bg-white/10'}`}>{option}</button>)}</div>
+  const shortcutLabels = choiceShortcutLabels(options)
+  return <div className="grid gap-3 sm:grid-cols-2">{options.map((option, index) => <button key={option} onClick={() => { onInteract(); setSelected(option) }} className={`flex items-center gap-3 rounded-xl border p-4 text-left text-lg font-semibold transition ${selected === option ? 'border-polyglot-accent bg-polyglot-accent/20' : 'border-white/10 bg-white/5 hover:bg-white/10'}`}>{shortcutLabels[index] && <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-white/15 bg-black/30 text-sm font-bold text-polyglot-accent">{shortcutLabels[index]}</span>}<span>{option}</span></button>)}</div>
 }
 
 function ImageChoice({ options, selected, setSelected, onInteract }) {
   const selectable = selectableImageChoiceOptions(options)
+  const shortcutLabels = choiceShortcutLabels(selectable)
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      {selectable.map((option) => (
-        <button key={option.key} onClick={() => { onInteract(); setSelected(option.selectValue) }} className={`rounded-2xl border p-4 text-center transition ${selected === option.selectValue ? 'border-polyglot-accent bg-polyglot-accent/20' : 'border-white/10 bg-white/5 hover:bg-white/10'}`}>
+      {selectable.map((option, index) => (
+        <button key={option.key} onClick={() => { onInteract(); setSelected(option.selectValue) }} className={`relative rounded-2xl border p-4 text-center transition ${selected === option.selectValue ? 'border-polyglot-accent bg-polyglot-accent/20' : 'border-white/10 bg-white/5 hover:bg-white/10'}`}>
+          {shortcutLabels[index] && <span className="absolute left-3 top-3 flex h-7 w-7 items-center justify-center rounded-full border border-white/15 bg-black/60 text-sm font-bold text-polyglot-accent">{shortcutLabels[index]}</span>}
           <div className="mx-auto mb-3 flex h-24 w-24 items-center justify-center overflow-hidden rounded-2xl bg-white/90 p-2">
             <img src={option.imageSrc} alt={option.label} className="h-full w-full object-contain" />
           </div>
