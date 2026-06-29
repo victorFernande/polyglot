@@ -17,6 +17,7 @@ import { filterExerciseLessonsByLanguage, summarizeExerciseLessonProgressByLangu
 import { reorderBuiltWords } from '../lib/buildWordOrder.mjs'
 import { cleanExercisePrompt, pageForSessionNumber, sessionWindowForPage, trailHeaderLayoutClasses } from '../lib/exerciseTrailLayout.mjs'
 import { nextExerciseActionLabel, sessionNumberForExerciseSession } from '../lib/exerciseSessionLabels.mjs'
+import { parseMicroDialoguePrompt } from '../lib/microDialoguePrompt.mjs'
 
 const LANG_META = {
   de: { accent: 'Rammstein', color: 'from-red-600 to-red-900' },
@@ -124,6 +125,7 @@ export default function Exercises() {
   const lessonLanguageProgress = useMemo(() => summarizeExerciseLessonProgressByLanguage(lessons), [lessons])
   const filteredLessons = useMemo(() => filterExerciseLessonsByLanguage(lessons, lessonLanguageFilter), [lessons, lessonLanguageFilter])
   const currentSessionNumber = sessionNumberForExerciseSession(session, activePath)
+  const microDialogue = useMemo(() => (item?.type === 'context_choice' ? parseMicroDialoguePrompt(item.prompt) : null), [item])
 
   useEffect(() => {
     if (activePath) {
@@ -379,6 +381,8 @@ export default function Exercises() {
           </div>
 
 
+          {microDialogue && <MicroDialoguePrompt dialogue={microDialogue} />}
+
           {['choice', 'listen_choice', 'context_choice'].includes(item.type) && <Choice options={choiceOptions} selected={selected} onInteract={() => setFeedback(null)} setSelected={setSelected} />}
           {item.type === 'image_choice' && <ImageChoice options={choiceOptions} selected={selected} onInteract={() => setFeedback(null)} setSelected={setSelected} />}
           {BUILD_LIKE_TYPES.includes(item.type) && <Build item={item} built={built} onInteract={() => setFeedback(null)} setBuilt={setBuilt} />}
@@ -421,6 +425,24 @@ function ProgressStat({ label, value, detail }) {
         <span className="text-2xl font-bold text-white">{value}</span>
         {detail && <span className="text-sm font-semibold text-polyglot-accent">{detail}</span>}
       </div>
+    </div>
+  )
+}
+
+function MicroDialoguePrompt({ dialogue }) {
+  return (
+    <div className="mb-5 rounded-2xl border border-white/10 bg-white/5 p-4">
+      <div className="space-y-3">
+        <div className="mr-8 rounded-2xl rounded-tl-sm bg-black/30 p-3">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-500">{dialogue.partnerLabel}</p>
+          <p className="mt-1 text-lg font-semibold text-white">{dialogue.partnerText}</p>
+        </div>
+        <div className="ml-8 rounded-2xl rounded-tr-sm border border-polyglot-accent/40 bg-polyglot-accent/10 p-3">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">{dialogue.learnerLabel}</p>
+          <p className="mt-1 text-lg font-semibold text-white">{dialogue.learnerText}</p>
+        </div>
+      </div>
+      {dialogue.instruction && <p className="mt-3 text-sm text-gray-300">{dialogue.instruction}</p>}
     </div>
   )
 }
