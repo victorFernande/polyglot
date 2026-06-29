@@ -155,6 +155,23 @@ def test_first_five_exercises_are_not_repetitive_variations_of_same_task():
     assert any("complete" in prompt.casefold() or "situação" in prompt.casefold() for prompt in prompts)
 
 
+def test_context_choice_includes_microdialogue_with_target_language_options():
+    items = ExerciseService.generate_items("de")
+    dialogues = [
+        item for item in items
+        if item["type"] == "context_choice" and "Você:" in item["prompt"] and "___" in item["prompt"]
+    ]
+
+    assert dialogues, "expected at least one context_choice prompt formatted as a microdialogue"
+    item = dialogues[0]
+    assert "Cliente:" in item["prompt"] or "Pessoa:" in item["prompt"]
+    assert item["answer"]["value"] in item["options"]
+    assert len(item["options"]) == 4
+    assert all(option in [foreign for _pt, foreign in ExerciseService._expanded_practice_bank("de", A1_UNITS[0], 1)] for option in item["options"])
+    assert item["hint"]
+    assert item["explanation"]
+
+
 def test_choice_items_include_reverse_comprehension_prompts_with_portuguese_options():
     items = ExerciseService.generate_items("de")
     reverse_items = [

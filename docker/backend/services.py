@@ -410,6 +410,15 @@ class ExerciseService:
         return wrong
 
     @staticmethod
+    def _microdialogue_prompt(prefix, topic_name, pt, opening_line):
+        return (
+            f"{prefix}: situação em microdiálogo no cenário “{topic_name}”\n"
+            f"Pessoa: {opening_line}\n"
+            "Você: ___\n"
+            f"Escolha uma fala para comunicar “{pt}”."
+        )
+
+    @staticmethod
     def _prompt_for_question(prefix, question_index, pt, target, name, topic_name):
         templates = [
             f"{prefix}: como dizer “{pt}” em {name}?",
@@ -486,6 +495,9 @@ class ExerciseService:
                         pairs = [[foreign, portuguese] for portuguese, foreign in sample]
                         item = ExerciseService._match(prompt, pairs, idx)
                     else:
+                        if question_index in {5, 10}:
+                            _context_pt, opening_line = bank[(start + question_index - 2) % len(bank)]
+                            prompt = ExerciseService._microdialogue_prompt(prefix, topic_name, pt, opening_line)
                         item = ExerciseService._context_choice(prompt, target, wrong, idx)
                     item["hint"] = hint
                     if item["type"] != "image_choice":
