@@ -13,7 +13,7 @@ import { lessonContextForExercise } from '../lib/exerciseLessonContext.mjs'
 import { hintForExerciseType } from '../lib/exerciseTypeHint.mjs'
 import { choiceShortcutLabels } from '../lib/exerciseChoiceShortcuts.mjs'
 import { exerciseSessionProgress } from '../lib/exerciseSessionProgress.mjs'
-import { filterExerciseLessonsByLanguage } from '../lib/exerciseLessonFilters.mjs'
+import { filterExerciseLessonsByLanguage, summarizeExerciseLessonProgressByLanguage } from '../lib/exerciseLessonFilters.mjs'
 
 const LANG_META = {
   de: { accent: 'Rammstein', color: 'from-red-600 to-red-900' },
@@ -114,6 +114,7 @@ export default function Exercises() {
   const choiceLikeTypes = ['choice', 'listen_choice', 'context_choice', 'image_choice']
   const choiceOptions = useMemo(() => (choiceLikeTypes.includes(item?.type) ? stableShuffleOptions(item.options || [], item.id ?? item.prompt) : []), [item])
   const lessonContext = useMemo(() => lessonContextForExercise(lesson), [lesson])
+  const lessonLanguageProgress = useMemo(() => summarizeExerciseLessonProgressByLanguage(lessons), [lessons])
   const filteredLessons = useMemo(() => filterExerciseLessonsByLanguage(lessons, lessonLanguageFilter), [lessons, lessonLanguageFilter])
 
   function resetExerciseState() {
@@ -282,16 +283,20 @@ export default function Exercises() {
       )}
 
       <div className="flex flex-wrap gap-2">
-        {LESSON_LANGUAGE_FILTERS.map((filter) => (
-          <button
-            key={filter.code}
-            type="button"
-            onClick={() => setLessonLanguageFilter(filter.code)}
-            className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${lessonLanguageFilter === filter.code ? 'border-polyglot-accent bg-polyglot-accent/20 text-polyglot-accent' : 'border-white/10 bg-white/5 text-gray-300 hover:bg-white/10'}`}
-          >
-            {filter.label}
-          </button>
-        ))}
+        {LESSON_LANGUAGE_FILTERS.map((filter) => {
+          const progressSummary = lessonLanguageProgress[filter.code] || { label: '0/0 sessões' }
+          return (
+            <button
+              key={filter.code}
+              type="button"
+              onClick={() => setLessonLanguageFilter(filter.code)}
+              className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${lessonLanguageFilter === filter.code ? 'border-polyglot-accent bg-polyglot-accent/20 text-polyglot-accent' : 'border-white/10 bg-white/5 text-gray-300 hover:bg-white/10'}`}
+            >
+              <span>{filter.label}</span>
+              <span className="ml-2 text-xs font-medium opacity-75">· {progressSummary.label}</span>
+            </button>
+          )
+        })}
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
