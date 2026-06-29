@@ -77,6 +77,11 @@ export default function Flashcards() {
     setFlipped(false)
   }
 
+  function restartDeck() {
+    setIndex(0)
+    setFlipped(false)
+  }
+
   function markNeedsReview() {
     if (!card) return
 
@@ -176,6 +181,24 @@ export default function Flashcards() {
             {supportVisibility.explanation && (
               <div className="rounded-xl bg-white/5 p-4 text-sm text-gray-300"><strong>Explicação:</strong> {card.explanation}</div>
             )}
+          </div>
+        )}
+
+        {sessionStats.isComplete && (
+          <div className="mt-6 rounded-2xl border border-polyglot-accent/30 bg-polyglot-accent/10 p-5 text-sm text-gray-200">
+            <p className="text-xs uppercase tracking-[0.3em] text-polyglot-accent">Sessão concluída</p>
+            <h2 className="mt-2 text-2xl font-bold text-white">Bom trabalho — deck finalizado!</h2>
+            <p className="mt-2 text-gray-300">
+              Você estudou {sessionStats.studiedCount} cards nesta rodada e marcou {sessionStats.reviewQueueCount} para revisar.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-3">
+              <button className="btn-secondary inline-flex items-center gap-2" onClick={restartDeck}>
+                <RotateCcw size={18} /> Recomeçar deck
+              </button>
+              <button className="btn-primary inline-flex items-center gap-2" onClick={shuffleDeck} disabled={cards.length < 2}>
+                <Shuffle size={18} /> Misturar e recomeçar
+              </button>
+            </div>
           </div>
         )}
 

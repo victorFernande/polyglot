@@ -10,6 +10,7 @@ test('getFlashcardSessionStats reports studied review queue and remaining counts
       studiedCount: 4,
       reviewQueueCount: 2,
       remainingCount: 8,
+      isComplete: false,
     },
   )
 })
@@ -21,6 +22,7 @@ test('getFlashcardSessionStats starts empty decks at zero without negative remai
       studiedCount: 0,
       reviewQueueCount: 0,
       remainingCount: 0,
+      isComplete: false,
     },
   )
 })
@@ -32,6 +34,22 @@ test('getFlashcardSessionStats clamps an out-of-range index to the visible deck 
       studiedCount: 4,
       reviewQueueCount: 1,
       remainingCount: 0,
+      isComplete: true,
     },
+  )
+})
+
+test('getFlashcardSessionStats marks non-empty sessions complete only after the final visible card', () => {
+  assert.equal(
+    getFlashcardSessionStats({ deckCount: 3, reviewQueueCount: 1, currentIndex: 2 }).isComplete,
+    false,
+  )
+  assert.equal(
+    getFlashcardSessionStats({ deckCount: 3, reviewQueueCount: 1, currentIndex: 3 }).isComplete,
+    true,
+  )
+  assert.equal(
+    getFlashcardSessionStats({ deckCount: 0, reviewQueueCount: 0, currentIndex: 0 }).isComplete,
+    false,
   )
 })
