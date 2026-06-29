@@ -14,6 +14,7 @@ import { hintForExerciseType } from '../lib/exerciseTypeHint.mjs'
 import { choiceShortcutLabels } from '../lib/exerciseChoiceShortcuts.mjs'
 import { exerciseSessionProgress } from '../lib/exerciseSessionProgress.mjs'
 import { filterExerciseLessonsByLanguage, summarizeExerciseLessonProgressByLanguage } from '../lib/exerciseLessonFilters.mjs'
+import { moveBuiltWord } from '../lib/buildWordOrder.mjs'
 
 const LANG_META = {
   de: { accent: 'Rammstein', color: 'from-red-600 to-red-900' },
@@ -451,7 +452,68 @@ function ImageChoice({ options, selected, setSelected, onInteract }) {
 
 function Build({ item, built, setBuilt, onInteract }) {
   const tiles = buildTilesForItem(item)
-  return <div className="space-y-4"><div className="min-h-16 rounded-xl border border-dashed border-white/20 bg-white/5 p-4">{built.length === 0 ? <span className="text-gray-500">Toque nas palavras para montar a frase...</span> : built.map((word, i) => <button key={`${word}-${i}`} onClick={() => { onInteract(); setBuilt(built.filter((_, idx) => idx !== i)) }} className="mr-2 mb-2 rounded-lg bg-polyglot-accent px-3 py-2 font-semibold">{word}</button>)}</div><div className="flex flex-wrap gap-2">{tiles.map((tile, i) => <button key={`${tile}-${i}`} disabled={built.includes(tile)} onClick={() => { onInteract(); setBuilt([...built, tile]) }} className="rounded-lg bg-white/10 px-4 py-3 font-semibold hover:bg-white/20 disabled:opacity-30">{tile}</button>)}</div></div>
+
+  function removeWord(index) {
+    onInteract()
+    setBuilt(built.filter((_, idx) => idx !== index))
+  }
+
+  function moveWord(index, direction) {
+    onInteract()
+    setBuilt(moveBuiltWord(built, index, direction))
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="min-h-16 rounded-xl border border-dashed border-white/20 bg-white/5 p-4">
+        {built.length === 0 ? (
+          <span className="text-gray-500">Toque nas palavras para montar a frase...</span>
+        ) : (
+          <div className="flex flex-wrap gap-2">
+            {built.map((word, i) => (
+              <div key={`${word}-${i}`} className="inline-flex items-center overflow-hidden rounded-lg bg-polyglot-accent font-semibold text-white">
+                <button
+                  type="button"
+                  onClick={() => moveWord(i, -1)}
+                  disabled={i === 0}
+                  aria-label={`Mover ${word} para a esquerda`}
+                  className="px-2 py-2 text-sm hover:bg-black/15 disabled:cursor-not-allowed disabled:opacity-30"
+                  title="Mover palavra para a esquerda"
+                >
+                  ←
+                </button>
+                <button
+                  type="button"
+                  onClick={() => removeWord(i)}
+                  aria-label={`Remover ${word} da resposta`}
+                  className="px-3 py-2 hover:bg-black/10"
+                  title="Remover palavra selecionada"
+                >
+                  {word}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => moveWord(i, 1)}
+                  disabled={i === built.length - 1}
+                  aria-label={`Mover ${word} para a direita`}
+                  className="px-2 py-2 text-sm hover:bg-black/15 disabled:cursor-not-allowed disabled:opacity-30"
+                  title="Mover palavra para a direita"
+                >
+                  →
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      {built.length > 1 && <p className="text-xs text-gray-500">Errou a ordem? Use ← e → nas palavras selecionadas para reorganizar sem desmontar tudo.</p>}
+      <div className="flex flex-wrap gap-2">
+        {tiles.map((tile, i) => (
+          <button key={`${tile}-${i}`} disabled={built.includes(tile)} onClick={() => { onInteract(); setBuilt([...built, tile]) }} className="rounded-lg bg-white/10 px-4 py-3 font-semibold hover:bg-white/20 disabled:opacity-30">{tile}</button>
+        ))}
+      </div>
+    </div>
+  )
 }
 
 function Match({ item, matched, setMatched, onInteract }) {
