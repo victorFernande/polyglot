@@ -7,6 +7,7 @@ import { handleExerciseKeyDown } from '../lib/exerciseKeyboard.mjs'
 import { buildTilesForItem, matchRightOptions, stableShuffleOptions } from '../lib/exerciseOptions.mjs'
 import { speakSegmentsWithBrowser, voiceSegmentsForFeedback, voiceSegmentsForItem } from '../lib/voiceMode.mjs'
 import { createSpeechPlaybackController } from '../lib/speechPlayback.mjs'
+import { buildExerciseFeedback } from '../lib/exerciseFeedback.mjs'
 import { selectableImageChoiceOptions } from '../lib/imageChoice.mjs'
 import { lessonContextForExercise } from '../lib/exerciseLessonContext.mjs'
 
@@ -149,8 +150,10 @@ export default function Exercises() {
     setBusy(true)
     try {
       const result = await answerExerciseSession(session.id, { item_id: item.id, payload: normalizedPayload })
+      const nextFeedback = buildExerciseFeedback(result, item, currentIndex)
       setSession(result.session)
-      setFeedback(result.is_correct ? { type: 'correct', explanation: result.explanation, itemSnapshot: item, answeredIndex: currentIndex } : { type: 'wrong', explanation: result.explanation, correctAnswer: result.correct_answer, mistake: result.mistake_feedback, itemSnapshot: item, answeredIndex: currentIndex })
+      setFeedback(nextFeedback)
+      speakCurrent(voiceSegmentsForFeedback(nextFeedback, langCode))
     } catch (err) {
       setError(err.message)
     } finally {
@@ -204,10 +207,6 @@ export default function Exercises() {
   useEffect(() => {
     if (voiceMode && item && !feedback) speakCurrent()
   }, [voiceMode, item?.id, feedback])
-
-  useEffect(() => {
-    if (voiceMode && feedback) speakCurrent(voiceSegmentsForFeedback(feedback, langCode))
-  }, [voiceMode, feedback])
 
   useEffect(() => {
     function onKeyDown(event) {
