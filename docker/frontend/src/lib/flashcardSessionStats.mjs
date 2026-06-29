@@ -76,18 +76,32 @@ export function getFlashcardMicroGoalState({ studiedCount, goalSize = 10 }) {
   }
 }
 
+function getFlashcardConfidenceLabel(confidencePercent, studiedCount) {
+  if (studiedCount === 0) return 'Comece a estudar para medir confiança'
+  if (confidencePercent >= 80) return 'Boa retenção nesta rodada'
+  if (confidencePercent >= 40) return 'Continue revisando os marcados'
+  return 'Sessão boa para reforço'
+}
+
 export function getFlashcardSessionStats({ deckCount, reviewQueueCount, currentIndex }) {
-  const visibleCount = Math.max(0, deckCount + reviewQueueCount)
+  const safeReviewQueueCount = Math.max(0, reviewQueueCount)
+  const visibleCount = Math.max(0, deckCount + safeReviewQueueCount)
   const studiedCount = visibleCount === 0
     ? 0
     : Math.min(visibleCount, Math.max(0, currentIndex + 1))
+  const markedStudiedCount = Math.min(studiedCount, safeReviewQueueCount)
+  const confidencePercent = studiedCount === 0
+    ? 0
+    : Math.round(((studiedCount - markedStudiedCount) / studiedCount) * 100)
   const isComplete = visibleCount > 0 && studiedCount === visibleCount
 
   return {
     studiedCount,
-    reviewQueueCount: Math.max(0, reviewQueueCount),
+    reviewQueueCount: safeReviewQueueCount,
     remainingCount: Math.max(0, visibleCount - studiedCount),
     isComplete,
+    confidencePercent,
+    confidenceLabel: getFlashcardConfidenceLabel(confidencePercent, studiedCount),
   }
 }
 

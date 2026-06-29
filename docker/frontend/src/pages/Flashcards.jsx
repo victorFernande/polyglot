@@ -191,7 +191,7 @@ export default function Flashcards() {
           </div>
         </div>
 
-        <div className="mb-6 grid gap-3 text-sm sm:grid-cols-3">
+        <div className="mb-6 grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
           <div className="rounded-xl bg-white/5 p-3 text-gray-300">
             <div className="text-xs uppercase tracking-[0.2em] text-gray-500">Estudados</div>
             <div className="mt-1 text-xl font-bold text-white">{sessionStats.studiedCount}</div>
@@ -206,6 +206,11 @@ export default function Flashcards() {
             <div className="text-xs uppercase tracking-[0.2em] text-gray-500">Restantes</div>
             <div className="mt-1 text-xl font-bold text-white">{sessionStats.remainingCount}</div>
             <div className="text-xs text-gray-500">no deck atual</div>
+          </div>
+          <div className="rounded-xl bg-white/5 p-3 text-gray-300">
+            <div className="text-xs uppercase tracking-[0.2em] text-gray-500">Confiança</div>
+            <div className="mt-1 text-xl font-bold text-polyglot-accent">{sessionStats.confidencePercent}%</div>
+            <div className="text-xs text-gray-500">{sessionStats.confidenceLabel}</div>
           </div>
         </div>
 

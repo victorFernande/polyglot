@@ -124,7 +124,7 @@ test('getFlashcardMicroGoalState supports smaller safe goals and clamps invalid 
 })
 
 
-test('getFlashcardSessionStats reports studied review queue and remaining counts for the visible deck', () => {
+test('getFlashcardSessionStats reports studied review queue remaining and confidence counts for the visible deck', () => {
   assert.deepEqual(
     getFlashcardSessionStats({ deckCount: 10, reviewQueueCount: 2, currentIndex: 3 }),
     {
@@ -132,7 +132,42 @@ test('getFlashcardSessionStats reports studied review queue and remaining counts
       reviewQueueCount: 2,
       remainingCount: 8,
       isComplete: false,
+      confidencePercent: 50,
+      confidenceLabel: 'Continue revisando os marcados',
     },
+  )
+})
+
+test('getFlashcardSessionStats reports full confidence when no studied cards were marked', () => {
+  assert.equal(
+    getFlashcardSessionStats({ deckCount: 10, reviewQueueCount: 0, currentIndex: 4 }).confidencePercent,
+    100,
+  )
+  assert.equal(
+    getFlashcardSessionStats({ deckCount: 10, reviewQueueCount: 0, currentIndex: 4 }).confidenceLabel,
+    'Boa retenção nesta rodada',
+  )
+})
+
+test('getFlashcardSessionStats reports zero confidence when every studied card was marked', () => {
+  assert.equal(
+    getFlashcardSessionStats({ deckCount: 10, reviewQueueCount: 3, currentIndex: 2 }).confidencePercent,
+    0,
+  )
+  assert.equal(
+    getFlashcardSessionStats({ deckCount: 10, reviewQueueCount: 3, currentIndex: 2 }).confidenceLabel,
+    'Sessão boa para reforço',
+  )
+})
+
+test('getFlashcardSessionStats keeps confidence neutral before any cards are studied', () => {
+  assert.equal(
+    getFlashcardSessionStats({ deckCount: 0, reviewQueueCount: 0, currentIndex: 0 }).confidencePercent,
+    0,
+  )
+  assert.equal(
+    getFlashcardSessionStats({ deckCount: 0, reviewQueueCount: 0, currentIndex: 0 }).confidenceLabel,
+    'Comece a estudar para medir confiança',
   )
 })
 
@@ -144,6 +179,8 @@ test('getFlashcardSessionStats starts empty decks at zero without negative remai
       reviewQueueCount: 0,
       remainingCount: 0,
       isComplete: false,
+      confidencePercent: 0,
+      confidenceLabel: 'Comece a estudar para medir confiança',
     },
   )
 })
@@ -156,6 +193,8 @@ test('getFlashcardSessionStats clamps an out-of-range index to the visible deck 
       reviewQueueCount: 1,
       remainingCount: 0,
       isComplete: true,
+      confidencePercent: 75,
+      confidenceLabel: 'Continue revisando os marcados',
     },
   )
 })
