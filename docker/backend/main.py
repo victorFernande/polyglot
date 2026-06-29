@@ -383,9 +383,9 @@ def get_exercise_lesson(lesson_id: int, db: Session = Depends(get_db)):
     return payload
 
 @app.post("/exercise-lessons/{lesson_id}/sessions")
-def start_exercise_session(lesson_id: int, user_id: int = 1, db: Session = Depends(get_db)):
+def start_exercise_session(lesson_id: int, user_id: int = 1, session_number: Optional[int] = None, db: Session = Depends(get_db)):
     if not db.query(User).filter(User.id == user_id).first(): ExerciseService.bootstrap_user(db, user_id)
-    session = ExerciseService.start_session(db, user_id=user_id, lesson_id=lesson_id)
+    session = ExerciseService.start_session(db, user_id=user_id, lesson_id=lesson_id, session_number=session_number)
     if not session: raise HTTPException(status_code=404, detail="Exercise lesson not found")
     return ExerciseService.session_payload(session, include_items=True)
 

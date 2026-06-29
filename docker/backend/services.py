@@ -563,7 +563,7 @@ class ExerciseService:
     def session_items(db: Session, session: ExerciseSession):
         items = list(session.lesson.items)
         chunks = max(1, (len(items) + ExerciseService.SESSION_SIZE - 1) // ExerciseService.SESSION_SIZE)
-        number = ExerciseService._session_number(db, session)
+        number = (session.session_number - 1) if getattr(session, "session_number", None) else ExerciseService._session_number(db, session)
         offset = (number % chunks) * ExerciseService.SESSION_SIZE
         return items[offset:offset + ExerciseService.SESSION_SIZE]
 
@@ -573,7 +573,7 @@ class ExerciseService:
         db = db or SessionLocal()
         items = ExerciseService.session_items(db, session)
         current = items[session.current_index] if session.current_index < len(items) else None
-        payload = {"id": session.id, "user_id": session.user_id, "lesson_id": session.lesson_id, "status": session.status, "hearts_start": session.hearts_start, "hearts_left": session.hearts_left, "current_index": session.current_index, "correct_count": session.correct_count, "total_count": session.total_count, "xp_earned": session.xp_earned, "started_at": session.started_at, "completed_at": session.completed_at, "current_item": ExerciseService.item_payload(current) if current else None}
+        payload = {"id": session.id, "user_id": session.user_id, "lesson_id": session.lesson_id, "status": session.status, "hearts_start": session.hearts_start, "hearts_left": session.hearts_left, "current_index": session.current_index, "correct_count": session.correct_count, "total_count": session.total_count, "session_number": session.session_number or (ExerciseService._session_number(db, session) + 1), "xp_earned": session.xp_earned, "started_at": session.started_at, "completed_at": session.completed_at, "current_item": ExerciseService.item_payload(current) if current else None}
         if include_items or include_current_item:
             payload["items"] = [ExerciseService.item_payload(i) for i in items]
         if created_db:
@@ -587,8 +587,9 @@ class ExerciseService:
             sessions = db.query(ExerciseSession).filter(ExerciseSession.user_id == user_id, ExerciseSession.lesson_id == lesson.id).all()
             active = next((s for s in sessions if s.status == "in_progress"), None)
             completed = [s for s in sessions if s.status == "completed"]
+            completed_numbers = {s.session_number or (idx + 1) for idx, s in enumerate(sorted(completed, key=lambda s: s.id))}
             total_sessions = (len(lesson.items) + ExerciseService.SESSION_SIZE - 1) // ExerciseService.SESSION_SIZE
-            out.append({"id": lesson.id, "language_code": lesson.language_code, "language": lesson.language_code, "language_name": lesson.language_name, "slug": lesson.slug, "title": lesson.title, "description": lesson.description, "order_index": lesson.order_index, "xp_base": lesson.xp_base, "active": lesson.active, "items_count": len(lesson.items), "session_size": ExerciseService.SESSION_SIZE, "total_sessions": total_sessions, "best_score": max([s.correct_count for s in completed], default=0), "completed_sessions": len(completed), "active_session_id": active.id if active else None})
+            out.append({"id": lesson.id, "language_code": lesson.language_code, "language": lesson.language_code, "language_name": lesson.language_name, "slug": lesson.slug, "title": lesson.title, "description": lesson.description, "order_index": lesson.order_index, "xp_base": lesson.xp_base, "active": lesson.active, "items_count": len(lesson.items), "session_size": ExerciseService.SESSION_SIZE, "total_sessions": total_sessions, "best_score": max([s.correct_count for s in completed], default=0), "completed_sessions": len(completed_numbers), "active_session_id": active.id if active else None})
         return out
 
     @staticmethod
@@ -603,19 +604,29 @@ class ExerciseService:
         return {"id": lesson.id, "language_code": lesson.language_code, "language": lesson.language_code, "language_name": lesson.language_name, "slug": lesson.slug, "title": lesson.title, "description": lesson.description, "order_index": lesson.order_index, "xp_base": lesson.xp_base, "active": lesson.active, "items_count": len(lesson.items), "session_size": ExerciseService.SESSION_SIZE, "total_sessions": (len(lesson.items)+ExerciseService.SESSION_SIZE-1)//ExerciseService.SESSION_SIZE, "items": [ExerciseService.item_payload(i) for i in lesson.items]}
 
     @staticmethod
-    def start_session(db: Session, user_id: int, lesson_id: int):
+    def start_session(db: Session, user_id: int, lesson_id: int, session_number: int | None = None):
         lesson = db.query(ExerciseLesson).filter(ExerciseLesson.id == lesson_id).first()
         if not lesson: return None
-        session = db.query(ExerciseSession).filter(ExerciseSession.user_id == user_id, ExerciseSession.lesson_id == lesson_id, ExerciseSession.status == "in_progress").first()
-        if session:
-            if int(session.current_index or 0) < int(session.total_count or 0):
-                return session
-            ExerciseService.complete_session(db, session.id)
-        completed_count = db.query(ExerciseSession).filter(ExerciseSession.user_id == user_id, ExerciseSession.lesson_id == lesson_id, ExerciseSession.status == "completed").count()
         total_sessions = max(1, (len(lesson.items) + ExerciseService.SESSION_SIZE - 1) // ExerciseService.SESSION_SIZE)
-        offset = (completed_count % total_sessions) * ExerciseService.SESSION_SIZE
+        requested_number = max(1, min(int(session_number), total_sessions)) if session_number else None
+        if requested_number is not None:
+            session = db.query(ExerciseSession).filter(ExerciseSession.user_id == user_id, ExerciseSession.lesson_id == lesson_id, ExerciseSession.status == "in_progress", ExerciseSession.session_number == requested_number).order_by(ExerciseSession.id.desc()).first()
+            if session and int(session.current_index or 0) < int(session.total_count or 0):
+                return session
+            if session:
+                ExerciseService.complete_session(db, session.id)
+        else:
+            session = db.query(ExerciseSession).filter(ExerciseSession.user_id == user_id, ExerciseSession.lesson_id == lesson_id, ExerciseSession.status == "in_progress").order_by(ExerciseSession.id.desc()).first()
+            if session:
+                if int(session.current_index or 0) < int(session.total_count or 0):
+                    return session
+                ExerciseService.complete_session(db, session.id)
+            completed = db.query(ExerciseSession).filter(ExerciseSession.user_id == user_id, ExerciseSession.lesson_id == lesson_id, ExerciseSession.status == "completed").all()
+            completed_numbers = {s.session_number or (idx + 1) for idx, s in enumerate(sorted(completed, key=lambda s: s.id))}
+            requested_number = (len(completed_numbers) % total_sessions) + 1
+        offset = (requested_number - 1) * ExerciseService.SESSION_SIZE
         count = min(ExerciseService.SESSION_SIZE, len(lesson.items) - offset)
-        session = ExerciseSession(user_id=user_id, lesson_id=lesson_id, total_count=count, hearts_start=5, hearts_left=5, current_index=0)
+        session = ExerciseSession(user_id=user_id, lesson_id=lesson_id, total_count=count, session_number=requested_number, hearts_start=5, hearts_left=5, current_index=0)
         db.add(session); db.commit(); db.refresh(session); return session
 
     @staticmethod

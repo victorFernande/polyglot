@@ -194,6 +194,7 @@ class ExerciseSession(Base):
     current_index = Column(Integer, default=0)
     correct_count = Column(Integer, default=0)
     total_count = Column(Integer, default=0)
+    session_number = Column(Integer, nullable=True)
     xp_earned = Column(Integer, default=0)
     started_at = Column(DateTime, default=datetime.utcnow)
     completed_at = Column(DateTime, nullable=True)
@@ -234,6 +235,10 @@ def init_db():
                 if "language_code" not in cols:
                     for table in ["exercise_answers", "exercise_sessions", "exercise_items", "exercise_lessons"]:
                         conn.exec_driver_sql(f"DROP TABLE IF EXISTS {table}")
+            if "exercise_sessions" in tables:
+                session_cols = {row[1] for row in conn.exec_driver_sql("PRAGMA table_info(exercise_sessions)")}
+                if "session_number" not in session_cols:
+                    conn.exec_driver_sql("ALTER TABLE exercise_sessions ADD COLUMN session_number INTEGER")
     Base.metadata.create_all(bind=engine)
     
     # Seed achievements

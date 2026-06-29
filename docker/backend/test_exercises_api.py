@@ -129,6 +129,30 @@ def test_starting_after_exhausted_session_returns_next_10_item_session():
         assert [item["id"] for item in next_session["items"]] != first_item_ids
 
 
+def test_can_start_a_specific_previous_session_window_without_using_real_user():
+    with TestClient(app) as client:
+        user_id = 93021
+        client.post(f"/users/{user_id}/bootstrap")
+        lesson = client.get("/exercise-lessons", params={"user_id": user_id}).json()[0]
+        full_lesson = client.get(f"/exercise-lessons/{lesson['id']}").json()
+
+        session = client.post(
+            f"/exercise-lessons/{lesson['id']}/sessions",
+            params={"user_id": user_id, "session_number": 4},
+        )
+
+        assert session.status_code == 200, session.text
+        payload = session.json()
+        assert payload["session_number"] == 4
+        assert [item["id"] for item in payload["items"]] == [item["id"] for item in full_lesson["items"][30:40]]
+
+        same_session = client.post(
+            f"/exercise-lessons/{lesson['id']}/sessions",
+            params={"user_id": user_id, "session_number": 4},
+        ).json()
+        assert same_session["id"] == payload["id"]
+
+
 def test_bootstrap_allows_independent_test_users():
     with TestClient(app) as client:
         first = client.post("/users/91001/bootstrap")

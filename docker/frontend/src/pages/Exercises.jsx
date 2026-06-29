@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Check, Heart, X, Volume2, RotateCcw, Trophy, ArrowRight, Loader2, Star } from 'lucide-react'
+import { Check, Heart, X, Volume2, RotateCcw, Trophy, ArrowRight, Loader2, Star, ChevronLeft, ChevronRight } from 'lucide-react'
 import LanguageFlag from '../components/LanguageFlag'
 import { answerExerciseSession, bootstrapUser, completeExerciseSession, loadExerciseLessons, loadExercisePath, startExerciseSession, apiFetch, synthesizeSpeech } from '../lib/api'
 import { handleExerciseKeyDown } from '../lib/exerciseKeyboard.mjs'
@@ -15,6 +15,8 @@ import { choiceShortcutLabels } from '../lib/exerciseChoiceShortcuts.mjs'
 import { exerciseSessionProgress } from '../lib/exerciseSessionProgress.mjs'
 import { filterExerciseLessonsByLanguage, summarizeExerciseLessonProgressByLanguage } from '../lib/exerciseLessonFilters.mjs'
 import { reorderBuiltWords } from '../lib/buildWordOrder.mjs'
+import { cleanExercisePrompt, pageForSessionNumber, sessionWindowForPage } from '../lib/exerciseTrailLayout.mjs'
+import { nextExerciseActionLabel, sessionNumberForExerciseSession } from '../lib/exerciseSessionLabels.mjs'
 
 const LANG_META = {
   de: { accent: 'Rammstein', color: 'from-red-600 to-red-900' },
@@ -74,6 +76,7 @@ export default function Exercises() {
   const [summary, setSummary] = useState(null)
   const [voiceMode, setVoiceMode] = useState(false)
   const [lessonLanguageFilter, setLessonLanguageFilter] = useState('all')
+  const [trailPage, setTrailPage] = useState(0)
   const speechPlaybackRef = useRef(null)
   if (!speechPlaybackRef.current) {
     speechPlaybackRef.current = createSpeechPlaybackController({
@@ -119,6 +122,11 @@ export default function Exercises() {
   const lessonContext = useMemo(() => lessonContextForExercise(lesson), [lesson])
   const lessonLanguageProgress = useMemo(() => summarizeExerciseLessonProgressByLanguage(lessons), [lessons])
   const filteredLessons = useMemo(() => filterExerciseLessonsByLanguage(lessons, lessonLanguageFilter), [lessons, lessonLanguageFilter])
+  const currentSessionNumber = sessionNumberForExerciseSession(session, activePath)
+
+  useEffect(() => {
+    if (activePath) setTrailPage(pageForSessionNumber(currentSessionNumber))
+  }, [activePath?.language_code, currentSessionNumber])
 
   function resetExerciseState() {
     setSummary(null)
@@ -139,6 +147,21 @@ export default function Exercises() {
       const full = await apiFetch(`/exercise-lessons/${lessonSummary.id}`)
       const started = await startExerciseSession(lessonSummary.id, userId || user?.id || 1)
       setLesson(full)
+      setSession(started)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function openSessionNumber(sessionNumber) {
+    if (!lesson?.id || !activePath || sessionNumber > activePath.completed_sessions + 1) return
+    setBusy(true)
+    setError(null)
+    resetExerciseState()
+    try {
+      const started = await startExerciseSession(lesson.id, user?.id || 1, sessionNumber)
       setSession(started)
     } catch (err) {
       setError(err.message)
@@ -320,7 +343,7 @@ export default function Exercises() {
         })}
       </div>
 
-      {activePath && <SkillTrail path={activePath} />}
+      {activePath && <SkillTrail path={activePath} lessonContext={lessonContext} page={trailPage} onPageChange={setTrailPage} currentSessionNumber={currentSessionNumber} onSessionClick={openSessionNumber} />}
 
       {item && session && lesson && (
         <div className="card">
@@ -333,9 +356,9 @@ export default function Exercises() {
 
           <div className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <ProgressStat label="Respondidas" value={`${sessionProgress.answered}/${sessionProgress.total}`} />
+            <ProgressStat label="Sessão" value={`${currentSessionNumber}/${activePath?.total_sessions || lesson?.total_sessions || '—'}`} />
             <ProgressStat label="Faltam" value={sessionProgress.remaining} />
             <ProgressStat label="Acerto parcial" value={`${sessionProgress.correct}/${sessionProgress.answered}`} detail={`${sessionProgress.accuracyPercent}%`} />
-            <ProgressStat label="XP da sessão" value={sessionProgress.xpEarned} />
           </div>
 
           <div className="mb-6 flex items-center gap-3">
@@ -343,7 +366,7 @@ export default function Exercises() {
             <div>
               <p className="text-sm text-gray-400">{lesson.language_name} · questão {displayIndex + 1}/{session.total_count} · {session.xp_earned} XP na sessão</p>
               <p className="mt-1 inline-flex rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-polyglot-accent">{hintForExerciseType(item.type)}</p>
-              <h2 className="text-2xl font-bold">{item.prompt}</h2>
+              <h2 className="text-2xl font-bold">{cleanExercisePrompt(item.prompt)}</h2>
             </div>
             <div className="ml-auto flex gap-2">
               <button className="btn-secondary" title="Ouvir pergunta/correção" onClick={replayCurrentAudio}><Volume2 size={18} /></button>
@@ -351,13 +374,6 @@ export default function Exercises() {
             </div>
           </div>
 
-          {lessonContext && (
-            <div className="mb-6 rounded-2xl border border-polyglot-accent/20 bg-polyglot-accent/10 p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-polyglot-accent">{lessonContext.label}</p>
-              <h3 className="mt-1 text-lg font-bold text-white">{lessonContext.title}</h3>
-              {lessonContext.description && <p className="mt-1 text-sm text-gray-300">{lessonContext.description}</p>}
-            </div>
-          )}
 
           {['choice', 'listen_choice', 'context_choice'].includes(item.type) && <Choice options={choiceOptions} selected={selected} onInteract={() => setFeedback(null)} setSelected={setSelected} />}
           {item.type === 'image_choice' && <ImageChoice options={choiceOptions} selected={selected} onInteract={() => setFeedback(null)} setSelected={setSelected} />}
@@ -384,8 +400,8 @@ export default function Exercises() {
           <div className="mt-6 flex justify-end gap-3">
             {!feedback && <button className="btn-primary disabled:opacity-40" disabled={!canCheck || busy} onClick={check}>{busy ? 'Salvando...' : 'Verificar'}</button>}
             {feedback && <button className="btn-secondary inline-flex items-center gap-2" onClick={() => speakCurrent(voiceSegmentsForAnswerOnly(feedback, langCode))}><Volume2 size={18} /> Repetir resposta</button>}
-            {feedback?.type === 'wrong' && (session.current_index >= session.total_count ? <button className="btn-primary inline-flex items-center gap-2" onClick={() => finish(true)}>Salvar e ir para questão 11 <ArrowRight size={18} /></button> : <button className="btn-primary inline-flex items-center gap-2" onClick={next}>Entendi, continuar <ArrowRight size={18} /></button>)}
-            {feedback?.type === 'correct' && (session.current_index >= session.total_count ? <button className="btn-primary inline-flex items-center gap-2" onClick={() => finish(true)}>Salvar e ir para questão 11 <ArrowRight size={18} /></button> : <button className="btn-primary inline-flex items-center gap-2" onClick={next}>Continuar <ArrowRight size={18} /></button>)}
+            {feedback?.type === 'wrong' && (session.current_index >= session.total_count ? <button className="btn-primary inline-flex items-center gap-2" onClick={() => finish(true)}>{nextExerciseActionLabel(session)} <ArrowRight size={18} /></button> : <button className="btn-primary inline-flex items-center gap-2" onClick={next}>Entendi, continuar <ArrowRight size={18} /></button>)}
+            {feedback?.type === 'correct' && (session.current_index >= session.total_count ? <button className="btn-primary inline-flex items-center gap-2" onClick={() => finish(true)}>{nextExerciseActionLabel(session)} <ArrowRight size={18} /></button> : <button className="btn-primary inline-flex items-center gap-2" onClick={next}>{nextExerciseActionLabel(session)} <ArrowRight size={18} /></button>)}
           </div>
         </div>
       )}
@@ -405,25 +421,54 @@ function ProgressStat({ label, value, detail }) {
   )
 }
 
-function SkillTrail({ path }) {
+function SkillTrail({ path, lessonContext, page, onPageChange, currentSessionNumber, onSessionClick }) {
+  const windowState = sessionWindowForPage(path.nodes, page)
   return (
     <div className="card">
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-5 grid gap-4 lg:grid-cols-[1.2fr_2fr] lg:items-center">
         <div>
-          <h3 className="text-xl font-bold">Trilha de níveis — {path.language_name}</h3>
-          <p className="text-sm text-gray-400">Inspirado em skill paths: cada nó é uma sessão de 10 questões.</p>
-        </div>
-        <span className="rounded-full bg-polyglot-accent/20 px-3 py-1 text-sm text-polyglot-accent">{path.completed_sessions}/{path.total_sessions}</span>
-      </div>
-      <div className="grid grid-cols-5 gap-4 md:grid-cols-10">
-        {path.nodes.map((node, i) => (
-          <div key={node.number} className="flex flex-col items-center gap-2">
-            <div className={`flex h-12 w-12 items-center justify-center rounded-full border-2 ${node.status === 'completed' ? 'border-polyglot-green bg-polyglot-green/20 text-polyglot-green' : node.status === 'current' ? 'border-polyglot-accent bg-polyglot-accent/20 text-polyglot-accent animate-pulse' : 'border-white/10 bg-white/5 text-gray-500'}`}>
-              {node.status === 'completed' ? '✓' : <Star size={18} />}
-            </div>
-            <span className="text-xs text-gray-400">{i + 1}</span>
+          <div className="flex items-center justify-between gap-3">
+            <h3 className="text-xl font-bold">Trilha de níveis — {path.language_name}</h3>
+            <span className="rounded-full bg-polyglot-accent/20 px-3 py-1 text-sm text-polyglot-accent">{path.completed_sessions}/{path.total_sessions}</span>
           </div>
-        ))}
+          {lessonContext && (
+            <div className="mt-3 rounded-2xl border border-polyglot-accent/20 bg-polyglot-accent/10 p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-polyglot-accent">{lessonContext.label}</p>
+              <h4 className="mt-1 text-lg font-bold text-white">{lessonContext.title}</h4>
+              {lessonContext.description && <p className="mt-1 text-sm text-gray-300">{lessonContext.description}</p>}
+            </div>
+          )}
+        </div>
+        <div className="flex items-center gap-3">
+          {windowState.canGoPrev && (
+            <button type="button" className="btn-secondary rounded-full p-3" onClick={() => onPageChange(windowState.page - 1)} aria-label="Ver sessões anteriores">
+              <ChevronLeft size={20} />
+            </button>
+          )}
+          <div className="flex min-w-0 flex-1 items-center">
+            {windowState.visibleNodes.map((node, index) => {
+              const isActiveSession = node.number === currentSessionNumber
+              const isEnabled = node.number <= path.completed_sessions + 1
+              const isGreenConnector = node.status === 'completed' || (node.status === 'current' && node.number <= path.completed_sessions + 1)
+              return (
+                <div key={node.number} className="flex flex-1 items-center last:flex-none">
+                  <button type="button" disabled={!isEnabled} onClick={() => onSessionClick?.(node.number)} className="flex flex-col items-center gap-2 disabled:cursor-not-allowed" title={isEnabled ? `Abrir sessão ${node.number}` : 'Sessão bloqueada'}>
+                    <div className={`flex h-12 w-12 items-center justify-center rounded-full border-2 text-sm font-bold transition ${node.status === 'completed' ? 'border-polyglot-green bg-polyglot-green/20 text-polyglot-green hover:scale-105' : isActiveSession ? 'border-polyglot-accent bg-polyglot-accent/20 text-polyglot-accent animate-pulse' : 'border-white/10 bg-white/5 text-gray-500'}`}>
+                      {node.status === 'completed' ? '✓' : <Star size={18} />}
+                    </div>
+                    <span className={`text-xs ${isActiveSession ? 'text-polyglot-accent' : 'text-gray-400'}`}>Sessão {node.number}</span>
+                  </button>
+                  {index < windowState.visibleNodes.length - 1 && <div className={`mx-2 h-1 flex-1 rounded-full ${isGreenConnector ? 'bg-polyglot-green' : 'bg-white/15'}`} />}
+                </div>
+              )
+            })}
+          </div>
+          {windowState.canGoNext && (
+            <button type="button" className="btn-secondary rounded-full p-3" onClick={() => onPageChange(windowState.page + 1)} aria-label="Ver próximas sessões">
+              <ChevronRight size={20} />
+            </button>
+          )}
+        </div>
       </div>
     </div>
   )

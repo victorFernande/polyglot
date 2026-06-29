@@ -78,8 +78,10 @@ export async function loadFlashcards(language = '', limit = 100) {
   return apiFetch(`/flashcards?${params.toString()}`)
 }
 
-export async function startExerciseSession(lessonId, userId = getStoredUserId()) {
-  return apiFetch(`/exercise-lessons/${lessonId}/sessions?user_id=${encodeURIComponent(userId)}`, {
+export async function startExerciseSession(lessonId, userId = getStoredUserId(), sessionNumber = null) {
+  const params = new URLSearchParams({ user_id: String(userId) })
+  if (sessionNumber) params.set('session_number', String(sessionNumber))
+  return apiFetch(`/exercise-lessons/${lessonId}/sessions?${params.toString()}`, {
     method: 'POST',
   })
 }
