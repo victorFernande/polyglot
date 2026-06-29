@@ -13,6 +13,7 @@ import { lessonContextForExercise } from '../lib/exerciseLessonContext.mjs'
 import { hintForExerciseType } from '../lib/exerciseTypeHint.mjs'
 import { choiceShortcutLabels } from '../lib/exerciseChoiceShortcuts.mjs'
 import { exerciseSessionProgress } from '../lib/exerciseSessionProgress.mjs'
+import { filterExerciseLessonsByLanguage } from '../lib/exerciseLessonFilters.mjs'
 
 const LANG_META = {
   de: { accent: 'Rammstein', color: 'from-red-600 to-red-900' },
@@ -21,6 +22,15 @@ const LANG_META = {
   jp: { accent: 'Anime/Manga', color: 'from-pink-600 to-pink-900' },
   en: { accent: 'Pop/Internet', color: 'from-emerald-600 to-emerald-900' },
 }
+
+const LESSON_LANGUAGE_FILTERS = [
+  { code: 'all', label: 'Todos' },
+  { code: 'de', label: 'Alemão' },
+  { code: 'fr', label: 'Francês' },
+  { code: 'ru', label: 'Russo' },
+  { code: 'jp', label: 'Japonês' },
+  { code: 'en', label: 'Inglês' },
+]
 
 function answerValue(answer) {
   if (answer && typeof answer === 'object' && 'value' in answer) return answer.value
@@ -60,6 +70,7 @@ export default function Exercises() {
   const [matched, setMatched] = useState({})
   const [summary, setSummary] = useState(null)
   const [voiceMode, setVoiceMode] = useState(false)
+  const [lessonLanguageFilter, setLessonLanguageFilter] = useState('all')
   const speechPlaybackRef = useRef(null)
   if (!speechPlaybackRef.current) {
     speechPlaybackRef.current = createSpeechPlaybackController({
@@ -103,6 +114,7 @@ export default function Exercises() {
   const choiceLikeTypes = ['choice', 'listen_choice', 'context_choice', 'image_choice']
   const choiceOptions = useMemo(() => (choiceLikeTypes.includes(item?.type) ? stableShuffleOptions(item.options || [], item.id ?? item.prompt) : []), [item])
   const lessonContext = useMemo(() => lessonContextForExercise(lesson), [lesson])
+  const filteredLessons = useMemo(() => filterExerciseLessonsByLanguage(lessons, lessonLanguageFilter), [lessons, lessonLanguageFilter])
 
   function resetExerciseState() {
     setSummary(null)
@@ -269,8 +281,21 @@ export default function Exercises() {
         </div>
       )}
 
+      <div className="flex flex-wrap gap-2">
+        {LESSON_LANGUAGE_FILTERS.map((filter) => (
+          <button
+            key={filter.code}
+            type="button"
+            onClick={() => setLessonLanguageFilter(filter.code)}
+            className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${lessonLanguageFilter === filter.code ? 'border-polyglot-accent bg-polyglot-accent/20 text-polyglot-accent' : 'border-white/10 bg-white/5 text-gray-300 hover:bg-white/10'}`}
+          >
+            {filter.label}
+          </button>
+        ))}
+      </div>
+
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {lessons.map((l) => {
+        {filteredLessons.map((l) => {
           const code = l.language_code || l.language
           return (
             <button key={l.id} disabled={busy} onClick={() => openLesson(l)} className={`card p-4 text-left transition-all ${lesson?.id === l.id ? 'ring-2 ring-polyglot-accent' : 'hover:bg-white/5'}`}>
