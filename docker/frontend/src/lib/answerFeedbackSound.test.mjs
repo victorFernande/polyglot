@@ -54,8 +54,8 @@ assert.equal(events.filter(([name]) => name === 'ctx:new').length, 0, 'play shou
 assert.ok(events.some(([name, value]) => name === 'gain:set' && value === 0.0001), 'sound must fade in from near silence')
 assert.ok(events.some(([name, value]) => name === 'gain:ramp' && value === 0.0001), 'sound must fade out to avoid clicks')
 assert.ok(
-  events.filter(([name]) => name === 'gain:linear').some(([, value]) => value >= 0.7),
-  'correct chime must be loud enough to sound like a reward, not a quiet UI tick'
+  events.filter(([name]) => name === 'gain:linear').some(([, value]) => value >= 0.95),
+  'correct chime must be louder than spoken feedback and use near-maximum safe Web Audio gain'
 )
 assert.ok(
   Math.max(...events.filter(([name]) => name === 'osc:stop').map(([, time]) => time)) >= 2.45,
