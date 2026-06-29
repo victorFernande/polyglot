@@ -21,6 +21,15 @@ function cleanText(text) {
   return String(text || '').replace(/\s+/g, ' ').trim()
 }
 
+function stripLearningPathPrefix(text) {
+  let out = cleanText(text)
+  // Drop verbose progress/navigation labels from spoken questions. Keep only the
+  // action the learner needs to hear, e.g. "como dizer..." or "escolha...".
+  out = out.replace(/^Unidade\s+\d+\/\d+\s+—\s+.*?:\s*/i, '')
+  out = out.replace(/^Tópico\s+\d+\/\d+\s+—\s+.*?:\s*/i, '')
+  return cleanText(out)
+}
+
 export function speechLangForLanguage(languageCode) {
   return SPEECH_LANG[languageCode] || languageCode || 'pt-BR'
 }
@@ -29,7 +38,7 @@ function compactSegments(segments) {
   const out = []
   for (const segment of segments) {
     const text = cleanText(segment.text)
-    if (!text) continue
+    if (!text || /^[.!?,;:]+$/.test(text)) continue
     const lang = segment.lang || 'pt-BR'
     const last = out[out.length - 1]
     if (last && last.lang === lang) last.text = cleanText(`${last.text} ${text}`)
@@ -44,25 +53,32 @@ export function voiceTextForItem(item) {
 
 export function voiceSegmentsForItem(item, languageCode = 'pt') {
   if (!item?.prompt) return []
-  const targetLang = speechLangForLanguage(languageCode)
   const targetAnswer = readableAnswer(item.answer)
-  const segments = []
   let prompt = item.prompt
 
+  // The question audio must never reveal the answer before the learner responds.
+  // Some prompts include the target-language phrase in parentheses for visual/image
+  // context; keep that visible on screen, but remove it from pre-answer audio.
   const parentheticalTarget = targetAnswer ? `(${targetAnswer})` : ''
   if (parentheticalTarget && prompt.includes(parentheticalTarget)) {
     prompt = prompt.replace(parentheticalTarget, '')
-    segments.push({ text: prompt, lang: 'pt-BR' })
-    segments.push({ text: targetAnswer, lang: targetLang })
-    return compactSegments(segments)
   }
 
-  segments.push({ text: prompt, lang: 'pt-BR' })
-  if (targetAnswer && !prompt.includes(targetAnswer)) {
-    segments.push({ text: `Resposta em ${LANGUAGE_NAMES[languageCode] || 'idioma estudado'}:`, lang: 'pt-BR' })
-    segments.push({ text: targetAnswer, lang: targetLang })
+  return compactSegments([{ text: stripLearningPathPrefix(prompt), lang: 'pt-BR' }])
+}
+
+function segmentsReplacingCorrectAnswer(text, correct, targetLang) {
+  const clean = cleanText(text)
+  if (!clean || !correct || !clean.includes(correct)) {
+    return clean ? [{ text: clean, lang: 'pt-BR' }] : []
   }
-  return compactSegments(segments)
+  const [before, ...afterParts] = clean.split(correct)
+  const after = afterParts.join(correct).replace(/^\s*[.!?,;:]+\s*/, '')
+  return compactSegments([
+    { text: before, lang: 'pt-BR' },
+    { text: correct, lang: targetLang },
+    { text: after, lang: 'pt-BR' },
+  ])
 }
 
 export function voiceTextForFeedback(feedback) {
@@ -81,23 +97,23 @@ export function voiceSegmentsForFeedback(feedback, languageCode = 'pt') {
   const targetLang = speechLangForLanguage(languageCode)
   const correct = readableAnswer(feedback.correctAnswer || feedback.correct_answer || feedback.mistake?.correct_answer)
   if (feedback.type === 'correct') {
-    const explanation = feedback.explanation || ''
-    if (correct && explanation.includes(correct)) {
-      const prefix = explanation.replace(correct, '').replace(/\s+\./g, '.').replace(/:\s*\./g, ':').trim() || 'Resposta correta:'
-      return compactSegments([
-        { text: `Correto. ${prefix}`, lang: 'pt-BR' },
-        { text: correct, lang: targetLang },
-      ])
-    }
-    return compactSegments([{ text: 'Correto.', lang: 'pt-BR' }, { text: explanation, lang: 'pt-BR' }])
+    const explanation = feedback.explanation || (correct ? `Resposta correta: ${correct}` : '')
+    return compactSegments([
+      { text: 'Correto.', lang: 'pt-BR' },
+      ...segmentsReplacingCorrectAnswer(explanation, correct, targetLang),
+    ])
   }
   if (feedback.type === 'wrong') {
+    const message = feedback.mistake?.message || 'Resposta incorreta.'
+    const explanation = feedback.explanation || ''
+    const combined = [message, explanation].filter(Boolean).join(' ')
+    const spokenFeedback = correct && !combined.includes(correct)
+      ? `${combined} A resposta correta é ${correct}`
+      : combined
     return compactSegments([
       { text: 'Marcado como erro.', lang: 'pt-BR' },
-      { text: feedback.mistake?.message || '', lang: 'pt-BR' },
-      correct ? { text: correct, lang: targetLang } : null,
-      { text: feedback.explanation || '', lang: 'pt-BR' },
-    ].filter(Boolean))
+      ...segmentsReplacingCorrectAnswer(spokenFeedback, correct, targetLang),
+    ])
   }
   return compactSegments([{ text: feedback.explanation || '', lang: 'pt-BR' }])
 }

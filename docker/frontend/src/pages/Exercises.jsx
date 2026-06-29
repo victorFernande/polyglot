@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Check, Heart, X, Volume2, RotateCcw, Trophy, ArrowRight, Loader2, Star } from 'lucide-react'
 import LanguageFlag from '../components/LanguageFlag'
@@ -6,6 +6,7 @@ import { answerExerciseSession, bootstrapUser, completeExerciseSession, loadExer
 import { handleExerciseKeyDown } from '../lib/exerciseKeyboard.mjs'
 import { buildTilesForItem, matchRightOptions, stableShuffleOptions } from '../lib/exerciseOptions.mjs'
 import { speakSegmentsWithBrowser, voiceSegmentsForFeedback, voiceSegmentsForItem } from '../lib/voiceMode.mjs'
+import { createSpeechPlaybackController } from '../lib/speechPlayback.mjs'
 import { selectableImageChoiceOptions } from '../lib/imageChoice.mjs'
 import { lessonContextForExercise } from '../lib/exerciseLessonContext.mjs'
 
@@ -55,6 +56,17 @@ export default function Exercises() {
   const [matched, setMatched] = useState({})
   const [summary, setSummary] = useState(null)
   const [voiceMode, setVoiceMode] = useState(false)
+  const speechPlaybackRef = useRef(null)
+  if (!speechPlaybackRef.current) {
+    speechPlaybackRef.current = createSpeechPlaybackController({
+      synthesizeSpeech,
+      fallbackSpeakSegments: speakSegmentsWithBrowser,
+    })
+  }
+
+  useEffect(() => {
+    return () => speechPlaybackRef.current?.stop()
+  }, [])
 
   useEffect(() => {
     async function boot() {
@@ -185,35 +197,8 @@ export default function Exercises() {
     if (current) await openLesson(current)
   }
 
-  async function playAudioBlob(blob) {
-    const url = URL.createObjectURL(blob)
-    try {
-      const audio = new Audio(url)
-      await new Promise((resolve, reject) => {
-        audio.onended = resolve
-        audio.onerror = reject
-        audio.play().catch(reject)
-      })
-    } finally {
-      URL.revokeObjectURL(url)
-    }
-  }
-
-  async function speakSegments(segments) {
-    const cleanSegments = (segments || []).filter((segment) => segment?.text)
-    if (!cleanSegments.length) return
-    try {
-      for (const segment of cleanSegments) {
-        const blob = await synthesizeSpeech(segment.text, segment.lang)
-        await playAudioBlob(blob)
-      }
-    } catch (_err) {
-      speakSegmentsWithBrowser(cleanSegments)
-    }
-  }
-
   function speakCurrent(segments = voiceSegmentsForItem(item, langCode)) {
-    speakSegments(segments)
+    speechPlaybackRef.current?.speakSegments(segments)
   }
 
   useEffect(() => {
