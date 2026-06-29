@@ -47,31 +47,35 @@ events.length = 0
 assert.equal(player.play('correct'), true)
 assert.deepEqual(
   events.filter(([name]) => name === 'freq:set').map(([, value]) => value),
-  [659.25, 783.99, 987.77, 1318.51],
-  'correct feedback should play a bright four-note celebratory chime'
+  [880, 1760, 1320, 2640],
+  'correct feedback should be a two-note rising tin-din/ka-ching with bright bell harmonics'
 )
 assert.equal(events.filter(([name]) => name === 'ctx:new').length, 0, 'play should reuse the unlocked context instead of creating a blocked one after the API response')
 assert.ok(events.some(([name, value]) => name === 'gain:set' && value === 0.0001), 'sound must fade in from near silence')
 assert.ok(events.some(([name, value]) => name === 'gain:ramp' && value === 0.0001), 'sound must fade out to avoid clicks')
 assert.ok(
-  events.filter(([name]) => name === 'gain:linear').some(([, value]) => value >= 0.22),
-  'correct chime must be loud enough to cut through spoken feedback on mobile'
+  events.filter(([name]) => name === 'gain:linear').some(([, value]) => value >= 0.7),
+  'correct chime must be loud enough to sound like a reward, not a quiet UI tick'
 )
 assert.ok(
-  Math.max(...events.filter(([name]) => name === 'osc:stop').map(([, time]) => time)) >= 2.38,
-  'correct chime must last long enough to feel celebratory, not like a barely audible click'
+  Math.max(...events.filter(([name]) => name === 'osc:stop').map(([, time]) => time)) >= 2.45,
+  'correct chime must last around 0.45s so the reward is clearly audible before speech'
 )
 
 events.length = 0
 assert.equal(player.play('wrong'), true)
 assert.deepEqual(
   events.filter(([name]) => name === 'freq:set').map(([, value]) => value),
-  [220, 174.61, 146.83],
-  'wrong feedback should play a clear three-note falling tone'
+  [196, 130.81],
+  'wrong feedback should be a clear two-note low tum-dom/bonk falling tone'
 )
 assert.ok(
-  events.filter(([name]) => name === 'gain:linear').some(([, value]) => value >= 0.13),
-  'wrong tone should also be audible, without being harsh'
+  events.filter(([name]) => name === 'gain:linear').some(([, value]) => value >= 0.34),
+  'wrong tone should be audible, but lower and less shiny than the reward chime'
+)
+assert.ok(
+  Math.max(...events.filter(([name]) => name === 'osc:stop').map(([, time]) => time)) >= 2.32,
+  'wrong tone must last long enough to read as tum-dom, not a click'
 )
 
 assert.equal(createAnswerFeedbackSoundPlayer({}).play('correct'), false, 'missing Web Audio support should fail silently')

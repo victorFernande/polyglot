@@ -1,14 +1,13 @@
 const SOUND_SEQUENCES = {
   correct: [
-    { frequency: 659.25, start: 0, duration: 0.13, gain: 0.22, type: 'triangle' },
-    { frequency: 783.99, start: 0.075, duration: 0.14, gain: 0.24, type: 'sine' },
-    { frequency: 987.77, start: 0.16, duration: 0.15, gain: 0.23, type: 'sine' },
-    { frequency: 1318.51, start: 0.255, duration: 0.18, gain: 0.2, type: 'triangle' },
+    // Original, high, bright two-step reward: "tin-din" / "ka-ching".
+    { frequency: 880, start: 0, duration: 0.22, gain: 0.62, type: 'triangle', harmonics: [{ frequency: 1760, gain: 0.24, type: 'sine' }] },
+    { frequency: 1320, start: 0.14, duration: 0.32, gain: 0.78, type: 'sine', harmonics: [{ frequency: 2640, gain: 0.22, type: 'sine' }] },
   ],
   wrong: [
-    { frequency: 220, start: 0, duration: 0.12, gain: 0.14, type: 'triangle' },
-    { frequency: 174.61, start: 0.085, duration: 0.14, gain: 0.13, type: 'triangle' },
-    { frequency: 146.83, start: 0.18, duration: 0.16, gain: 0.115, type: 'sine' },
+    // Lower, dry, falling "tum-dom" / soft bonk.
+    { frequency: 196, start: 0, duration: 0.17, gain: 0.36, type: 'triangle' },
+    { frequency: 130.81, start: 0.12, duration: 0.24, gain: 0.34, type: 'triangle' },
   ],
 }
 
@@ -16,7 +15,7 @@ function audioContextConstructor(win) {
   return win?.AudioContext || win?.webkitAudioContext
 }
 
-function scheduleTone(ctx, note) {
+function scheduleOscillator(ctx, note) {
   const now = ctx.currentTime || 0
   const start = now + note.start
   const end = start + note.duration
@@ -27,13 +26,20 @@ function scheduleTone(ctx, note) {
   oscillator.frequency.setValueAtTime(note.frequency, start)
 
   gain.gain.setValueAtTime(0.0001, start)
-  gain.gain.linearRampToValueAtTime(note.gain, start + 0.018)
+  gain.gain.linearRampToValueAtTime(note.gain, start + 0.012)
   gain.gain.exponentialRampToValueAtTime(0.0001, end)
 
   oscillator.connect(gain)
   gain.connect(ctx.destination)
   oscillator.start(start)
   oscillator.stop(end)
+}
+
+function scheduleTone(ctx, note) {
+  scheduleOscillator(ctx, note)
+  for (const harmonic of note.harmonics || []) {
+    scheduleOscillator(ctx, { ...harmonic, start: note.start, duration: note.duration })
+  }
 }
 
 export function createAnswerFeedbackSoundPlayer(win = globalThis.window) {
