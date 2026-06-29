@@ -6,7 +6,7 @@ import { handleFlashcardKeyDown } from '../lib/flashcardKeyboard.mjs'
 import { shuffleFlashcards } from '../lib/flashcardOrder.mjs'
 import { getFlashcardSupportVisibility } from '../lib/flashcardReveal.mjs'
 import { addFlashcardToReviewQueue, mergeFlashcardsWithReviewQueue } from '../lib/flashcardReviewQueue.mjs'
-import { getFlashcardSessionStats } from '../lib/flashcardSessionStats.mjs'
+import { getFlashcardReviewJumpState, getFlashcardSessionStats } from '../lib/flashcardSessionStats.mjs'
 
 const LANGS = [
   { code: 'de', name: 'Alemão' },
@@ -59,6 +59,14 @@ export default function Flashcards() {
     reviewQueueCount: reviewQueue.length,
     currentIndex: index,
   })
+  const reviewJumpState = useMemo(
+    () => getFlashcardReviewJumpState({
+      deckCount: cards.length,
+      reviewQueueCount: reviewQueue.length,
+      currentIndex: index,
+    }),
+    [cards.length, reviewQueue.length, index],
+  )
 
   function next() {
     setIndex((i) => Math.min(visibleCards.length - 1, i + 1))
@@ -97,6 +105,11 @@ export default function Flashcards() {
     setFlipped(false)
   }
 
+  function jumpToReviewQueue() {
+    setIndex(reviewJumpState.reviewQueueStartIndex)
+    setFlipped(false)
+  }
+
   useEffect(() => {
     function onKeyDown(event) {
       handleFlashcardKeyDown(event, {
@@ -107,12 +120,14 @@ export default function Flashcards() {
         showFront: () => setFlipped(false),
         markNeedsReview,
         canMarkNeedsReview: Boolean(card) && !isReviewCard,
+        jumpToReviewQueue,
+        canJumpToReviewQueue: reviewJumpState.canJumpToReviewQueue,
       })
     }
 
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [visibleCards.length, card, isReviewCard, reviewQueue])
+  }, [visibleCards.length, card, isReviewCard, reviewQueue, reviewJumpState])
 
   if (loading) return <div className="flex h-64 items-center justify-center"><Loader2 className="animate-spin text-polyglot-accent" size={42} /></div>
   if (error) return <div className="card border-red-500/30 bg-red-500/10 text-red-200">Erro: {error}</div>
@@ -169,7 +184,7 @@ export default function Flashcards() {
             <p className="text-xs uppercase tracking-[0.3em] text-gray-500">{flipped ? 'Verso' : 'Frente'} · {card.type}</p>
             <div className="mt-6 text-2xl font-bold leading-relaxed">{flipped ? card.back : card.front}</div>
             <p className="mt-8 text-sm text-gray-400">Toque no card para virar</p>
-            <p className="mt-3 text-xs text-gray-500">Atalhos: ←/→ navegar · Espaço/Enter virar · R frente · N revisar depois</p>
+            <p className="mt-3 text-xs text-gray-500">Atalhos: ←/→ navegar · Espaço/Enter virar · R frente · N revisar depois · V revisar marcados</p>
           </button>
         )}
 
@@ -207,6 +222,9 @@ export default function Flashcards() {
           <button className="btn-secondary inline-flex items-center gap-2" onClick={() => setFlipped(false)}><RotateCcw size={18} /> Frente</button>
           <button className="btn-secondary inline-flex items-center gap-2" onClick={shuffleDeck} disabled={cards.length < 2}><Shuffle size={18} /> Misturar</button>
           <button className="btn-secondary inline-flex items-center gap-2" onClick={markNeedsReview} disabled={!card || isReviewCard}>Não sabia · Revisar depois</button>
+          {reviewJumpState.canJumpToReviewQueue && (
+            <button className="btn-secondary inline-flex items-center gap-2" onClick={jumpToReviewQueue}>Revisar marcados agora</button>
+          )}
           <button className="btn-primary inline-flex items-center gap-2" onClick={next} disabled={index + 1 >= visibleCards.length}>Próximo <ChevronRight size={18} /></button>
         </div>
       </div>

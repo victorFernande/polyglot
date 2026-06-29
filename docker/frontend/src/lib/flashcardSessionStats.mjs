@@ -12,3 +12,12 @@ export function getFlashcardSessionStats({ deckCount, reviewQueueCount, currentI
     isComplete,
   }
 }
+
+export function getFlashcardReviewJumpState({ deckCount, reviewQueueCount, currentIndex }) {
+  const reviewQueueStartIndex = Math.max(0, deckCount)
+
+  return {
+    canJumpToReviewQueue: reviewQueueCount > 0 && currentIndex < reviewQueueStartIndex,
+    reviewQueueStartIndex,
+  }
+}

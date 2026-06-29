@@ -13,6 +13,7 @@ function recorder() {
       flip: () => calls.push('flip'),
       showFront: () => calls.push('showFront'),
       markNeedsReview: () => calls.push('markNeedsReview'),
+      jumpToReviewQueue: () => calls.push('jumpToReviewQueue'),
     },
   }
 }
@@ -87,6 +88,27 @@ test('N marks a normal flashcard for review later', () => {
 
 test('N is ignored when the current flashcard cannot be marked for review', () => {
   assert.deepEqual(press('n', 3, { canMarkNeedsReview: false }), {
+    handled: false,
+    calls: [],
+    defaultPrevented: false,
+  })
+})
+
+test('V jumps directly to marked flashcards when review is available', () => {
+  assert.deepEqual(press('v', 3, { canJumpToReviewQueue: true }), {
+    handled: true,
+    calls: ['jumpToReviewQueue'],
+    defaultPrevented: true,
+  })
+  assert.deepEqual(press('V', 3, { canJumpToReviewQueue: true }), {
+    handled: true,
+    calls: ['jumpToReviewQueue'],
+    defaultPrevented: true,
+  })
+})
+
+test('V is ignored when there are no marked flashcards to review', () => {
+  assert.deepEqual(press('v', 3, { canJumpToReviewQueue: false }), {
     handled: false,
     calls: [],
     defaultPrevented: false,

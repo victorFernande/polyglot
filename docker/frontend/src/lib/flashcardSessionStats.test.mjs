@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import { getFlashcardSessionStats } from './flashcardSessionStats.mjs'
+import { getFlashcardReviewJumpState, getFlashcardSessionStats } from './flashcardSessionStats.mjs'
 
 test('getFlashcardSessionStats reports studied review queue and remaining counts for the visible deck', () => {
   assert.deepEqual(
@@ -51,5 +51,32 @@ test('getFlashcardSessionStats marks non-empty sessions complete only after the 
   assert.equal(
     getFlashcardSessionStats({ deckCount: 0, reviewQueueCount: 0, currentIndex: 0 }).isComplete,
     false,
+  )
+})
+
+test('getFlashcardReviewJumpState enables jumping from the main deck to the first marked card', () => {
+  assert.deepEqual(
+    getFlashcardReviewJumpState({ deckCount: 10, reviewQueueCount: 2, currentIndex: 4 }),
+    {
+      canJumpToReviewQueue: true,
+      reviewQueueStartIndex: 10,
+    },
+  )
+})
+
+test('getFlashcardReviewJumpState disables jumping without marked cards or while already reviewing', () => {
+  assert.deepEqual(
+    getFlashcardReviewJumpState({ deckCount: 10, reviewQueueCount: 0, currentIndex: 4 }),
+    {
+      canJumpToReviewQueue: false,
+      reviewQueueStartIndex: 10,
+    },
+  )
+  assert.deepEqual(
+    getFlashcardReviewJumpState({ deckCount: 10, reviewQueueCount: 2, currentIndex: 10 }),
+    {
+      canJumpToReviewQueue: false,
+      reviewQueueStartIndex: 10,
+    },
   )
 })

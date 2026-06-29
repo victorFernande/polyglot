@@ -1,6 +1,16 @@
 export function handleFlashcardKeyDown(
   event,
-  { cardsLength, next, prev, flip, showFront, markNeedsReview, canMarkNeedsReview = true },
+  {
+    cardsLength,
+    next,
+    prev,
+    flip,
+    showFront,
+    markNeedsReview,
+    canMarkNeedsReview = true,
+    jumpToReviewQueue,
+    canJumpToReviewQueue = false,
+  },
 ) {
   if (!cardsLength) return false
 
@@ -16,7 +26,9 @@ export function handleFlashcardKeyDown(
             ? showFront
             : key.toLowerCase() === 'n' && canMarkNeedsReview
               ? markNeedsReview
-              : null
+              : key.toLowerCase() === 'v' && canJumpToReviewQueue
+                ? jumpToReviewQueue
+                : null
 
   if (!action) return false
 
