@@ -1,7 +1,82 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import { getFlashcardMicroGoalState, getFlashcardReviewJumpState, getFlashcardSessionStats } from './flashcardSessionStats.mjs'
+import { getFlashcardFocusState, getFlashcardMicroGoalState, getFlashcardReviewJumpState, getFlashcardSessionStats } from './flashcardSessionStats.mjs'
+
+
+test('getFlashcardFocusState stays neutral until enough cards were studied', () => {
+  assert.deepEqual(
+    getFlashcardFocusState({ studiedCount: 6, reviewQueueCount: 3 }),
+    {
+      studiedCount: 6,
+      reviewQueueCount: 3,
+      minimumStudiedCount: 10,
+      reviewRate: 0.5,
+      reviewPercent: 50,
+      level: 'neutral',
+      label: 'Aguardando dados',
+      message: 'Estude mais alguns cards para gerar um resumo de foco.',
+    },
+  )
+})
+
+test('getFlashcardFocusState recommends the current rhythm for a low review rate', () => {
+  assert.deepEqual(
+    getFlashcardFocusState({ studiedCount: 10, reviewQueueCount: 1 }),
+    {
+      studiedCount: 10,
+      reviewQueueCount: 1,
+      minimumStudiedCount: 10,
+      reviewRate: 0.1,
+      reviewPercent: 10,
+      level: 'low',
+      label: 'Ritmo bom',
+      message: 'Siga no ritmo atual; poucos cards ficaram marcados para revisão.',
+    },
+  )
+})
+
+test('getFlashcardFocusState recommends end-of-block review for a medium review rate', () => {
+  assert.equal(
+    getFlashcardFocusState({ studiedCount: 10, reviewQueueCount: 3 }).message,
+    'Revise os cards marcados ao fim do bloco antes de avançar rápido demais.',
+  )
+  assert.equal(getFlashcardFocusState({ studiedCount: 10, reviewQueueCount: 3 }).level, 'medium')
+  assert.equal(getFlashcardFocusState({ studiedCount: 10, reviewQueueCount: 3 }).reviewPercent, 30)
+})
+
+test('getFlashcardFocusState recommends slowing down for a high review rate', () => {
+  assert.deepEqual(
+    getFlashcardFocusState({ studiedCount: 12, reviewQueueCount: 7 }),
+    {
+      studiedCount: 12,
+      reviewQueueCount: 7,
+      minimumStudiedCount: 10,
+      reviewRate: 7 / 12,
+      reviewPercent: 58,
+      level: 'high',
+      label: 'Priorize revisão',
+      message: 'Reduza a velocidade e priorize os cards marcados antes de continuar.',
+    },
+  )
+})
+
+test('getFlashcardFocusState clamps invalid counts before calculating the review rate', () => {
+  assert.deepEqual(
+    getFlashcardFocusState({ studiedCount: -4, reviewQueueCount: -2, minimumStudiedCount: 3 }),
+    {
+      studiedCount: 0,
+      reviewQueueCount: 0,
+      minimumStudiedCount: 3,
+      reviewRate: 0,
+      reviewPercent: 0,
+      level: 'neutral',
+      label: 'Aguardando dados',
+      message: 'Estude mais alguns cards para gerar um resumo de foco.',
+    },
+  )
+})
+
 
 test('getFlashcardMicroGoalState reports progress toward the default ten-card quick goal', () => {
   assert.deepEqual(

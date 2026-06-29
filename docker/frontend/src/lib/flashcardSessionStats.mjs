@@ -1,3 +1,61 @@
+export function getFlashcardFocusState({ studiedCount, reviewQueueCount, minimumStudiedCount = 10 }) {
+  const safeStudiedCount = Math.max(0, studiedCount)
+  const safeReviewQueueCount = Math.max(0, reviewQueueCount)
+  const safeMinimumStudiedCount = Math.max(1, minimumStudiedCount)
+  const reviewRate = safeStudiedCount === 0 ? 0 : safeReviewQueueCount / safeStudiedCount
+  const reviewPercent = Math.round(reviewRate * 100)
+
+  if (safeStudiedCount < safeMinimumStudiedCount) {
+    return {
+      studiedCount: safeStudiedCount,
+      reviewQueueCount: safeReviewQueueCount,
+      minimumStudiedCount: safeMinimumStudiedCount,
+      reviewRate,
+      reviewPercent,
+      level: 'neutral',
+      label: 'Aguardando dados',
+      message: 'Estude mais alguns cards para gerar um resumo de foco.',
+    }
+  }
+
+  if (reviewRate < 0.2) {
+    return {
+      studiedCount: safeStudiedCount,
+      reviewQueueCount: safeReviewQueueCount,
+      minimumStudiedCount: safeMinimumStudiedCount,
+      reviewRate,
+      reviewPercent,
+      level: 'low',
+      label: 'Ritmo bom',
+      message: 'Siga no ritmo atual; poucos cards ficaram marcados para revisão.',
+    }
+  }
+
+  if (reviewRate < 0.5) {
+    return {
+      studiedCount: safeStudiedCount,
+      reviewQueueCount: safeReviewQueueCount,
+      minimumStudiedCount: safeMinimumStudiedCount,
+      reviewRate,
+      reviewPercent,
+      level: 'medium',
+      label: 'Revise no fim do bloco',
+      message: 'Revise os cards marcados ao fim do bloco antes de avançar rápido demais.',
+    }
+  }
+
+  return {
+    studiedCount: safeStudiedCount,
+    reviewQueueCount: safeReviewQueueCount,
+    minimumStudiedCount: safeMinimumStudiedCount,
+    reviewRate,
+    reviewPercent,
+    level: 'high',
+    label: 'Priorize revisão',
+    message: 'Reduza a velocidade e priorize os cards marcados antes de continuar.',
+  }
+}
+
 export function getFlashcardMicroGoalState({ studiedCount, goalSize = 10 }) {
   const safeStudiedCount = Math.max(0, studiedCount)
   const safeGoalSize = Math.max(1, goalSize)

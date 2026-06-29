@@ -6,7 +6,7 @@ import { handleFlashcardKeyDown } from '../lib/flashcardKeyboard.mjs'
 import { shuffleFlashcards } from '../lib/flashcardOrder.mjs'
 import { getFlashcardSupportVisibility } from '../lib/flashcardReveal.mjs'
 import { addFlashcardToReviewQueue, mergeFlashcardsWithReviewQueue } from '../lib/flashcardReviewQueue.mjs'
-import { getFlashcardMicroGoalState, getFlashcardReviewJumpState, getFlashcardSessionStats } from '../lib/flashcardSessionStats.mjs'
+import { getFlashcardFocusState, getFlashcardMicroGoalState, getFlashcardReviewJumpState, getFlashcardSessionStats } from '../lib/flashcardSessionStats.mjs'
 
 const LANGS = [
   { code: 'de', name: 'Alemão' },
@@ -60,6 +60,10 @@ export default function Flashcards() {
     currentIndex: index,
   })
   const microGoalState = getFlashcardMicroGoalState({ studiedCount: sessionStats.studiedCount })
+  const focusState = getFlashcardFocusState({
+    studiedCount: sessionStats.studiedCount,
+    reviewQueueCount: sessionStats.reviewQueueCount,
+  })
   const reviewJumpState = useMemo(
     () => getFlashcardReviewJumpState({
       deckCount: cards.length,
@@ -170,6 +174,20 @@ export default function Flashcards() {
             <span className={microGoalState.isComplete ? 'text-polyglot-accent' : 'text-gray-400'}>
               {microGoalState.message}
             </span>
+          </div>
+        </div>
+
+        <div className="mb-6 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-gray-300">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="text-xs uppercase tracking-[0.25em] text-gray-500">Foco da sessão</p>
+              <p className="mt-1 font-semibold text-white">{focusState.label}</p>
+              <p className="mt-2 text-gray-400">{focusState.message}</p>
+            </div>
+            <div className="rounded-xl bg-black/20 px-4 py-3 text-center">
+              <div className="text-2xl font-bold text-polyglot-accent">{focusState.reviewPercent}%</div>
+              <div className="text-xs text-gray-500">marcados</div>
+            </div>
           </div>
         </div>
 
