@@ -12,6 +12,7 @@ import { selectableImageChoiceOptions } from '../lib/imageChoice.mjs'
 import { lessonContextForExercise } from '../lib/exerciseLessonContext.mjs'
 import { hintForExerciseType } from '../lib/exerciseTypeHint.mjs'
 import { choiceShortcutLabels } from '../lib/exerciseChoiceShortcuts.mjs'
+import { exerciseSessionProgress } from '../lib/exerciseSessionProgress.mjs'
 
 const LANG_META = {
   de: { accent: 'Rammstein', color: 'from-red-600 to-red-900' },
@@ -96,6 +97,7 @@ export default function Exercises() {
   const item = feedback?.itemSnapshot || currentItem
   const displayIndex = feedback?.answeredIndex ?? currentIndex
   const progress = session?.total_count ? (currentIndex / session.total_count) * 100 : 0
+  const sessionProgress = useMemo(() => exerciseSessionProgress(session), [session])
   const langCode = lesson?.language_code || lesson?.language || 'de'
   const activePath = pathData.find((p) => (p.language_code || p.language) === langCode)
   const choiceLikeTypes = ['choice', 'listen_choice', 'context_choice', 'image_choice']
@@ -296,6 +298,13 @@ export default function Exercises() {
             </div>
           </div>
 
+          <div className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <ProgressStat label="Respondidas" value={`${sessionProgress.answered}/${sessionProgress.total}`} />
+            <ProgressStat label="Faltam" value={sessionProgress.remaining} />
+            <ProgressStat label="Acerto parcial" value={`${sessionProgress.correct}/${sessionProgress.answered}`} detail={`${sessionProgress.accuracyPercent}%`} />
+            <ProgressStat label="XP da sessão" value={sessionProgress.xpEarned} />
+          </div>
+
           <div className="mb-6 flex items-center gap-3">
             <LanguageFlag code={langCode} className="h-12 w-12" />
             <div>
@@ -347,6 +356,18 @@ export default function Exercises() {
           </div>
         </div>
       )}
+    </div>
+  )
+}
+
+function ProgressStat({ label, value, detail }) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
+      <div className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">{label}</div>
+      <div className="mt-1 flex items-baseline gap-2">
+        <span className="text-2xl font-bold text-white">{value}</span>
+        {detail && <span className="text-sm font-semibold text-polyglot-accent">{detail}</span>}
+      </div>
     </div>
   )
 }
