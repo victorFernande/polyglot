@@ -27,8 +27,10 @@ export function trailHeaderLayoutClasses() {
   return {
     wrapper: 'mb-5 space-y-5',
     contextCard: 'w-full rounded-2xl border border-polyglot-accent/20 bg-polyglot-accent/10 p-4',
-    trailArea: 'flex items-center gap-2 overflow-x-auto pb-2 lg:gap-3 lg:overflow-visible lg:pb-0',
-    trailNodes: 'flex min-w-[720px] flex-1 items-center lg:min-w-0',
-    nodeLabel: 'hidden text-xs sm:inline',
+    mobileTrail: 'flex items-center gap-2 sm:hidden',
+    mobileTrailNodes: 'grid flex-1 grid-cols-3 items-start gap-2',
+    desktopTrail: 'hidden items-center gap-3 sm:flex',
+    desktopTrailNodes: 'flex min-w-0 flex-1 items-center',
+    nodeLabel: 'text-xs',
   }
 }

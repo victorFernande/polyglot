@@ -51,17 +51,27 @@ test('sessionWindowForPage clamps invalid pages to the available range', () => {
   assert.equal(sessionWindowForPage(nodes, 99).page, 1)
 })
 
-test('trailHeaderLayoutClasses stacks the unit context above the session path and switches mobile/desktop trail layouts', () => {
+test('trailHeaderLayoutClasses stacks context and separates 3-item mobile from 10-item desktop trail layouts', () => {
   const classes = trailHeaderLayoutClasses()
 
   assert.match(classes.wrapper, /space-y-5/)
   assert.doesNotMatch(classes.wrapper, /lg:grid-cols/)
   assert.match(classes.contextCard, /w-full/)
-  assert.match(classes.trailArea, /overflow-x-auto/)
-  assert.match(classes.trailNodes, /min-w-\[720px\]/)
-  assert.match(classes.trailNodes, /lg:min-w-0/)
-  assert.match(classes.nodeLabel, /hidden/)
-  assert.match(classes.nodeLabel, /sm:inline/)
+  assert.match(classes.mobileTrail, /sm:hidden/)
+  assert.match(classes.mobileTrailNodes, /grid-cols-3/)
+  assert.doesNotMatch(classes.mobileTrailNodes, /min-w-/)
+  assert.match(classes.desktopTrail, /hidden/)
+  assert.match(classes.desktopTrail, /sm:flex/)
+  assert.match(classes.desktopTrailNodes, /min-w-0/)
+  assert.doesNotMatch(classes.desktopTrailNodes, /min-w-\[720px\]/)
+})
+
+test('sessionWindowForPage can paginate mobile trail as groups of three sessions', () => {
+  const nodes = Array.from({ length: 10 }, (_, index) => ({ number: index + 1 }))
+
+  assert.deepEqual(sessionWindowForPage(nodes, 0, 3).visibleNodes, nodes.slice(0, 3))
+  assert.deepEqual(sessionWindowForPage(nodes, 1, 3).visibleNodes, nodes.slice(3, 6))
+  assert.deepEqual(sessionWindowForPage(nodes, 3, 3).visibleNodes, nodes.slice(9, 10))
 })
 
 test('Tailwind scans mjs helpers that provide exercise trail classes', () => {

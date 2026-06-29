@@ -77,6 +77,7 @@ export default function Exercises() {
   const [voiceMode, setVoiceMode] = useState(false)
   const [lessonLanguageFilter, setLessonLanguageFilter] = useState('all')
   const [trailPage, setTrailPage] = useState(0)
+  const [mobileTrailPage, setMobileTrailPage] = useState(0)
   const speechPlaybackRef = useRef(null)
   if (!speechPlaybackRef.current) {
     speechPlaybackRef.current = createSpeechPlaybackController({
@@ -125,7 +126,10 @@ export default function Exercises() {
   const currentSessionNumber = sessionNumberForExerciseSession(session, activePath)
 
   useEffect(() => {
-    if (activePath) setTrailPage(pageForSessionNumber(currentSessionNumber))
+    if (activePath) {
+      setTrailPage(pageForSessionNumber(currentSessionNumber, 10))
+      setMobileTrailPage(pageForSessionNumber(currentSessionNumber, 3))
+    }
   }, [activePath?.language_code, currentSessionNumber])
 
   function resetExerciseState() {
@@ -343,7 +347,7 @@ export default function Exercises() {
         })}
       </div>
 
-      {activePath && <SkillTrail path={activePath} lessonContext={lessonContext} page={trailPage} onPageChange={setTrailPage} currentSessionNumber={currentSessionNumber} onSessionClick={openSessionNumber} />}
+      {activePath && <SkillTrail path={activePath} lessonContext={lessonContext} page={trailPage} mobilePage={mobileTrailPage} onPageChange={setTrailPage} onMobilePageChange={setMobileTrailPage} currentSessionNumber={currentSessionNumber} onSessionClick={openSessionNumber} />}
 
       {item && session && lesson && (
         <div className="card">
@@ -421,9 +425,41 @@ function ProgressStat({ label, value, detail }) {
   )
 }
 
-function SkillTrail({ path, lessonContext, page, onPageChange, currentSessionNumber, onSessionClick }) {
-  const windowState = sessionWindowForPage(path.nodes, page)
+function SkillTrail({ path, lessonContext, page, mobilePage, onPageChange, onMobilePageChange, currentSessionNumber, onSessionClick }) {
+  const desktopWindowState = sessionWindowForPage(path.nodes, page, 10)
+  const mobileWindowState = sessionWindowForPage(path.nodes, mobilePage, 3)
   const layout = trailHeaderLayoutClasses()
+
+  function renderDesktopNode(node, index, nodes) {
+    const isActiveSession = node.number === currentSessionNumber
+    const isEnabled = node.number <= path.completed_sessions + 1
+    const isGreenConnector = node.status === 'completed' || (node.status === 'current' && node.number <= path.completed_sessions + 1)
+    return (
+      <div key={node.number} className="flex flex-1 items-center last:flex-none">
+        <button type="button" disabled={!isEnabled} onClick={() => onSessionClick?.(node.number)} className="flex flex-col items-center gap-2 disabled:cursor-not-allowed" title={isEnabled ? `Abrir sessão ${node.number}` : 'Sessão bloqueada'}>
+          <div className={`flex h-12 w-12 items-center justify-center rounded-full border-2 text-sm font-bold transition ${node.status === 'completed' ? 'border-polyglot-green bg-polyglot-green/20 text-polyglot-green hover:scale-105' : isActiveSession ? 'border-polyglot-accent bg-polyglot-accent/20 text-polyglot-accent animate-pulse' : 'border-white/10 bg-white/5 text-gray-500'}`}>
+            {node.status === 'completed' ? '✓' : <Star size={18} />}
+          </div>
+          <span className={`${layout.nodeLabel} ${isActiveSession ? 'text-polyglot-accent' : 'text-gray-400'}`}>Sessão {node.number}</span>
+        </button>
+        {index < nodes.length - 1 && <div className={`mx-2 h-1 flex-1 rounded-full ${isGreenConnector ? 'bg-polyglot-green' : 'bg-white/15'}`} />}
+      </div>
+    )
+  }
+
+  function renderMobileNode(node) {
+    const isActiveSession = node.number === currentSessionNumber
+    const isEnabled = node.number <= path.completed_sessions + 1
+    return (
+      <button key={node.number} type="button" disabled={!isEnabled} onClick={() => onSessionClick?.(node.number)} className="min-w-0 rounded-2xl border border-white/10 bg-white/5 p-2 text-center disabled:cursor-not-allowed" title={isEnabled ? `Abrir sessão ${node.number}` : 'Sessão bloqueada'}>
+        <div className={`mx-auto flex h-10 w-10 items-center justify-center rounded-full border-2 text-sm font-bold transition ${node.status === 'completed' ? 'border-polyglot-green bg-polyglot-green/20 text-polyglot-green' : isActiveSession ? 'border-polyglot-accent bg-polyglot-accent/20 text-polyglot-accent animate-pulse' : 'border-white/10 bg-white/5 text-gray-500'}`}>
+          {node.status === 'completed' ? '✓' : <Star size={16} />}
+        </div>
+        <span className={`mt-1 block truncate text-[11px] font-semibold ${isActiveSession ? 'text-polyglot-accent' : 'text-gray-400'}`}>S{node.number}</span>
+      </button>
+    )
+  }
+
   return (
     <div className="card">
       <div className={layout.wrapper}>
@@ -441,32 +477,28 @@ function SkillTrail({ path, lessonContext, page, onPageChange, currentSessionNum
             {lessonContext.description && <p className="mt-1 text-sm text-gray-300">{lessonContext.description}</p>}
           </div>
         )}
-        <div className={layout.trailArea}>
-          {windowState.canGoPrev && (
-            <button type="button" className="btn-secondary shrink-0 rounded-full p-3" onClick={() => onPageChange(windowState.page - 1)} aria-label="Ver sessões anteriores">
+        <div className={layout.mobileTrail}>
+          <button type="button" className="btn-secondary shrink-0 rounded-full p-3 disabled:opacity-30" disabled={!mobileWindowState.canGoPrev} onClick={() => onMobilePageChange(mobileWindowState.page - 1)} aria-label="Ver sessões anteriores">
+            <ChevronLeft size={20} />
+          </button>
+          <div className={layout.mobileTrailNodes}>
+            {mobileWindowState.visibleNodes.map(renderMobileNode)}
+          </div>
+          <button type="button" className="btn-secondary shrink-0 rounded-full p-3 disabled:opacity-30" disabled={!mobileWindowState.canGoNext} onClick={() => onMobilePageChange(mobileWindowState.page + 1)} aria-label="Ver próximas sessões">
+            <ChevronRight size={20} />
+          </button>
+        </div>
+        <div className={layout.desktopTrail}>
+          {desktopWindowState.canGoPrev && (
+            <button type="button" className="btn-secondary shrink-0 rounded-full p-3" onClick={() => onPageChange(desktopWindowState.page - 1)} aria-label="Ver sessões anteriores">
               <ChevronLeft size={20} />
             </button>
           )}
-          <div className={layout.trailNodes}>
-            {windowState.visibleNodes.map((node, index) => {
-              const isActiveSession = node.number === currentSessionNumber
-              const isEnabled = node.number <= path.completed_sessions + 1
-              const isGreenConnector = node.status === 'completed' || (node.status === 'current' && node.number <= path.completed_sessions + 1)
-              return (
-                <div key={node.number} className="flex flex-1 items-center last:flex-none">
-                  <button type="button" disabled={!isEnabled} onClick={() => onSessionClick?.(node.number)} className="flex flex-col items-center gap-1 disabled:cursor-not-allowed sm:gap-2" title={isEnabled ? `Abrir sessão ${node.number}` : 'Sessão bloqueada'}>
-                    <div className={`flex h-10 w-10 items-center justify-center rounded-full border-2 text-sm font-bold transition sm:h-12 sm:w-12 ${node.status === 'completed' ? 'border-polyglot-green bg-polyglot-green/20 text-polyglot-green hover:scale-105' : isActiveSession ? 'border-polyglot-accent bg-polyglot-accent/20 text-polyglot-accent animate-pulse' : 'border-white/10 bg-white/5 text-gray-500'}`}>
-                      {node.status === 'completed' ? '✓' : <Star size={18} />}
-                    </div>
-                    <span className={`${layout.nodeLabel} ${isActiveSession ? 'text-polyglot-accent' : 'text-gray-400'}`}>Sessão {node.number}</span>
-                  </button>
-                  {index < windowState.visibleNodes.length - 1 && <div className={`mx-1 h-1 flex-1 rounded-full sm:mx-2 ${isGreenConnector ? 'bg-polyglot-green' : 'bg-white/15'}`} />}
-                </div>
-              )
-            })}
+          <div className={layout.desktopTrailNodes}>
+            {desktopWindowState.visibleNodes.map(renderDesktopNode)}
           </div>
-          {windowState.canGoNext && (
-            <button type="button" className="btn-secondary shrink-0 rounded-full p-3" onClick={() => onPageChange(windowState.page + 1)} aria-label="Ver próximas sessões">
+          {desktopWindowState.canGoNext && (
+            <button type="button" className="btn-secondary shrink-0 rounded-full p-3" onClick={() => onPageChange(desktopWindowState.page + 1)} aria-label="Ver próximas sessões">
               <ChevronRight size={20} />
             </button>
           )}
