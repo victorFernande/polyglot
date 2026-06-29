@@ -154,6 +154,22 @@ def test_first_five_exercises_are_not_repetitive_variations_of_same_task():
     assert any("complete" in prompt.casefold() or "situação" in prompt.casefold() for prompt in prompts)
 
 
+def test_flashcards_that_ask_to_listen_include_audio_payload():
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
+    db = SessionLocal()
+    try:
+        ExerciseService.seed_lessons(db)
+        cards = ExerciseService.flashcards(db, language="de", limit=20)
+        listen_cards = [card for card in cards if "ouça" in f"{card['front']} {card['hint']}".casefold()]
+
+        assert listen_cards, "fixture should include at least one listen-style flashcard"
+        assert all(card.get("audio_text") for card in listen_cards)
+        assert all(card.get("audio_lang") == "de-DE" for card in listen_cards)
+    finally:
+        db.close()
+
+
 
 def _answer_signature(item):
     answer = item["answer"].get("value") or item["answer"].get("pairs")

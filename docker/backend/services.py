@@ -111,6 +111,7 @@ class WaveService:
 class ExerciseService:
     LANGUAGE_TO_WAVE = {"de": "german", "fr": "french", "ru": "russian", "jp": "japanese", "en": "english"}
     LANGUAGE_NAMES = {"de": "Alemão", "fr": "Francês", "ru": "Russo", "jp": "Japonês", "en": "Inglês"}
+    SPEECH_LANGS = {"de": "de-DE", "fr": "fr-FR", "ru": "ru-RU", "jp": "ja-JP", "en": "en-US"}
     VISUAL_VOCAB = {
         "de": [("ambulância", "Krankenwagen", "ambulance"), ("café", "Kaffee", "coffee"), ("bola", "Ball", "ball"), ("garfo", "Gabel", "fork"), ("trem", "Zug", "train"), ("casa", "Haus", "house"), ("camisa", "Hemd", "shirt"), ("telefone", "Telefon", "phone"), ("livro", "Buch", "book"), ("água", "Wasser", "water")],
         "fr": [("ambulância", "ambulance", "ambulance"), ("café", "café", "coffee"), ("bola", "ballon", "ball"), ("garfo", "fourchette", "fork"), ("trem", "train", "train"), ("casa", "maison", "house"), ("camisa", "chemise", "shirt"), ("telefone", "téléphone", "phone"), ("livro", "livre", "book"), ("água", "eau", "water")],
@@ -665,6 +666,10 @@ class ExerciseService:
                 back = item.answer.get("value") if isinstance(item.answer, dict) and "value" in item.answer else item.answer
                 if isinstance(back, list): back = " ".join(back)
                 if isinstance(back, dict) and "pairs" in back: back = "; ".join([f"{a} = {b}" for a,b in back["pairs"]])
-                cards.append({"id": item.id, "language_code": lesson.language_code, "language_name": lesson.language_name, "front": item.prompt, "back": back, "hint": item.hint, "explanation": item.explanation, "type": item.type})
+                card = {"id": item.id, "language_code": lesson.language_code, "language_name": lesson.language_name, "front": item.prompt, "back": back, "hint": item.hint, "explanation": item.explanation, "type": item.type}
+                if item.type == "listen_choice" or "ouça" in f"{item.prompt} {item.hint}".casefold():
+                    card["audio_text"] = str(back or "").strip()
+                    card["audio_lang"] = ExerciseService.SPEECH_LANGS.get(lesson.language_code, "pt-BR")
+                cards.append(card)
         return cards[:limit]
 

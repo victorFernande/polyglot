@@ -1,8 +1,11 @@
-import React, { useEffect, useMemo, useState } from 'react'
-import { RotateCcw, ChevronLeft, ChevronRight, Loader2, Shuffle } from 'lucide-react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { RotateCcw, ChevronLeft, ChevronRight, Loader2, Shuffle, Volume2 } from 'lucide-react'
 import LanguageFlag from '../components/LanguageFlag'
-import { bootstrapUser, loadFlashcards } from '../lib/api'
+import { bootstrapUser, loadFlashcards, synthesizeSpeech } from '../lib/api'
 import { handleFlashcardKeyDown } from '../lib/flashcardKeyboard.mjs'
+import { audioSegmentsForFlashcard, hasFlashcardAudio } from '../lib/flashcardAudio.mjs'
+import { createSpeechPlaybackController } from '../lib/speechPlayback.mjs'
+import { speakSegmentsWithBrowser } from '../lib/voiceMode.mjs'
 import { shuffleFlashcards } from '../lib/flashcardOrder.mjs'
 import { getFlashcardSupportVisibility } from '../lib/flashcardReveal.mjs'
 import { addFlashcardToReviewQueue, mergeFlashcardsWithReviewQueue } from '../lib/flashcardReviewQueue.mjs'
@@ -25,6 +28,15 @@ export default function Flashcards() {
   const [error, setError] = useState(null)
   const [reviewQueue, setReviewQueue] = useState([])
   const [recallCounts, setRecallCounts] = useState({ knownCount: 0, unknownCount: 0 })
+  const speechPlaybackRef = useRef(null)
+
+  useEffect(() => {
+    speechPlaybackRef.current = createSpeechPlaybackController({
+      synthesizeSpeech,
+      fallbackSpeakSegments: speakSegmentsWithBrowser,
+    })
+    return () => speechPlaybackRef.current?.stop?.()
+  }, [])
 
   useEffect(() => {
     async function load() {
@@ -127,6 +139,11 @@ export default function Flashcards() {
   function jumpToReviewQueue() {
     setIndex(reviewJumpState.reviewQueueStartIndex)
     setFlipped(false)
+  }
+
+  function playFlashcardAudio(event) {
+    event?.stopPropagation?.()
+    speechPlaybackRef.current?.speakSegments(audioSegmentsForFlashcard(card))
   }
 
   useEffect(() => {
@@ -234,13 +251,22 @@ export default function Flashcards() {
         </div>
 
         {card && (
-          <button onClick={() => setFlipped(!flipped)} className="min-h-80 w-full rounded-3xl border border-white/10 bg-gradient-to-br from-white/10 to-white/5 p-8 text-center transition hover:border-polyglot-accent/50">
-            <div className="mb-4 flex justify-center"><LanguageFlag code={language} className="h-14 w-14" /></div>
-            <p className="text-xs uppercase tracking-[0.3em] text-gray-500">{flipped ? 'Verso' : 'Frente'} · {card.type}</p>
-            <div className="mt-6 text-2xl font-bold leading-relaxed">{flipped ? card.back : card.front}</div>
-            <p className="mt-8 text-sm text-gray-400">Toque no card para virar</p>
-            <p className="mt-3 text-xs text-gray-500">Atalhos: ←/→ navegar · Espaço/Enter virar · R frente · N revisar depois · V revisar marcados</p>
-          </button>
+          <>
+            <button onClick={() => setFlipped(!flipped)} className="min-h-80 w-full rounded-3xl border border-white/10 bg-gradient-to-br from-white/10 to-white/5 p-8 text-center transition hover:border-polyglot-accent/50">
+              <div className="mb-4 flex justify-center"><LanguageFlag code={language} className="h-14 w-14" /></div>
+              <p className="text-xs uppercase tracking-[0.3em] text-gray-500">{flipped ? 'Verso' : 'Frente'} · {card.type}</p>
+              <div className="mt-6 text-2xl font-bold leading-relaxed">{flipped ? card.back : card.front}</div>
+              <p className="mt-8 text-sm text-gray-400">Toque no card para virar</p>
+              <p className="mt-3 text-xs text-gray-500">Atalhos: ←/→ navegar · Espaço/Enter virar · R frente · N revisar depois · V revisar marcados</p>
+            </button>
+            {hasFlashcardAudio(card) && (
+              <div className="mt-4 flex justify-center">
+                <button className="btn-secondary inline-flex items-center gap-2" onClick={playFlashcardAudio}>
+                  <Volume2 size={18} /> Ouvir áudio do card
+                </button>
+              </div>
+            )}
+          </>
         )}
 
         {card && (supportVisibility.hint || supportVisibility.explanation) && (
