@@ -1,3 +1,5 @@
+import { bootstrapPathForUserId, normalizeUserId } from './apiUser.mjs'
+
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api'
 const DEFAULT_USER_ID = 1
 
@@ -29,16 +31,13 @@ export async function apiFetch(path, options = {}) {
 }
 
 export function getStoredUserId() {
-  const raw = localStorage.getItem('polyglot_user_id')
-  const parsed = Number(raw)
-  return Number.isInteger(parsed) && parsed > 0 ? parsed : DEFAULT_USER_ID
+  return normalizeUserId(localStorage.getItem('polyglot_user_id'), DEFAULT_USER_ID)
 }
 
 export async function bootstrapUser() {
   const storedId = getStoredUserId()
-  const user = await apiFetch('/users/bootstrap', {
+  const user = await apiFetch(bootstrapPathForUserId(storedId), {
     method: 'POST',
-    body: JSON.stringify({ user_id: storedId }),
   })
   const userId = user?.id || user?.user?.id || storedId
   localStorage.setItem('polyglot_user_id', String(userId))

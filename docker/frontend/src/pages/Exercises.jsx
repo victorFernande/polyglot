@@ -6,7 +6,7 @@ import { answerExerciseSession, bootstrapUser, completeExerciseSession, loadExer
 import { handleExerciseKeyDown } from '../lib/exerciseKeyboard.mjs'
 import { buildTilesForItem, matchRightOptions, stableShuffleOptions } from '../lib/exerciseOptions.mjs'
 import { speak, voiceTextForFeedback, voiceTextForItem } from '../lib/voiceMode.mjs'
-import { svgToDataUri } from '../lib/imageChoice.mjs'
+import { selectableImageChoiceOptions } from '../lib/imageChoice.mjs'
 
 const LANG_META = {
   de: { accent: 'Rammstein', color: 'from-red-600 to-red-900' },
@@ -351,15 +351,16 @@ function Choice({ options, selected, setSelected, onInteract }) {
 }
 
 function ImageChoice({ options, selected, setSelected, onInteract }) {
+  const selectable = selectableImageChoiceOptions(options)
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      {options.map((option) => (
-        <button key={option.value} onClick={() => { onInteract(); setSelected(option.value) }} className={`rounded-2xl border p-4 text-center transition ${selected === option.value ? 'border-polyglot-accent bg-polyglot-accent/20' : 'border-white/10 bg-white/5 hover:bg-white/10'}`}>
+      {selectable.map((option) => (
+        <button key={option.key} onClick={() => { onInteract(); setSelected(option.selectValue) }} className={`rounded-2xl border p-4 text-center transition ${selected === option.selectValue ? 'border-polyglot-accent bg-polyglot-accent/20' : 'border-white/10 bg-white/5 hover:bg-white/10'}`}>
           <div className="mx-auto mb-3 flex h-24 w-24 items-center justify-center overflow-hidden rounded-2xl bg-white/90 p-2">
-            <img src={option.image_src || svgToDataUri(option.svg)} alt={option.label_pt} className="h-full w-full object-contain" />
+            <img src={option.imageSrc} alt={option.label} className="h-full w-full object-contain" />
           </div>
-          <div className="text-sm text-gray-300">{option.label_pt}</div>
-          <div className="mt-1 text-lg font-bold">{option.value}</div>
+          <div className="text-sm text-gray-300">{option.label}</div>
+          <div className="mt-1 text-lg font-bold text-white">{option.selectValue}</div>
         </button>
       ))}
     </div>

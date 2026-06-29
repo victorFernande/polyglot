@@ -137,3 +137,46 @@ def test_bootstrap_allows_independent_test_users():
         assert first.status_code == 200, first.text
         assert second.status_code == 200, second.text
         assert first.json()["user"]["email"] != second.json()["user"]["email"]
+
+
+def test_image_choice_can_be_played_by_separate_test_user_without_touching_user_one():
+    with TestClient(app) as client:
+        user_id = 99991
+        before_user_one = client.get("/exercise-lessons", params={"user_id": 1}).json()[0]
+        bootstrap = client.post(f"/users/{user_id}/bootstrap")
+        assert bootstrap.status_code == 200, bootstrap.text
+        assert bootstrap.json()["user"]["id"] == user_id
+
+        lesson = client.get("/exercise-lessons", params={"user_id": user_id}).json()[0]
+        session = client.post(f"/exercise-lessons/{lesson['id']}/sessions", params={"user_id": user_id}).json()
+        assert session["user_id"] == user_id
+        assert session["current_index"] == 0
+
+        while session["current_item"]["type"] != "image_choice":
+            item = session["current_item"]
+            response = client.post(
+                f"/exercise-sessions/{session['id']}/answer",
+                json={"item_id": item["id"], "payload": ui_payload(item)},
+            )
+            assert response.status_code == 200, response.text
+            session = response.json()["session"]
+
+        image_item = session["current_item"]
+        assert image_item["type"] == "image_choice"
+        assert len(image_item["options"]) == 4
+        assert all(option.get("label_pt") for option in image_item["options"])
+        assert all(option.get("value") for option in image_item["options"])
+        assert all(option.get("image_src", "").startswith("data:image/svg+xml") for option in image_item["options"])
+
+        chosen = image_item["answer"]["value"]
+        answer = client.post(
+            f"/exercise-sessions/{session['id']}/answer",
+            json={"item_id": image_item["id"], "payload": chosen},
+        )
+        assert answer.status_code == 200, answer.text
+        assert answer.json()["is_correct"] is True
+        assert answer.json()["session"]["user_id"] == user_id
+
+        after_user_one = client.get("/exercise-lessons", params={"user_id": 1}).json()[0]
+        assert after_user_one["completed_sessions"] == before_user_one["completed_sessions"]
+        assert after_user_one["active_session_id"] == before_user_one["active_session_id"]
