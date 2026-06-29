@@ -1,4 +1,7 @@
-export function handleFlashcardKeyDown(event, { cardsLength, next, prev, flip, showFront }) {
+export function handleFlashcardKeyDown(
+  event,
+  { cardsLength, next, prev, flip, showFront, markNeedsReview, canMarkNeedsReview = true },
+) {
   if (!cardsLength) return false
 
   const key = event.key
@@ -11,7 +14,9 @@ export function handleFlashcardKeyDown(event, { cardsLength, next, prev, flip, s
           ? flip
           : key.toLowerCase() === 'r'
             ? showFront
-            : null
+            : key.toLowerCase() === 'n' && canMarkNeedsReview
+              ? markNeedsReview
+              : null
 
   if (!action) return false
 

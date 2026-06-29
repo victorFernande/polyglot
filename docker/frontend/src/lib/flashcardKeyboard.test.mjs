@@ -12,11 +12,12 @@ function recorder() {
       prev: () => calls.push('prev'),
       flip: () => calls.push('flip'),
       showFront: () => calls.push('showFront'),
+      markNeedsReview: () => calls.push('markNeedsReview'),
     },
   }
 }
 
-function press(key, cardsLength = 3) {
+function press(key, cardsLength = 3, overrides = {}) {
   const event = {
     key,
     defaultPrevented: false,
@@ -25,7 +26,7 @@ function press(key, cardsLength = 3) {
     },
   }
   const { calls, handlers } = recorder()
-  const handled = handleFlashcardKeyDown(event, { cardsLength, ...handlers })
+  const handled = handleFlashcardKeyDown(event, { cardsLength, ...handlers, ...overrides })
   return { handled, calls, defaultPrevented: event.defaultPrevented }
 }
 
@@ -68,6 +69,27 @@ test('R returns the current flashcard to the front side', () => {
     handled: true,
     calls: ['showFront'],
     defaultPrevented: true,
+  })
+})
+
+test('N marks a normal flashcard for review later', () => {
+  assert.deepEqual(press('n'), {
+    handled: true,
+    calls: ['markNeedsReview'],
+    defaultPrevented: true,
+  })
+  assert.deepEqual(press('N'), {
+    handled: true,
+    calls: ['markNeedsReview'],
+    defaultPrevented: true,
+  })
+})
+
+test('N is ignored when the current flashcard cannot be marked for review', () => {
+  assert.deepEqual(press('n', 3, { canMarkNeedsReview: false }), {
+    handled: false,
+    calls: [],
+    defaultPrevented: false,
   })
 })
 

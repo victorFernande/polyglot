@@ -94,12 +94,14 @@ export default function Flashcards() {
         prev,
         flip: () => setFlipped((value) => !value),
         showFront: () => setFlipped(false),
+        markNeedsReview,
+        canMarkNeedsReview: Boolean(card) && !isReviewCard,
       })
     }
 
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [visibleCards.length])
+  }, [visibleCards.length, card, isReviewCard, reviewQueue])
 
   if (loading) return <div className="flex h-64 items-center justify-center"><Loader2 className="animate-spin text-polyglot-accent" size={42} /></div>
   if (error) return <div className="card border-red-500/30 bg-red-500/10 text-red-200">Erro: {error}</div>
@@ -138,7 +140,7 @@ export default function Flashcards() {
             <p className="text-xs uppercase tracking-[0.3em] text-gray-500">{flipped ? 'Verso' : 'Frente'} · {card.type}</p>
             <div className="mt-6 text-2xl font-bold leading-relaxed">{flipped ? card.back : card.front}</div>
             <p className="mt-8 text-sm text-gray-400">Toque no card para virar</p>
-            <p className="mt-3 text-xs text-gray-500">Atalhos: ←/→ navegar · Espaço/Enter virar · R frente</p>
+            <p className="mt-3 text-xs text-gray-500">Atalhos: ←/→ navegar · Espaço/Enter virar · R frente · N revisar depois</p>
           </button>
         )}
 
