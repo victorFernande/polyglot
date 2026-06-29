@@ -34,13 +34,26 @@ assert.deepEqual(
 
 assert.deepEqual(
   voiceSegmentsForItem({
+    type: 'listen_choice',
+    prompt: 'Unidade 1/10 — Café: ouça o áudio e escolha a opção correta.',
+    answer: { value: 'Hallo' },
+  }, 'de'),
+  [
+    { text: 'Hallo', lang: 'de-DE' },
+  ],
+  'listen-choice question audio should speak the target answer in the studied language before answering'
+)
+
+assert.deepEqual(
+  voiceSegmentsForItem({
+    type: 'choice',
     prompt: 'Unidade 1/10 — Café: como dizer “Olá” em Alemão?',
     answer: { value: 'Hallo' },
   }, 'de'),
   [
     { text: 'como dizer “Olá” em Alemão?', lang: 'pt-BR' },
   ],
-  'before answering, question audio must not reveal the correct answer or read the long unit/topic prefix'
+  'before answering, non-listening question audio must not reveal the correct answer or read the long unit/topic prefix'
 )
 
 assert.deepEqual(
