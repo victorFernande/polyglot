@@ -62,9 +62,24 @@ polyglot/
 │   ├── vocabulary/
 │   ├── immersion/rammstein/   # 🎸 Letras, traduções, análise
 │   └── progress/
-├── french/          # 🇫🇷 Onda 2
-├── russian/         # 🇷🇺 Onda 3
-├── japanese/        # 🇯🇵 Onda 4
+├── french/          # 🇫🇷 Onda 2 — Chanson/Cinema
+│   ├── alphabet/
+│   ├── grammar/
+│   ├── vocabulary/
+│   ├── immersion/chanson/
+│   └── progress/
+├── russian/         # 🇷🇺 Onda 3 — Cirílico/Música
+│   ├── alphabet/
+│   ├── grammar/
+│   ├── vocabulary/
+│   ├── immersion/music/
+│   └── progress/
+├── japanese/        # 🇯🇵 Onda 4 — Anime/Manga
+│   ├── alphabet/
+│   ├── grammar/
+│   ├── vocabulary/
+│   ├── immersion/anime/
+│   └── progress/
 ├── shared/
 │   ├── anki-decks/      # Decks gerados por onda
 │   ├── methodology/     # Como aprender idiomas (ciência)
