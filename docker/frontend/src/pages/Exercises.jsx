@@ -14,7 +14,7 @@ import { hintForExerciseType } from '../lib/exerciseTypeHint.mjs'
 import { choiceShortcutLabels } from '../lib/exerciseChoiceShortcuts.mjs'
 import { exerciseSessionProgress } from '../lib/exerciseSessionProgress.mjs'
 import { filterExerciseLessonsByLanguage, summarizeExerciseLessonProgressByLanguage } from '../lib/exerciseLessonFilters.mjs'
-import { moveBuiltWord } from '../lib/buildWordOrder.mjs'
+import { reorderBuiltWords } from '../lib/buildWordOrder.mjs'
 
 const LANG_META = {
   de: { accent: 'Rammstein', color: 'from-red-600 to-red-900' },
@@ -458,9 +458,18 @@ function Build({ item, built, setBuilt, onInteract }) {
     setBuilt(built.filter((_, idx) => idx !== index))
   }
 
-  function moveWord(index, direction) {
+  function dragWord(event, index) {
+    event.dataTransfer.effectAllowed = 'move'
+    event.dataTransfer.setData('application/x-polyglot-built-word-index', String(index))
+  }
+
+  function dropWord(event, toIndex) {
+    event.preventDefault()
+    const rawIndex = event.dataTransfer.getData('application/x-polyglot-built-word-index')
+    if (rawIndex === '') return
+    const fromIndex = Number(rawIndex)
     onInteract()
-    setBuilt(moveBuiltWord(built, index, direction))
+    setBuilt(reorderBuiltWords(built, fromIndex, toIndex))
   }
 
   return (
@@ -471,42 +480,25 @@ function Build({ item, built, setBuilt, onInteract }) {
         ) : (
           <div className="flex flex-wrap gap-2">
             {built.map((word, i) => (
-              <div key={`${word}-${i}`} className="inline-flex items-center overflow-hidden rounded-lg bg-polyglot-accent font-semibold text-white">
-                <button
-                  type="button"
-                  onClick={() => moveWord(i, -1)}
-                  disabled={i === 0}
-                  aria-label={`Mover ${word} para a esquerda`}
-                  className="px-2 py-2 text-sm hover:bg-black/15 disabled:cursor-not-allowed disabled:opacity-30"
-                  title="Mover palavra para a esquerda"
-                >
-                  ←
-                </button>
-                <button
-                  type="button"
-                  onClick={() => removeWord(i)}
-                  aria-label={`Remover ${word} da resposta`}
-                  className="px-3 py-2 hover:bg-black/10"
-                  title="Remover palavra selecionada"
-                >
-                  {word}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => moveWord(i, 1)}
-                  disabled={i === built.length - 1}
-                  aria-label={`Mover ${word} para a direita`}
-                  className="px-2 py-2 text-sm hover:bg-black/15 disabled:cursor-not-allowed disabled:opacity-30"
-                  title="Mover palavra para a direita"
-                >
-                  →
-                </button>
-              </div>
+              <button
+                key={`${word}-${i}`}
+                type="button"
+                draggable
+                onDragStart={(event) => dragWord(event, i)}
+                onDragOver={(event) => event.preventDefault()}
+                onDrop={(event) => dropWord(event, i)}
+                onClick={() => removeWord(i)}
+                aria-label={`Arraste ${word} para mudar a ordem ou clique para remover`}
+                className="cursor-grab rounded-lg bg-polyglot-accent px-3 py-2 font-semibold text-white shadow-sm transition hover:scale-[1.02] active:cursor-grabbing active:scale-95"
+                title="Arraste para reordenar · Clique para remover"
+              >
+                {word}
+              </button>
             ))}
           </div>
         )}
       </div>
-      {built.length > 1 && <p className="text-xs text-gray-500">Errou a ordem? Use ← e → nas palavras selecionadas para reorganizar sem desmontar tudo.</p>}
+      {built.length > 1 && <p className="text-xs text-gray-500">Errou a ordem? Clique e arraste uma palavra selecionada para reorganizar a frase. Clique simples remove a palavra.</p>}
       <div className="flex flex-wrap gap-2">
         {tiles.map((tile, i) => (
           <button key={`${tile}-${i}`} disabled={built.includes(tile)} onClick={() => { onInteract(); setBuilt([...built, tile]) }} className="rounded-lg bg-white/10 px-4 py-3 font-semibold hover:bg-white/20 disabled:opacity-30">{tile}</button>
