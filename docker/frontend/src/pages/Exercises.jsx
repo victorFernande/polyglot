@@ -19,6 +19,7 @@ import { cleanExercisePrompt, isTrailSessionEnabled, pageForSessionNumber, sessi
 import { nextExerciseActionLabel, sessionNumberForExerciseSession } from '../lib/exerciseSessionLabels.mjs'
 import { parseMicroDialoguePrompt } from '../lib/microDialoguePrompt.mjs'
 import { playAnswerFeedbackSound, unlockAnswerFeedbackSound } from '../lib/answerFeedbackSound.mjs'
+import { buildLetterScramblePayload, isLetterScrambleEligible, singleWordBuildAnswer, stableScrambleLetters } from '../lib/letterScramble.mjs'
 
 const LANG_META = {
   de: { accent: 'Rammstein', color: 'from-red-600 to-red-900' },
@@ -182,7 +183,7 @@ export default function Exercises() {
     if (!item) return null
     if (['choice', 'listen_choice', 'context_choice'].includes(item.type)) return selected
     if (item.type === 'image_choice') return selected
-    if (BUILD_LIKE_TYPES.includes(item.type)) return built
+    if (BUILD_LIKE_TYPES.includes(item.type)) return isLetterScrambleEligible(item) ? buildLetterScramblePayload(built) : built
     if (item.type === 'match') return matched
     return selected
   }, [item, selected, built, matched])
@@ -191,7 +192,10 @@ export default function Exercises() {
     if (!item) return false
     if (['choice', 'listen_choice', 'context_choice'].includes(item.type)) return !!selected
     if (item.type === 'image_choice') return !!selected
-    if (BUILD_LIKE_TYPES.includes(item.type)) return built.length === (answerValue(item.answer)?.length || 0)
+    if (BUILD_LIKE_TYPES.includes(item.type)) {
+      if (isLetterScrambleEligible(item)) return built.length === singleWordBuildAnswer(item).length
+      return built.length === (answerValue(item.answer)?.length || 0)
+    }
     if (item.type === 'match') return Object.keys(matched).length === matchPairs(item).length
     return false
   }, [item, selected, built, matched])
@@ -562,6 +566,10 @@ function ImageChoice({ options, selected, setSelected, onInteract }) {
 }
 
 function Build({ item, built, setBuilt, onInteract }) {
+  if (isLetterScrambleEligible(item)) {
+    return <LetterScramble item={item} built={built} onInteract={onInteract} setBuilt={setBuilt} />
+  }
+
   const tiles = buildTilesForItem(item)
 
   function removeWord(index) {
@@ -615,6 +623,68 @@ function Build({ item, built, setBuilt, onInteract }) {
           <button key={`${tile}-${i}`} disabled={built.includes(tile)} onClick={() => { onInteract(); setBuilt([...built, tile]) }} className="rounded-lg bg-white/10 px-4 py-3 font-semibold hover:bg-white/20 disabled:opacity-30">{tile}</button>
         ))}
       </div>
+    </div>
+  )
+}
+
+function LetterScramble({ item, built, setBuilt, onInteract }) {
+  const answer = singleWordBuildAnswer(item)
+  const letters = stableScrambleLetters(answer, item.id ?? item.prompt)
+
+  function selectedLetterCount(letter) {
+    return built.filter((selected) => selected === letter).length
+  }
+
+  function availableLetterCount(letter, index) {
+    return letters.slice(0, index + 1).filter((available) => available === letter).length
+  }
+
+  function removeLetter(index) {
+    onInteract()
+    setBuilt(built.filter((_, idx) => idx !== index))
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="min-h-16 rounded-xl border border-dashed border-polyglot-accent/40 bg-polyglot-accent/10 p-4">
+        {built.length === 0 ? (
+          <span className="text-gray-500">Toque nas letras para montar a palavra...</span>
+        ) : (
+          <div className="flex flex-wrap gap-2">
+            {built.map((letter, i) => (
+              <button
+                key={`${letter}-${i}`}
+                type="button"
+                onClick={() => removeLetter(i)}
+                aria-label={`Remover letra ${letter}`}
+                className="rounded-lg bg-polyglot-accent px-3 py-2 text-xl font-bold text-white shadow-sm transition hover:scale-[1.02] active:scale-95"
+                title="Clique para remover"
+              >
+                {letter}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+      <p className="text-xs text-gray-500">Variante de embaralhar letras: reconstrua a palavra e envie como resposta curta.</p>
+      <div className="flex flex-wrap gap-2">
+        {letters.map((letter, i) => (
+          <button
+            key={`${letter}-${i}`}
+            type="button"
+            disabled={selectedLetterCount(letter) >= availableLetterCount(letter, i)}
+            onClick={() => { onInteract(); setBuilt([...built, letter]) }}
+            className="rounded-lg bg-white/10 px-4 py-3 text-xl font-bold hover:bg-white/20 disabled:opacity-30"
+          >
+            {letter}
+          </button>
+        ))}
+      </div>
+      {built.length > 0 && (
+        <button type="button" className="text-sm font-semibold text-polyglot-accent hover:underline" onClick={() => { onInteract(); setBuilt([]) }}>
+          Limpar letras
+        </button>
+      )}
     </div>
   )
 }
