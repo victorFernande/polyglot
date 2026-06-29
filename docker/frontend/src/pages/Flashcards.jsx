@@ -5,6 +5,7 @@ import { bootstrapUser, loadFlashcards } from '../lib/api'
 import { handleFlashcardKeyDown } from '../lib/flashcardKeyboard.mjs'
 import { shuffleFlashcards } from '../lib/flashcardOrder.mjs'
 import { getFlashcardSupportVisibility } from '../lib/flashcardReveal.mjs'
+import { addFlashcardToReviewQueue, mergeFlashcardsWithReviewQueue } from '../lib/flashcardReviewQueue.mjs'
 
 const LANGS = [
   { code: 'de', name: 'Alemão' },
@@ -21,6 +22,7 @@ export default function Flashcards() {
   const [flipped, setFlipped] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [reviewQueue, setReviewQueue] = useState([])
 
   useEffect(() => {
     async function load() {
@@ -30,6 +32,7 @@ export default function Flashcards() {
         await bootstrapUser()
         const data = await loadFlashcards(language, 100)
         setCards(data)
+        setReviewQueue([])
         setIndex(0)
         setFlipped(false)
       } catch (err) {
@@ -41,13 +44,18 @@ export default function Flashcards() {
     load()
   }, [language])
 
-  const card = cards[index]
-  const progress = cards.length ? ((index + 1) / cards.length) * 100 : 0
+  const visibleCards = useMemo(
+    () => mergeFlashcardsWithReviewQueue(cards, reviewQueue),
+    [cards, reviewQueue],
+  )
+  const card = visibleCards[index]
+  const isReviewCard = index >= cards.length
+  const progress = visibleCards.length ? ((index + 1) / visibleCards.length) * 100 : 0
   const currentLang = useMemo(() => LANGS.find((l) => l.code === language), [language])
   const supportVisibility = getFlashcardSupportVisibility({ flipped })
 
   function next() {
-    setIndex((i) => Math.min(cards.length - 1, i + 1))
+    setIndex((i) => Math.min(visibleCards.length - 1, i + 1))
     setFlipped(false)
   }
 
@@ -58,14 +66,30 @@ export default function Flashcards() {
 
   function shuffleDeck() {
     setCards((currentCards) => shuffleFlashcards(currentCards))
+    setReviewQueue([])
     setIndex(0)
+    setFlipped(false)
+  }
+
+  function markNeedsReview() {
+    if (!card) return
+
+    if (isReviewCard) {
+      next()
+      return
+    }
+
+    const nextReviewQueue = addFlashcardToReviewQueue(reviewQueue, card)
+    const nextDeckLength = cards.length + nextReviewQueue.length
+    setReviewQueue(nextReviewQueue)
+    setIndex((i) => Math.min(nextDeckLength - 1, i + 1))
     setFlipped(false)
   }
 
   useEffect(() => {
     function onKeyDown(event) {
       handleFlashcardKeyDown(event, {
-        cardsLength: cards.length,
+        cardsLength: visibleCards.length,
         next,
         prev,
         flip: () => setFlipped((value) => !value),
@@ -75,7 +99,7 @@ export default function Flashcards() {
 
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [cards.length])
+  }, [visibleCards.length])
 
   if (loading) return <div className="flex h-64 items-center justify-center"><Loader2 className="animate-spin text-polyglot-accent" size={42} /></div>
   if (error) return <div className="card border-red-500/30 bg-red-500/10 text-red-200">Erro: {error}</div>
@@ -103,7 +127,7 @@ export default function Flashcards() {
 
       <div className="card">
         <div className="mb-4 flex items-center justify-between text-sm text-gray-400">
-          <span>{currentLang?.name} · card {index + 1}/{cards.length}</span>
+          <span>{currentLang?.name} · card {index + 1}/{visibleCards.length}{isReviewCard ? ' · revisão' : ''}</span>
           <span>{Math.round(progress)}%</span>
         </div>
         <div className="progress-bar mb-6"><div className="progress-fill" style={{ width: `${progress}%` }} /></div>
@@ -133,7 +157,8 @@ export default function Flashcards() {
           <button className="btn-secondary inline-flex items-center gap-2" onClick={prev} disabled={index === 0}><ChevronLeft size={18} /> Anterior</button>
           <button className="btn-secondary inline-flex items-center gap-2" onClick={() => setFlipped(false)}><RotateCcw size={18} /> Frente</button>
           <button className="btn-secondary inline-flex items-center gap-2" onClick={shuffleDeck} disabled={cards.length < 2}><Shuffle size={18} /> Misturar</button>
-          <button className="btn-primary inline-flex items-center gap-2" onClick={next} disabled={index + 1 >= cards.length}>Próximo <ChevronRight size={18} /></button>
+          <button className="btn-secondary inline-flex items-center gap-2" onClick={markNeedsReview} disabled={!card || isReviewCard}>Não sabia · Revisar depois</button>
+          <button className="btn-primary inline-flex items-center gap-2" onClick={next} disabled={index + 1 >= visibleCards.length}>Próximo <ChevronRight size={18} /></button>
         </div>
       </div>
     </div>
