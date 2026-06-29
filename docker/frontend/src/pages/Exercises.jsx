@@ -15,7 +15,7 @@ import { choiceShortcutLabels } from '../lib/exerciseChoiceShortcuts.mjs'
 import { exerciseSessionProgress } from '../lib/exerciseSessionProgress.mjs'
 import { filterExerciseLessonsByLanguage, summarizeExerciseLessonProgressByLanguage } from '../lib/exerciseLessonFilters.mjs'
 import { reorderBuiltWords } from '../lib/buildWordOrder.mjs'
-import { cleanExercisePrompt, pageForSessionNumber, sessionWindowForPage } from '../lib/exerciseTrailLayout.mjs'
+import { cleanExercisePrompt, pageForSessionNumber, sessionWindowForPage, trailHeaderLayoutClasses } from '../lib/exerciseTrailLayout.mjs'
 import { nextExerciseActionLabel, sessionNumberForExerciseSession } from '../lib/exerciseSessionLabels.mjs'
 
 const LANG_META = {
@@ -423,48 +423,50 @@ function ProgressStat({ label, value, detail }) {
 
 function SkillTrail({ path, lessonContext, page, onPageChange, currentSessionNumber, onSessionClick }) {
   const windowState = sessionWindowForPage(path.nodes, page)
+  const layout = trailHeaderLayoutClasses()
   return (
     <div className="card">
-      <div className="mb-5 grid gap-4 lg:grid-cols-[1.2fr_2fr] lg:items-center">
-        <div>
-          <div className="flex items-center justify-between gap-3">
+      <div className={layout.wrapper}>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div>
             <h3 className="text-xl font-bold">Trilha de níveis — {path.language_name}</h3>
-            <span className="rounded-full bg-polyglot-accent/20 px-3 py-1 text-sm text-polyglot-accent">{path.completed_sessions}/{path.total_sessions}</span>
+            <p className="mt-1 text-sm text-gray-400">Escolha uma sessão liberada ou avance pela trilha.</p>
           </div>
-          {lessonContext && (
-            <div className="mt-3 rounded-2xl border border-polyglot-accent/20 bg-polyglot-accent/10 p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-polyglot-accent">{lessonContext.label}</p>
-              <h4 className="mt-1 text-lg font-bold text-white">{lessonContext.title}</h4>
-              {lessonContext.description && <p className="mt-1 text-sm text-gray-300">{lessonContext.description}</p>}
-            </div>
-          )}
+          <span className="w-fit rounded-full bg-polyglot-accent/20 px-3 py-1 text-sm text-polyglot-accent">{path.completed_sessions}/{path.total_sessions}</span>
         </div>
-        <div className="flex items-center gap-3">
+        {lessonContext && (
+          <div className={layout.contextCard}>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-polyglot-accent">{lessonContext.label}</p>
+            <h4 className="mt-1 text-lg font-bold text-white">{lessonContext.title}</h4>
+            {lessonContext.description && <p className="mt-1 text-sm text-gray-300">{lessonContext.description}</p>}
+          </div>
+        )}
+        <div className={layout.trailArea}>
           {windowState.canGoPrev && (
-            <button type="button" className="btn-secondary rounded-full p-3" onClick={() => onPageChange(windowState.page - 1)} aria-label="Ver sessões anteriores">
+            <button type="button" className="btn-secondary shrink-0 rounded-full p-3" onClick={() => onPageChange(windowState.page - 1)} aria-label="Ver sessões anteriores">
               <ChevronLeft size={20} />
             </button>
           )}
-          <div className="flex min-w-0 flex-1 items-center">
+          <div className={layout.trailNodes}>
             {windowState.visibleNodes.map((node, index) => {
               const isActiveSession = node.number === currentSessionNumber
               const isEnabled = node.number <= path.completed_sessions + 1
               const isGreenConnector = node.status === 'completed' || (node.status === 'current' && node.number <= path.completed_sessions + 1)
               return (
                 <div key={node.number} className="flex flex-1 items-center last:flex-none">
-                  <button type="button" disabled={!isEnabled} onClick={() => onSessionClick?.(node.number)} className="flex flex-col items-center gap-2 disabled:cursor-not-allowed" title={isEnabled ? `Abrir sessão ${node.number}` : 'Sessão bloqueada'}>
-                    <div className={`flex h-12 w-12 items-center justify-center rounded-full border-2 text-sm font-bold transition ${node.status === 'completed' ? 'border-polyglot-green bg-polyglot-green/20 text-polyglot-green hover:scale-105' : isActiveSession ? 'border-polyglot-accent bg-polyglot-accent/20 text-polyglot-accent animate-pulse' : 'border-white/10 bg-white/5 text-gray-500'}`}>
+                  <button type="button" disabled={!isEnabled} onClick={() => onSessionClick?.(node.number)} className="flex flex-col items-center gap-1 disabled:cursor-not-allowed sm:gap-2" title={isEnabled ? `Abrir sessão ${node.number}` : 'Sessão bloqueada'}>
+                    <div className={`flex h-10 w-10 items-center justify-center rounded-full border-2 text-sm font-bold transition sm:h-12 sm:w-12 ${node.status === 'completed' ? 'border-polyglot-green bg-polyglot-green/20 text-polyglot-green hover:scale-105' : isActiveSession ? 'border-polyglot-accent bg-polyglot-accent/20 text-polyglot-accent animate-pulse' : 'border-white/10 bg-white/5 text-gray-500'}`}>
                       {node.status === 'completed' ? '✓' : <Star size={18} />}
                     </div>
-                    <span className={`text-xs ${isActiveSession ? 'text-polyglot-accent' : 'text-gray-400'}`}>Sessão {node.number}</span>
+                    <span className={`${layout.nodeLabel} ${isActiveSession ? 'text-polyglot-accent' : 'text-gray-400'}`}>Sessão {node.number}</span>
                   </button>
-                  {index < windowState.visibleNodes.length - 1 && <div className={`mx-2 h-1 flex-1 rounded-full ${isGreenConnector ? 'bg-polyglot-green' : 'bg-white/15'}`} />}
+                  {index < windowState.visibleNodes.length - 1 && <div className={`mx-1 h-1 flex-1 rounded-full sm:mx-2 ${isGreenConnector ? 'bg-polyglot-green' : 'bg-white/15'}`} />}
                 </div>
               )
             })}
           </div>
           {windowState.canGoNext && (
-            <button type="button" className="btn-secondary rounded-full p-3" onClick={() => onPageChange(windowState.page + 1)} aria-label="Ver próximas sessões">
+            <button type="button" className="btn-secondary shrink-0 rounded-full p-3" onClick={() => onPageChange(windowState.page + 1)} aria-label="Ver próximas sessões">
               <ChevronRight size={20} />
             </button>
           )}

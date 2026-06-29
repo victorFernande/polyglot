@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
 import test from 'node:test'
 
-import { cleanExercisePrompt, sessionWindowForPage } from './exerciseTrailLayout.mjs'
+import { cleanExercisePrompt, sessionWindowForPage, trailHeaderLayoutClasses } from './exerciseTrailLayout.mjs'
 
 test('cleanExercisePrompt removes verbose unit and topic prefix from the question', () => {
   assert.equal(
@@ -48,4 +49,23 @@ test('sessionWindowForPage clamps invalid pages to the available range', () => {
 
   assert.equal(sessionWindowForPage(nodes, -1).page, 0)
   assert.equal(sessionWindowForPage(nodes, 99).page, 1)
+})
+
+test('trailHeaderLayoutClasses stacks the unit context above the session path and switches mobile/desktop trail layouts', () => {
+  const classes = trailHeaderLayoutClasses()
+
+  assert.match(classes.wrapper, /space-y-5/)
+  assert.doesNotMatch(classes.wrapper, /lg:grid-cols/)
+  assert.match(classes.contextCard, /w-full/)
+  assert.match(classes.trailArea, /overflow-x-auto/)
+  assert.match(classes.trailNodes, /min-w-\[720px\]/)
+  assert.match(classes.trailNodes, /lg:min-w-0/)
+  assert.match(classes.nodeLabel, /hidden/)
+  assert.match(classes.nodeLabel, /sm:inline/)
+})
+
+test('Tailwind scans mjs helpers that provide exercise trail classes', () => {
+  const config = readFileSync(new URL('../../tailwind.config.js', import.meta.url), 'utf8')
+
+  assert.match(config, /mjs/)
 })
