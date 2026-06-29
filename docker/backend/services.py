@@ -395,6 +395,21 @@ class ExerciseService:
         return wrong
 
     @staticmethod
+    def _wrong_portuguese_options(bank, target, start, size=3):
+        wrong = []
+        seen = {str(target).casefold()}
+        for offset in range(len(bank)):
+            portuguese, _foreign = bank[(start + offset) % len(bank)]
+            key = str(portuguese).casefold()
+            if key in seen:
+                continue
+            wrong.append(portuguese)
+            seen.add(key)
+            if len(wrong) == size:
+                break
+        return wrong
+
+    @staticmethod
     def _prompt_for_question(prefix, question_index, pt, target, name, topic_name):
         templates = [
             f"{prefix}: como dizer “{pt}” em {name}?",
@@ -442,7 +457,12 @@ class ExerciseService:
                     prompt = ExerciseService._prompt_for_question(prefix, question_index + topic_index - 1, pt, target, name, topic_name)
                     item_type = pattern[question_index - 1]
                     if item_type == "choice":
-                        item = ExerciseService._choice(prompt, target, wrong, idx)
+                        if question_index in {6, 7, 8}:
+                            reverse_prompt = f"{prefix}: entenda “{target}” — qual é o significado em português?"
+                            portuguese_wrong = ExerciseService._wrong_portuguese_options(bank, pt, start + question_index, 3)
+                            item = ExerciseService._choice(reverse_prompt, pt, portuguese_wrong, idx)
+                        else:
+                            item = ExerciseService._choice(prompt, target, wrong, idx)
                     elif item_type == "listen_choice":
                         item = ExerciseService._listen_choice(prompt, target, wrong, idx)
                     elif item_type == "image_choice":

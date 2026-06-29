@@ -5,6 +5,7 @@ os.environ["DATABASE_URL"] = f"sqlite:///{tempfile.NamedTemporaryFile(delete=Fal
 
 from models import Base, engine, SessionLocal, ExerciseLesson, ExerciseItem  # noqa: E402
 from services import ExerciseService  # noqa: E402
+from curriculum import A1_UNITS  # noqa: E402
 
 
 LANGUAGES = {"de", "fr", "ru", "jp", "en"}
@@ -152,6 +153,23 @@ def test_first_five_exercises_are_not_repetitive_variations_of_same_task():
     assert any("ouça" in prompt.casefold() for prompt in prompts)
     assert any("imagem" in prompt.casefold() for prompt in prompts)
     assert any("complete" in prompt.casefold() or "situação" in prompt.casefold() for prompt in prompts)
+
+
+def test_choice_items_include_reverse_comprehension_prompts_with_portuguese_options():
+    items = ExerciseService.generate_items("de")
+    reverse_items = [
+        item for item in items
+        if item["type"] == "choice" and "significado em português" in item["prompt"].casefold()
+    ]
+
+    assert reverse_items, "expected at least one choice item that asks for target-language comprehension"
+    item = reverse_items[0]
+    assert "entenda" in item["prompt"].casefold()
+    assert item["answer"]["value"] in item["options"]
+    assert len(item["options"]) == 4
+    unit_portuguese_answers = [pt for pt, _foreign in ExerciseService._expanded_practice_bank("de", A1_UNITS[0], 1)]
+    assert all(option in unit_portuguese_answers for option in item["options"])
+    assert item["answer"]["value"] != item["prompt"].split("entenda “", 1)[1].split("”", 1)[0]
 
 
 def test_flashcards_that_ask_to_listen_include_audio_payload():
