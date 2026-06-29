@@ -1,5 +1,19 @@
-export function cleanExercisePrompt(prompt) {
-  return String(prompt || '').replace(/^Unidade\s+\d+\/\d+\s+—\s+.*?\s+·\s+Tópico\s+\d+\/\d+\s+—\s+.*?:\s*/i, '').trim()
+function answerValue(answer) {
+  if (answer && typeof answer === 'object' && 'value' in answer) return answer.value
+  return answer
+}
+
+function escapeRegExp(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+export function cleanExercisePrompt(prompt, answer) {
+  let cleaned = String(prompt || '').replace(/^Unidade\s+\d+\/\d+\s+—\s+.*?\s+·\s+Tópico\s+\d+\/\d+\s+—\s+.*?:\s*/i, '').trim()
+  const targetAnswer = answerValue(answer)
+  if (typeof targetAnswer === 'string' && targetAnswer.trim()) {
+    cleaned = cleaned.replace(new RegExp(`\\s*\\(${escapeRegExp(targetAnswer.trim())}\\)\\s*$`, 'i'), '').trim()
+  }
+  return cleaned
 }
 
 export function sessionWindowForPage(nodes, requestedPage, pageSize = 10) {
@@ -44,4 +58,12 @@ export function trailNodeStateClasses(node, isActiveSession) {
   if (node?.status === 'completed') return 'border-polyglot-green bg-polyglot-green/20 text-polyglot-green hover:scale-105'
   if (isActiveSession) return 'border-polyglot-accent bg-polyglot-accent/20 text-polyglot-accent ring-2 ring-polyglot-accent/50 shadow-[0_0_18px_rgba(233,69,96,0.35)]'
   return 'border-white/10 bg-white/5 text-gray-500'
+}
+
+export function trailConnectorStateClasses(leftNode, rightNode, currentSessionNumber) {
+  if (leftNode?.status === 'completed') return 'bg-polyglot-green'
+  if (leftNode?.number === currentSessionNumber && rightNode?.number === currentSessionNumber + 1) {
+    return 'bg-gradient-to-r from-polyglot-accent via-polyglot-gold to-polyglot-accent bg-[length:200%_100%] animate-shimmer'
+  }
+  return 'bg-white/15'
 }

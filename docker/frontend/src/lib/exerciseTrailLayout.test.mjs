@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import test from 'node:test'
 
-import { cleanExercisePrompt, isTrailSessionEnabled, sessionWindowForPage, trailHeaderLayoutClasses, trailNodeStateClasses } from './exerciseTrailLayout.mjs'
+import { cleanExercisePrompt, isTrailSessionEnabled, sessionWindowForPage, trailConnectorStateClasses, trailHeaderLayoutClasses, trailNodeStateClasses } from './exerciseTrailLayout.mjs'
 
 test('cleanExercisePrompt removes verbose unit and topic prefix from the question', () => {
   assert.equal(
@@ -13,6 +13,23 @@ test('cleanExercisePrompt removes verbose unit and topic prefix from the questio
 
 test('cleanExercisePrompt keeps already clean prompts unchanged', () => {
   assert.equal(cleanExercisePrompt('como dizer “olá” em Alemão?'), 'como dizer “olá” em Alemão?')
+})
+
+test('cleanExercisePrompt removes parenthesized target answer from visible image-choice prompts', () => {
+  assert.equal(
+    cleanExercisePrompt(
+      'escolha a imagem/frase que representa “a palavra livro” (das Wort Buch)',
+      { value: 'das Wort Buch' },
+    ),
+    'escolha a imagem/frase que representa “a palavra livro”',
+  )
+})
+
+test('cleanExercisePrompt keeps explanatory parentheses that are not the answer', () => {
+  assert.equal(
+    cleanExercisePrompt('escolha a imagem correta (atenção ao contexto)', { value: 'das Buch' }),
+    'escolha a imagem correta (atenção ao contexto)',
+  )
 })
 
 test('sessionWindowForPage shows exactly one line of ten sessions and arrow state', () => {
@@ -90,6 +107,21 @@ test('active trail node uses a stable highlight, not a loading animation', () =>
 
   assert.match(classes, /ring-2/)
   assert.doesNotMatch(classes, /animate-pulse/)
+})
+
+test('connector from active session to next session uses loading-bar animation', () => {
+  const classes = trailConnectorStateClasses({ number: 11, status: 'current' }, { number: 12, status: 'locked' }, 11)
+
+  assert.match(classes, /bg-\[length:200%_100%\]/)
+  assert.match(classes, /animate-/)
+  assert.match(classes, /from-polyglot-accent/)
+  assert.doesNotMatch(classes, /bg-white\/15/)
+})
+
+test('connectors behind completed sessions stay solid green', () => {
+  const classes = trailConnectorStateClasses({ number: 10, status: 'completed' }, { number: 11, status: 'current' }, 11)
+
+  assert.equal(classes, 'bg-polyglot-green')
 })
 
 test('Exercises page imports trail helpers used by the rendered trail', () => {

@@ -15,9 +15,10 @@ import { choiceShortcutLabels } from '../lib/exerciseChoiceShortcuts.mjs'
 import { exerciseSessionProgress } from '../lib/exerciseSessionProgress.mjs'
 import { filterExerciseLessonsByLanguage, summarizeExerciseLessonProgressByLanguage } from '../lib/exerciseLessonFilters.mjs'
 import { reorderBuiltWords } from '../lib/buildWordOrder.mjs'
-import { cleanExercisePrompt, isTrailSessionEnabled, pageForSessionNumber, sessionWindowForPage, trailHeaderLayoutClasses, trailNodeStateClasses } from '../lib/exerciseTrailLayout.mjs'
+import { cleanExercisePrompt, isTrailSessionEnabled, pageForSessionNumber, sessionWindowForPage, trailConnectorStateClasses, trailHeaderLayoutClasses, trailNodeStateClasses } from '../lib/exerciseTrailLayout.mjs'
 import { nextExerciseActionLabel, sessionNumberForExerciseSession } from '../lib/exerciseSessionLabels.mjs'
 import { parseMicroDialoguePrompt } from '../lib/microDialoguePrompt.mjs'
+import { playAnswerFeedbackSound } from '../lib/answerFeedbackSound.mjs'
 
 const LANG_META = {
   de: { accent: 'Rammstein', color: 'from-red-600 to-red-900' },
@@ -202,6 +203,7 @@ export default function Exercises() {
       const nextFeedback = buildExerciseFeedback(result, item, currentIndex)
       setSession(result.session)
       setFeedback(nextFeedback)
+      playAnswerFeedbackSound(nextFeedback.type)
       speakCurrent(voiceSegmentsForFeedback(nextFeedback, langCode))
     } catch (err) {
       setError(err.message)
@@ -372,7 +374,7 @@ export default function Exercises() {
             <div>
               <p className="text-sm text-gray-400">{lesson.language_name} · questão {displayIndex + 1}/{session.total_count} · {session.xp_earned} XP na sessão</p>
               <p className="mt-1 inline-flex rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-polyglot-accent">{hintForExerciseType(item.type)}</p>
-              <h2 className="text-2xl font-bold">{cleanExercisePrompt(item.prompt)}</h2>
+              <h2 className="text-2xl font-bold">{cleanExercisePrompt(item.prompt, item.answer)}</h2>
             </div>
             <div className="ml-auto flex gap-2">
               <button className="btn-secondary" title="Ouvir pergunta/correção" onClick={replayCurrentAudio}><Volume2 size={18} /></button>
@@ -455,7 +457,7 @@ function SkillTrail({ path, lessonContext, page, mobilePage, onPageChange, onMob
   function renderDesktopNode(node, index, nodes) {
     const isActiveSession = node.number === currentSessionNumber
     const isEnabled = isTrailSessionEnabled(node, path.completed_sessions, currentSessionNumber)
-    const isGreenConnector = node.status === 'completed' || isActiveSession
+    const nextNode = nodes[index + 1]
     return (
       <div key={node.number} className="flex flex-1 items-center last:flex-none">
         <button type="button" disabled={!isEnabled} onClick={() => onSessionClick?.(node.number)} className="flex flex-col items-center gap-2 disabled:cursor-not-allowed" title={isEnabled ? `Abrir sessão ${node.number}` : 'Sessão bloqueada'}>
@@ -464,7 +466,7 @@ function SkillTrail({ path, lessonContext, page, mobilePage, onPageChange, onMob
           </div>
           <span className={`${layout.nodeLabel} ${isActiveSession ? 'text-polyglot-accent' : 'text-gray-400'}`}>Sessão {node.number}</span>
         </button>
-        {index < nodes.length - 1 && <div className={`mx-2 h-1 flex-1 rounded-full ${isGreenConnector ? 'bg-polyglot-green' : 'bg-white/15'}`} />}
+        {index < nodes.length - 1 && <div className={`mx-2 h-1 flex-1 rounded-full ${trailConnectorStateClasses(node, nextNode, currentSessionNumber)}`} />}
       </div>
     )
   }
@@ -472,7 +474,7 @@ function SkillTrail({ path, lessonContext, page, mobilePage, onPageChange, onMob
   function renderMobileNode(node, index, nodes) {
     const isActiveSession = node.number === currentSessionNumber
     const isEnabled = isTrailSessionEnabled(node, path.completed_sessions, currentSessionNumber)
-    const isGreenConnector = node.status === 'completed' || isActiveSession
+    const nextNode = nodes[index + 1]
     return (
       <React.Fragment key={node.number}>
         <div role={isEnabled ? 'button' : undefined} tabIndex={isEnabled ? 0 : undefined} onClick={isEnabled ? () => onSessionClick?.(node.number) : undefined} onKeyDown={isEnabled ? (event) => { if (event.key === 'Enter' || event.key === ' ') onSessionClick?.(node.number) } : undefined} className="min-w-0 flex-1 text-center" title={isEnabled ? `Abrir sessão ${node.number}` : 'Sessão bloqueada'}>
@@ -481,7 +483,7 @@ function SkillTrail({ path, lessonContext, page, mobilePage, onPageChange, onMob
           </div>
           <span className={`mt-1 block truncate text-[11px] font-semibold ${isActiveSession ? 'text-polyglot-accent' : 'text-gray-400'}`}>S{node.number}</span>
         </div>
-        {index < nodes.length - 1 && <div className={`${layout.mobileConnector} ${isGreenConnector ? 'bg-polyglot-green' : 'bg-white/15'}`} />}
+        {index < nodes.length - 1 && <div className={`${layout.mobileConnector} ${trailConnectorStateClasses(node, nextNode, currentSessionNumber)}`} />}
       </React.Fragment>
     )
   }

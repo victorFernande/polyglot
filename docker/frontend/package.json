@@ -23,6 +23,6 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test:voice": "node src/lib/voiceMode.test.mjs && node src/lib/speechPlayback.test.mjs && node src/lib/exerciseFeedback.test.mjs && node src/lib/flashcardAudio.test.mjs && node src/lib/buildWordOrder.test.mjs && node src/lib/exerciseTrailLayout.test.mjs && node src/lib/exerciseSessionLabels.test.mjs && node src/lib/microDialoguePrompt.test.mjs && node src/lib/appNavigation.test.mjs"
+    "test:voice": "node src/lib/voiceMode.test.mjs && node src/lib/speechPlayback.test.mjs && node src/lib/exerciseFeedback.test.mjs && node src/lib/answerFeedbackSound.test.mjs && node src/lib/answerFeedbackSoundIntegration.test.mjs && node src/lib/flashcardAudio.test.mjs && node src/lib/buildWordOrder.test.mjs && node src/lib/exerciseTrailLayout.test.mjs && node src/lib/exerciseSessionLabels.test.mjs && node src/lib/microDialoguePrompt.test.mjs && node src/lib/appNavigation.test.mjs"
   }
 }

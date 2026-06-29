@@ -1,0 +1,20 @@
+import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
+
+const exercisesSource = readFileSync(new URL('../pages/Exercises.jsx', import.meta.url), 'utf8')
+
+assert.match(
+  exercisesSource,
+  /import \{ playAnswerFeedbackSound \} from ['"]\.\.\/lib\/answerFeedbackSound\.mjs['"]/,
+  'Exercises page must import the short answer feedback sound helper'
+)
+assert.match(
+  exercisesSource,
+  /playAnswerFeedbackSound\(nextFeedback\.type\)/,
+  'checking an answer must play the short correct/wrong sound from the computed feedback type'
+)
+assert.match(
+  exercisesSource,
+  /speakCurrent\(voiceSegmentsForFeedback\(nextFeedback, langCode\)\)/,
+  'voice feedback must remain available after adding the short sound effect'
+)
