@@ -454,12 +454,12 @@ function SkillTrail({ path, lessonContext, page, mobilePage, onPageChange, onMob
 
   function renderDesktopNode(node, index, nodes) {
     const isActiveSession = node.number === currentSessionNumber
-    const isEnabled = node.number <= path.completed_sessions + 1
-    const isGreenConnector = node.status === 'completed' || (node.status === 'current' && node.number <= path.completed_sessions + 1)
+    const isEnabled = isTrailSessionEnabled(node, path.completed_sessions, currentSessionNumber)
+    const isGreenConnector = node.status === 'completed' || isActiveSession
     return (
       <div key={node.number} className="flex flex-1 items-center last:flex-none">
         <button type="button" disabled={!isEnabled} onClick={() => onSessionClick?.(node.number)} className="flex flex-col items-center gap-2 disabled:cursor-not-allowed" title={isEnabled ? `Abrir sessão ${node.number}` : 'Sessão bloqueada'}>
-          <div className={`flex h-12 w-12 items-center justify-center rounded-full border-2 text-sm font-bold transition ${node.status === 'completed' ? 'border-polyglot-green bg-polyglot-green/20 text-polyglot-green hover:scale-105' : isActiveSession ? 'border-polyglot-accent bg-polyglot-accent/20 text-polyglot-accent animate-pulse' : 'border-white/10 bg-white/5 text-gray-500'}`}>
+          <div className={`flex h-12 w-12 items-center justify-center rounded-full border-2 text-sm font-bold transition ${trailNodeStateClasses(node, isActiveSession)}`}>
             {node.status === 'completed' ? '✓' : <Star size={18} />}
           </div>
           <span className={`${layout.nodeLabel} ${isActiveSession ? 'text-polyglot-accent' : 'text-gray-400'}`}>Sessão {node.number}</span>
@@ -469,16 +469,20 @@ function SkillTrail({ path, lessonContext, page, mobilePage, onPageChange, onMob
     )
   }
 
-  function renderMobileNode(node) {
+  function renderMobileNode(node, index, nodes) {
     const isActiveSession = node.number === currentSessionNumber
-    const isEnabled = node.number <= path.completed_sessions + 1
+    const isEnabled = isTrailSessionEnabled(node, path.completed_sessions, currentSessionNumber)
+    const isGreenConnector = node.status === 'completed' || isActiveSession
     return (
-      <button key={node.number} type="button" disabled={!isEnabled} onClick={() => onSessionClick?.(node.number)} className="min-w-0 rounded-2xl border border-white/10 bg-white/5 p-2 text-center disabled:cursor-not-allowed" title={isEnabled ? `Abrir sessão ${node.number}` : 'Sessão bloqueada'}>
-        <div className={`mx-auto flex h-10 w-10 items-center justify-center rounded-full border-2 text-sm font-bold transition ${node.status === 'completed' ? 'border-polyglot-green bg-polyglot-green/20 text-polyglot-green' : isActiveSession ? 'border-polyglot-accent bg-polyglot-accent/20 text-polyglot-accent animate-pulse' : 'border-white/10 bg-white/5 text-gray-500'}`}>
-          {node.status === 'completed' ? '✓' : <Star size={16} />}
-        </div>
-        <span className={`mt-1 block truncate text-[11px] font-semibold ${isActiveSession ? 'text-polyglot-accent' : 'text-gray-400'}`}>S{node.number}</span>
-      </button>
+      <React.Fragment key={node.number}>
+        <button type="button" disabled={!isEnabled} onClick={() => onSessionClick?.(node.number)} className="min-w-0 flex-1 rounded-2xl border border-white/10 bg-white/5 p-2 text-center disabled:cursor-not-allowed" title={isEnabled ? `Abrir sessão ${node.number}` : 'Sessão bloqueada'}>
+          <div className={`mx-auto flex h-10 w-10 items-center justify-center rounded-full border-2 text-sm font-bold transition ${trailNodeStateClasses(node, isActiveSession)}`}>
+            {node.status === 'completed' ? '✓' : <Star size={16} />}
+          </div>
+          <span className={`mt-1 block truncate text-[11px] font-semibold ${isActiveSession ? 'text-polyglot-accent' : 'text-gray-400'}`}>S{node.number}</span>
+        </button>
+        {index < nodes.length - 1 && <div className={`${layout.mobileConnector} ${isGreenConnector ? 'bg-polyglot-green' : 'bg-white/15'}`} />}
+      </React.Fragment>
     )
   }
 

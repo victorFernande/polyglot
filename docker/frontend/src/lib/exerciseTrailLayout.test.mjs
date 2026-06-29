@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import test from 'node:test'
 
-import { cleanExercisePrompt, sessionWindowForPage, trailHeaderLayoutClasses } from './exerciseTrailLayout.mjs'
+import { cleanExercisePrompt, isTrailSessionEnabled, sessionWindowForPage, trailHeaderLayoutClasses, trailNodeStateClasses } from './exerciseTrailLayout.mjs'
 
 test('cleanExercisePrompt removes verbose unit and topic prefix from the question', () => {
   assert.equal(
@@ -59,9 +59,11 @@ test('trailHeaderLayoutClasses stacks context and separates 3-item mobile from 1
   assert.match(classes.contextCard, /w-full/)
   assert.match(classes.mobileTrail, /lg:hidden/)
   assert.doesNotMatch(classes.mobileTrail, /sm:hidden/)
-  assert.match(classes.mobileTrailNodes, /grid-cols-3/)
+  assert.match(classes.mobileTrailNodes, /flex/)
   assert.match(classes.mobileTrailNodes, /min-w-0/)
+  assert.doesNotMatch(classes.mobileTrailNodes, /grid-cols/)
   assert.doesNotMatch(classes.mobileTrailNodes, /min-w-\[/)
+  assert.match(classes.mobileConnector, /h-1/)
   assert.match(classes.desktopTrail, /hidden/)
   assert.match(classes.desktopTrail, /lg:flex/)
   assert.doesNotMatch(classes.desktopTrail, /sm:flex/)
@@ -75,6 +77,19 @@ test('sessionWindowForPage can paginate mobile trail as groups of three sessions
   assert.deepEqual(sessionWindowForPage(nodes, 0, 3).visibleNodes, nodes.slice(0, 3))
   assert.deepEqual(sessionWindowForPage(nodes, 1, 3).visibleNodes, nodes.slice(3, 6))
   assert.deepEqual(sessionWindowForPage(nodes, 3, 3).visibleNodes, nodes.slice(9, 10))
+})
+
+test('active trail session stays enabled even if path progress is temporarily stale', () => {
+  assert.equal(isTrailSessionEnabled({ number: 11 }, 9, 11), true)
+  assert.equal(isTrailSessionEnabled({ number: 11 }, 9, 10), false)
+  assert.equal(isTrailSessionEnabled({ number: 10 }, 9, 10), true)
+})
+
+test('active trail node uses a stable highlight, not a loading animation', () => {
+  const classes = trailNodeStateClasses({ status: 'current' }, true)
+
+  assert.match(classes, /ring-2/)
+  assert.doesNotMatch(classes, /animate-pulse/)
 })
 
 test('Tailwind scans mjs helpers that provide exercise trail classes', () => {
