@@ -18,17 +18,22 @@ function recorder() {
   }
 }
 
-function press(key, cardsLength = 3, overrides = {}) {
+function press(key, cardsLength = 3, overrides = {}, eventProps = {}) {
   const event = {
     key,
     defaultPrevented: false,
     preventDefault() {
       this.defaultPrevented = true
     },
+    ...eventProps,
   }
   const { calls, handlers } = recorder()
   const handled = handleFlashcardKeyDown(event, { cardsLength, ...handlers, ...overrides })
   return { handled, calls, defaultPrevented: event.defaultPrevented }
+}
+
+function target(tagName, props = {}) {
+  return { tagName, isContentEditable: false, ...props }
 }
 
 test('ArrowRight advances to the next flashcard', () => {
@@ -117,6 +122,37 @@ test('V is ignored when there are no marked flashcards to review', () => {
 
 test('keys are ignored until flashcards are loaded', () => {
   assert.deepEqual(press('ArrowRight', 0), {
+    handled: false,
+    calls: [],
+    defaultPrevented: false,
+  })
+})
+
+test('keyboard shortcuts are ignored inside editable fields', () => {
+  assert.deepEqual(press('Enter', 3, {}, { target: target('INPUT') }), {
+    handled: false,
+    calls: [],
+    defaultPrevented: false,
+  })
+  assert.deepEqual(press(' ', 3, {}, { target: target('TEXTAREA') }), {
+    handled: false,
+    calls: [],
+    defaultPrevented: false,
+  })
+  assert.deepEqual(press('r', 3, {}, { target: target('DIV', { isContentEditable: true }) }), {
+    handled: false,
+    calls: [],
+    defaultPrevented: false,
+  })
+})
+
+test('keyboard shortcuts are ignored on interactive controls to avoid duplicate actions', () => {
+  assert.deepEqual(press('Enter', 3, {}, { target: target('BUTTON') }), {
+    handled: false,
+    calls: [],
+    defaultPrevented: false,
+  })
+  assert.deepEqual(press(' ', 3, {}, { target: target('A') }), {
     handled: false,
     calls: [],
     defaultPrevented: false,
