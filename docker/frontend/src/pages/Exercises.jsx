@@ -10,6 +10,7 @@ import { createSpeechPlaybackController } from '../lib/speechPlayback.mjs'
 import { buildExerciseFeedback } from '../lib/exerciseFeedback.mjs'
 import { selectableImageChoiceOptions } from '../lib/imageChoice.mjs'
 import { lessonContextForExercise } from '../lib/exerciseLessonContext.mjs'
+import { hintForExerciseType } from '../lib/exerciseTypeHint.mjs'
 
 const LANG_META = {
   de: { accent: 'Rammstein', color: 'from-red-600 to-red-900' },
@@ -293,6 +294,7 @@ export default function Exercises() {
             <LanguageFlag code={langCode} className="h-12 w-12" />
             <div>
               <p className="text-sm text-gray-400">{lesson.language_name} · questão {displayIndex + 1}/{session.total_count} · {session.xp_earned} XP na sessão</p>
+              <p className="mt-1 inline-flex rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-polyglot-accent">{hintForExerciseType(item.type)}</p>
               <h2 className="text-2xl font-bold">{item.prompt}</h2>
             </div>
             <div className="ml-auto flex gap-2">
