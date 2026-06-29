@@ -6,6 +6,7 @@ import { handleFlashcardKeyDown } from '../lib/flashcardKeyboard.mjs'
 import { shuffleFlashcards } from '../lib/flashcardOrder.mjs'
 import { getFlashcardSupportVisibility } from '../lib/flashcardReveal.mjs'
 import { addFlashcardToReviewQueue, mergeFlashcardsWithReviewQueue } from '../lib/flashcardReviewQueue.mjs'
+import { getFlashcardSessionStats } from '../lib/flashcardSessionStats.mjs'
 
 const LANGS = [
   { code: 'de', name: 'Alemão' },
@@ -53,6 +54,11 @@ export default function Flashcards() {
   const progress = visibleCards.length ? ((index + 1) / visibleCards.length) * 100 : 0
   const currentLang = useMemo(() => LANGS.find((l) => l.code === language), [language])
   const supportVisibility = getFlashcardSupportVisibility({ flipped })
+  const sessionStats = getFlashcardSessionStats({
+    deckCount: cards.length,
+    reviewQueueCount: reviewQueue.length,
+    currentIndex: index,
+  })
 
   function next() {
     setIndex((i) => Math.min(visibleCards.length - 1, i + 1))
@@ -133,6 +139,24 @@ export default function Flashcards() {
           <span>{Math.round(progress)}%</span>
         </div>
         <div className="progress-bar mb-6"><div className="progress-fill" style={{ width: `${progress}%` }} /></div>
+
+        <div className="mb-6 grid gap-3 text-sm sm:grid-cols-3">
+          <div className="rounded-xl bg-white/5 p-3 text-gray-300">
+            <div className="text-xs uppercase tracking-[0.2em] text-gray-500">Estudados</div>
+            <div className="mt-1 text-xl font-bold text-white">{sessionStats.studiedCount}</div>
+            <div className="text-xs text-gray-500">nesta sessão</div>
+          </div>
+          <div className="rounded-xl bg-white/5 p-3 text-gray-300">
+            <div className="text-xs uppercase tracking-[0.2em] text-gray-500">Marcados</div>
+            <div className="mt-1 text-xl font-bold text-white">{sessionStats.reviewQueueCount}</div>
+            <div className="text-xs text-gray-500">para revisar</div>
+          </div>
+          <div className="rounded-xl bg-white/5 p-3 text-gray-300">
+            <div className="text-xs uppercase tracking-[0.2em] text-gray-500">Restantes</div>
+            <div className="mt-1 text-xl font-bold text-white">{sessionStats.remainingCount}</div>
+            <div className="text-xs text-gray-500">no deck atual</div>
+          </div>
+        </div>
 
         {card && (
           <button onClick={() => setFlipped(!flipped)} className="min-h-80 w-full rounded-3xl border border-white/10 bg-gradient-to-br from-white/10 to-white/5 p-8 text-center transition hover:border-polyglot-accent/50">
