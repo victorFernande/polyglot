@@ -6,7 +6,7 @@ import { handleFlashcardKeyDown } from '../lib/flashcardKeyboard.mjs'
 import { shuffleFlashcards } from '../lib/flashcardOrder.mjs'
 import { getFlashcardSupportVisibility } from '../lib/flashcardReveal.mjs'
 import { addFlashcardToReviewQueue, mergeFlashcardsWithReviewQueue } from '../lib/flashcardReviewQueue.mjs'
-import { getFlashcardFocusState, getFlashcardMicroGoalState, getFlashcardReviewJumpState, getFlashcardSessionStats } from '../lib/flashcardSessionStats.mjs'
+import { getFlashcardFocusState, getFlashcardMicroGoalState, getFlashcardRecallStats, getFlashcardReviewJumpState, getFlashcardSessionStats, recordFlashcardRecall } from '../lib/flashcardSessionStats.mjs'
 
 const LANGS = [
   { code: 'de', name: 'Alemão' },
@@ -24,6 +24,7 @@ export default function Flashcards() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [reviewQueue, setReviewQueue] = useState([])
+  const [recallCounts, setRecallCounts] = useState({ knownCount: 0, unknownCount: 0 })
 
   useEffect(() => {
     async function load() {
@@ -34,6 +35,7 @@ export default function Flashcards() {
         const data = await loadFlashcards(language, 100)
         setCards(data)
         setReviewQueue([])
+        setRecallCounts({ knownCount: 0, unknownCount: 0 })
         setIndex(0)
         setFlipped(false)
       } catch (err) {
@@ -59,6 +61,7 @@ export default function Flashcards() {
     reviewQueueCount: reviewQueue.length,
     currentIndex: index,
   })
+  const recallStats = getFlashcardRecallStats(recallCounts)
   const microGoalState = getFlashcardMicroGoalState({ studiedCount: sessionStats.studiedCount })
   const focusState = getFlashcardFocusState({
     studiedCount: sessionStats.studiedCount,
@@ -86,17 +89,28 @@ export default function Flashcards() {
   function shuffleDeck() {
     setCards((currentCards) => shuffleFlashcards(currentCards))
     setReviewQueue([])
+    setRecallCounts({ knownCount: 0, unknownCount: 0 })
     setIndex(0)
     setFlipped(false)
   }
 
   function restartDeck() {
+    setRecallCounts({ knownCount: 0, unknownCount: 0 })
     setIndex(0)
     setFlipped(false)
   }
 
+  function markKnown() {
+    if (!card) return
+
+    setRecallCounts((counts) => recordFlashcardRecall(counts, 'known'))
+    next()
+  }
+
   function markNeedsReview() {
     if (!card) return
+
+    setRecallCounts((counts) => recordFlashcardRecall(counts, 'unknown'))
 
     if (isReviewCard) {
       next()
@@ -191,7 +205,7 @@ export default function Flashcards() {
           </div>
         </div>
 
-        <div className="mb-6 grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mb-6 grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-5">
           <div className="rounded-xl bg-white/5 p-3 text-gray-300">
             <div className="text-xs uppercase tracking-[0.2em] text-gray-500">Estudados</div>
             <div className="mt-1 text-xl font-bold text-white">{sessionStats.studiedCount}</div>
@@ -211,6 +225,11 @@ export default function Flashcards() {
             <div className="text-xs uppercase tracking-[0.2em] text-gray-500">Confiança</div>
             <div className="mt-1 text-xl font-bold text-polyglot-accent">{sessionStats.confidencePercent}%</div>
             <div className="text-xs text-gray-500">{sessionStats.confidenceLabel}</div>
+          </div>
+          <div className="rounded-xl bg-white/5 p-3 text-gray-300">
+            <div className="text-xs uppercase tracking-[0.2em] text-gray-500">Lembrança</div>
+            <div className="mt-1 text-xl font-bold text-polyglot-accent">{recallStats.recallPercent}%</div>
+            <div className="text-xs text-gray-500">Sabia: {recallStats.knownCount} · Não sabia: {recallStats.unknownCount}</div>
           </div>
         </div>
 
@@ -240,7 +259,7 @@ export default function Flashcards() {
             <p className="text-xs uppercase tracking-[0.3em] text-polyglot-accent">Sessão concluída</p>
             <h2 className="mt-2 text-2xl font-bold text-white">Bom trabalho — deck finalizado!</h2>
             <p className="mt-2 text-gray-300">
-              Você estudou {sessionStats.studiedCount} cards nesta rodada e marcou {sessionStats.reviewQueueCount} para revisar.
+              Você estudou {sessionStats.studiedCount} cards nesta rodada, marcou {sessionStats.reviewQueueCount} para revisar e registrou {recallStats.recallLabel.toLowerCase()}.
             </p>
             <div className="mt-4 flex flex-wrap gap-3">
               <button className="btn-secondary inline-flex items-center gap-2" onClick={restartDeck}>
@@ -257,7 +276,8 @@ export default function Flashcards() {
           <button className="btn-secondary inline-flex items-center gap-2" onClick={prev} disabled={index === 0}><ChevronLeft size={18} /> Anterior</button>
           <button className="btn-secondary inline-flex items-center gap-2" onClick={() => setFlipped(false)}><RotateCcw size={18} /> Frente</button>
           <button className="btn-secondary inline-flex items-center gap-2" onClick={shuffleDeck} disabled={cards.length < 2}><Shuffle size={18} /> Misturar</button>
-          <button className="btn-secondary inline-flex items-center gap-2" onClick={markNeedsReview} disabled={!card || isReviewCard}>Não sabia · Revisar depois</button>
+          <button className="btn-primary inline-flex items-center gap-2" onClick={markKnown} disabled={!card}>Sabia</button>
+          <button className="btn-secondary inline-flex items-center gap-2" onClick={markNeedsReview} disabled={!card}>Não sabia · Revisar depois</button>
           {reviewJumpState.canJumpToReviewQueue && (
             <button className="btn-secondary inline-flex items-center gap-2" onClick={jumpToReviewQueue}>Revisar marcados agora</button>
           )}

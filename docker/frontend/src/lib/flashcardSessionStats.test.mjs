@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import { getFlashcardFocusState, getFlashcardMicroGoalState, getFlashcardReviewJumpState, getFlashcardSessionStats } from './flashcardSessionStats.mjs'
+import { getFlashcardFocusState, getFlashcardMicroGoalState, getFlashcardRecallStats, getFlashcardReviewJumpState, getFlashcardSessionStats, recordFlashcardRecall } from './flashcardSessionStats.mjs'
 
 
 test('getFlashcardFocusState stays neutral until enough cards were studied', () => {
@@ -123,6 +123,43 @@ test('getFlashcardMicroGoalState supports smaller safe goals and clamps invalid 
   )
 })
 
+
+test('recordFlashcardRecall increments known and unknown local session counters', () => {
+  assert.deepEqual(
+    recordFlashcardRecall({ knownCount: 1, unknownCount: 2 }, 'known'),
+    { knownCount: 2, unknownCount: 2 },
+  )
+  assert.deepEqual(
+    recordFlashcardRecall({ knownCount: 1, unknownCount: 2 }, 'unknown'),
+    { knownCount: 1, unknownCount: 3 },
+  )
+})
+
+test('getFlashcardRecallStats reports recall rate from explicit local self assessments', () => {
+  assert.deepEqual(
+    getFlashcardRecallStats({ knownCount: 3, unknownCount: 1 }),
+    {
+      knownCount: 3,
+      unknownCount: 1,
+      answeredCount: 4,
+      recallPercent: 75,
+      recallLabel: 'Taxa de lembrança: 75%',
+    },
+  )
+})
+
+test('getFlashcardRecallStats keeps an unanswered local session at zero percent', () => {
+  assert.deepEqual(
+    getFlashcardRecallStats({ knownCount: 0, unknownCount: 0 }),
+    {
+      knownCount: 0,
+      unknownCount: 0,
+      answeredCount: 0,
+      recallPercent: 0,
+      recallLabel: 'Taxa de lembrança: 0%',
+    },
+  )
+})
 
 test('getFlashcardSessionStats reports studied review queue remaining and confidence counts for the visible deck', () => {
   assert.deepEqual(

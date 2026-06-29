@@ -76,6 +76,30 @@ export function getFlashcardMicroGoalState({ studiedCount, goalSize = 10 }) {
   }
 }
 
+export function recordFlashcardRecall({ knownCount, unknownCount }, outcome) {
+  return {
+    knownCount: Math.max(0, knownCount) + (outcome === 'known' ? 1 : 0),
+    unknownCount: Math.max(0, unknownCount) + (outcome === 'unknown' ? 1 : 0),
+  }
+}
+
+export function getFlashcardRecallStats({ knownCount, unknownCount }) {
+  const safeKnownCount = Math.max(0, knownCount)
+  const safeUnknownCount = Math.max(0, unknownCount)
+  const answeredCount = safeKnownCount + safeUnknownCount
+  const recallPercent = answeredCount === 0
+    ? 0
+    : Math.round((safeKnownCount / answeredCount) * 100)
+
+  return {
+    knownCount: safeKnownCount,
+    unknownCount: safeUnknownCount,
+    answeredCount,
+    recallPercent,
+    recallLabel: `Taxa de lembrança: ${recallPercent}%`,
+  }
+}
+
 function getFlashcardConfidenceLabel(confidencePercent, studiedCount) {
   if (studiedCount === 0) return 'Comece a estudar para medir confiança'
   if (confidencePercent >= 80) return 'Boa retenção nesta rodada'
