@@ -243,8 +243,11 @@ class ExerciseService:
         # metalinguistic vocabulary bank. The four-card sequence should read
         # like a short dialogue/introduction that a learner can order by logic.
         unit_pairs = unit["phrases"][code]
-        start = max(0, min(len(unit_pairs) - 4, topic_index - 4))
-        return [[portuguese, foreign] for portuguese, foreign in unit_pairs[start:start + 4]]
+        if unit["title"] == "Apresente-se":
+            start = max(0, min(len(unit_pairs) - 4, topic_index - 4))
+        else:
+            start = (topic_index - 1) % len(unit_pairs)
+        return [[unit_pairs[(start + offset) % len(unit_pairs)][0], unit_pairs[(start + offset) % len(unit_pairs)][1]] for offset in range(4)]
 
     @staticmethod
     def _match(prompt, pairs, idx):
@@ -324,7 +327,7 @@ class ExerciseService:
             distractors.append((pt, foreign, ExerciseService._icon_key_for_phrase(pt, foreign, topic_name)))
             if len(distractors) == 3:
                 break
-        prompt = f"{prefix}: escolha a imagem/frase que representa “{answer_pt}” ({answer_foreign})"
+        prompt = f"{prefix}: observe a imagem e escolha a frase que representa “{answer_pt}”"
         return ExerciseService._image_choice(prompt, answer, distractors, idx)
 
     @staticmethod
@@ -343,6 +346,30 @@ class ExerciseService:
             if len(sample) == size:
                 break
         return sample
+
+    @staticmethod
+    def _unit_phrase_window(unit, code: str, start: int, size: int = 4):
+        phrases = unit["phrases"][code]
+        return [phrases[(start + offset) % len(phrases)] for offset in range(size)]
+
+    @staticmethod
+    def _build_tokens(code: str, target: str):
+        words = target.split()
+        if len(words) >= 2:
+            return words
+        if code == "jp" and len(target) > 1:
+            return [char for char in target if char.strip()]
+        return words
+
+    @staticmethod
+    def _build_source_phrase(unit, code: str, topic_index: int, question_index: int):
+        phrases = unit["phrases"][code]
+        start = (topic_index + question_index - 2) % len(phrases)
+        for offset in range(len(phrases)):
+            pt, foreign = phrases[(start + offset) % len(phrases)]
+            if len(ExerciseService._build_tokens(code, foreign)) >= 2:
+                return pt, foreign
+        return phrases[start]
 
     @staticmethod
     def _items_need_regeneration(lesson: ExerciseLesson, generated: list[dict]) -> bool:
@@ -447,19 +474,19 @@ class ExerciseService:
         templates = [
             f"{prefix}: como dizer “{pt}” em {name}?",
             f"{prefix}: ouça o áudio e identifique “{pt}”",
-            f"{prefix}: escolha a imagem/frase que representa “{pt}” ({target})",
-            f"{prefix}: monte em ordem natural — “{pt}”",
-            f"{prefix}: situação no cenário “{topic_name}” — qual opção comunica “{pt}”?",
-            f"{prefix}: combine itens do contexto “{topic_name}”",
-            f"{prefix}: responda rápido — “{pt}”",
+            f"{prefix}: observe a imagem e escolha a frase que representa “{pt}”",
+            f"{prefix}: monte a frase em ordem natural para dizer “{pt}”",
+            f"{prefix}: escolha a opção que comunica “{pt}” no tema “{topic_name}”",
+            f"{prefix}: relacione cada frase ao significado em português no tema “{topic_name}”",
+            f"{prefix}: escolha a melhor tradução para “{pt}”",
             f"{prefix}: organize as palavras para expressar “{pt}”",
-            f"{prefix}: placa/cardápio — selecione o equivalente de “{pt}”",
-            f"{prefix}: conversa real — escolha como falar “{pt}”",
-            f"{prefix}: pergunta curta — qual é “{pt}”?",
-            f"{prefix}: áudio de revisão — reconheça “{pt}”",
-            f"{prefix}: microfrase — construa “{pt}”",
-            f"{prefix}: situação prática — você precisa dizer “{pt}”",
-            f"{prefix}: leitura rápida — encontre “{pt}”",
+            f"{prefix}: selecione o equivalente de “{pt}” no idioma estudado",
+            f"{prefix}: escolha como dizer “{pt}” em uma fala natural",
+            f"{prefix}: escolha a opção correta para “{pt}”",
+            f"{prefix}: ouça a revisão e reconheça “{pt}”",
+            f"{prefix}: construa a frase para dizer “{pt}”",
+            f"{prefix}: escolha a fala adequada para dizer “{pt}”",
+            f"{prefix}: leia as opções e encontre “{pt}”",
         ]
         return templates[(question_index - 1) % len(templates)]
 
@@ -489,38 +516,45 @@ class ExerciseService:
                     wrong = ExerciseService._wrong_options(bank, target, start + question_index, 3)
                     prompt = ExerciseService._prompt_for_question(prefix, question_index + topic_index - 1, pt, target, name, topic_name)
                     item_type = pattern[question_index - 1]
+                    topic_pt, topic_target = unit["phrases"][code][topic_index - 1]
+                    topic_wrong_foreign = [foreign for idx_pair, (_pt, foreign) in enumerate(unit["phrases"][code]) if idx_pair != topic_index - 1][:3]
+                    topic_wrong_portuguese = [portuguese for idx_pair, (portuguese, _foreign) in enumerate(unit["phrases"][code]) if idx_pair != topic_index - 1][:3]
                     if item_type == "choice":
                         if question_index in {6, 7, 8}:
-                            reverse_prompt = f"{prefix}: entenda “{target}” — qual é o significado em português?"
-                            portuguese_wrong = ExerciseService._wrong_portuguese_options(bank, pt, start + question_index, 3)
-                            item = ExerciseService._choice(reverse_prompt, pt, portuguese_wrong, idx)
+                            reverse_prompt = f"{prefix}: entenda “{topic_target}” — qual é o significado em português?"
+                            item = ExerciseService._choice(reverse_prompt, topic_pt, topic_wrong_portuguese, idx)
                         else:
-                            item = ExerciseService._choice(prompt, target, wrong, idx)
+                            prompt = f"{prefix}: escolha como dizer “{topic_pt}” em {name}"
+                            item = ExerciseService._choice(prompt, topic_target, topic_wrong_foreign, idx)
                     elif item_type == "listen_choice":
-                        item = ExerciseService._listen_choice(prompt, target, wrong, idx)
+                        prompt = f"{prefix}: ouça o áudio e identifique “{topic_pt}”"
+                        item = ExerciseService._listen_choice(prompt, topic_target, topic_wrong_foreign, idx)
                     elif item_type == "image_choice":
-                        image_options = []
-                        for opt_pt, opt_foreign in ExerciseService._windowed_pairs(bank, start + question_index, 8):
-                            if opt_foreign == target:
-                                continue
-                            image_options.append((opt_pt, opt_foreign, ExerciseService._icon_key_for_phrase(opt_pt, opt_foreign, topic_name)))
-                            if len(image_options) == 3:
-                                break
-                        answer = (pt, target, ExerciseService._icon_key_for_phrase(pt, target, topic_name))
+                        sample = ExerciseService._unit_phrase_window(unit, code, topic_index + question_index, 4)
+                        answer_pt, answer_foreign = sample[0]
+                        answer = (answer_pt, answer_foreign, ExerciseService._icon_key_for_phrase(answer_pt, answer_foreign, topic_name))
+                        image_options = [
+                            (opt_pt, opt_foreign, ExerciseService._icon_key_for_phrase(opt_pt, opt_foreign, topic_name))
+                            for opt_pt, opt_foreign in sample[1:]
+                        ]
+                        prompt = f"{prefix}: observe a imagem e escolha a frase que representa “{answer_pt}”"
                         item = ExerciseService._image_choice(prompt, answer, image_options, idx)
                     elif item_type in {"build", "listen_build"}:
-                        words = target.split()
-                        extras = [word for foreign in all_foreign[start % len(all_foreign):(start % len(all_foreign)) + 12] for word in foreign.split()]
+                        build_pt, build_target = ExerciseService._build_source_phrase(unit, code, topic_index, question_index)
+                        words = ExerciseService._build_tokens(code, build_target)
+                        extras = [word for foreign in all_foreign[start % len(all_foreign):(start % len(all_foreign)) + 12] for word in ExerciseService._build_tokens(code, foreign)]
                         if len(extras) < 8:
-                            extras.extend([word for foreign in all_foreign[:12] for word in foreign.split()])
+                            extras.extend([word for foreign in all_foreign[:12] for word in ExerciseService._build_tokens(code, foreign)])
                         if item_type == "listen_build":
-                            prompt = f"{prefix}: ouça e monte em ordem natural — “{pt}”"
+                            prompt = f"{prefix}: ouça e monte em ordem natural — “{build_pt}”"
                             item = ExerciseService._listen_build(prompt, words, extras, idx)
                         else:
+                            prompt = f"{prefix}: monte a frase em ordem natural para dizer “{build_pt}”"
                             item = ExerciseService._build(prompt, words, extras, idx)
                     elif item_type == "match":
-                        sample = ExerciseService._windowed_pairs(bank, start + question_index, 4)
+                        sample = ExerciseService._unit_phrase_window(unit, code, topic_index + question_index, 4)
                         pairs = [[foreign, portuguese] for portuguese, foreign in sample]
+                        prompt = f"{prefix}: relacione cada frase ao significado em português no tema “{topic_name}”"
                         item = ExerciseService._match(prompt, pairs, idx)
                     elif item_type == "sequence_dialogue":
                         sequence_pairs = ExerciseService._coherent_sequence_pairs(unit, code, topic_index)
@@ -529,18 +563,30 @@ class ExerciseService:
                         prompt = f"{prefix}: monte uma {sequence_label} seguindo esta ordem: nome → origem → onde mora → idioma que fala" if unit["title"] == "Apresente-se" else f"{prefix}: monte uma {sequence_label}; ordene as frases pelo fluxo lógico da situação"
                         item = ExerciseService._sequence_dialogue(prompt, phrases, idx)
                     else:
+                        context_sample = ExerciseService._unit_phrase_window(unit, code, topic_index * 4 + question_index * 3, 4)
+                        context_pt, context_target = context_sample[0]
+                        context_wrong = [foreign for _pt, foreign in context_sample[1:]]
+                        prompt = f"{prefix}: escolha a fala que comunica “{context_pt}” no tema “{topic_name}”"
                         if question_index in {5, 10}:
-                            _context_pt, opening_line = bank[(start + question_index - 2) % len(bank)]
-                            prompt = ExerciseService._microdialogue_prompt(prefix, topic_name, pt, opening_line)
-                        item = ExerciseService._context_choice(prompt, target, wrong, idx)
+                            _opening_pt, opening_line = context_sample[1]
+                            prompt = ExerciseService._microdialogue_prompt(prefix, topic_name, context_pt, opening_line)
+                        item = ExerciseService._context_choice(prompt, context_target, context_wrong, idx)
                     if item["type"] == "listen_build":
                         item["hint"] = f"{hint} Ouça a frase, repita em voz alta e monte as palavras na ordem correta."
                     elif item["type"] == "sequence_dialogue":
                         item["hint"] = f"{hint} Siga a ordem indicada no enunciado e organize apenas as frases no idioma estudado."
                     else:
                         item["hint"] = hint
-                    if item["type"] != "image_choice":
-                        item["explanation"] = explanation
+                    if item["type"] == "image_choice":
+                        pass
+                    elif item["type"] == "match":
+                        item["explanation"] = f"Cada par conecta uma frase em {name} ao significado em português dentro do tema “{topic_name}”."
+                    elif item["type"] == "sequence_dialogue":
+                        pass
+                    elif item["type"] in {"build", "listen_build"}:
+                        item["explanation"] = f"A frase correta é: “{' '.join(item['answer']['value'])}”."
+                    else:
+                        item["explanation"] = f"{unit['title']}: “{item['answer']['value']}” comunica a ideia pedida em {name}."
                     items.append(item)
         return items[:ExerciseService.TARGET_ITEMS]
 
