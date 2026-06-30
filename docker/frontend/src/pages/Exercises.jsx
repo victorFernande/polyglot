@@ -28,6 +28,7 @@ import { eligibleWordSearchWords, generateWordSearchGrid, updateFoundWordSearchW
 import { eligibleLetterBlockWords, generateLetterBlocksPuzzle, validateLetterBlocksPath, updateFoundLetterBlockWords, letterBlocksSeed } from '../lib/letterBlocks.mjs'
 import { buildTypingRushQueue, validateTypingRushAnswer, typingRushPrompt } from '../lib/typingRush.mjs'
 import { buildClozeRushQueue, validateClozeRushSelection, clozeRushPrompt } from '../lib/clozeRush.mjs'
+import { buildArticleBlitzQueue, validateArticleBlitzSelection, ARTICLE_BLITZ_OPTIONS } from '../lib/articleBlitz.mjs'
 
 const LANG_META = {
   de: { accent: 'Rammstein', color: 'from-red-600 to-red-900' },
@@ -443,11 +444,88 @@ export default function Exercises() {
           </div>
 
           <TypingRushPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
+          <ArticleBlitzPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
           <ClozeRushPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
           <WordSearchPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
           <LetterBlocksPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
         </div>
       )}
+    </div>
+  )
+}
+
+function ArticleBlitzPractice({ items, lesson, session, currentIndex }) {
+  const queue = useMemo(() => buildArticleBlitzQueue(items, { lesson, session, currentIndex }), [items, lesson, session, currentIndex])
+  const [cardIndex, setCardIndex] = useState(0)
+  const [selectedArticle, setSelectedArticle] = useState('')
+  const [result, setResult] = useState(null)
+  const [correctCount, setCorrectCount] = useState(0)
+
+  useEffect(() => {
+    setCardIndex(0)
+    setSelectedArticle('')
+    setResult(null)
+    setCorrectCount(0)
+  }, [queue.map((card) => card.seed).join('|')])
+
+  if (queue.length < 4) return null
+
+  const card = queue[cardIndex % queue.length]
+
+  function chooseArticle(article) {
+    setSelectedArticle(article)
+    setResult(null)
+  }
+
+  function verify() {
+    const nextResult = validateArticleBlitzSelection(selectedArticle, card)
+    setResult(nextResult)
+    if (nextResult.status === 'correct') setCorrectCount((count) => count + 1)
+  }
+
+  function nextCard() {
+    setCardIndex((index) => (index + 1) % queue.length)
+    setSelectedArticle('')
+    setResult(null)
+  }
+
+  return (
+    <div className="mt-8 rounded-2xl border border-yellow-400/30 bg-yellow-500/10 p-4">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">Treino local: artigo relâmpago</p>
+          <h3 className="mt-1 text-xl font-bold text-white">Escolha der, die ou das</h3>
+          <p className="mt-1 text-sm text-gray-300">Recupere o artigo de substantivos alemães desta sessão. Este treino não altera XP/progresso.</p>
+        </div>
+        <span className="w-fit rounded-full border border-white/10 bg-black/20 px-3 py-1 text-sm font-semibold text-polyglot-accent">{correctCount} acertos</span>
+      </div>
+
+      <div className="mt-4 rounded-xl border border-white/10 bg-black/20 p-4">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">Substantivo</p>
+        <p className="mt-2 text-4xl font-black text-white">{card.noun}</p>
+        {card.prompt && <p className="mt-2 text-sm text-gray-400">Dica da sessão: {card.prompt}</p>}
+        <div className="mt-4 grid grid-cols-3 gap-2 sm:flex sm:flex-wrap">
+          {ARTICLE_BLITZ_OPTIONS.map((article) => (
+            <button
+              key={article}
+              type="button"
+              onClick={() => chooseArticle(article)}
+              className={`rounded-xl border px-4 py-3 text-lg font-black transition ${selectedArticle === article ? 'border-polyglot-accent bg-polyglot-accent/25 text-white' : 'border-white/10 bg-white/5 text-gray-200 hover:border-polyglot-accent/50 hover:bg-white/10'}`}
+            >
+              {article}
+            </button>
+          ))}
+        </div>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <button type="button" className="btn-primary disabled:opacity-40" disabled={!selectedArticle} onClick={verify}>Verificar</button>
+          <button type="button" className="btn-secondary" onClick={nextCard}>Próxima</button>
+        </div>
+        {result && (
+          <p className={`mt-3 rounded-lg p-3 text-sm font-semibold ${result.status === 'correct' ? 'bg-polyglot-green/15 text-polyglot-green' : 'bg-red-500/15 text-red-200'}`}>
+            {result.status === 'correct' ? 'Correto — artigo recuperado.' : `Resposta esperada: ${result.fullAnswer}`}
+          </p>
+        )}
+      </div>
     </div>
   )
 }
