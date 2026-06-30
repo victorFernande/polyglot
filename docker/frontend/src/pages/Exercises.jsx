@@ -25,6 +25,7 @@ import { buildMemoryMatchCards, memoryMatchSelection } from '../lib/memoryMatch.
 import { buildListenBuildDictationPayload, canSubmitListenBuildDictation } from '../lib/listenBuildDictation.mjs'
 import { sequenceDialogueCanSubmit, sequenceDialoguePayload } from '../lib/sequenceDialogue.mjs'
 import { eligibleWordSearchWords, generateWordSearchGrid, updateFoundWordSearchWords, validateWordSearchSelection, wordSearchSeed } from '../lib/wordSearch.mjs'
+import { buildTypingRushQueue, validateTypingRushAnswer, typingRushPrompt } from '../lib/typingRush.mjs'
 
 const LANG_META = {
   de: { accent: 'Rammstein', color: 'from-red-600 to-red-900' },
@@ -439,9 +440,86 @@ export default function Exercises() {
             {feedback?.type === 'correct' && (session.current_index >= session.total_count ? <button className="btn-primary inline-flex items-center gap-2" onClick={() => finish(true)}>{nextExerciseActionLabel(session)} <ArrowRight size={18} /></button> : <button className="btn-primary inline-flex items-center gap-2" onClick={next}>{nextExerciseActionLabel(session)} <ArrowRight size={18} /></button>)}
           </div>
 
+          <TypingRushPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
           <WordSearchPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
         </div>
       )}
+    </div>
+  )
+}
+
+function TypingRushPractice({ items, lesson, session, currentIndex }) {
+  const queue = useMemo(() => buildTypingRushQueue(items, { lesson, session, currentIndex }), [items, lesson, session, currentIndex])
+  const [cardIndex, setCardIndex] = useState(0)
+  const [input, setInput] = useState('')
+  const [result, setResult] = useState(null)
+  const [correctCount, setCorrectCount] = useState(0)
+
+  useEffect(() => {
+    setCardIndex(0)
+    setInput('')
+    setResult(null)
+    setCorrectCount(0)
+  }, [queue.map((card) => card.seed).join('|')])
+
+  if (queue.length < 2) return null
+
+  const card = queue[cardIndex % queue.length]
+  const feedbackText = {
+    correct: 'Correto — boa recuperação ativa.',
+    close: `Quase lá. Resposta esperada: ${result?.expected}`,
+    wrong: `Resposta esperada: ${result?.expected}`,
+  }
+
+  function verify() {
+    const nextResult = validateTypingRushAnswer(input, card.answer)
+    setResult(nextResult)
+    if (nextResult.status === 'correct') setCorrectCount((count) => count + 1)
+  }
+
+  function nextCard() {
+    setCardIndex((index) => (index + 1) % queue.length)
+    setInput('')
+    setResult(null)
+  }
+
+  return (
+    <div className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-4">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">Treino local: digitação relâmpago</p>
+          <h3 className="mt-1 text-xl font-bold text-white">Digite a resposta no idioma estudado</h3>
+          <p className="mt-1 text-sm text-gray-300">Recuperação ativa com itens desta sessão. Este treino não altera XP/progresso.</p>
+        </div>
+        <span className="w-fit rounded-full border border-white/10 bg-black/20 px-3 py-1 text-sm font-semibold text-polyglot-accent">{correctCount} acertos</span>
+      </div>
+
+      <div className="mt-4 rounded-xl border border-white/10 bg-black/20 p-4">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">Dica</p>
+        <p className="mt-1 text-lg font-bold text-white">{typingRushPrompt(card.prompt, card.answer)}</p>
+        <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+          <input
+            value={input}
+            onChange={(event) => {
+              setInput(event.target.value)
+              setResult(null)
+            }}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' && input.trim()) verify()
+            }}
+            className="min-w-0 flex-1 rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-white outline-none focus:border-polyglot-accent"
+            placeholder="Digite aqui..."
+            aria-label="Resposta do treino de digitação relâmpago"
+          />
+          <button type="button" className="btn-primary disabled:opacity-40" disabled={!input.trim()} onClick={verify}>Verificar</button>
+          <button type="button" className="btn-secondary" onClick={nextCard}>Próxima</button>
+        </div>
+        {result && (
+          <p className={`mt-3 rounded-lg p-3 text-sm font-semibold ${result.status === 'correct' ? 'bg-polyglot-green/15 text-polyglot-green' : result.status === 'close' ? 'bg-yellow-500/15 text-yellow-200' : 'bg-red-500/15 text-red-200'}`}>
+            {feedbackText[result.status]}
+          </p>
+        )}
+      </div>
     </div>
   )
 }
