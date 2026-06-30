@@ -178,8 +178,8 @@ test('Tailwind scans mjs helpers that provide exercise trail classes', () => {
   assert.match(config, /mjs/)
 })
 
-test('slow trail connector animation lasts fifteen seconds', () => {
+test('slow trail connector animation lasts thirteen seconds', () => {
   const config = readFileSync(new URL('../../tailwind.config.js', import.meta.url), 'utf8')
 
-  assert.match(config, /'shimmer-slow': 'shimmer 15s linear infinite'/)
+  assert.match(config, /'shimmer-slow': 'shimmer 13s linear infinite'/)
 })
