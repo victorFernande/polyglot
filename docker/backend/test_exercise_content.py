@@ -26,7 +26,7 @@ def test_seed_lessons_is_long_varied_and_idempotent():
         for lesson in lessons:
             items = db.query(ExerciseItem).filter(ExerciseItem.lesson_id == lesson.id).all()
             assert len(items) == ExerciseService.TARGET_ITEMS
-            assert {item.type for item in items} >= {"choice", "listen_choice", "image_choice", "build", "context_choice", "match", "listen_build"}
+            assert {item.type for item in items} >= {"choice", "listen_choice", "image_choice", "build", "context_choice", "match", "listen_build", "sequence_dialogue"}
             assert all(item.hint for item in items)
             assert all(item.explanation for item in items)
             assert any("Unidade 1/10 — Fazendo um pedido no café" in item.prompt for item in items)
@@ -55,6 +55,11 @@ def test_seed_lessons_is_long_varied_and_idempotent():
                     assert correct["label_pt"] in item.explanation
                 elif item.type in {"build", "listen_build"}:
                     assert all(word in item.tiles for word in item.answer["value"])
+                elif item.type == "sequence_dialogue":
+                    assert len(item.answer["value"]) == 4
+                    assert all(phrase in item.tiles for phrase in item.answer["value"])
+                    assert item.options is None
+                    assert item.pairs is None
                 elif item.type == "match":
                     assert item.answer["pairs"] == item.pairs
                     assert len(item.pairs) == 4
@@ -185,6 +190,22 @@ def test_context_choice_includes_microdialogue_with_target_language_options():
     assert all(option in [foreign for _pt, foreign in ExerciseService._expanded_practice_bank("de", A1_UNITS[0], 1)] for option in item["options"])
     assert item["hint"]
     assert item["explanation"]
+
+
+def test_sequence_dialogue_items_order_four_topic_phrases_and_validate_ordered_payload():
+    items = ExerciseService.generate_items("de")
+    sequence_items = [item for item in items if item["type"] == "sequence_dialogue"]
+
+    assert sequence_items, "expected at least one sequence_dialogue item in generated track"
+    item = sequence_items[0]
+    assert "ordene" in f"{item['prompt']} {item['hint']}".casefold()
+    assert isinstance(item["answer"]["value"], list)
+    assert len(item["answer"]["value"]) == 4
+    assert len(set(item["answer"]["value"])) == 4
+    assert set(item["tiles"]) == set(item["answer"]["value"])
+    assert item["tiles"] != item["answer"]["value"]
+    assert ExerciseService.normalize(item["answer"]["value"]) == ExerciseService.normalize(item["answer"])
+    assert ExerciseService.normalize(list(reversed(item["answer"]["value"]))) != ExerciseService.normalize(item["answer"])
 
 
 def test_choice_items_include_reverse_comprehension_prompts_with_portuguese_options():

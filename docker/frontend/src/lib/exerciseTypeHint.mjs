@@ -5,6 +5,7 @@ const EXERCISE_TYPE_HINTS = {
   image_choice: 'Escolha a imagem correta.',
   build: 'Monte a frase na ordem correta.',
   listen_build: 'Ouça e monte a frase.',
+  sequence_dialogue: 'Ordene o diálogo ou situação.',
   match: 'Relacione cada item ao par correto.',
 }
 

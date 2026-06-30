@@ -230,6 +230,14 @@ class ExerciseService:
         return item
 
     @staticmethod
+    def _sequence_dialogue(prompt, phrases, idx):
+        tiles = list(phrases)
+        if len(tiles) > 1:
+            shift = (idx % (len(tiles) - 1)) + 1
+            tiles = tiles[shift:] + tiles[:shift]
+        return {"type":"sequence_dialogue","prompt":prompt,"answer":{"value":phrases},"options":None,"tiles":tiles,"pairs":None,"hint":"Ordene as falas/frases para formar uma sequência comunicativa lógica.","explanation":"A ordem correta reconstrói o fluxo da situação: começo, desenvolvimento, pergunta/resposta e fechamento.","xp_reward":12 + (idx % 4)}
+
+    @staticmethod
     def _match(prompt, pairs, idx):
         return {"type":"match","prompt":prompt,"answer":{"pairs":pairs},"options":None,"tiles":None,"pairs":pairs,"hint":"Combine pelo significado, não pela aparência da palavra.","explanation":"Matching fortalece reconhecimento rápido de vocabulário.","xp_reward":12 + (idx % 4)}
 
@@ -451,11 +459,11 @@ class ExerciseService:
         name = ExerciseService.LANGUAGE_NAMES[code]
         items = []
         type_patterns = [
-            ["choice", "listen_choice", "image_choice", "build", "context_choice", "match", "choice", "listen_build", "listen_choice", "context_choice"],
-            ["listen_choice", "choice", "build", "context_choice", "image_choice", "choice", "match", "listen_choice", "listen_build", "context_choice"],
-            ["context_choice", "image_choice", "choice", "listen_choice", "build", "match", "choice", "context_choice", "listen_choice", "listen_build"],
-            ["choice", "build", "listen_choice", "image_choice", "context_choice", "match", "listen_build", "choice", "context_choice", "listen_choice"],
-            ["image_choice", "choice", "context_choice", "build", "listen_choice", "match", "choice", "listen_choice", "listen_build", "context_choice"],
+            ["choice", "listen_choice", "image_choice", "build", "context_choice", "match", "choice", "listen_build", "sequence_dialogue", "context_choice"],
+            ["listen_choice", "choice", "build", "context_choice", "image_choice", "choice", "match", "sequence_dialogue", "listen_build", "context_choice"],
+            ["context_choice", "image_choice", "choice", "listen_choice", "build", "match", "sequence_dialogue", "context_choice", "listen_choice", "listen_build"],
+            ["choice", "build", "listen_choice", "image_choice", "context_choice", "match", "listen_build", "choice", "sequence_dialogue", "listen_choice"],
+            ["image_choice", "choice", "context_choice", "build", "listen_choice", "match", "choice", "listen_choice", "listen_build", "sequence_dialogue"],
         ]
         for unit_index, unit in enumerate(A1_UNITS, 1):
             bank = ExerciseService._expanded_practice_bank(code, unit, unit_index)
@@ -505,6 +513,11 @@ class ExerciseService:
                         sample = ExerciseService._windowed_pairs(bank, start + question_index, 4)
                         pairs = [[foreign, portuguese] for portuguese, foreign in sample]
                         item = ExerciseService._match(prompt, pairs, idx)
+                    elif item_type == "sequence_dialogue":
+                        sample = ExerciseService._matching_sample(bank, start + question_index - 1, 4)
+                        phrases = [foreign for _portuguese, foreign in sample]
+                        prompt = f"{prefix}: ordene o diálogo/situação no cenário “{topic_name}”"
+                        item = ExerciseService._sequence_dialogue(prompt, phrases, idx)
                     else:
                         if question_index in {5, 10}:
                             _context_pt, opening_line = bank[(start + question_index - 2) % len(bank)]

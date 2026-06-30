@@ -23,6 +23,7 @@ import { playSessionCompletionFanfare, unlockSessionCompletionFanfare } from '..
 import { buildLetterScramblePayload, isLetterScrambleEligible, singleWordBuildAnswer, stableScrambleLetters } from '../lib/letterScramble.mjs'
 import { buildMemoryMatchCards, memoryMatchSelection } from '../lib/memoryMatch.mjs'
 import { buildListenBuildDictationPayload, canSubmitListenBuildDictation } from '../lib/listenBuildDictation.mjs'
+import { sequenceDialogueCanSubmit, sequenceDialoguePayload } from '../lib/sequenceDialogue.mjs'
 
 const LANG_META = {
   de: { accent: 'Rammstein', color: 'from-red-600 to-red-900' },
@@ -190,6 +191,7 @@ export default function Exercises() {
     if (['choice', 'listen_choice', 'context_choice'].includes(item.type)) return selected
     if (item.type === 'image_choice') return selected
     if (isUsingListenBuildDictation) return buildListenBuildDictationPayload(typedAnswer)
+    if (item.type === 'sequence_dialogue') return sequenceDialoguePayload(built)
     if (BUILD_LIKE_TYPES.includes(item.type)) return isLetterScrambleEligible(item) ? buildLetterScramblePayload(built) : built
     if (item.type === 'match') return matched
     return selected
@@ -200,6 +202,7 @@ export default function Exercises() {
     if (['choice', 'listen_choice', 'context_choice'].includes(item.type)) return !!selected
     if (item.type === 'image_choice') return !!selected
     if (isUsingListenBuildDictation) return canSubmitListenBuildDictation(item, typedAnswer)
+    if (item.type === 'sequence_dialogue') return sequenceDialogueCanSubmit(item, built)
     if (BUILD_LIKE_TYPES.includes(item.type)) {
       if (isLetterScrambleEligible(item)) return built.length === singleWordBuildAnswer(item).length
       return built.length === (answerValue(item.answer)?.length || 0)
@@ -407,6 +410,7 @@ export default function Exercises() {
           {['choice', 'listen_choice', 'context_choice'].includes(item.type) && <Choice options={choiceOptions} selected={selected} onInteract={() => setFeedback(null)} setSelected={setSelected} />}
           {item.type === 'image_choice' && <ImageChoice options={choiceOptions} selected={selected} onInteract={() => setFeedback(null)} setSelected={setSelected} />}
           {item.type === 'listen_build' && <ListenBuildDictation typedAnswer={typedAnswer} setTypedAnswer={setTypedAnswer} onInteract={() => setFeedback(null)} onSubmit={check} canSubmit={canCheck} busy={busy} />}
+          {item.type === 'sequence_dialogue' && <SequenceDialogue item={item} built={built} onInteract={() => setFeedback(null)} setBuilt={setBuilt} />}
           {BUILD_LIKE_TYPES.includes(item.type) && <Build item={item} built={built} onInteract={() => setFeedback(null)} setBuilt={setBuilt} />}
           {item.type === 'match' && <Match item={item} matched={matched} onInteract={() => setFeedback(null)} setMatched={setMatched} />}
 
@@ -613,6 +617,70 @@ function ListenBuildDictation({ typedAnswer, setTypedAnswer, onInteract, onSubmi
         )}
       </div>
       <p className="mt-2 text-xs text-gray-400">Pressione Enter para verificar quando a frase digitada tiver a mesma quantidade de palavras da resposta. Se preferir, deixe o campo vazio e use as peças abaixo.</p>
+    </div>
+  )
+}
+
+function SequenceDialogue({ item, built, setBuilt, onInteract }) {
+  const tiles = buildTilesForItem(item)
+
+  function removePhrase(index) {
+    onInteract()
+    setBuilt(built.filter((_, idx) => idx !== index))
+  }
+
+  function dragPhrase(event, index) {
+    event.dataTransfer.effectAllowed = 'move'
+    event.dataTransfer.setData('application/x-polyglot-dialogue-phrase-index', String(index))
+  }
+
+  function dropPhrase(event, toIndex) {
+    event.preventDefault()
+    const rawIndex = event.dataTransfer.getData('application/x-polyglot-dialogue-phrase-index')
+    if (rawIndex === '') return
+    onInteract()
+    setBuilt(reorderBuiltWords(built, Number(rawIndex), toIndex))
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="rounded-2xl border border-polyglot-accent/30 bg-polyglot-accent/10 p-4">
+        <p className="text-sm font-semibold text-polyglot-accent">Sequência montada</p>
+        <div className="mt-3 min-h-20 rounded-xl border border-dashed border-white/20 bg-black/20 p-3">
+          {built.length === 0 ? (
+            <span className="text-gray-500">Toque nas cartas para ordenar o diálogo...</span>
+          ) : (
+            <ol className="space-y-2">
+              {built.map((phrase, i) => (
+                <li key={`${phrase}-${i}`} className="flex items-start gap-2">
+                  <span className="mt-2 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-black/30 text-sm font-bold text-polyglot-accent">{i + 1}</span>
+                  <button
+                    type="button"
+                    draggable
+                    onDragStart={(event) => dragPhrase(event, i)}
+                    onDragOver={(event) => event.preventDefault()}
+                    onDrop={(event) => dropPhrase(event, i)}
+                    onClick={() => removePhrase(i)}
+                    aria-label={`Arraste a fala ${phrase} para mudar a ordem ou clique para remover`}
+                    className="w-full cursor-grab rounded-xl border border-polyglot-accent/40 bg-polyglot-accent/20 px-4 py-3 text-left font-semibold text-white transition hover:scale-[1.01] active:cursor-grabbing active:scale-[0.99]"
+                    title="Arraste para reordenar · Clique para remover"
+                  >
+                    {phrase}
+                  </button>
+                </li>
+              ))}
+            </ol>
+          )}
+        </div>
+        {built.length > 1 && <p className="mt-2 text-xs text-gray-400">Você pode arrastar as cartas selecionadas para ajustar a ordem antes de verificar.</p>}
+      </div>
+      <div className="grid gap-2 sm:grid-cols-2">
+        {tiles.map((tile, i) => (
+          <button key={`${tile}-${i}`} disabled={built.includes(tile)} onClick={() => { onInteract(); setBuilt([...built, tile]) }} className="rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-left font-semibold hover:bg-white/20 disabled:opacity-30">
+            {tile}
+          </button>
+        ))}
+      </div>
     </div>
   )
 }
