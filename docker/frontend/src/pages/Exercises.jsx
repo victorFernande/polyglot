@@ -26,6 +26,7 @@ import { buildListenBuildDictationPayload, canSubmitListenBuildDictation } from 
 import { sequenceDialogueCanSubmit, sequenceDialoguePayload } from '../lib/sequenceDialogue.mjs'
 import { eligibleWordSearchWords, generateWordSearchGrid, updateFoundWordSearchWords, validateWordSearchSelection, wordSearchSeed } from '../lib/wordSearch.mjs'
 import { buildTypingRushQueue, validateTypingRushAnswer, typingRushPrompt } from '../lib/typingRush.mjs'
+import { buildClozeRushQueue, validateClozeRushSelection, clozeRushPrompt } from '../lib/clozeRush.mjs'
 
 const LANG_META = {
   de: { accent: 'Rammstein', color: 'from-red-600 to-red-900' },
@@ -441,9 +442,88 @@ export default function Exercises() {
           </div>
 
           <TypingRushPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
+          <ClozeRushPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
           <WordSearchPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
         </div>
       )}
+    </div>
+  )
+}
+
+function ClozeRushPractice({ items, lesson, session, currentIndex }) {
+  const queue = useMemo(() => buildClozeRushQueue(items, { lesson, session, currentIndex }), [items, lesson, session, currentIndex])
+  const [cardIndex, setCardIndex] = useState(0)
+  const [selectedChip, setSelectedChip] = useState('')
+  const [result, setResult] = useState(null)
+  const [correctCount, setCorrectCount] = useState(0)
+
+  useEffect(() => {
+    setCardIndex(0)
+    setSelectedChip('')
+    setResult(null)
+    setCorrectCount(0)
+  }, [queue.map((card) => card.seed).join('|')])
+
+  if (queue.length < 2) return null
+
+  const card = queue[cardIndex % queue.length]
+
+  function chooseChip(chip) {
+    setSelectedChip(chip)
+    setResult(null)
+  }
+
+  function verify() {
+    const nextResult = validateClozeRushSelection(selectedChip, card)
+    setResult(nextResult)
+    if (nextResult.status === 'correct') setCorrectCount((count) => count + 1)
+  }
+
+  function nextCard() {
+    setCardIndex((index) => (index + 1) % queue.length)
+    setSelectedChip('')
+    setResult(null)
+  }
+
+  return (
+    <div className="mt-8 rounded-2xl border border-purple-400/30 bg-purple-500/10 p-4">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">Treino local: lacuna relâmpago</p>
+          <h3 className="mt-1 text-xl font-bold text-white">Complete a palavra que falta</h3>
+          <p className="mt-1 text-sm text-gray-300">Escolha o chip ausente em frases desta sessão. Este treino não altera XP/progresso.</p>
+        </div>
+        <span className="w-fit rounded-full border border-white/10 bg-black/20 px-3 py-1 text-sm font-semibold text-polyglot-accent">{correctCount} acertos</span>
+      </div>
+
+      <div className="mt-4 rounded-xl border border-white/10 bg-black/20 p-4">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">Contexto</p>
+        <p className="mt-1 text-sm text-gray-300">{clozeRushPrompt(card.prompt, card.fullText)}</p>
+        <p className="mt-4 rounded-xl bg-white/5 p-4 text-2xl font-black text-white">{card.clozeText}</p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {card.chips.map((chip) => (
+            <button
+              key={chip}
+              type="button"
+              onClick={() => chooseChip(chip)}
+              className={`rounded-xl border px-4 py-3 text-sm font-bold transition ${selectedChip === chip ? 'border-polyglot-accent bg-polyglot-accent/25 text-white' : 'border-white/10 bg-white/5 text-gray-200 hover:border-polyglot-accent/50 hover:bg-white/10'}`}
+            >
+              {chip}
+            </button>
+          ))}
+        </div>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <button type="button" className="btn-primary disabled:opacity-40" disabled={!selectedChip} onClick={verify}>Verificar</button>
+          <button type="button" className="btn-secondary" onClick={nextCard}>Próxima</button>
+        </div>
+        {result && (
+          <div className={`mt-3 rounded-lg p-3 text-sm font-semibold ${result.status === 'correct' ? 'bg-polyglot-green/15 text-polyglot-green' : 'bg-red-500/15 text-red-200'}`}>
+            <p>{result.status === 'correct' ? 'Correto — lacuna completa.' : `Resposta esperada: ${result.expected}`}</p>
+            <p className="mt-1 opacity-90">Frase completa: {result.fullText}</p>
+            {card.explanation && <p className="mt-1 opacity-80">{card.explanation}</p>}
+          </div>
+        )}
+      </div>
     </div>
   )
 }
