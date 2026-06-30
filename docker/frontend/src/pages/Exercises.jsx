@@ -32,6 +32,7 @@ import { buildClozeRushQueue, validateClozeRushSelection, clozeRushPrompt } from
 import { buildArticleBlitzQueue, validateArticleBlitzSelection, ARTICLE_BLITZ_OPTIONS } from '../lib/articleBlitz.mjs'
 import { buildErrorSpotterQueue, validateErrorSpotterSelection } from '../lib/errorSpotter.mjs'
 import { buildAudioABQueue, validateAudioABSelection } from '../lib/audioAB.mjs'
+import { buildAudioBingoQueue, validateAudioBingoSelection } from '../lib/audioBingo.mjs'
 
 const LANG_META = {
   de: { accent: 'Rammstein', color: 'from-red-600 to-red-900' },
@@ -449,6 +450,7 @@ export default function Exercises() {
           <TypingRushPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
           <WordScramblePractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
           <AudioABPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} langCode={langCode} speechPlayback={speechPlaybackRef.current} />
+          <AudioBingoPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} langCode={langCode} speechPlayback={speechPlaybackRef.current} />
           <ArticleBlitzPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
           <ClozeRushPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
           <ErrorSpotterPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
@@ -535,6 +537,90 @@ function AudioABPractice({ items, lesson, session, currentIndex, langCode, speec
           <div className={`mt-3 rounded-lg p-3 text-sm font-semibold ${result.status === 'correct' ? 'bg-polyglot-green/15 text-polyglot-green' : 'bg-red-500/15 text-red-200'}`}>
             <p>{result.status === 'correct' ? 'Correto — você reconheceu a frase.' : `Resposta esperada: ${result.expected}`}</p>
             <p className="mt-1 opacity-90">Frase ouvida: {result.expected}</p>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function AudioBingoPractice({ items, lesson, session, currentIndex, langCode, speechPlayback }) {
+  const queue = useMemo(() => buildAudioBingoQueue(items, { lesson, session, currentIndex }), [items, lesson, session, currentIndex])
+  const [cardIndex, setCardIndex] = useState(0)
+  const [selectedKey, setSelectedKey] = useState('')
+  const [result, setResult] = useState(null)
+  const [correctCount, setCorrectCount] = useState(0)
+
+  useEffect(() => {
+    setCardIndex(0)
+    setSelectedKey('')
+    setResult(null)
+    setCorrectCount(0)
+  }, [queue.map((card) => card.seed).join('|')])
+
+  if (queue.length < 1) return null
+
+  const card = queue[cardIndex % queue.length]
+  const targetLang = speechLangForLanguage(langCode)
+
+  function playTarget() {
+    speechPlayback?.speakSegments([{ text: card.targetText, lang: targetLang }])
+  }
+
+  function chooseOption(key) {
+    setSelectedKey(key)
+    setResult(null)
+  }
+
+  function verify() {
+    const nextResult = validateAudioBingoSelection(selectedKey, card)
+    setResult(nextResult)
+    if (nextResult.status === 'correct') setCorrectCount((count) => count + 1)
+  }
+
+  function nextCard() {
+    setCardIndex((index) => (index + 1) % queue.length)
+    setSelectedKey('')
+    setResult(null)
+  }
+
+  return (
+    <div className="mt-8 rounded-2xl border border-cyan-400/30 bg-cyan-500/10 p-4">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">Treino local: Audio Bingo</p>
+          <h3 className="mt-1 text-xl font-bold text-white">Ouça e encontre na grade 3x3</h3>
+          <p className="mt-1 text-sm text-gray-300">Reconhecimento rápido com cartões no idioma-alvo desta sessão. Este treino não altera XP/progresso.</p>
+        </div>
+        <span className="w-fit rounded-full border border-white/10 bg-black/20 px-3 py-1 text-sm font-semibold text-polyglot-accent">{correctCount} acertos</span>
+      </div>
+
+      <div className="mt-4 rounded-xl border border-white/10 bg-black/20 p-4">
+        <div className="flex flex-wrap gap-2">
+          <button type="button" className="btn-secondary inline-flex items-center gap-2" onClick={playTarget}><Volume2 size={18} /> Ouvir alvo</button>
+          <button type="button" className="btn-secondary" onClick={nextCard}>Próximo alvo</button>
+        </div>
+        <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
+          {card.grid.map((option) => (
+            <button
+              key={option.key}
+              type="button"
+              onClick={() => chooseOption(option.key)}
+              className={`min-h-16 rounded-xl border px-3 py-3 text-center text-sm font-bold transition ${selectedKey === option.key ? 'border-polyglot-accent bg-polyglot-accent/25 text-white' : 'border-white/10 bg-white/5 text-gray-200 hover:border-polyglot-accent/50 hover:bg-white/10'}`}
+            >
+              {option.text}
+            </button>
+          ))}
+        </div>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <button type="button" className="btn-primary disabled:opacity-40" disabled={!selectedKey} onClick={verify}>Verificar</button>
+          <button type="button" className="btn-secondary" onClick={playTarget}>Ouvir de novo</button>
+          <button type="button" className="btn-secondary" onClick={nextCard}>Próximo</button>
+        </div>
+        {result && (
+          <div className={`mt-3 rounded-lg p-3 text-sm font-semibold ${result.status === 'correct' ? 'bg-polyglot-green/15 text-polyglot-green' : 'bg-red-500/15 text-red-200'}`}>
+            <p>{result.status === 'correct' ? 'Bingo — você encontrou a frase ouvida.' : `Era: ${result.expected}`}</p>
+            {result.selected && <p className="mt-1 opacity-90">Você tocou: {result.selected}</p>}
           </div>
         )}
       </div>
