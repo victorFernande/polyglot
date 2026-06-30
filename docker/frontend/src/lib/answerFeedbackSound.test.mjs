@@ -54,8 +54,8 @@ assert.equal(events.filter(([name]) => name === 'ctx:new').length, 0, 'play shou
 assert.ok(events.some(([name, value]) => name === 'gain:set' && value === 0.0001), 'sound must fade in from near silence')
 assert.ok(events.some(([name, value]) => name === 'gain:ramp' && value === 0.0001), 'sound must fade out to avoid clicks')
 assert.ok(
-  events.filter(([name]) => name === 'gain:linear').some(([, value]) => value >= 0.95),
-  'correct chime must be louder than spoken feedback and use near-maximum safe Web Audio gain'
+  events.filter(([name]) => name === 'gain:linear').some(([, value]) => value >= 1.35),
+  'correct chime must be boosted well above spoken feedback volume'
 )
 assert.ok(
   Math.max(...events.filter(([name]) => name === 'osc:stop').map(([, time]) => time)) >= 2.45,
@@ -70,8 +70,8 @@ assert.deepEqual(
   'wrong feedback should be a clear two-note low tum-dom/bonk falling tone'
 )
 assert.ok(
-  events.filter(([name]) => name === 'gain:linear').some(([, value]) => value >= 0.34),
-  'wrong tone should be audible, but lower and less shiny than the reward chime'
+  events.filter(([name]) => name === 'gain:linear').some(([, value]) => value >= 0.85),
+  'wrong tone should be clearly audible even when device volume is tuned for speech'
 )
 assert.ok(
   Math.max(...events.filter(([name]) => name === 'osc:stop').map(([, time]) => time)) >= 2.32,

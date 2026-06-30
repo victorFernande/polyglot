@@ -1,13 +1,13 @@
 const SOUND_SEQUENCES = {
   correct: [
     // Original, high, bright two-step reward: "tin-din" / "ka-ching".
-    { frequency: 880, start: 0, duration: 0.22, gain: 0.88, type: 'triangle', harmonics: [{ frequency: 1760, gain: 0.34, type: 'sine' }] },
-    { frequency: 1320, start: 0.14, duration: 0.32, gain: 0.98, type: 'sine', harmonics: [{ frequency: 2640, gain: 0.32, type: 'sine' }] },
+    { frequency: 880, start: 0, duration: 0.22, gain: 1.22, type: 'triangle', harmonics: [{ frequency: 1760, gain: 0.48, type: 'sine' }] },
+    { frequency: 1320, start: 0.14, duration: 0.32, gain: 1.42, type: 'sine', harmonics: [{ frequency: 2640, gain: 0.44, type: 'sine' }] },
   ],
   wrong: [
     // Lower, dry, falling "tum-dom" / soft bonk.
-    { frequency: 196, start: 0, duration: 0.17, gain: 0.48, type: 'triangle' },
-    { frequency: 130.81, start: 0.12, duration: 0.24, gain: 0.46, type: 'triangle' },
+    { frequency: 196, start: 0, duration: 0.17, gain: 0.88, type: 'triangle' },
+    { frequency: 130.81, start: 0.12, duration: 0.24, gain: 0.86, type: 'triangle' },
   ],
 }
 
