@@ -1,8 +1,8 @@
 const FANFARE_NOTES = [
-  { frequency: 523.25, start: 0, duration: 0.16, gain: 0.24 },
-  { frequency: 659.25, start: 0.18, duration: 0.16, gain: 0.25 },
-  { frequency: 783.99, start: 0.36, duration: 0.18, gain: 0.25 },
-  { frequency: 1046.5, start: 0.58, duration: 0.58, gain: 0.28 },
+  { frequency: 523.25, start: 0, duration: 0.16, gain: 0.48 },
+  { frequency: 659.25, start: 0.18, duration: 0.16, gain: 0.52 },
+  { frequency: 783.99, start: 0.36, duration: 0.18, gain: 0.56 },
+  { frequency: 1046.5, start: 0.58, duration: 0.58, gain: 0.62 },
 ]
 
 function audioContextConstructor(win) {

@@ -7,6 +7,7 @@ import Flashcards from './pages/Flashcards'
 import Achievements from './pages/Achievements'
 import Leaderboard from './pages/Leaderboard'
 import Profile from './pages/Profile'
+import Sounds from './pages/Sounds'
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/achievements" element={<Achievements />} />
         <Route path="/leaderboard" element={<Leaderboard />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/sounds" element={<Sounds />} />
       </Routes>
     </Layout>
   )

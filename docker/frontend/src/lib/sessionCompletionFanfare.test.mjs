@@ -63,8 +63,8 @@ assert.ok(
   'completion fanfare must stay under two seconds'
 )
 assert.ok(
-  events.filter(([name]) => name === 'gain:linear').some(([, value]) => value <= 0.3 && value >= 0.22),
-  'completion fanfare should be polished and not louder than answer chimes'
+  events.filter(([name]) => name === 'gain:linear').some(([, value]) => value >= 0.58),
+  'completion fanfare should be clearly audible when advancing sessions'
 )
 
 assert.equal(createSessionCompletionFanfarePlayer({}).play(), false, 'missing Web Audio support should fail silently')

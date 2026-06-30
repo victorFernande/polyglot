@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Globe, Trophy, Users, User, Menu, X, Gamepad2, Layers } from 'lucide-react'
+import { Globe, Trophy, Users, User, Menu, X, Gamepad2, Layers, Volume2 } from 'lucide-react'
 
 const navItems = [
   { path: '/', label: 'Dashboard', icon: Globe },
@@ -9,6 +9,7 @@ const navItems = [
   { path: '/achievements', label: 'Conquistas', icon: Trophy },
   { path: '/leaderboard', label: 'Ranking', icon: Users },
   { path: '/profile', label: 'Perfil', icon: User },
+  { path: '/sounds', label: 'Som', icon: Volume2 },
 ]
 
 export default function Layout({ children }) {
