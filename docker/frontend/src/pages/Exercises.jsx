@@ -27,6 +27,7 @@ import { sequenceDialogueCanSubmit, sequenceDialoguePayload } from '../lib/seque
 import { eligibleWordSearchWords, generateWordSearchGrid, updateFoundWordSearchWords, validateWordSearchSelection, wordSearchSeed } from '../lib/wordSearch.mjs'
 import { eligibleLetterBlockWords, generateLetterBlocksPuzzle, validateLetterBlocksPath, updateFoundLetterBlockWords, letterBlocksSeed } from '../lib/letterBlocks.mjs'
 import { buildTypingRushQueue, validateTypingRushAnswer, typingRushPrompt } from '../lib/typingRush.mjs'
+import { buildWordScrambleQueue, validateWordScrambleAnswer } from '../lib/wordScramble.mjs'
 import { buildClozeRushQueue, validateClozeRushSelection, clozeRushPrompt } from '../lib/clozeRush.mjs'
 import { buildArticleBlitzQueue, validateArticleBlitzSelection, ARTICLE_BLITZ_OPTIONS } from '../lib/articleBlitz.mjs'
 import { buildErrorSpotterQueue, validateErrorSpotterSelection } from '../lib/errorSpotter.mjs'
@@ -446,6 +447,7 @@ export default function Exercises() {
           </div>
 
           <TypingRushPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
+          <WordScramblePractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
           <AudioABPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} langCode={langCode} speechPlayback={speechPlaybackRef.current} />
           <ArticleBlitzPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
           <ClozeRushPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
@@ -856,6 +858,119 @@ function TypingRushPractice({ items, lesson, session, currentIndex }) {
         {result && (
           <p className={`mt-3 rounded-lg p-3 text-sm font-semibold ${result.status === 'correct' ? 'bg-polyglot-green/15 text-polyglot-green' : result.status === 'close' ? 'bg-yellow-500/15 text-yellow-200' : 'bg-red-500/15 text-red-200'}`}>
             {feedbackText[result.status]}
+          </p>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function WordScramblePractice({ items, lesson, session, currentIndex }) {
+  const queue = useMemo(() => buildWordScrambleQueue(items, { lesson, session, currentIndex }), [items, lesson, session, currentIndex])
+  const [cardIndex, setCardIndex] = useState(0)
+  const [selectedLetters, setSelectedLetters] = useState([])
+  const [result, setResult] = useState(null)
+  const [correctCount, setCorrectCount] = useState(0)
+
+  useEffect(() => {
+    setCardIndex(0)
+    setSelectedLetters([])
+    setResult(null)
+    setCorrectCount(0)
+  }, [queue.map((card) => card.seed).join('|')])
+
+  if (queue.length < 3) return null
+
+  const card = queue[cardIndex % queue.length]
+  const selectedText = selectedLetters.join('')
+
+  function selectedLetterCount(letter) {
+    return selectedLetters.filter((selected) => selected === letter).length
+  }
+
+  function availableLetterCount(letter, index) {
+    return card.letters.slice(0, index + 1).filter((available) => available === letter).length
+  }
+
+  function chooseLetter(letter) {
+    setSelectedLetters((letters) => [...letters, letter])
+    setResult(null)
+  }
+
+  function removeLetter(index) {
+    setSelectedLetters((letters) => letters.filter((_, idx) => idx !== index))
+    setResult(null)
+  }
+
+  function verify() {
+    const nextResult = validateWordScrambleAnswer(selectedLetters, card.answer)
+    setResult(nextResult)
+    if (nextResult.status === 'correct') setCorrectCount((count) => count + 1)
+  }
+
+  function clear() {
+    setSelectedLetters([])
+    setResult(null)
+  }
+
+  function nextCard() {
+    setCardIndex((index) => (index + 1) % queue.length)
+    setSelectedLetters([])
+    setResult(null)
+  }
+
+  return (
+    <div className="mt-8 rounded-2xl border border-fuchsia-400/30 bg-fuchsia-500/10 p-4">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">Treino local: palavra embaralhada</p>
+          <h3 className="mt-1 text-xl font-bold text-white">Monte a palavra com letras misturadas</h3>
+          <p className="mt-1 text-sm text-gray-300">Ortografia ativa com respostas desta sessão. Este treino não altera XP/progresso.</p>
+        </div>
+        <span className="w-fit rounded-full border border-white/10 bg-black/20 px-3 py-1 text-sm font-semibold text-polyglot-accent">{correctCount} acertos</span>
+      </div>
+
+      <div className="mt-4 rounded-xl border border-white/10 bg-black/20 p-4">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">Dica</p>
+        <p className="mt-1 text-lg font-bold text-white">{typingRushPrompt(card.prompt, card.answer)}</p>
+        <div className="mt-4 min-h-16 rounded-xl border border-dashed border-fuchsia-300/30 bg-black/20 p-3">
+          {selectedLetters.length === 0 ? (
+            <span className="text-gray-500">Toque nas letras abaixo...</span>
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              {selectedLetters.map((letter, index) => (
+                <button key={`${letter}-${index}`} type="button" onClick={() => removeLetter(index)} className="rounded-lg bg-polyglot-accent px-3 py-2 text-xl font-bold text-white shadow-sm transition hover:scale-[1.02] active:scale-95" aria-label={`Remover letra ${letter}`}>
+                  {letter}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="mt-3 flex flex-wrap gap-2">
+          {card.letters.map((letter, index) => (
+            <button
+              key={`${letter}-${index}`}
+              type="button"
+              disabled={selectedLetterCount(letter) >= availableLetterCount(letter, index)}
+              onClick={() => chooseLetter(letter)}
+              className="rounded-lg bg-white/10 px-4 py-3 text-xl font-bold hover:bg-white/20 disabled:opacity-30"
+            >
+              {letter}
+            </button>
+          ))}
+        </div>
+
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <button type="button" className="btn-primary disabled:opacity-40" disabled={selectedLetters.length !== Array.from(card.answer).length} onClick={verify}>Verificar</button>
+          <button type="button" className="btn-secondary disabled:opacity-40" disabled={!selectedLetters.length} onClick={clear}>Limpar</button>
+          <button type="button" className="btn-secondary" onClick={nextCard}>Próxima</button>
+          {selectedText && <span className="text-sm text-gray-400">Sua resposta: <strong className="text-white">{selectedText}</strong></span>}
+        </div>
+
+        {result && (
+          <p className={`mt-3 rounded-lg p-3 text-sm font-semibold ${result.status === 'correct' ? 'bg-polyglot-green/15 text-polyglot-green' : 'bg-red-500/15 text-red-200'}`}>
+            {result.status === 'correct' ? 'Correto — boa ortografia.' : `Resposta esperada: ${result.expected}`}
           </p>
         )}
       </div>
