@@ -19,6 +19,7 @@ import { cleanExercisePrompt, isTrailSessionEnabled, pageForSessionNumber, sessi
 import { nextExerciseActionLabel, sessionNumberForExerciseSession } from '../lib/exerciseSessionLabels.mjs'
 import { parseMicroDialoguePrompt } from '../lib/microDialoguePrompt.mjs'
 import { playAnswerFeedbackSound, unlockAnswerFeedbackSound } from '../lib/answerFeedbackSound.mjs'
+import { playSessionCompletionFanfare, unlockSessionCompletionFanfare } from '../lib/sessionCompletionFanfare.mjs'
 import { buildLetterScramblePayload, isLetterScrambleEligible, singleWordBuildAnswer, stableScrambleLetters } from '../lib/letterScramble.mjs'
 import { buildMemoryMatchCards, memoryMatchSelection } from '../lib/memoryMatch.mjs'
 
@@ -221,7 +222,11 @@ export default function Exercises() {
 
   async function next() {
     resetExerciseState()
-    if (session?.current_index >= session?.total_count) await finish(true)
+    if (session?.current_index >= session?.total_count) {
+      unlockSessionCompletionFanfare()
+      await finish(true)
+      return
+    }
   }
 
   async function finish(continueNext = false) {
@@ -234,6 +239,7 @@ export default function Exercises() {
       setLessons(refreshed)
       setPathData(await loadExercisePath(user?.id || 1))
       if (continueNext) {
+        playSessionCompletionFanfare()
         const currentLesson = refreshed.find((l) => l.id === lesson?.id) || lessons.find((l) => l.id === lesson?.id) || lesson
         if (currentLesson?.id) {
           const started = await startExerciseSession(currentLesson.id, user?.id || 1)
