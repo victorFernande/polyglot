@@ -114,9 +114,11 @@ test('connector from active session to next session uses a slow dark-orange and 
 
   assert.match(classes, /bg-\[length:200%_100%\]/)
   assert.match(classes, /animate-shimmer-slow/)
-  assert.match(classes, /from-orange-900/)
+  assert.match(classes, /from-orange-700/)
   assert.match(classes, /via-white/)
-  assert.match(classes, /to-orange-900/)
+  assert.match(classes, /to-orange-700/)
+  assert.doesNotMatch(classes, /from-orange-900/)
+  assert.doesNotMatch(classes, /to-orange-900/)
   assert.doesNotMatch(classes, /from-blue-900/)
   assert.doesNotMatch(classes, /to-blue-900/)
   assert.doesNotMatch(classes, /from-polyglot-accent/)

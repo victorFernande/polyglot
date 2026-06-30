@@ -238,6 +238,15 @@ class ExerciseService:
         return {"type":"sequence_dialogue","prompt":prompt,"answer":{"value":phrases},"options":None,"tiles":tiles,"pairs":None,"hint":"Ordene as falas/frases para formar uma sequência comunicativa lógica.","explanation":"A ordem correta reconstrói o fluxo da situação: começo, desenvolvimento, pergunta/resposta e fechamento.","xp_reward":12 + (idx % 4)}
 
     @staticmethod
+    def _coherent_sequence_phrases(unit, code: str, topic_index: int):
+        # Use the real communicative phrases from the unit, not the expanded
+        # metalinguistic vocabulary bank. The four-card sequence should read
+        # like a short dialogue/introduction that a learner can order by logic.
+        unit_phrases = [foreign for _portuguese, foreign in unit["phrases"][code]]
+        start = max(0, min(len(unit_phrases) - 4, topic_index - 4))
+        return unit_phrases[start:start + 4]
+
+    @staticmethod
     def _match(prompt, pairs, idx):
         return {"type":"match","prompt":prompt,"answer":{"pairs":pairs},"options":None,"tiles":None,"pairs":pairs,"hint":"Combine pelo significado, não pela aparência da palavra.","explanation":"Matching fortalece reconhecimento rápido de vocabulário.","xp_reward":12 + (idx % 4)}
 
@@ -514,9 +523,9 @@ class ExerciseService:
                         pairs = [[foreign, portuguese] for portuguese, foreign in sample]
                         item = ExerciseService._match(prompt, pairs, idx)
                     elif item_type == "sequence_dialogue":
-                        sample = ExerciseService._matching_sample(bank, start + question_index - 1, 4)
-                        phrases = [foreign for _portuguese, foreign in sample]
-                        prompt = f"{prefix}: ordene o diálogo/situação no cenário “{topic_name}”"
+                        phrases = ExerciseService._coherent_sequence_phrases(unit, code, topic_index)
+                        sequence_label = "apresentação curta" if unit["title"] == "Apresente-se" else "sequência curta"
+                        prompt = f"{prefix}: ordene uma {sequence_label} no cenário “{topic_name}”"
                         item = ExerciseService._sequence_dialogue(prompt, phrases, idx)
                     else:
                         if question_index in {5, 10}:

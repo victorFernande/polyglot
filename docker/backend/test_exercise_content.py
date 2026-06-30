@@ -208,6 +208,25 @@ def test_sequence_dialogue_items_order_four_topic_phrases_and_validate_ordered_p
     assert ExerciseService.normalize(list(reversed(item["answer"]["value"]))) != ExerciseService.normalize(item["answer"])
 
 
+def test_sequence_dialogue_session_14_question_9_is_a_coherent_introduction():
+    items = ExerciseService.generate_items("de")
+    item = items[138]
+
+    assert item["type"] == "sequence_dialogue"
+    assert "apresentação curta" in item["prompt"].casefold()
+    assert item["answer"]["value"] == [
+        "Ich heiße Victor.",
+        "Ich komme aus Brasilien.",
+        "Ich wohne in São Paulo.",
+        "Ich spreche Portugiesisch.",
+    ]
+    joined = " ".join(item["answer"]["value"]).casefold()
+    assert "das wort" not in joined
+    assert "ich höre" not in joined
+    assert "ich lese" not in joined
+    assert "neun" not in joined
+
+
 def test_choice_items_include_reverse_comprehension_prompts_with_portuguese_options():
     items = ExerciseService.generate_items("de")
     reverse_items = [
