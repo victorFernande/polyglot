@@ -34,6 +34,7 @@ import { buildArticleSorterRound, validateArticleSorterBuckets, ARTICLE_SORTER_B
 import { buildErrorSpotterQueue, validateErrorSpotterSelection } from '../lib/errorSpotter.mjs'
 import { buildAudioABQueue, validateAudioABSelection } from '../lib/audioAB.mjs'
 import { buildAudioBingoQueue, validateAudioBingoSelection } from '../lib/audioBingo.mjs'
+import { buildOrthographyRepairQueue, validateOrthographyRepairAnswer, damageOrthographyRepairText } from '../lib/orthographyRepair.mjs'
 
 const LANG_META = {
   de: { accent: 'Rammstein', color: 'from-red-600 to-red-900' },
@@ -449,6 +450,7 @@ export default function Exercises() {
           </div>
 
           <TypingRushPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
+          <OrthographyRepairPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
           <WordScramblePractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
           <AudioABPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} langCode={langCode} speechPlayback={speechPlaybackRef.current} />
           <AudioBingoPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} langCode={langCode} speechPlayback={speechPlaybackRef.current} />
@@ -1021,6 +1023,84 @@ function TypingRushPractice({ items, lesson, session, currentIndex }) {
             className="min-w-0 flex-1 rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-white outline-none focus:border-polyglot-accent"
             placeholder="Digite aqui..."
             aria-label="Resposta do treino de digitação relâmpago"
+          />
+          <button type="button" className="btn-primary disabled:opacity-40" disabled={!input.trim()} onClick={verify}>Verificar</button>
+          <button type="button" className="btn-secondary" onClick={nextCard}>Próxima</button>
+        </div>
+        {result && (
+          <p className={`mt-3 rounded-lg p-3 text-sm font-semibold ${result.status === 'correct' ? 'bg-polyglot-green/15 text-polyglot-green' : result.status === 'close' ? 'bg-yellow-500/15 text-yellow-200' : 'bg-red-500/15 text-red-200'}`}>
+            {feedbackText[result.status]}
+          </p>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function OrthographyRepairPractice({ items, lesson, session, currentIndex }) {
+  const queue = useMemo(() => buildOrthographyRepairQueue(items, { lesson, session, currentIndex }), [items, lesson, session, currentIndex])
+  const [cardIndex, setCardIndex] = useState(0)
+  const [input, setInput] = useState('')
+  const [result, setResult] = useState(null)
+  const [correctCount, setCorrectCount] = useState(0)
+
+  useEffect(() => {
+    setCardIndex(0)
+    setInput('')
+    setResult(null)
+    setCorrectCount(0)
+  }, [queue.map((card) => card.seed).join('|')])
+
+  if (queue.length < 2) return null
+
+  const card = queue[cardIndex % queue.length]
+  const damaged = card.damaged || damageOrthographyRepairText(card.answer)
+  const feedbackText = {
+    correct: 'Correto — ortografia restaurada.',
+    close: 'Quase: palavras certas, mas revise maiúsculas/pontuação.',
+    wrong: `Resposta esperada: ${result?.expected}`,
+  }
+
+  function verify() {
+    const nextResult = validateOrthographyRepairAnswer(input, card.answer)
+    setResult(nextResult)
+    if (nextResult.status === 'correct') setCorrectCount((count) => count + 1)
+  }
+
+  function nextCard() {
+    setCardIndex((index) => (index + 1) % queue.length)
+    setInput('')
+    setResult(null)
+  }
+
+  return (
+    <div className="mt-8 rounded-2xl border border-amber-300/30 bg-amber-500/10 p-4">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">Treino local: reparador de ortografia</p>
+          <h3 className="mt-1 text-xl font-bold text-white">Repare a frase</h3>
+          <p className="mt-1 text-sm text-gray-300">Restaure maiúsculas, acentos e pontuação com frases desta sessão. Este treino não altera XP/progresso.</p>
+        </div>
+        <span className="w-fit rounded-full border border-white/10 bg-black/20 px-3 py-1 text-sm font-semibold text-polyglot-accent">{correctCount} acertos</span>
+      </div>
+
+      <div className="mt-4 rounded-xl border border-white/10 bg-black/20 p-4">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">Frase danificada</p>
+        <p className="mt-1 rounded-xl border border-dashed border-amber-200/30 bg-black/20 px-4 py-3 text-lg font-bold text-white">{damaged}</p>
+        <p className="mt-2 text-xs text-gray-400">Dica de contexto: {card.prompt}</p>
+        <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+          <input
+            value={input}
+            onChange={(event) => {
+              setInput(event.target.value)
+              setResult(null)
+            }}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' && input.trim()) verify()
+            }}
+            className="min-w-0 flex-1 rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-white outline-none focus:border-polyglot-accent"
+            placeholder="Digite a frase corrigida..."
+            aria-label="Resposta do treino reparador de ortografia"
           />
           <button type="button" className="btn-primary disabled:opacity-40" disabled={!input.trim()} onClick={verify}>Verificar</button>
           <button type="button" className="btn-secondary" onClick={nextCard}>Próxima</button>
