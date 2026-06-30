@@ -4,7 +4,7 @@ import { Check, Heart, X, Volume2, RotateCcw, Trophy, ArrowRight, Loader2, Star,
 import LanguageFlag from '../components/LanguageFlag'
 import { answerExerciseSession, bootstrapUser, completeExerciseSession, loadExerciseLessons, loadExercisePath, startExerciseSession, apiFetch, synthesizeSpeech } from '../lib/api'
 import { handleExerciseKeyDown } from '../lib/exerciseKeyboard.mjs'
-import { buildTilesForItem, matchRightOptions, stableShuffleOptions } from '../lib/exerciseOptions.mjs'
+import { buildTilesForItem, stableShuffleOptions } from '../lib/exerciseOptions.mjs'
 import { speakSegmentsWithBrowser, voiceSegmentsForAnswerOnly, voiceSegmentsForFeedback, voiceSegmentsForItem } from '../lib/voiceMode.mjs'
 import { createSpeechPlaybackController } from '../lib/speechPlayback.mjs'
 import { buildExerciseFeedback } from '../lib/exerciseFeedback.mjs'
@@ -20,6 +20,7 @@ import { nextExerciseActionLabel, sessionNumberForExerciseSession } from '../lib
 import { parseMicroDialoguePrompt } from '../lib/microDialoguePrompt.mjs'
 import { playAnswerFeedbackSound, unlockAnswerFeedbackSound } from '../lib/answerFeedbackSound.mjs'
 import { buildLetterScramblePayload, isLetterScrambleEligible, singleWordBuildAnswer, stableScrambleLetters } from '../lib/letterScramble.mjs'
+import { buildMemoryMatchCards, memoryMatchSelection } from '../lib/memoryMatch.mjs'
 
 const LANG_META = {
   de: { accent: 'Rammstein', color: 'from-red-600 to-red-900' },
@@ -691,6 +692,66 @@ function LetterScramble({ item, built, setBuilt, onInteract }) {
 
 function Match({ item, matched, setMatched, onInteract }) {
   const pairs = matchPairs(item)
-  const rights = matchRightOptions(item)
-  return <div className="grid gap-3 md:grid-cols-2">{pairs.map(([left]) => <div key={left} className="rounded-xl bg-white/5 p-4"><div className="mb-3 text-xl font-bold">{left}</div><div className="flex flex-wrap gap-2">{rights.map((right) => <button key={right} onClick={() => { onInteract(); setMatched({ ...matched, [left]: right }) }} className={`rounded-lg px-3 py-2 text-sm font-semibold ${matched[left] === right ? 'bg-polyglot-accent' : 'bg-white/10 hover:bg-white/20'}`}>{right}</button>)}</div></div>)}</div>
+  const cards = useMemo(() => buildMemoryMatchCards(pairs, item.id ?? item.prompt), [item.id, item.prompt, pairs])
+  const [selectedCards, setSelectedCards] = useState([])
+  const [mismatchedIds, setMismatchedIds] = useState([])
+
+  useEffect(() => {
+    setSelectedCards([])
+    setMismatchedIds([])
+  }, [item.id])
+
+  function isCardFound(card) {
+    if (card.side === 'left') return matched[card.value] === card.matchValue
+    return matched[card.matchValue] === card.value
+  }
+
+  function chooseCard(card) {
+    if (isCardFound(card) || selectedCards.some((selected) => selected.id === card.id)) return
+    onInteract()
+    const nextSelected = selectedCards.length >= 2 ? [card] : [...selectedCards, card]
+    setSelectedCards(nextSelected)
+
+    if (nextSelected.length === 2) {
+      const result = memoryMatchSelection({ selectedCards: nextSelected, matched })
+      if (result.isPairFound) setMatched(result.matched)
+      if (!result.isPairFound) setMismatchedIds(nextSelected.map((selected) => selected.id))
+      window.setTimeout(() => {
+        setSelectedCards([])
+        setMismatchedIds([])
+      }, result.isPairFound ? 250 : 700)
+    }
+  }
+
+  return (
+    <div className="space-y-3">
+      <p className="text-sm text-gray-400">Vire duas cartas para encontrar cada par. Pares corretos ficam revelados e a resposta final continua no mesmo formato de associação.</p>
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {cards.map((card) => {
+          const found = isCardFound(card)
+          const selected = selectedCards.some((candidate) => candidate.id === card.id)
+          const mismatched = mismatchedIds.includes(card.id)
+          const revealed = found || selected
+          return (
+            <button
+              key={card.id}
+              type="button"
+              onClick={() => chooseCard(card)}
+              aria-pressed={revealed}
+              disabled={found}
+              className={`min-h-24 rounded-2xl border p-3 text-center font-bold transition ${found ? 'border-polyglot-green/60 bg-polyglot-green/20 text-polyglot-green' : mismatched ? 'border-red-400/70 bg-red-500/20 text-red-100' : selected ? 'border-polyglot-accent bg-polyglot-accent/20 text-white' : 'border-white/10 bg-white/5 text-gray-500 hover:border-polyglot-accent/50 hover:bg-white/10'}`}
+            >
+              {revealed ? (
+                <span className="block text-lg text-white">{card.value}</span>
+              ) : (
+                <span className="block text-2xl text-polyglot-accent">?</span>
+              )}
+              {revealed && <span className="mt-2 block text-[11px] font-semibold uppercase tracking-[0.16em] text-gray-400">{card.side === 'left' ? 'termo' : 'par'}</span>}
+            </button>
+          )
+        })}
+      </div>
+      <div className="text-xs text-gray-500">Pares encontrados: {Object.keys(matched).length}/{pairs.length}</div>
+    </div>
+  )
 }
