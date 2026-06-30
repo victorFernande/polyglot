@@ -19,7 +19,7 @@ export default {
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'bounce-slow': 'bounce 2s infinite',
         'shimmer': 'shimmer 2s linear infinite',
-        'shimmer-slow': 'shimmer 7s linear infinite',
+        'shimmer-slow': 'shimmer 15s linear infinite',
       },
       keyframes: {
         shimmer: {
