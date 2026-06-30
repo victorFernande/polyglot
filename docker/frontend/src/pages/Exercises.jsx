@@ -29,6 +29,7 @@ import { eligibleLetterBlockWords, generateLetterBlocksPuzzle, validateLetterBlo
 import { buildTypingRushQueue, validateTypingRushAnswer, typingRushPrompt } from '../lib/typingRush.mjs'
 import { buildClozeRushQueue, validateClozeRushSelection, clozeRushPrompt } from '../lib/clozeRush.mjs'
 import { buildArticleBlitzQueue, validateArticleBlitzSelection, ARTICLE_BLITZ_OPTIONS } from '../lib/articleBlitz.mjs'
+import { buildErrorSpotterQueue, validateErrorSpotterSelection } from '../lib/errorSpotter.mjs'
 
 const LANG_META = {
   de: { accent: 'Rammstein', color: 'from-red-600 to-red-900' },
@@ -446,6 +447,7 @@ export default function Exercises() {
           <TypingRushPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
           <ArticleBlitzPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
           <ClozeRushPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
+          <ErrorSpotterPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
           <WordSearchPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
           <LetterBlocksPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
         </div>
@@ -524,6 +526,99 @@ function ArticleBlitzPractice({ items, lesson, session, currentIndex }) {
           <p className={`mt-3 rounded-lg p-3 text-sm font-semibold ${result.status === 'correct' ? 'bg-polyglot-green/15 text-polyglot-green' : 'bg-red-500/15 text-red-200'}`}>
             {result.status === 'correct' ? 'Correto — artigo recuperado.' : `Resposta esperada: ${result.fullAnswer}`}
           </p>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function ErrorSpotterPractice({ items, lesson, session, currentIndex }) {
+  const queue = useMemo(() => buildErrorSpotterQueue(items, { lesson, session, currentIndex }), [items, lesson, session, currentIndex])
+  const [cardIndex, setCardIndex] = useState(0)
+  const [selectedToken, setSelectedToken] = useState('')
+  const [result, setResult] = useState(null)
+  const [correctCount, setCorrectCount] = useState(0)
+
+  useEffect(() => {
+    setCardIndex(0)
+    setSelectedToken('')
+    setResult(null)
+    setCorrectCount(0)
+  }, [queue.map((card) => card.seed).join('|')])
+
+  if (queue.length < 3) return null
+
+  const card = queue[cardIndex % queue.length]
+
+  function chooseToken(token, index) {
+    setSelectedToken(`${index}:${token}`)
+    setResult(null)
+  }
+
+  function verify() {
+    const token = selectedToken.replace(/^\d+:/u, '')
+    const nextResult = validateErrorSpotterSelection(token, card)
+    setResult(nextResult)
+    if (nextResult.status === 'correct') setCorrectCount((count) => count + 1)
+  }
+
+  function nextCard() {
+    setCardIndex((index) => (index + 1) % queue.length)
+    setSelectedToken('')
+    setResult(null)
+  }
+
+  function restart() {
+    setCardIndex(0)
+    setSelectedToken('')
+    setResult(null)
+    setCorrectCount(0)
+  }
+
+  return (
+    <div className="mt-8 rounded-2xl border border-orange-400/30 bg-orange-500/10 p-4">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">Treino local: caça-erro</p>
+          <h3 className="mt-1 text-xl font-bold text-white">Encontre a palavra intrusa</h3>
+          <p className="mt-1 text-sm text-gray-300">Clique no chip que deixou a frase errada. Este treino não altera XP/progresso.</p>
+        </div>
+        <span className="w-fit rounded-full border border-white/10 bg-black/20 px-3 py-1 text-sm font-semibold text-polyglot-accent">{correctCount} acertos</span>
+      </div>
+
+      <div className="mt-4 rounded-xl border border-white/10 bg-black/20 p-4">
+        {card.prompt && (
+          <>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">Contexto</p>
+            <p className="mt-1 text-sm text-gray-300">{card.prompt}</p>
+          </>
+        )}
+        <div className="mt-4 flex flex-wrap gap-2">
+          {card.spottedTokens.map((token, index) => {
+            const tokenKey = `${index}:${token}`
+            return (
+              <button
+                key={tokenKey}
+                type="button"
+                onClick={() => chooseToken(token, index)}
+                className={`rounded-xl border px-4 py-3 text-lg font-black transition ${selectedToken === tokenKey ? 'border-polyglot-accent bg-polyglot-accent/25 text-white' : 'border-white/10 bg-white/5 text-gray-100 hover:border-polyglot-accent/50 hover:bg-white/10'}`}
+              >
+                {token}
+              </button>
+            )
+          })}
+        </div>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <button type="button" className="btn-primary disabled:opacity-40" disabled={!selectedToken} onClick={verify}>Verificar</button>
+          <button type="button" className="btn-secondary" onClick={nextCard}>Próxima</button>
+          <button type="button" className="btn-secondary" onClick={restart}><RotateCcw className="h-4 w-4" /> Reiniciar</button>
+        </div>
+        {result && (
+          <div className={`mt-3 rounded-lg p-3 text-sm font-semibold ${result.status === 'correct' ? 'bg-polyglot-green/15 text-polyglot-green' : 'bg-red-500/15 text-red-200'}`}>
+            <p>{result.status === 'correct' ? `Sim — a palavra intrusa era ${result.intruder}.` : 'Ainda não. Compare com o sentido da frase e tente outra.'}</p>
+            <p className="mt-1 opacity-90">Frase correta: {result.correctText}</p>
+            {result.status === 'correct' && <p className="mt-1 opacity-80">No lugar dela, a frase usa: {result.correctToken}</p>}
+          </div>
         )}
       </div>
     </div>
