@@ -109,13 +109,13 @@ test('active trail node uses a stable highlight, not a loading animation', () =>
   assert.doesNotMatch(classes, /animate-pulse/)
 })
 
-test('connector from active session to next session uses a deliberately slow loading-bar animation', () => {
+test('connector from active session to next session uses a Lottie-friendly fallback track instead of shimmer CSS', () => {
   const classes = trailConnectorStateClasses({ number: 11, status: 'current' }, { number: 12, status: 'locked' }, 11)
 
-  assert.match(classes, /bg-\[length:200%_100%\]/)
-  assert.match(classes, /animate-shimmer-slow/)
+  assert.match(classes, /bg-polyglot-accent\/10/)
+  assert.doesNotMatch(classes, /bg-\[length:200%_100%\]/)
+  assert.doesNotMatch(classes, /animate-shimmer-slow/)
   assert.doesNotMatch(classes, /animate-shimmer(\s|$)/)
-  assert.match(classes, /from-polyglot-accent/)
   assert.doesNotMatch(classes, /bg-white\/15/)
 })
 
@@ -140,6 +140,17 @@ test('Exercises desktop trail requests five sessions per page to reduce visual c
   assert.match(source, /sessionWindowForPage\(path\.nodes, page, 5\)/)
   assert.doesNotMatch(source, /pageForSessionNumber\(currentSessionNumber, 10\)/)
   assert.doesNotMatch(source, /sessionWindowForPage\(path\.nodes, page, 10\)/)
+})
+
+test('active trail connector renders the requested hosted Lottie animation', () => {
+  const source = readFileSync(new URL('../pages/Exercises.jsx', import.meta.url), 'utf8')
+  const packageJson = readFileSync(new URL('../../package.json', import.meta.url), 'utf8')
+
+  assert.match(packageJson, /@dotlottie\/player-component/)
+  assert.match(source, /@dotlottie\/player-component/)
+  assert.match(source, /https:\/\/lottie\.host\/67a98442-61e9-4ff8-8676-aab2eced50a1\/5BMMpIf6hv\.lottie/)
+  assert.match(source, /<dotlottie-player/)
+  assert.match(source, /trailConnectorStateClasses\(leftNode, rightNode, currentSessionNumber\)/)
 })
 
 test('mobile trail nodes render only the inner marker and label, without card button wrapper', () => {

@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
+import '@dotlottie/player-component'
 import { motion } from 'framer-motion'
 import { Check, Heart, X, Volume2, RotateCcw, Trophy, ArrowRight, Loader2, Star, ChevronLeft, ChevronRight } from 'lucide-react'
 import LanguageFlag from '../components/LanguageFlag'
@@ -43,6 +44,7 @@ const LESSON_LANGUAGE_FILTERS = [
 
 const BUILD_LIKE_TYPES = ['build', 'listen_build']
 const ANSWER_FEEDBACK_SPEECH_DELAY_MS = 420
+const TRAIL_CONNECTOR_LOTTIE_URL = 'https://lottie.host/67a98442-61e9-4ff8-8676-aab2eced50a1/5BMMpIf6hv.lottie'
 
 function answerValue(answer) {
   if (answer && typeof answer === 'object' && 'value' in answer) return answer.value
@@ -486,7 +488,7 @@ function SkillTrail({ path, lessonContext, page, mobilePage, onPageChange, onMob
           </div>
           <span className={`${layout.nodeLabel} ${isActiveSession ? 'text-polyglot-accent' : 'text-gray-400'}`}>Sessão {node.number}</span>
         </button>
-        {index < nodes.length - 1 && <div className={`mx-2 h-1 flex-1 rounded-full ${trailConnectorStateClasses(node, nextNode, currentSessionNumber)}`} />}
+        {index < nodes.length - 1 && <TrailConnector leftNode={node} rightNode={nextNode} currentSessionNumber={currentSessionNumber} className="mx-2 h-6 flex-1" />}
       </div>
     )
   }
@@ -503,7 +505,7 @@ function SkillTrail({ path, lessonContext, page, mobilePage, onPageChange, onMob
           </div>
           <span className={`mt-1 block truncate text-[11px] font-semibold ${isActiveSession ? 'text-polyglot-accent' : 'text-gray-400'}`}>S{node.number}</span>
         </div>
-        {index < nodes.length - 1 && <div className={`${layout.mobileConnector} ${trailConnectorStateClasses(node, nextNode, currentSessionNumber)}`} />}
+        {index < nodes.length - 1 && <TrailConnector leftNode={node} rightNode={nextNode} currentSessionNumber={currentSessionNumber} className={layout.mobileConnector} compact />}
       </React.Fragment>
     )
   }
@@ -552,6 +554,26 @@ function SkillTrail({ path, lessonContext, page, mobilePage, onPageChange, onMob
           )}
         </div>
       </div>
+    </div>
+  )
+}
+
+function TrailConnector({ leftNode, rightNode, currentSessionNumber, className = '', compact = false }) {
+  const isActiveConnector = leftNode?.number === currentSessionNumber && rightNode?.number === currentSessionNumber + 1
+  const trackClasses = trailConnectorStateClasses(leftNode, rightNode, currentSessionNumber)
+
+  return (
+    <div className={`${className} relative overflow-hidden rounded-full ${trackClasses}`}>
+      {isActiveConnector && (
+        <dotlottie-player
+          src={TRAIL_CONNECTOR_LOTTIE_URL}
+          autoplay
+          loop
+          speed="1"
+          aria-hidden="true"
+          className={`pointer-events-none absolute inset-0 h-full w-full scale-x-125 ${compact ? 'scale-y-[3]' : 'scale-y-150'}`}
+        />
+      )}
     </div>
   )
 }
