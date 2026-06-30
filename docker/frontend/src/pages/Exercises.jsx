@@ -23,7 +23,7 @@ import { playSessionCompletionFanfare, unlockSessionCompletionFanfare } from '..
 import { buildLetterScramblePayload, isLetterScrambleEligible, singleWordBuildAnswer, stableScrambleLetters } from '../lib/letterScramble.mjs'
 import { buildMemoryMatchCards, memoryMatchSelection } from '../lib/memoryMatch.mjs'
 import { buildListenBuildDictationPayload, canSubmitListenBuildDictation } from '../lib/listenBuildDictation.mjs'
-import { sequenceDialogueCanSubmit, sequenceDialoguePayload } from '../lib/sequenceDialogue.mjs'
+import { sequenceDialogueCanSubmit, sequenceDialoguePayload, sequenceDialogueSupportForPhrase } from '../lib/sequenceDialogue.mjs'
 
 const LANG_META = {
   de: { accent: 'Rammstein', color: 'from-red-600 to-red-900' },
@@ -665,7 +665,8 @@ function SequenceDialogue({ item, built, setBuilt, onInteract }) {
                     className="w-full cursor-grab rounded-xl border border-polyglot-accent/40 bg-polyglot-accent/20 px-4 py-3 text-left font-semibold text-white transition hover:scale-[1.01] active:cursor-grabbing active:scale-[0.99]"
                     title="Arraste para reordenar · Clique para remover"
                   >
-                    {phrase}
+                    {sequenceDialogueSupportForPhrase(item, phrase) && <span className="block text-xs font-semibold uppercase tracking-[0.16em] text-orange-200">{sequenceDialogueSupportForPhrase(item, phrase)}</span>}
+                    <span className="mt-1 block">{phrase}</span>
                   </button>
                 </li>
               ))}
@@ -677,7 +678,8 @@ function SequenceDialogue({ item, built, setBuilt, onInteract }) {
       <div className="grid gap-2 sm:grid-cols-2">
         {tiles.map((tile, i) => (
           <button key={`${tile}-${i}`} disabled={built.includes(tile)} onClick={() => { onInteract(); setBuilt([...built, tile]) }} className="rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-left font-semibold hover:bg-white/20 disabled:opacity-30">
-            {tile}
+            {sequenceDialogueSupportForPhrase(item, tile) && <span className="block text-xs font-semibold uppercase tracking-[0.16em] text-gray-400">{sequenceDialogueSupportForPhrase(item, tile)}</span>}
+            <span className="mt-1 block">{tile}</span>
           </button>
         ))}
       </div>

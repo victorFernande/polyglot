@@ -59,7 +59,8 @@ def test_seed_lessons_is_long_varied_and_idempotent():
                     assert len(item.answer["value"]) == 4
                     assert all(phrase in item.tiles for phrase in item.answer["value"])
                     assert item.options is None
-                    assert item.pairs is None
+                    assert item.pairs
+                    assert [foreign for _pt, foreign in item.pairs] == item.answer["value"]
                 elif item.type == "match":
                     assert item.answer["pairs"] == item.pairs
                     assert len(item.pairs) == 4
@@ -198,7 +199,8 @@ def test_sequence_dialogue_items_order_four_topic_phrases_and_validate_ordered_p
 
     assert sequence_items, "expected at least one sequence_dialogue item in generated track"
     item = sequence_items[0]
-    assert "ordene" in f"{item['prompt']} {item['hint']}".casefold()
+    assert "monte" in f"{item['prompt']} {item['hint']}".casefold()
+    assert "apoio" in f"{item['prompt']} {item['hint']}".casefold()
     assert isinstance(item["answer"]["value"], list)
     assert len(item["answer"]["value"]) == 4
     assert len(set(item["answer"]["value"])) == 4
@@ -213,12 +215,20 @@ def test_sequence_dialogue_session_14_question_9_is_a_coherent_introduction():
     item = items[138]
 
     assert item["type"] == "sequence_dialogue"
-    assert "apresentação curta" in item["prompt"].casefold()
+    prompt = item["prompt"].casefold()
+    assert "monte uma apresentação curta" in prompt
+    assert "nome → origem → onde mora → idioma que fala" in prompt
     assert item["answer"]["value"] == [
         "Ich heiße Victor.",
         "Ich komme aus Brasilien.",
         "Ich wohne in São Paulo.",
         "Ich spreche Portugiesisch.",
+    ]
+    assert item["pairs"] == [
+        ["Meu nome é Victor.", "Ich heiße Victor."],
+        ["Eu sou do Brasil.", "Ich komme aus Brasilien."],
+        ["Eu moro em São Paulo.", "Ich wohne in São Paulo."],
+        ["Eu falo português.", "Ich spreche Portugiesisch."],
     ]
     joined = " ".join(item["answer"]["value"]).casefold()
     assert "das wort" not in joined

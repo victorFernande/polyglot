@@ -230,21 +230,21 @@ class ExerciseService:
         return item
 
     @staticmethod
-    def _sequence_dialogue(prompt, phrases, idx):
+    def _sequence_dialogue(prompt, phrases, idx, pairs=None):
         tiles = list(phrases)
         if len(tiles) > 1:
             shift = (idx % (len(tiles) - 1)) + 1
             tiles = tiles[shift:] + tiles[:shift]
-        return {"type":"sequence_dialogue","prompt":prompt,"answer":{"value":phrases},"options":None,"tiles":tiles,"pairs":None,"hint":"Ordene as falas/frases para formar uma sequência comunicativa lógica.","explanation":"A ordem correta reconstrói o fluxo da situação: começo, desenvolvimento, pergunta/resposta e fechamento.","xp_reward":12 + (idx % 4)}
+        return {"type":"sequence_dialogue","prompt":prompt,"answer":{"value":phrases},"options":None,"tiles":tiles,"pairs":pairs,"hint":"Use o apoio em português de cada carta para ordenar a sequência; envie a ordem das frases no idioma estudado.","explanation":"A ordem correta reconstrói o fluxo da situação pelo significado: começo, contexto, detalhe e fechamento.","xp_reward":12 + (idx % 4)}
 
     @staticmethod
-    def _coherent_sequence_phrases(unit, code: str, topic_index: int):
+    def _coherent_sequence_pairs(unit, code: str, topic_index: int):
         # Use the real communicative phrases from the unit, not the expanded
         # metalinguistic vocabulary bank. The four-card sequence should read
         # like a short dialogue/introduction that a learner can order by logic.
-        unit_phrases = [foreign for _portuguese, foreign in unit["phrases"][code]]
-        start = max(0, min(len(unit_phrases) - 4, topic_index - 4))
-        return unit_phrases[start:start + 4]
+        unit_pairs = unit["phrases"][code]
+        start = max(0, min(len(unit_pairs) - 4, topic_index - 4))
+        return [[portuguese, foreign] for portuguese, foreign in unit_pairs[start:start + 4]]
 
     @staticmethod
     def _match(prompt, pairs, idx):
@@ -523,16 +523,22 @@ class ExerciseService:
                         pairs = [[foreign, portuguese] for portuguese, foreign in sample]
                         item = ExerciseService._match(prompt, pairs, idx)
                     elif item_type == "sequence_dialogue":
-                        phrases = ExerciseService._coherent_sequence_phrases(unit, code, topic_index)
+                        sequence_pairs = ExerciseService._coherent_sequence_pairs(unit, code, topic_index)
+                        phrases = [foreign for _portuguese, foreign in sequence_pairs]
                         sequence_label = "apresentação curta" if unit["title"] == "Apresente-se" else "sequência curta"
-                        prompt = f"{prefix}: ordene uma {sequence_label} no cenário “{topic_name}”"
-                        item = ExerciseService._sequence_dialogue(prompt, phrases, idx)
+                        prompt = f"{prefix}: monte uma {sequence_label}; use os apoios para ordenar: nome → origem → onde mora → idioma que fala" if unit["title"] == "Apresente-se" else f"{prefix}: monte uma {sequence_label}; use os apoios em português para ordenar as frases pelo significado"
+                        item = ExerciseService._sequence_dialogue(prompt, phrases, idx, sequence_pairs)
                     else:
                         if question_index in {5, 10}:
                             _context_pt, opening_line = bank[(start + question_index - 2) % len(bank)]
                             prompt = ExerciseService._microdialogue_prompt(prefix, topic_name, pt, opening_line)
                         item = ExerciseService._context_choice(prompt, target, wrong, idx)
-                    item["hint"] = f"{hint} Ouça a frase, repita em voz alta e monte as palavras na ordem correta." if item["type"] == "listen_build" else hint
+                    if item["type"] == "listen_build":
+                        item["hint"] = f"{hint} Ouça a frase, repita em voz alta e monte as palavras na ordem correta."
+                    elif item["type"] == "sequence_dialogue":
+                        item["hint"] = f"{hint} Use o apoio em português de cada carta para decidir a sequência; a resposta enviada continua sendo a frase no idioma estudado."
+                    else:
+                        item["hint"] = hint
                     if item["type"] != "image_choice":
                         item["explanation"] = explanation
                     items.append(item)
