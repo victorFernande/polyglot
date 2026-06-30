@@ -30,6 +30,7 @@ import { buildTypingRushQueue, validateTypingRushAnswer, typingRushPrompt } from
 import { buildWordScrambleQueue, validateWordScrambleAnswer } from '../lib/wordScramble.mjs'
 import { buildClozeRushQueue, validateClozeRushSelection, clozeRushPrompt } from '../lib/clozeRush.mjs'
 import { buildArticleBlitzQueue, validateArticleBlitzSelection, ARTICLE_BLITZ_OPTIONS } from '../lib/articleBlitz.mjs'
+import { buildArticleSorterRound, validateArticleSorterBuckets, ARTICLE_SORTER_BUCKETS } from '../lib/articleSorter.mjs'
 import { buildErrorSpotterQueue, validateErrorSpotterSelection } from '../lib/errorSpotter.mjs'
 import { buildAudioABQueue, validateAudioABSelection } from '../lib/audioAB.mjs'
 import { buildAudioBingoQueue, validateAudioBingoSelection } from '../lib/audioBingo.mjs'
@@ -451,6 +452,7 @@ export default function Exercises() {
           <WordScramblePractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
           <AudioABPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} langCode={langCode} speechPlayback={speechPlaybackRef.current} />
           <AudioBingoPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} langCode={langCode} speechPlayback={speechPlaybackRef.current} />
+          <ArticleSorterPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
           <ArticleBlitzPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
           <ClozeRushPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
           <ErrorSpotterPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
@@ -624,6 +626,88 @@ function AudioBingoPractice({ items, lesson, session, currentIndex, langCode, sp
           </div>
         )}
       </div>
+    </div>
+  )
+}
+
+function ArticleSorterPractice({ items, lesson, session, currentIndex }) {
+  const round = useMemo(() => buildArticleSorterRound(items, { lesson, session, currentIndex }), [items, lesson, session, currentIndex])
+  const [assignments, setAssignments] = useState({})
+  const [result, setResult] = useState(null)
+
+  useEffect(() => {
+    setAssignments({})
+    setResult(null)
+  }, [round.cards.map((card) => card.seed).join('|')])
+
+  if (round.cards.length < 4) return null
+
+  function assignCard(cardId, bucket) {
+    setAssignments((current) => ({ ...current, [cardId]: bucket }))
+    setResult(null)
+  }
+
+  function verify() {
+    setResult(validateArticleSorterBuckets(assignments, round.cards))
+  }
+
+  function restart() {
+    setAssignments({})
+    setResult(null)
+  }
+
+  const assignedCount = round.cards.filter((card) => assignments[card.id]).length
+
+  return (
+    <div className="mt-8 rounded-2xl border border-amber-400/30 bg-amber-500/10 p-4">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">Treino local: classificador de artigos</p>
+          <h3 className="mt-1 text-xl font-bold text-white">Envie cada substantivo para der, die ou das</h3>
+          <p className="mt-1 text-sm text-gray-300">Classifique substantivos alemães desta sessão em buckets der, die e das. Este treino não altera XP/progresso.</p>
+        </div>
+        <span className="w-fit rounded-full border border-white/10 bg-black/20 px-3 py-1 text-sm font-semibold text-polyglot-accent">{assignedCount}/{round.cards.length} classificados</span>
+      </div>
+
+      <div className="mt-4 space-y-3">
+        {round.cards.map((card) => (
+          <div key={card.id} className="rounded-xl border border-white/10 bg-black/20 p-3">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-lg font-black text-white">{card.noun}</p>
+                {card.prompt && <p className="mt-1 text-xs text-gray-400">Dica da sessão: {card.prompt}</p>}
+              </div>
+              <div className="grid grid-cols-3 gap-2 sm:min-w-64">
+                {ARTICLE_SORTER_BUCKETS.map((bucket) => (
+                  <button
+                    key={`${card.id}-${bucket}`}
+                    type="button"
+                    onClick={() => assignCard(card.id, bucket)}
+                    className={`rounded-xl border px-3 py-2 text-base font-black transition ${assignments[card.id] === bucket ? 'border-polyglot-accent bg-polyglot-accent/25 text-white' : 'border-white/10 bg-white/5 text-gray-200 hover:border-polyglot-accent/50 hover:bg-white/10'}`}
+                  >
+                    {bucket}
+                  </button>
+                ))}
+              </div>
+            </div>
+            {result?.items?.find((item) => item.id === card.id) && (
+              <p className={`mt-2 rounded-lg p-2 text-sm font-semibold ${result.items.find((item) => item.id === card.id).status === 'correct' ? 'bg-polyglot-green/15 text-polyglot-green' : 'bg-red-500/15 text-red-200'}`}>
+                {result.items.find((item) => item.id === card.id).status === 'correct' ? 'Correto.' : result.items.find((item) => item.id === card.id).feedback}
+              </p>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-4 flex flex-wrap gap-2">
+        <button type="button" className="btn-primary disabled:opacity-40" disabled={assignedCount === 0} onClick={verify}>Verificar buckets</button>
+        <button type="button" className="btn-secondary" onClick={restart}>Recomeçar</button>
+      </div>
+      {result && (
+        <p className={`mt-3 rounded-lg p-3 text-sm font-semibold ${result.status === 'correct' ? 'bg-polyglot-green/15 text-polyglot-green' : 'bg-red-500/15 text-red-200'}`}>
+          {result.correct}/{result.total} corretas nos buckets.
+        </p>
+      )}
     </div>
   )
 }
