@@ -456,6 +456,7 @@ export default function Exercises() {
             <OrthographyRepairPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
             <DialogueReactionPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
             <WordScramblePractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
+            <ChunkBuilderPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
             <AudioABPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} langCode={langCode} speechPlayback={speechPlaybackRef.current} />
             <AudioBingoPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} langCode={langCode} speechPlayback={speechPlaybackRef.current} />
             <ArticleSorterPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />

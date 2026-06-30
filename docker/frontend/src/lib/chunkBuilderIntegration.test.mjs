@@ -8,5 +8,6 @@ test('Exercises wires chunk builder helpers without creating progress-changing l
   assert.match(exercisesSource, /import \{[^}]*buildChunkBuilderQueue[^}]*validateChunkBuilderAnswer/s)
   assert.match(exercisesSource, /Exercício extra: monte por blocos/)
   assert.match(exercisesSource, /não altera XP\/progresso/)
+  assert.match(exercisesSource, /<ChunkBuilderPractice\s+items=\{sessionItems\}\s+lesson=\{lesson\}\s+session=\{session\}\s+currentIndex=\{currentIndex\}\s*\/>/s)
   assert.doesNotMatch(exercisesSource, /<ChunkBuilderPractice[^>]*(answerExerciseSession|completeExerciseSession|startExerciseSession|setSession|setSummary)/s)
 })
