@@ -63,7 +63,7 @@ export function trailNodeStateClasses(node, isActiveSession) {
 export function trailConnectorStateClasses(leftNode, rightNode, currentSessionNumber) {
   if (leftNode?.status === 'completed') return 'bg-polyglot-green'
   if (leftNode?.number === currentSessionNumber && rightNode?.number === currentSessionNumber + 1) {
-    return 'bg-gradient-to-r from-blue-900 via-white to-blue-900 bg-[length:200%_100%] animate-shimmer-slow'
+    return 'bg-gradient-to-r from-orange-900 via-white to-orange-900 bg-[length:200%_100%] animate-shimmer-slow'
   }
   return 'bg-white/15'
 }
