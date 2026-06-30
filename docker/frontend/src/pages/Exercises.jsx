@@ -28,6 +28,7 @@ import { eligibleWordSearchWords, generateWordSearchGrid, updateFoundWordSearchW
 import { eligibleLetterBlockWords, generateLetterBlocksPuzzle, validateLetterBlocksPath, updateFoundLetterBlockWords, letterBlocksSeed } from '../lib/letterBlocks.mjs'
 import { buildTypingRushQueue, validateTypingRushAnswer, typingRushPrompt } from '../lib/typingRush.mjs'
 import { buildWordScrambleQueue, validateWordScrambleAnswer } from '../lib/wordScramble.mjs'
+import { buildChunkBuilderQueue, chunkBuilderCanSubmit, validateChunkBuilderAnswer } from '../lib/chunkBuilder.mjs'
 import { buildClozeRushQueue, validateClozeRushSelection, clozeRushPrompt } from '../lib/clozeRush.mjs'
 import { buildArticleBlitzQueue, validateArticleBlitzSelection, ARTICLE_BLITZ_OPTIONS } from '../lib/articleBlitz.mjs'
 import { buildArticleSorterRound, validateArticleSorterBuckets, ARTICLE_SORTER_BUCKETS } from '../lib/articleSorter.mjs'
@@ -1354,6 +1355,114 @@ function WordScramblePractice({ items, lesson, session, currentIndex }) {
         {result && (
           <p className={`mt-3 rounded-lg p-3 text-sm font-semibold ${result.status === 'correct' ? 'bg-polyglot-green/15 text-polyglot-green' : 'bg-red-500/15 text-red-200'}`}>
             {result.status === 'correct' ? 'Correto — boa ortografia.' : `Resposta esperada: ${result.expected}`}
+          </p>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function ChunkBuilderPractice({ items, lesson, session, currentIndex }) {
+  const queue = useMemo(() => buildChunkBuilderQueue(items, { lesson, session, currentIndex }), [items, lesson, session, currentIndex])
+  const [cardIndex, setCardIndex] = useState(0)
+  const [selectedChunks, setSelectedChunks] = useState([])
+  const [availableChunks, setAvailableChunks] = useState([])
+  const [result, setResult] = useState(null)
+  const [correctCount, setCorrectCount] = useState(0)
+
+  const queueKey = queue.map((card) => card.seed).join('|')
+  const card = queue[cardIndex % Math.max(queue.length, 1)]
+
+  useEffect(() => {
+    setCardIndex(0)
+    setSelectedChunks([])
+    setAvailableChunks(queue[0]?.shuffledChunks ?? [])
+    setResult(null)
+    setCorrectCount(0)
+  }, [queueKey])
+
+  useEffect(() => {
+    setSelectedChunks([])
+    setAvailableChunks(card?.shuffledChunks ?? [])
+    setResult(null)
+  }, [card?.seed])
+
+  if (queue.length < 3 || !card) return null
+
+  function chooseChunk(chunk, index) {
+    setSelectedChunks((chunks) => [...chunks, chunk])
+    setAvailableChunks((chunks) => chunks.filter((_, idx) => idx !== index))
+    setResult(null)
+  }
+
+  function removeChunk(index) {
+    const [removed] = selectedChunks.slice(index, index + 1)
+    setSelectedChunks((chunks) => chunks.filter((_, idx) => idx !== index))
+    if (removed) setAvailableChunks((chunks) => [...chunks, removed])
+    setResult(null)
+  }
+
+  function verify() {
+    const nextResult = validateChunkBuilderAnswer(selectedChunks, card.chunks)
+    setResult(nextResult)
+    if (nextResult.status === 'correct') setCorrectCount((count) => count + 1)
+  }
+
+  function clear() {
+    setSelectedChunks([])
+    setAvailableChunks(card.shuffledChunks)
+    setResult(null)
+  }
+
+  function nextCard() {
+    setCardIndex((index) => (index + 1) % queue.length)
+  }
+
+  return (
+    <div className="mt-8 rounded-2xl border border-amber-400/30 bg-amber-500/10 p-4">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">Exercício extra: monte por blocos</p>
+          <h3 className="mt-1 text-xl font-bold text-white">Ordene os blocos de sentido</h3>
+          <p className="mt-1 text-sm text-gray-300">Monte a frase com chunks desta sessão. Este treino não altera XP/progresso.</p>
+        </div>
+        <span className="w-fit rounded-full border border-white/10 bg-black/20 px-3 py-1 text-sm font-semibold text-polyglot-accent">{correctCount} acertos</span>
+      </div>
+
+      <div className="mt-4 rounded-xl border border-white/10 bg-black/20 p-4">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">Dica</p>
+        <p className="mt-1 text-lg font-bold text-white">{card.prompt || 'Monte a frase no idioma estudado.'}</p>
+        <div className="mt-4 min-h-16 rounded-xl border border-dashed border-amber-300/30 bg-black/20 p-3">
+          {selectedChunks.length === 0 ? (
+            <span className="text-gray-500">Toque nos blocos abaixo...</span>
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              {selectedChunks.map((chunk, index) => (
+                <button key={`${chunk}-${index}`} type="button" onClick={() => removeChunk(index)} className="rounded-lg bg-polyglot-accent px-3 py-2 text-base font-bold text-white shadow-sm transition hover:scale-[1.02] active:scale-95" aria-label={`Remover bloco ${chunk}`}>
+                  {chunk}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="mt-3 flex flex-wrap gap-2">
+          {availableChunks.map((chunk, index) => (
+            <button key={`${chunk}-${index}`} type="button" onClick={() => chooseChunk(chunk, index)} className="rounded-lg bg-white/10 px-4 py-3 text-base font-bold hover:bg-white/20">
+              {chunk}
+            </button>
+          ))}
+        </div>
+
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <button type="button" className="btn-primary disabled:opacity-40" disabled={!chunkBuilderCanSubmit(selectedChunks, card.chunks)} onClick={verify}>Verificar</button>
+          <button type="button" className="btn-secondary disabled:opacity-40" disabled={!selectedChunks.length} onClick={clear}>Limpar</button>
+          <button type="button" className="btn-secondary" onClick={nextCard}>Próxima frase</button>
+        </div>
+
+        {result && (
+          <p className={`mt-3 rounded-lg p-3 text-sm font-semibold ${result.status === 'correct' ? 'bg-polyglot-green/15 text-polyglot-green' : 'bg-red-500/15 text-red-200'}`}>
+            {result.status === 'correct' ? 'Correto — os blocos formam uma frase natural.' : `Resposta esperada: ${result.expected}`}
           </p>
         )}
       </div>
