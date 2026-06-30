@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
-    "@dotlottie/player-component": "^2.7.12",
     "axios": "^1.6.2",
     "framer-motion": "^10.16.0",
     "lucide-react": "^0.294.0",

@@ -109,12 +109,16 @@ test('active trail node uses a stable highlight, not a loading animation', () =>
   assert.doesNotMatch(classes, /animate-pulse/)
 })
 
-test('connector from active session to next session uses a Lottie-friendly fallback track instead of shimmer CSS', () => {
+test('connector from active session to next session uses a slow blue loading-bar animation', () => {
   const classes = trailConnectorStateClasses({ number: 11, status: 'current' }, { number: 12, status: 'locked' }, 11)
 
-  assert.match(classes, /bg-polyglot-accent\/10/)
-  assert.doesNotMatch(classes, /bg-\[length:200%_100%\]/)
-  assert.doesNotMatch(classes, /animate-shimmer-slow/)
+  assert.match(classes, /bg-\[length:200%_100%\]/)
+  assert.match(classes, /animate-shimmer-slow/)
+  assert.match(classes, /from-polyglot-blue/)
+  assert.match(classes, /via-sky-300/)
+  assert.match(classes, /to-polyglot-blue/)
+  assert.doesNotMatch(classes, /from-polyglot-accent/)
+  assert.doesNotMatch(classes, /via-polyglot-gold/)
   assert.doesNotMatch(classes, /animate-shimmer(\s|$)/)
   assert.doesNotMatch(classes, /bg-white\/15/)
 })
@@ -142,15 +146,15 @@ test('Exercises desktop trail requests five sessions per page to reduce visual c
   assert.doesNotMatch(source, /sessionWindowForPage\(path\.nodes, page, 10\)/)
 })
 
-test('active trail connector renders the requested hosted Lottie animation', () => {
+test('active trail connector does not render the rejected hosted Lottie animation', () => {
   const source = readFileSync(new URL('../pages/Exercises.jsx', import.meta.url), 'utf8')
   const packageJson = readFileSync(new URL('../../package.json', import.meta.url), 'utf8')
 
-  assert.match(packageJson, /@dotlottie\/player-component/)
-  assert.match(source, /@dotlottie\/player-component/)
-  assert.match(source, /https:\/\/lottie\.host\/67a98442-61e9-4ff8-8676-aab2eced50a1\/5BMMpIf6hv\.lottie/)
-  assert.match(source, /<dotlottie-player/)
-  assert.match(source, /trailConnectorStateClasses\(leftNode, rightNode, currentSessionNumber\)/)
+  assert.doesNotMatch(packageJson, /@dotlottie\/player-component/)
+  assert.doesNotMatch(source, /@dotlottie\/player-component/)
+  assert.doesNotMatch(source, /https:\/\/lottie\.host\/67a98442-61e9-4ff8-8676-aab2eced50a1\/5BMMpIf6hv\.lottie/)
+  assert.doesNotMatch(source, /<dotlottie-player/)
+  assert.match(source, /trailConnectorStateClasses\(node, nextNode, currentSessionNumber\)/)
 })
 
 test('mobile trail nodes render only the inner marker and label, without card button wrapper', () => {
