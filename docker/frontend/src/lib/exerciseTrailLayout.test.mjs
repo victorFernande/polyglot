@@ -109,14 +109,16 @@ test('active trail node uses a stable highlight, not a loading animation', () =>
   assert.doesNotMatch(classes, /animate-pulse/)
 })
 
-test('connector from active session to next session uses a slow dark-orange and white loading-bar animation', () => {
+test('connector from active session to next session uses a slow neon-orange and white loading-bar animation', () => {
   const classes = trailConnectorStateClasses({ number: 11, status: 'current' }, { number: 12, status: 'locked' }, 11)
 
   assert.match(classes, /bg-\[length:200%_100%\]/)
   assert.match(classes, /animate-shimmer-slow/)
-  assert.match(classes, /from-orange-700/)
+  assert.match(classes, /from-\[#FF4D3F\]/)
   assert.match(classes, /via-white/)
-  assert.match(classes, /to-orange-700/)
+  assert.match(classes, /to-\[#FF4D3F\]/)
+  assert.doesNotMatch(classes, /from-orange-700/)
+  assert.doesNotMatch(classes, /to-orange-700/)
   assert.doesNotMatch(classes, /from-orange-900/)
   assert.doesNotMatch(classes, /to-orange-900/)
   assert.doesNotMatch(classes, /from-blue-900/)
