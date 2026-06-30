@@ -109,11 +109,12 @@ test('active trail node uses a stable highlight, not a loading animation', () =>
   assert.doesNotMatch(classes, /animate-pulse/)
 })
 
-test('connector from active session to next session uses loading-bar animation', () => {
+test('connector from active session to next session uses a deliberately slow loading-bar animation', () => {
   const classes = trailConnectorStateClasses({ number: 11, status: 'current' }, { number: 12, status: 'locked' }, 11)
 
   assert.match(classes, /bg-\[length:200%_100%\]/)
-  assert.match(classes, /animate-/)
+  assert.match(classes, /animate-shimmer-slow/)
+  assert.doesNotMatch(classes, /animate-shimmer(\s|$)/)
   assert.match(classes, /from-polyglot-accent/)
   assert.doesNotMatch(classes, /bg-white\/15/)
 })
