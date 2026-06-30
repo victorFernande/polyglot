@@ -6,7 +6,7 @@ const exercisesSource = readFileSync(new URL('../pages/Exercises.jsx', import.me
 
 test('Exercises renders cloze rush as an explicitly local optional training panel', () => {
   assert.match(exercisesSource, /import \{[^}]*buildClozeRushQueue[^}]*validateClozeRushSelection[^}]*clozeRushPrompt/s)
-  assert.match(exercisesSource, /Treino local: lacuna relâmpago/i)
+  assert.match(exercisesSource, /Exercício extra: lacuna relâmpago/i)
   assert.match(exercisesSource, /não altera XP\/progresso/)
 })
 

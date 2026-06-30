@@ -6,7 +6,7 @@ const exercisesSource = readFileSync(new URL('../pages/Exercises.jsx', import.me
 
 test('Exercises renders the word-search as an explicitly local training panel', () => {
   assert.match(exercisesSource, /import \{[^}]*eligibleWordSearchWords[^}]*generateWordSearchGrid[^}]*validateWordSearchSelection[^}]*wordSearchSeed/s)
-  assert.match(exercisesSource, /Treino local: caça-palavra/)
+  assert.match(exercisesSource, /Exercício extra: caça-palavra/)
   assert.match(exercisesSource, /não altera XP\/progresso/)
 })
 

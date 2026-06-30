@@ -35,6 +35,7 @@ import { buildErrorSpotterQueue, validateErrorSpotterSelection } from '../lib/er
 import { buildAudioABQueue, validateAudioABSelection } from '../lib/audioAB.mjs'
 import { buildAudioBingoQueue, validateAudioBingoSelection } from '../lib/audioBingo.mjs'
 import { buildOrthographyRepairQueue, validateOrthographyRepairAnswer, damageOrthographyRepairText } from '../lib/orthographyRepair.mjs'
+import { buildDialogueReactionQueue, validateDialogueReactionSelection } from '../lib/dialogueReaction.mjs'
 
 const LANG_META = {
   de: { accent: 'Rammstein', color: 'from-red-600 to-red-900' },
@@ -449,19 +450,151 @@ export default function Exercises() {
             {feedback?.type === 'correct' && (session.current_index >= session.total_count ? <button className="btn-primary inline-flex items-center gap-2" onClick={() => finish(true)}>{nextExerciseActionLabel(session)} <ArrowRight size={18} /></button> : <button className="btn-primary inline-flex items-center gap-2" onClick={next}>{nextExerciseActionLabel(session)} <ArrowRight size={18} /></button>)}
           </div>
 
-          <TypingRushPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
-          <OrthographyRepairPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
-          <WordScramblePractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
-          <AudioABPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} langCode={langCode} speechPlayback={speechPlaybackRef.current} />
-          <AudioBingoPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} langCode={langCode} speechPlayback={speechPlaybackRef.current} />
-          <ArticleSorterPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
-          <ArticleBlitzPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
-          <ClozeRushPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
-          <ErrorSpotterPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
-          <WordSearchPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
-          <LetterBlocksPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
+          <LocalPracticeCarousel>
+            <TypingRushPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
+            <OrthographyRepairPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
+            <DialogueReactionPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
+            <WordScramblePractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
+            <AudioABPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} langCode={langCode} speechPlayback={speechPlaybackRef.current} />
+            <AudioBingoPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} langCode={langCode} speechPlayback={speechPlaybackRef.current} />
+            <ArticleSorterPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
+            <ArticleBlitzPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
+            <ClozeRushPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
+            <ErrorSpotterPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
+            <WordSearchPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
+            <LetterBlocksPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
+          </LocalPracticeCarousel>
         </div>
       )}
+    </div>
+  )
+}
+
+function LocalPracticeCarousel({ children }) {
+  const visiblePracticeItems = React.Children.toArray(children)
+  const [activeIndex, setActiveIndex] = useState(0)
+
+  useEffect(() => {
+    setActiveIndex(0)
+  }, [visiblePracticeItems.length])
+
+  if (visiblePracticeItems.length === 0) return null
+
+  const safeActiveIndex = Math.min(activeIndex, visiblePracticeItems.length - 1)
+
+  return (
+    <section className="mt-8 rounded-3xl border border-polyglot-accent/25 bg-gradient-to-br from-white/10 to-white/5 p-4 shadow-xl shadow-black/20">
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-polyglot-accent">Exercícios extras</p>
+          <h3 className="text-xl font-bold text-white">Prática da sessão</h3>
+          <p className="text-sm text-gray-400">Um exercício extra por vez para manter a tela limpa.</p>
+        </div>
+        <span className="w-fit rounded-full border border-white/10 bg-black/20 px-3 py-1 text-sm font-semibold text-polyglot-accent">
+          {safeActiveIndex + 1}/{visiblePracticeItems.length}
+        </span>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {visiblePracticeItems.map((_, index) => (
+          <button
+            key={index}
+            type="button"
+            onClick={() => setActiveIndex(index)}
+            className={`rounded-full border px-3 py-1 text-xs font-bold transition ${index === activeIndex ? 'border-polyglot-accent bg-polyglot-accent/25 text-white' : 'border-white/10 bg-black/20 text-gray-400 hover:border-polyglot-accent/40 hover:text-white'}`}
+          >
+            Exercício {index + 1}
+          </button>
+        ))}
+      </div>
+      <div className="mt-4">
+        {visiblePracticeItems[safeActiveIndex]}
+      </div>
+    </section>
+  )
+}
+
+function DialogueReactionPractice({ items, lesson, session, currentIndex }) {
+  const queue = useMemo(() => buildDialogueReactionQueue(items, { lesson, session, currentIndex }), [items, lesson, session, currentIndex])
+  const [cardIndex, setCardIndex] = useState(0)
+  const [selectedOption, setSelectedOption] = useState('')
+  const [result, setResult] = useState(null)
+  const [correctCount, setCorrectCount] = useState(0)
+
+  useEffect(() => {
+    setCardIndex(0)
+    setSelectedOption('')
+    setResult(null)
+    setCorrectCount(0)
+  }, [queue.map((card) => card.seed).join('|')])
+
+  if (queue.length === 0) return null
+
+  const card = queue[cardIndex % queue.length]
+
+  function selectOption(option) {
+    setSelectedOption(option)
+    setResult(null)
+  }
+
+  function verify() {
+    const nextResult = validateDialogueReactionSelection(selectedOption, card)
+    setResult(nextResult)
+    if (nextResult.status === 'correct') setCorrectCount((count) => count + 1)
+  }
+
+  function nextCard() {
+    setCardIndex((index) => (index + 1) % queue.length)
+    setSelectedOption('')
+    setResult(null)
+  }
+
+  return (
+    <div className="mt-8 rounded-2xl border border-emerald-300/30 bg-emerald-500/10 p-4">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">Exercício extra: resposta de diálogo</p>
+          <h3 className="mt-1 text-xl font-bold text-white">Escolha a melhor réplica</h3>
+          <p className="mt-1 text-sm text-gray-300">Prática situacional com microdiálogos desta sessão. Este treino não altera XP/progresso.</p>
+        </div>
+        <span className="w-fit rounded-full border border-white/10 bg-black/20 px-3 py-1 text-sm font-semibold text-polyglot-accent">{correctCount} acertos</span>
+      </div>
+
+      <div className="mt-4 rounded-xl border border-white/10 bg-black/20 p-4">
+        {card.instruction && <p className="mb-3 text-sm text-gray-300">{card.instruction}</p>}
+        <div className="mr-8 rounded-2xl rounded-tl-sm bg-white/10 p-3">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-500">{card.partnerLabel}</p>
+          <p className="mt-1 text-lg font-semibold text-white">{card.partnerText}</p>
+        </div>
+        <div className="ml-8 mt-3 rounded-2xl rounded-tr-sm border border-polyglot-accent/40 bg-polyglot-accent/10 p-3">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">{card.learnerLabel}</p>
+          <p className="mt-1 text-lg font-semibold text-white">{card.learnerText}</p>
+        </div>
+
+        <div className="mt-4 grid gap-2 sm:grid-cols-2">
+          {card.options.map((option) => (
+            <button
+              key={option}
+              type="button"
+              onClick={() => selectOption(option)}
+              className={`rounded-xl border p-3 text-left font-semibold transition ${selectedOption === option ? 'border-polyglot-accent bg-polyglot-accent/25 text-white' : 'border-white/10 bg-white/5 text-gray-200 hover:border-polyglot-accent/40 hover:bg-white/10'}`}
+            >
+              {option}
+            </button>
+          ))}
+        </div>
+
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <button type="button" className="btn-primary disabled:opacity-40" disabled={!selectedOption} onClick={verify}>Verificar</button>
+          <button type="button" className="btn-secondary" onClick={nextCard}>Próxima situação</button>
+        </div>
+
+        {result && (
+          <div className={`mt-3 rounded-lg p-3 text-sm font-semibold ${result.status === 'correct' ? 'bg-polyglot-green/15 text-polyglot-green' : 'bg-red-500/15 text-red-200'}`}>
+            <p>{result.status === 'correct' ? 'Correto — réplica adequada ao contexto.' : `Era: ${result.expected}`}</p>
+            <p className="mt-1 font-normal opacity-90">{card.explanation}</p>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
@@ -510,7 +643,7 @@ function AudioABPractice({ items, lesson, session, currentIndex, langCode, speec
     <div className="mt-8 rounded-2xl border border-sky-400/30 bg-sky-500/10 p-4">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">Treino local: Áudio A/B</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">Exercício extra: Áudio A/B</p>
           <h3 className="mt-1 text-xl font-bold text-white">Ouça e escolha a frase falada</h3>
           <p className="mt-1 text-sm text-gray-300">Discriminação auditiva com frases desta sessão. Este treino não altera XP/progresso.</p>
         </div>
@@ -592,7 +725,7 @@ function AudioBingoPractice({ items, lesson, session, currentIndex, langCode, sp
     <div className="mt-8 rounded-2xl border border-cyan-400/30 bg-cyan-500/10 p-4">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">Treino local: Audio Bingo</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">Exercício extra: Audio Bingo</p>
           <h3 className="mt-1 text-xl font-bold text-white">Ouça e encontre na grade 3x3</h3>
           <p className="mt-1 text-sm text-gray-300">Reconhecimento rápido com cartões no idioma-alvo desta sessão. Este treino não altera XP/progresso.</p>
         </div>
@@ -664,7 +797,7 @@ function ArticleSorterPractice({ items, lesson, session, currentIndex }) {
     <div className="mt-8 rounded-2xl border border-amber-400/30 bg-amber-500/10 p-4">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">Treino local: classificador de artigos</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">Exercício extra: classificador de artigos</p>
           <h3 className="mt-1 text-xl font-bold text-white">Envie cada substantivo para der, die ou das</h3>
           <p className="mt-1 text-sm text-gray-300">Classifique substantivos alemães desta sessão em buckets der, die e das. Este treino não altera XP/progresso.</p>
         </div>
@@ -753,7 +886,7 @@ function ArticleBlitzPractice({ items, lesson, session, currentIndex }) {
     <div className="mt-8 rounded-2xl border border-yellow-400/30 bg-yellow-500/10 p-4">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">Treino local: artigo relâmpago</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">Exercício extra: artigo relâmpago</p>
           <h3 className="mt-1 text-xl font-bold text-white">Escolha der, die ou das</h3>
           <p className="mt-1 text-sm text-gray-300">Recupere o artigo de substantivos alemães desta sessão. Este treino não altera XP/progresso.</p>
         </div>
@@ -837,7 +970,7 @@ function ErrorSpotterPractice({ items, lesson, session, currentIndex }) {
     <div className="mt-8 rounded-2xl border border-orange-400/30 bg-orange-500/10 p-4">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">Treino local: caça-erro</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">Exercício extra: caça-erro</p>
           <h3 className="mt-1 text-xl font-bold text-white">Encontre a palavra intrusa</h3>
           <p className="mt-1 text-sm text-gray-300">Clique no chip que deixou a frase errada. Este treino não altera XP/progresso.</p>
         </div>
@@ -922,7 +1055,7 @@ function ClozeRushPractice({ items, lesson, session, currentIndex }) {
     <div className="mt-8 rounded-2xl border border-purple-400/30 bg-purple-500/10 p-4">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">Treino local: lacuna relâmpago</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">Exercício extra: lacuna relâmpago</p>
           <h3 className="mt-1 text-xl font-bold text-white">Complete a palavra que falta</h3>
           <p className="mt-1 text-sm text-gray-300">Escolha o chip ausente em frases desta sessão. Este treino não altera XP/progresso.</p>
         </div>
@@ -1000,7 +1133,7 @@ function TypingRushPractice({ items, lesson, session, currentIndex }) {
     <div className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-4">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">Treino local: digitação relâmpago</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">Exercício extra: digitação relâmpago</p>
           <h3 className="mt-1 text-xl font-bold text-white">Digite a resposta no idioma estudado</h3>
           <p className="mt-1 text-sm text-gray-300">Recuperação ativa com itens desta sessão. Este treino não altera XP/progresso.</p>
         </div>
@@ -1077,7 +1210,7 @@ function OrthographyRepairPractice({ items, lesson, session, currentIndex }) {
     <div className="mt-8 rounded-2xl border border-amber-300/30 bg-amber-500/10 p-4">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">Treino local: reparador de ortografia</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">Exercício extra: reparador de ortografia</p>
           <h3 className="mt-1 text-xl font-bold text-white">Repare a frase</h3>
           <p className="mt-1 text-sm text-gray-300">Restaure maiúsculas, acentos e pontuação com frases desta sessão. Este treino não altera XP/progresso.</p>
         </div>
@@ -1173,7 +1306,7 @@ function WordScramblePractice({ items, lesson, session, currentIndex }) {
     <div className="mt-8 rounded-2xl border border-fuchsia-400/30 bg-fuchsia-500/10 p-4">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">Treino local: palavra embaralhada</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">Exercício extra: palavra embaralhada</p>
           <h3 className="mt-1 text-xl font-bold text-white">Monte a palavra com letras misturadas</h3>
           <p className="mt-1 text-sm text-gray-300">Ortografia ativa com respostas desta sessão. Este treino não altera XP/progresso.</p>
         </div>
@@ -1292,7 +1425,7 @@ function WordSearchPractice({ items, lesson, session, currentIndex }) {
     <div className="mt-8 rounded-2xl border border-polyglot-accent/30 bg-polyglot-accent/10 p-4">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">Treino local: caça-palavra</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">Exercício extra: caça-palavra</p>
           <h3 className="mt-1 text-xl font-bold text-white">Encontre palavras desta sessão</h3>
           <p className="mt-1 text-sm text-gray-300">Selecione a primeira e a última letra em linha reta. Este treino não altera XP/progresso.</p>
         </div>
@@ -1395,7 +1528,7 @@ function LetterBlocksPractice({ items, lesson, session, currentIndex }) {
     <div className="mt-8 rounded-2xl border border-cyan-400/30 bg-cyan-500/10 p-4">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">Treino local: blocos de letras</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">Exercício extra: blocos de letras</p>
           <h3 className="mt-1 text-xl font-bold text-white">Conecte letras vizinhas</h3>
           <p className="mt-1 text-sm text-gray-300">Clique em letras horizontais/verticais adjacentes para formar palavras da sessão. Este treino não altera XP/progresso.</p>
         </div>

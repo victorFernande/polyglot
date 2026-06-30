@@ -7,7 +7,7 @@ const exercisesSource = readFileSync(new URL('../pages/Exercises.jsx', import.me
 test('Exercises renders Audio Bingo as a local 3x3 listening practice panel', () => {
   assert.match(exercisesSource, /import \{[^}]*buildAudioBingoQueue[^}]*validateAudioBingoSelection[^}]*\} from '\.\.\/lib\/audioBingo\.mjs'/s)
   assert.match(exercisesSource, /<AudioBingoPractice items=\{sessionItems\} lesson=\{lesson\} session=\{session\} currentIndex=\{currentIndex\} langCode=\{langCode\} speechPlayback=\{speechPlaybackRef\.current\} \/>/)
-  assert.match(exercisesSource, /Treino local: Audio Bingo/)
+  assert.match(exercisesSource, /Exercício extra: Audio Bingo/)
   assert.match(exercisesSource, /grade 3x3/i)
   assert.match(exercisesSource, /não altera XP\/progresso/)
 })

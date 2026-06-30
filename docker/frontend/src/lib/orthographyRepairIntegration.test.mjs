@@ -6,7 +6,7 @@ const exercisesSource = readFileSync(new URL('../pages/Exercises.jsx', import.me
 
 test('Exercises renders orthography repair as an explicitly local optional training panel', () => {
   assert.match(exercisesSource, /import \{[^}]*buildOrthographyRepairQueue[^}]*validateOrthographyRepairAnswer[^}]*damageOrthographyRepairText/s)
-  assert.match(exercisesSource, /Treino local: reparador de ortografia/)
+  assert.match(exercisesSource, /Exercício extra: reparador de ortografia/)
   assert.match(exercisesSource, /Repare a frase/)
   assert.match(exercisesSource, /não altera XP\/progresso/)
 })

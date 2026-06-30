@@ -6,7 +6,7 @@ const exercisesSource = readFileSync(new URL('../pages/Exercises.jsx', import.me
 
 test('Exercises renders typing rush as an explicitly local optional training panel', () => {
   assert.match(exercisesSource, /import \{[^}]*buildTypingRushQueue[^}]*validateTypingRushAnswer[^}]*typingRushPrompt/s)
-  assert.match(exercisesSource, /Treino local: digitação relâmpago/)
+  assert.match(exercisesSource, /Exercício extra: digitação relâmpago/)
   assert.match(exercisesSource, /não altera XP\/progresso/)
 })
 

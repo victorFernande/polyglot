@@ -7,7 +7,7 @@ const packageSource = readFileSync(new URL('../../package.json', import.meta.url
 
 test('Exercises renders Letter Blocks as an explicitly local training panel', () => {
   assert.match(exercisesSource, /import \{[^}]*eligibleLetterBlockWords[^}]*generateLetterBlocksPuzzle[^}]*validateLetterBlocksPath[^}]*letterBlocksSeed/s)
-  assert.match(exercisesSource, /Treino local: blocos de letras/i)
+  assert.match(exercisesSource, /Exercício extra: blocos de letras/i)
   assert.match(exercisesSource, /não altera XP\/progresso/)
   assert.match(exercisesSource, /Limpar seleção/)
   assert.match(exercisesSource, /Reiniciar/)

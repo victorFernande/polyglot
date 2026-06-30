@@ -6,7 +6,7 @@ const exercisesSource = readFileSync(new URL('../pages/Exercises.jsx', import.me
 
 test('Exercises renders article blitz as a German-only local optional training panel', () => {
   assert.match(exercisesSource, /import \{[^}]*buildArticleBlitzQueue[^}]*validateArticleBlitzSelection[^}]*ARTICLE_BLITZ_OPTIONS[^}]*\} from '\.\.\/lib\/articleBlitz\.mjs'/s)
-  assert.match(exercisesSource, /Treino local: artigo relâmpago/)
+  assert.match(exercisesSource, /Exercício extra: artigo relâmpago/)
   assert.match(exercisesSource, /não altera XP\/progresso/)
   assert.match(exercisesSource, /der.*die.*das/s)
 })

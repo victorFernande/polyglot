@@ -7,7 +7,7 @@ const exercisesSource = readFileSync(new URL('../pages/Exercises.jsx', import.me
 test('Exercises renders error-spotter as an explicitly local build-sentence practice panel', () => {
   assert.match(exercisesSource, /import \{[^}]*buildErrorSpotterQueue[^}]*validateErrorSpotterSelection[^}]*\} from '\.\.\/lib\/errorSpotter\.mjs'/s)
   assert.match(exercisesSource, /<ErrorSpotterPractice items=\{sessionItems\} lesson=\{lesson\} session=\{session\} currentIndex=\{currentIndex\} \/>/)
-  assert.match(exercisesSource, /Treino local: caça-erro/)
+  assert.match(exercisesSource, /Exercício extra: caça-erro/)
   assert.match(exercisesSource, /não altera XP\/progresso/)
 })
 

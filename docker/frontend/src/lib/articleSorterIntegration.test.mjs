@@ -7,7 +7,7 @@ const exercisesSource = readFileSync(new URL('../pages/Exercises.jsx', import.me
 test('Exercises renders Article Sorter as a German-only local bucket training panel', () => {
   assert.match(exercisesSource, /import \{[^}]*buildArticleSorterRound[^}]*validateArticleSorterBuckets[^}]*ARTICLE_SORTER_BUCKETS[^}]*\} from '\.\.\/lib\/articleSorter\.mjs'/s)
   assert.match(exercisesSource, /<ArticleSorterPractice items=\{sessionItems\} lesson=\{lesson\} session=\{session\} currentIndex=\{currentIndex\} \/>/)
-  assert.match(exercisesSource, /Treino local: classificador de artigos/)
+  assert.match(exercisesSource, /Exercício extra: classificador de artigos/)
   assert.match(exercisesSource, /buckets der, die e das/i)
   assert.match(exercisesSource, /não altera XP\/progresso/)
 })

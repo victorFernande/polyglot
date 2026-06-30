@@ -6,7 +6,7 @@ const exercisesSource = readFileSync(new URL('../pages/Exercises.jsx', import.me
 
 test('Exercises renders word scramble as an explicitly local optional training panel', () => {
   assert.match(exercisesSource, /import \{[^}]*buildWordScrambleQueue[^}]*validateWordScrambleAnswer/s)
-  assert.match(exercisesSource, /Treino local: palavra embaralhada/)
+  assert.match(exercisesSource, /Exercício extra: palavra embaralhada/)
   assert.match(exercisesSource, /não altera XP\/progresso/)
 })
 

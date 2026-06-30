@@ -7,7 +7,7 @@ const exercisesSource = readFileSync(new URL('../pages/Exercises.jsx', import.me
 test('Exercises renders Audio A/B as a local listening practice panel', () => {
   assert.match(exercisesSource, /import \{[^}]*buildAudioABQueue[^}]*validateAudioABSelection[^}]*\} from '\.\.\/lib\/audioAB\.mjs'/s)
   assert.match(exercisesSource, /<AudioABPractice items=\{sessionItems\} lesson=\{lesson\} session=\{session\} currentIndex=\{currentIndex\} langCode=\{langCode\} speechPlayback=\{speechPlaybackRef\.current\} \/>/)
-  assert.match(exercisesSource, /Treino local: Áudio A\/B/)
+  assert.match(exercisesSource, /Exercício extra: Áudio A\/B/)
   assert.match(exercisesSource, /não altera XP\/progresso/)
 })
 
