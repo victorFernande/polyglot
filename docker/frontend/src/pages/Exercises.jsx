@@ -22,6 +22,7 @@ import { playAnswerFeedbackSound, unlockAnswerFeedbackSound } from '../lib/answe
 import { playSessionCompletionFanfare, unlockSessionCompletionFanfare } from '../lib/sessionCompletionFanfare.mjs'
 import { buildLetterScramblePayload, isLetterScrambleEligible, singleWordBuildAnswer, stableScrambleLetters } from '../lib/letterScramble.mjs'
 import { buildMemoryMatchCards, memoryMatchSelection } from '../lib/memoryMatch.mjs'
+import { buildListenBuildDictationPayload, canSubmitListenBuildDictation } from '../lib/listenBuildDictation.mjs'
 
 const LANG_META = {
   de: { accent: 'Rammstein', color: 'from-red-600 to-red-900' },
@@ -79,6 +80,7 @@ export default function Exercises() {
   const [selected, setSelected] = useState(null)
   const [built, setBuilt] = useState([])
   const [matched, setMatched] = useState({})
+  const [typedAnswer, setTypedAnswer] = useState('')
   const [summary, setSummary] = useState(null)
   const [voiceMode, setVoiceMode] = useState(false)
   const [lessonLanguageFilter, setLessonLanguageFilter] = useState('all')
@@ -131,6 +133,7 @@ export default function Exercises() {
   const filteredLessons = useMemo(() => filterExerciseLessonsByLanguage(lessons, lessonLanguageFilter), [lessons, lessonLanguageFilter])
   const currentSessionNumber = sessionNumberForExerciseSession(session, activePath)
   const microDialogue = useMemo(() => (item?.type === 'context_choice' ? parseMicroDialoguePrompt(item.prompt) : null), [item])
+  const isUsingListenBuildDictation = item?.type === 'listen_build' && typedAnswer.trim().length > 0
 
   useEffect(() => {
     if (activePath) {
@@ -145,6 +148,7 @@ export default function Exercises() {
     setSelected(null)
     setBuilt([])
     setMatched({})
+    setTypedAnswer('')
   }
 
   async function openLesson(lessonSummary, userId = user?.id) {
@@ -185,22 +189,24 @@ export default function Exercises() {
     if (!item) return null
     if (['choice', 'listen_choice', 'context_choice'].includes(item.type)) return selected
     if (item.type === 'image_choice') return selected
+    if (isUsingListenBuildDictation) return buildListenBuildDictationPayload(typedAnswer)
     if (BUILD_LIKE_TYPES.includes(item.type)) return isLetterScrambleEligible(item) ? buildLetterScramblePayload(built) : built
     if (item.type === 'match') return matched
     return selected
-  }, [item, selected, built, matched])
+  }, [item, selected, built, matched, typedAnswer, isUsingListenBuildDictation])
 
   const canCheck = useMemo(() => {
     if (!item) return false
     if (['choice', 'listen_choice', 'context_choice'].includes(item.type)) return !!selected
     if (item.type === 'image_choice') return !!selected
+    if (isUsingListenBuildDictation) return canSubmitListenBuildDictation(item, typedAnswer)
     if (BUILD_LIKE_TYPES.includes(item.type)) {
       if (isLetterScrambleEligible(item)) return built.length === singleWordBuildAnswer(item).length
       return built.length === (answerValue(item.answer)?.length || 0)
     }
     if (item.type === 'match') return Object.keys(matched).length === matchPairs(item).length
     return false
-  }, [item, selected, built, matched])
+  }, [item, selected, built, matched, typedAnswer, isUsingListenBuildDictation])
 
   async function check() {
     if (!item || !session) return
@@ -400,6 +406,7 @@ export default function Exercises() {
 
           {['choice', 'listen_choice', 'context_choice'].includes(item.type) && <Choice options={choiceOptions} selected={selected} onInteract={() => setFeedback(null)} setSelected={setSelected} />}
           {item.type === 'image_choice' && <ImageChoice options={choiceOptions} selected={selected} onInteract={() => setFeedback(null)} setSelected={setSelected} />}
+          {item.type === 'listen_build' && <ListenBuildDictation typedAnswer={typedAnswer} setTypedAnswer={setTypedAnswer} onInteract={() => setFeedback(null)} onSubmit={check} canSubmit={canCheck} busy={busy} />}
           {BUILD_LIKE_TYPES.includes(item.type) && <Build item={item} built={built} onInteract={() => setFeedback(null)} setBuilt={setBuilt} />}
           {item.type === 'match' && <Match item={item} matched={matched} onInteract={() => setFeedback(null)} setMatched={setMatched} />}
 
@@ -568,6 +575,44 @@ function ImageChoice({ options, selected, setSelected, onInteract }) {
           <div className="mt-1 text-lg font-bold text-white">{option.displayText}</div>
         </button>
       ))}
+    </div>
+  )
+}
+
+function ListenBuildDictation({ typedAnswer, setTypedAnswer, onInteract, onSubmit, canSubmit, busy }) {
+  function updateTypedAnswer(event) {
+    onInteract()
+    setTypedAnswer(event.target.value)
+  }
+
+  function handleKeyDown(event) {
+    if (event.key === 'Enter' && canSubmit && !busy) {
+      event.preventDefault()
+      onSubmit()
+    }
+  }
+
+  return (
+    <div className="mb-4 rounded-2xl border border-polyglot-accent/30 bg-polyglot-accent/10 p-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+        <label className="flex-1 text-sm font-semibold text-polyglot-accent">
+          Ditado curto: digite o que ouviu
+          <input
+            type="text"
+            value={typedAnswer}
+            onChange={updateTypedAnswer}
+            onKeyDown={handleKeyDown}
+            placeholder="Digite a frase no idioma-alvo..."
+            className="mt-2 w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-base text-white outline-none transition placeholder:text-gray-500 focus:border-polyglot-accent"
+          />
+        </label>
+        {typedAnswer && (
+          <button type="button" className="btn-secondary" onClick={() => { onInteract(); setTypedAnswer('') }}>
+            Prefiro montar com peças
+          </button>
+        )}
+      </div>
+      <p className="mt-2 text-xs text-gray-400">Pressione Enter para verificar quando a frase digitada tiver a mesma quantidade de palavras da resposta. Se preferir, deixe o campo vazio e use as peças abaixo.</p>
     </div>
   )
 }
