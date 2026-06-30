@@ -32,27 +32,27 @@ test('cleanExercisePrompt keeps explanatory parentheses that are not the answer'
   )
 })
 
-test('sessionWindowForPage shows exactly one line of ten sessions and arrow state', () => {
+test('sessionWindowForPage shows a compact desktop line of five sessions and arrow state', () => {
   const nodes = Array.from({ length: 25 }, (_, index) => ({ number: index + 1 }))
 
-  assert.deepEqual(sessionWindowForPage(nodes, 0), {
+  assert.deepEqual(sessionWindowForPage(nodes, 0, 5), {
     page: 0,
     start: 0,
-    end: 10,
-    visibleNodes: nodes.slice(0, 10),
+    end: 5,
+    visibleNodes: nodes.slice(0, 5),
     canGoPrev: false,
     canGoNext: true,
   })
-  assert.deepEqual(sessionWindowForPage(nodes, 1), {
+  assert.deepEqual(sessionWindowForPage(nodes, 1, 5), {
     page: 1,
-    start: 10,
-    end: 20,
-    visibleNodes: nodes.slice(10, 20),
+    start: 5,
+    end: 10,
+    visibleNodes: nodes.slice(5, 10),
     canGoPrev: true,
     canGoNext: true,
   })
-  assert.deepEqual(sessionWindowForPage(nodes, 2), {
-    page: 2,
+  assert.deepEqual(sessionWindowForPage(nodes, 4, 5), {
+    page: 4,
     start: 20,
     end: 25,
     visibleNodes: nodes.slice(20, 25),
@@ -131,6 +131,15 @@ test('Exercises page imports trail helpers used by the rendered trail', () => {
 
   assert.match(importLine, /isTrailSessionEnabled/)
   assert.match(importLine, /trailNodeStateClasses/)
+})
+
+test('Exercises desktop trail requests five sessions per page to reduce visual clutter', () => {
+  const source = readFileSync(new URL('../pages/Exercises.jsx', import.meta.url), 'utf8')
+
+  assert.match(source, /pageForSessionNumber\(currentSessionNumber, 5\)/)
+  assert.match(source, /sessionWindowForPage\(path\.nodes, page, 5\)/)
+  assert.doesNotMatch(source, /pageForSessionNumber\(currentSessionNumber, 10\)/)
+  assert.doesNotMatch(source, /sessionWindowForPage\(path\.nodes, page, 10\)/)
 })
 
 test('mobile trail nodes render only the inner marker and label, without card button wrapper', () => {

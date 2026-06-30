@@ -137,7 +137,7 @@ export default function Exercises() {
 
   useEffect(() => {
     if (activePath) {
-      setTrailPage(pageForSessionNumber(currentSessionNumber, 10))
+      setTrailPage(pageForSessionNumber(currentSessionNumber, 5))
       setMobileTrailPage(pageForSessionNumber(currentSessionNumber, 3))
     }
   }, [activePath?.language_code, currentSessionNumber])
@@ -470,7 +470,7 @@ function MicroDialoguePrompt({ dialogue }) {
 }
 
 function SkillTrail({ path, lessonContext, page, mobilePage, onPageChange, onMobilePageChange, currentSessionNumber, onSessionClick }) {
-  const desktopWindowState = sessionWindowForPage(path.nodes, page, 10)
+  const desktopWindowState = sessionWindowForPage(path.nodes, page, 5)
   const mobileWindowState = sessionWindowForPage(path.nodes, mobilePage, 3)
   const layout = trailHeaderLayoutClasses()
 
