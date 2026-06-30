@@ -59,8 +59,7 @@ def test_seed_lessons_is_long_varied_and_idempotent():
                     assert len(item.answer["value"]) == 4
                     assert all(phrase in item.tiles for phrase in item.answer["value"])
                     assert item.options is None
-                    assert item.pairs
-                    assert [foreign for _pt, foreign in item.pairs] == item.answer["value"]
+                    assert item.pairs is None
                 elif item.type == "match":
                     assert item.answer["pairs"] == item.pairs
                     assert len(item.pairs) == 4
@@ -200,7 +199,7 @@ def test_sequence_dialogue_items_order_four_topic_phrases_and_validate_ordered_p
     assert sequence_items, "expected at least one sequence_dialogue item in generated track"
     item = sequence_items[0]
     assert "monte" in f"{item['prompt']} {item['hint']}".casefold()
-    assert "apoio" in f"{item['prompt']} {item['hint']}".casefold()
+    assert "ordem" in f"{item['prompt']} {item['hint']}".casefold()
     assert isinstance(item["answer"]["value"], list)
     assert len(item["answer"]["value"]) == 4
     assert len(set(item["answer"]["value"])) == 4
@@ -224,12 +223,7 @@ def test_sequence_dialogue_session_14_question_9_is_a_coherent_introduction():
         "Ich wohne in São Paulo.",
         "Ich spreche Portugiesisch.",
     ]
-    assert item["pairs"] == [
-        ["Meu nome é Victor.", "Ich heiße Victor."],
-        ["Eu sou do Brasil.", "Ich komme aus Brasilien."],
-        ["Eu moro em São Paulo.", "Ich wohne in São Paulo."],
-        ["Eu falo português.", "Ich spreche Portugiesisch."],
-    ]
+    assert item["pairs"] is None
     joined = " ".join(item["answer"]["value"]).casefold()
     assert "das wort" not in joined
     assert "ich höre" not in joined

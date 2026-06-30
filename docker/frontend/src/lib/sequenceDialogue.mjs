@@ -13,9 +13,3 @@ export function sequenceDialogueCanSubmit(item, selectedPhrases) {
   if (!Array.isArray(answer) || !Array.isArray(selectedPhrases)) return false
   return selectedPhrases.length === answer.length
 }
-
-export function sequenceDialogueSupportForPhrase(item, phrase) {
-  if (!Array.isArray(item?.pairs)) return ''
-  const pair = item.pairs.find((entry) => Array.isArray(entry) && entry[1] === phrase)
-  return pair?.[0] || ''
-}

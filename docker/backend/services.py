@@ -230,12 +230,12 @@ class ExerciseService:
         return item
 
     @staticmethod
-    def _sequence_dialogue(prompt, phrases, idx, pairs=None):
+    def _sequence_dialogue(prompt, phrases, idx):
         tiles = list(phrases)
         if len(tiles) > 1:
             shift = (idx % (len(tiles) - 1)) + 1
             tiles = tiles[shift:] + tiles[:shift]
-        return {"type":"sequence_dialogue","prompt":prompt,"answer":{"value":phrases},"options":None,"tiles":tiles,"pairs":pairs,"hint":"Use o apoio em português de cada carta para ordenar a sequência; envie a ordem das frases no idioma estudado.","explanation":"A ordem correta reconstrói o fluxo da situação pelo significado: começo, contexto, detalhe e fechamento.","xp_reward":12 + (idx % 4)}
+        return {"type":"sequence_dialogue","prompt":prompt,"answer":{"value":phrases},"options":None,"tiles":tiles,"pairs":None,"hint":"Use a lógica do enunciado para ordenar as frases no idioma estudado, sem tradução direta em cada carta.","explanation":"A ordem correta reconstrói o fluxo da situação pelo significado: começo, contexto, detalhe e fechamento.","xp_reward":12 + (idx % 4)}
 
     @staticmethod
     def _coherent_sequence_pairs(unit, code: str, topic_index: int):
@@ -526,8 +526,8 @@ class ExerciseService:
                         sequence_pairs = ExerciseService._coherent_sequence_pairs(unit, code, topic_index)
                         phrases = [foreign for _portuguese, foreign in sequence_pairs]
                         sequence_label = "apresentação curta" if unit["title"] == "Apresente-se" else "sequência curta"
-                        prompt = f"{prefix}: monte uma {sequence_label}; use os apoios para ordenar: nome → origem → onde mora → idioma que fala" if unit["title"] == "Apresente-se" else f"{prefix}: monte uma {sequence_label}; use os apoios em português para ordenar as frases pelo significado"
-                        item = ExerciseService._sequence_dialogue(prompt, phrases, idx, sequence_pairs)
+                        prompt = f"{prefix}: monte uma {sequence_label} seguindo esta ordem: nome → origem → onde mora → idioma que fala" if unit["title"] == "Apresente-se" else f"{prefix}: monte uma {sequence_label}; ordene as frases pelo fluxo lógico da situação"
+                        item = ExerciseService._sequence_dialogue(prompt, phrases, idx)
                     else:
                         if question_index in {5, 10}:
                             _context_pt, opening_line = bank[(start + question_index - 2) % len(bank)]
@@ -536,7 +536,7 @@ class ExerciseService:
                     if item["type"] == "listen_build":
                         item["hint"] = f"{hint} Ouça a frase, repita em voz alta e monte as palavras na ordem correta."
                     elif item["type"] == "sequence_dialogue":
-                        item["hint"] = f"{hint} Use o apoio em português de cada carta para decidir a sequência; a resposta enviada continua sendo a frase no idioma estudado."
+                        item["hint"] = f"{hint} Siga a ordem indicada no enunciado e organize apenas as frases no idioma estudado."
                     else:
                         item["hint"] = hint
                     if item["type"] != "image_choice":
