@@ -25,6 +25,7 @@ import { buildMemoryMatchCards, memoryMatchSelection } from '../lib/memoryMatch.
 import { buildListenBuildDictationPayload, canSubmitListenBuildDictation } from '../lib/listenBuildDictation.mjs'
 import { sequenceDialogueCanSubmit, sequenceDialoguePayload } from '../lib/sequenceDialogue.mjs'
 import { eligibleWordSearchWords, generateWordSearchGrid, updateFoundWordSearchWords, validateWordSearchSelection, wordSearchSeed } from '../lib/wordSearch.mjs'
+import { eligibleLetterBlockWords, generateLetterBlocksPuzzle, validateLetterBlocksPath, updateFoundLetterBlockWords, letterBlocksSeed } from '../lib/letterBlocks.mjs'
 import { buildTypingRushQueue, validateTypingRushAnswer, typingRushPrompt } from '../lib/typingRush.mjs'
 import { buildClozeRushQueue, validateClozeRushSelection, clozeRushPrompt } from '../lib/clozeRush.mjs'
 
@@ -444,6 +445,7 @@ export default function Exercises() {
           <TypingRushPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
           <ClozeRushPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
           <WordSearchPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
+          <LetterBlocksPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
         </div>
       )}
     </div>
@@ -704,6 +706,119 @@ function WordSearchPractice({ items, lesson, session, currentIndex }) {
             ))}
           </div>
           {isComplete && <p className="mt-4 rounded-lg bg-polyglot-green/15 p-3 text-sm font-semibold text-polyglot-green">Treino concluído — isso não altera seu progresso.</p>}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function LetterBlocksPractice({ items, lesson, session, currentIndex }) {
+  const seed = letterBlocksSeed({ lesson, session, currentIndex })
+  const words = useMemo(() => eligibleLetterBlockWords(items, 5), [items])
+  const puzzle = useMemo(() => generateLetterBlocksPuzzle(words, seed), [words, seed])
+  const [path, setPath] = useState([])
+  const [foundWords, setFoundWords] = useState([])
+  const [result, setResult] = useState(null)
+
+  useEffect(() => {
+    setPath([])
+    setFoundWords([])
+    setResult(null)
+  }, [seed])
+
+  if (words.length < 3) return null
+
+  const foundSet = new Set(foundWords)
+  const selectedCells = new Set(path.map((point) => `${point.row}:${point.col}`))
+  const foundCells = new Set(
+    foundWords.flatMap((word) => (puzzle.paths[word] || []).map((cell) => `${cell.row}:${cell.col}`)),
+  )
+  const currentAttempt = path.map((point) => puzzle.grid[point.row][point.col]).join('')
+  const isComplete = foundWords.length === puzzle.targets.length
+
+  function resetSelection() {
+    setPath([])
+    setResult(null)
+  }
+
+  function restartGame() {
+    setPath([])
+    setFoundWords([])
+    setResult(null)
+  }
+
+  function chooseCell(point) {
+    setResult(null)
+    if (path.some((cell) => cell.row === point.row && cell.col === point.col)) return
+    if (path.length > 0) {
+      const previous = path[path.length - 1]
+      const distance = Math.abs(previous.row - point.row) + Math.abs(previous.col - point.col)
+      if (distance !== 1) {
+        setResult({ found: false, word: null, reason: 'not-adjacent' })
+        return
+      }
+    }
+    const nextPath = [...path, point]
+    const nextResult = validateLetterBlocksPath({ grid: puzzle.grid, targets: puzzle.targets, path: nextPath })
+    if (nextResult.found) {
+      setFoundWords((current) => updateFoundLetterBlockWords(current, nextResult))
+      setResult(nextResult)
+      setPath([])
+      return
+    }
+    setPath(nextPath)
+  }
+
+  return (
+    <div className="mt-8 rounded-2xl border border-cyan-400/30 bg-cyan-500/10 p-4">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">Treino local: blocos de letras</p>
+          <h3 className="mt-1 text-xl font-bold text-white">Conecte letras vizinhas</h3>
+          <p className="mt-1 text-sm text-gray-300">Clique em letras horizontais/verticais adjacentes para formar palavras da sessão. Este treino não altera XP/progresso.</p>
+        </div>
+        <span className="w-fit rounded-full border border-white/10 bg-black/20 px-3 py-1 text-sm font-semibold text-polyglot-accent">{foundWords.length}/{puzzle.targets.length}</span>
+      </div>
+
+      <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_240px]">
+        <div className="rounded-xl border border-white/10 bg-black/20 p-3">
+          <div className="grid w-fit gap-2" style={{ gridTemplateColumns: `repeat(${puzzle.grid.length}, minmax(2.5rem, 1fr))` }}>
+            {puzzle.grid.map((row, rowIndex) => row.map((letter, colIndex) => {
+              const key = `${rowIndex}:${colIndex}`
+              const isSelected = selectedCells.has(key)
+              const isFound = foundCells.has(key)
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => chooseCell({ row: rowIndex, col: colIndex })}
+                  className={`flex h-10 w-10 items-center justify-center rounded-xl border text-base font-black transition ${isFound ? 'border-polyglot-green/60 bg-polyglot-green/25 text-polyglot-green' : isSelected ? 'border-cyan-300 bg-cyan-300/25 text-white' : 'border-white/10 bg-white/5 text-white hover:border-cyan-300/60 hover:bg-white/10'}`}
+                  aria-label={`Bloco linha ${rowIndex + 1}, coluna ${colIndex + 1}, letra ${letter}`}
+                >
+                  {letter}
+                </button>
+              )
+            }))}
+          </div>
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <span className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-gray-200">Seleção: <strong className="text-white">{currentAttempt || '—'}</strong></span>
+            <button type="button" className="btn-secondary" onClick={resetSelection}>Limpar seleção</button>
+            <button type="button" className="btn-secondary" onClick={restartGame}>Reiniciar</button>
+          </div>
+          {result && (
+            <p className={`mt-3 rounded-lg p-3 text-sm font-semibold ${result.found ? 'bg-polyglot-green/15 text-polyglot-green' : 'bg-red-500/15 text-red-200'}`}>
+              {result.found ? `Encontrou: ${result.word}` : 'Use apenas letras vizinhas na horizontal/vertical.'}
+            </p>
+          )}
+        </div>
+        <div className="rounded-xl border border-white/10 bg-black/20 p-3">
+          <p className="text-sm font-semibold text-gray-300">Palavras-alvo</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {puzzle.targets.map((word) => (
+              <span key={word} className={`rounded-full border px-3 py-1 text-sm font-bold ${foundSet.has(word) ? 'border-polyglot-green/50 bg-polyglot-green/20 text-polyglot-green line-through' : 'border-white/10 bg-white/5 text-gray-300'}`}>{word}</span>
+            ))}
+          </div>
+          {isComplete && <p className="mt-4 rounded-lg bg-polyglot-green/15 p-3 text-sm font-semibold text-polyglot-green">Blocos concluídos — treino local sem alterar progresso.</p>}
         </div>
       </div>
     </div>
