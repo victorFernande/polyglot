@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom'
 import Layout from './components/Layout'
 import Dashboard from './pages/Dashboard'
 import Exercises from './pages/Exercises'
+import ExercisesQA from './pages/ExercisesQA'
 import Flashcards from './pages/Flashcards'
 import Achievements from './pages/Achievements'
 import Leaderboard from './pages/Leaderboard'
@@ -15,6 +16,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/exercises" element={<Exercises />} />
+        <Route path="/exercises-qa" element={<ExercisesQA />} />
         <Route path="/flashcards" element={<Flashcards />} />
         <Route path="/achievements" element={<Achievements />} />
         <Route path="/leaderboard" element={<Leaderboard />} />

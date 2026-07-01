@@ -363,7 +363,7 @@ def list_exercise_lessons(user_id: int = 1, db: Session = Depends(get_db)):
 def get_exercise_session(session_id: int, db: Session = Depends(get_db)):
     session = db.query(ExerciseSession).filter(ExerciseSession.id == session_id).first()
     if not session: raise HTTPException(status_code=404, detail="Exercise session not found")
-    return ExerciseService.session_payload(session, include_items=True)
+    return ExerciseService.session_payload(session, include_items=True, db=db)
 
 @app.get("/exercise-path")
 def get_exercise_path(user_id: int = 1, db: Session = Depends(get_db)):
@@ -387,7 +387,7 @@ def start_exercise_session(lesson_id: int, user_id: int = 1, session_number: Opt
     if not db.query(User).filter(User.id == user_id).first(): ExerciseService.bootstrap_user(db, user_id)
     session = ExerciseService.start_session(db, user_id=user_id, lesson_id=lesson_id, session_number=session_number)
     if not session: raise HTTPException(status_code=404, detail="Exercise lesson not found")
-    return ExerciseService.session_payload(session, include_items=True)
+    return ExerciseService.session_payload(session, include_items=True, db=db)
 
 @app.post("/exercise-sessions/{session_id}/answer", response_model=ExerciseAnswerResult)
 def answer_exercise_session(session_id: int, answer: ExerciseAnswerCreate, db: Session = Depends(get_db)):

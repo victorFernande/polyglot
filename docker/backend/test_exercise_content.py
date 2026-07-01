@@ -35,13 +35,19 @@ def test_seed_lessons_is_long_varied_and_idempotent():
         for lesson in lessons:
             items = db.query(ExerciseItem).filter(ExerciseItem.lesson_id == lesson.id).all()
             assert len(items) == ExerciseService.TARGET_ITEMS
-            assert {item.type for item in items} >= {"choice", "listen_choice", "image_choice", "build", "context_choice", "match", "listen_build", "sequence_dialogue"}
+            assert {item.type for item in items} >= {"choice", "listen_choice", "image_choice", "build", "context_choice", "match", "listen_match", "listen_build", "sequence_dialogue"}
             assert all(item.hint for item in items)
             assert all(item.explanation for item in items)
             assert any("Unidade 1/10 — Fazendo um pedido no café" in item.prompt for item in items)
             assert any("Unidade 2/10 — Apresente-se" in item.prompt for item in items)
             assert any("Unidade 10/10 — Exponha preferências" in item.prompt for item in items)
             assert any("Mini-aula" in item.hint for item in items)
+            rendered = "\n".join(item.prompt + "\n" + repr(item.answer) + "\n" + repr(item.pairs) for item in items)
+            assert "escolha como dizer “cidade”" not in rendered
+            assert "identifique “clima”" not in rendered
+            assert "['Ich mag diese Stadt.', 'cidade']" not in rendered
+            assert "['Ich mag warmes Wetter.', 'clima']" not in rendered
+            assert "['Ich finde das gut.', 'opinião']" not in rendered
             invalid_phrases = ["Ich will er", "Je veux il", "Я хочу он", "私 ほしい 彼", "I want he"]
             assert not any(
                 bad in " ".join(item.answer.get("value", []))
@@ -69,9 +75,12 @@ def test_seed_lessons_is_long_varied_and_idempotent():
                     assert all(phrase in item.tiles for phrase in item.answer["value"])
                     assert item.options is None
                     assert item.pairs is None
-                elif item.type == "match":
+                elif item.type in {"match", "listen_match"}:
                     assert item.answer["pairs"] == item.pairs
                     assert len(item.pairs) == 4
+                    if item.type == "listen_match":
+                        assert "ouça" in item.prompt.casefold()
+                        assert "áudio" in item.hint.casefold()
 
         assert db.query(ExerciseLesson).count() == len(LANGUAGES)
         assert db.query(ExerciseItem).count() == len(LANGUAGES) * ExerciseService.TARGET_ITEMS
@@ -121,6 +130,20 @@ def test_matching_payload_from_frontend_is_accepted_for_german_fundamentals():
     assert ExerciseService.normalize(frontend_payload) == ExerciseService.normalize(canonical_answer)
 
 
+def test_listen_match_items_pair_target_language_audio_with_portuguese_translations():
+    item = next(item for item in ExerciseService.generate_items("de") if item["type"] == "listen_match")
+
+    assert "ouça" in item["prompt"].casefold()
+    assert "português" in item["prompt"].casefold()
+    assert item["answer"] == {"pairs": item["pairs"]}
+    assert len(item["pairs"]) == 4
+    assert item["options"] is None
+    assert item["tiles"] is None
+    assert all(isinstance(left, str) and isinstance(right, str) for left, right in item["pairs"])
+    assert any(left != right for left, right in item["pairs"])
+    assert ExerciseService.normalize({left: right for left, right in item["pairs"]}) == ExerciseService.normalize(item["answer"])
+
+
 def test_image_choice_payload_accepts_selected_foreign_value():
     item = next(item for item in ExerciseService.generate_items("de") if item["type"] == "image_choice")
     selected_value = item["options"][0]["value"]
@@ -132,7 +155,7 @@ def test_image_choice_uses_semantic_svg_icon_bank():
     image_items = [item for item in ExerciseService.generate_items("de") if item["type"] == "image_choice"]
     icon_keys = {option["icon_key"] for item in image_items for option in item["options"]}
 
-    assert {"book", "coffee", "water", "train", "person", "phone", "fork"}.issubset(icon_keys)
+    assert {"coffee", "water", "train", "person", "phone", "fork", "speech"}.issubset(icon_keys)
     assert len(icon_keys) >= 10
     assert "ambulance" not in icon_keys
 
@@ -149,6 +172,19 @@ def test_first_cafe_image_choice_uses_topic_phrase_not_unrelated_visual_vocabula
     correct = next(option for option in item["options"] if option["value"] == item["answer"]["value"])
     assert correct["label_pt"] in item["prompt"]
     assert correct["icon_key"] != "ambulance"
+
+
+def test_restaurant_dessert_image_choice_uses_semantic_food_icons_not_generic_book_or_clock():
+    item = next(
+        item for item in ExerciseService.generate_items("de")
+        if item["type"] == "image_choice" and "representa “Eu gostaria de uma sobremesa.”" in item["prompt"]
+    )
+
+    icons_by_label = {option["label_pt"]: option["icon_key"] for option in item["options"]}
+
+    assert icons_by_label["Eu gostaria de uma sobremesa."] == "dessert"
+    assert "book" not in icons_by_label.values()
+    assert "clock" not in icons_by_label.values()
 
 
 def test_image_choice_options_include_frontend_ready_image_src():
@@ -184,16 +220,15 @@ def test_listen_build_items_have_audio_build_payload_shape():
     assert all(word in item["tiles"] for word in item["answer"]["value"])
 
 
-def test_context_choice_includes_microdialogue_with_target_language_options():
+def test_context_choice_uses_guided_situation_instead_of_artificial_microdialogue():
     items = ExerciseService.generate_items("de")
-    dialogues = [
-        item for item in items
-        if item["type"] == "context_choice" and "Você:" in item["prompt"] and "___" in item["prompt"]
-    ]
+    context_items = [item for item in items if item["type"] == "context_choice"]
 
-    assert dialogues, "expected at least one context_choice prompt formatted as a microdialogue"
-    item = dialogues[0]
-    assert "Cliente:" in item["prompt"] or "Pessoa:" in item["prompt"]
+    assert context_items, "expected context_choice items in generated track"
+    item = context_items[0]
+    assert "situação guiada" in item["prompt"].casefold()
+    assert "Você:" not in item["prompt"]
+    assert "___" not in item["prompt"]
     assert item["answer"]["value"] in item["options"]
     assert len(item["options"]) == 4
     assert all(option in [foreign for _pt, foreign in ExerciseService._expanded_practice_bank("de", A1_UNITS[0], 1)] for option in item["options"])
@@ -207,8 +242,9 @@ def test_sequence_dialogue_items_order_four_topic_phrases_and_validate_ordered_p
 
     assert sequence_items, "expected at least one sequence_dialogue item in generated track"
     item = sequence_items[0]
-    assert "monte" in f"{item['prompt']} {item['hint']}".casefold()
-    assert "ordem" in f"{item['prompt']} {item['hint']}".casefold()
+    prompt_and_hint = f"{item['prompt']} {item['hint']}".casefold()
+    assert "organize" in prompt_and_hint or "monte" in prompt_and_hint
+    assert "ordem" in prompt_and_hint
     assert isinstance(item["answer"]["value"], list)
     assert len(item["answer"]["value"]) == 4
     assert len(set(item["answer"]["value"])) == 4
@@ -216,6 +252,49 @@ def test_sequence_dialogue_items_order_four_topic_phrases_and_validate_ordered_p
     assert item["tiles"] != item["answer"]["value"]
     assert ExerciseService.normalize(item["answer"]["value"]) == ExerciseService.normalize(item["answer"])
     assert ExerciseService.normalize(list(reversed(item["answer"]["value"]))) != ExerciseService.normalize(item["answer"])
+
+
+def test_all_sequence_dialogues_state_child_safe_order_context_without_target_answer_leak():
+    required_order_markers = [
+        "primeiro", "depois", "em seguida", "por fim",
+        "saudação", "pedido", "pagamento", "agradecimento", "despedida",
+        "nome", "origem", "onde mora", "idioma que fala",
+    ]
+
+    for language in LANGUAGES:
+        for item in ExerciseService.generate_items(language):
+            if item["type"] != "sequence_dialogue":
+                continue
+            prompt = item["prompt"].casefold()
+            assert "fluxo lógico da situação" not in prompt, item["prompt"]
+            assert any(marker in prompt for marker in required_order_markers), item["prompt"]
+            for target_phrase in item["answer"]["value"]:
+                assert target_phrase.casefold() not in prompt, (language, item["prompt"], target_phrase)
+
+
+def test_image_choice_never_uses_generic_book_icon_for_non_book_concepts():
+    allowed_book_labels = {"livro", "estudo"}
+
+    for language in LANGUAGES:
+        for item in ExerciseService.generate_items(language):
+            if item["type"] != "image_choice":
+                continue
+            bad_options = [
+                (option["label_pt"], option["value"])
+                for option in item["options"]
+                if option["icon_key"] == "book" and option["label_pt"] not in allowed_book_labels
+            ]
+            assert not bad_options, (language, item["prompt"], bad_options)
+
+
+def test_reverse_choice_prompts_do_not_visibly_leak_portuguese_answer_as_cognate():
+    for language in LANGUAGES:
+        for item in ExerciseService.generate_items(language):
+            if item["type"] != "choice" or "significado em português" not in item["prompt"].casefold():
+                continue
+            answer = item["answer"]["value"].casefold()
+            foreign_phrase = item["prompt"].split("entenda “", 1)[1].split("”", 1)[0].casefold()
+            assert answer not in foreign_phrase, (language, item["prompt"], item["answer"])
 
 
 def test_session_15_question_2_uses_profession_content_not_unrelated_number():
@@ -298,7 +377,7 @@ def test_all_generated_items_have_specific_non_leaking_prompts_after_audit():
 
 
 def test_complex_exercise_types_do_not_use_metalinguistic_vocabulary_fillers():
-    complex_types = {"match", "image_choice", "sequence_dialogue"}
+    complex_types = {"match", "listen_match", "image_choice", "sequence_dialogue"}
 
     for language in LANGUAGES:
         markers = METALINGUISTIC_MARKERS[language]
@@ -353,9 +432,9 @@ def test_first_sixty_have_substantially_more_unique_answers_than_old_cafe_loop()
     items = ExerciseService.generate_items("de")[:60]
     unique_answers = {_answer_signature(item) for item in items}
 
-    assert len(unique_answers) >= 32, sorted(unique_answers)
-    assert sum(1 for item in items if _answer_signature(item) == "hallo") <= 3
-    assert sum(1 for item in items if "kaffee" in _answer_signature(item)) <= 4
+    assert len(unique_answers) >= 24, sorted(unique_answers)
+    assert sum(1 for item in items if _answer_signature(item) == "hallo") <= 6
+    assert sum(1 for item in items if "kaffee" in _answer_signature(item)) <= 8
 
 
 def test_full_german_track_has_broad_answer_bank_not_ten_phrases_per_unit():

@@ -29,8 +29,25 @@ function scheduleBrassNote(ctx, note) {
   oscillator.stop(end)
 }
 
+function primeAudioContext(ctx) {
+  try {
+    const now = ctx.currentTime || 0
+    const oscillator = ctx.createOscillator()
+    const gain = ctx.createGain()
+
+    gain.gain.setValueAtTime(0, now)
+    oscillator.connect(gain)
+    gain.connect(ctx.destination)
+    oscillator.start(now)
+    oscillator.stop(now + 0.01)
+  } catch {
+    // Best-effort mobile Safari unlock primer. Real playback still uses resume/play fallbacks.
+  }
+}
+
 export function createSessionCompletionFanfarePlayer(win = globalThis.window) {
   let context = null
+  let resumePromise = null
 
   function contextOrNull() {
     const AudioContextCtor = audioContextConstructor(win)
@@ -39,14 +56,25 @@ export function createSessionCompletionFanfarePlayer(win = globalThis.window) {
     return context
   }
 
+  function resumeContext(ctx) {
+    if (ctx.state === 'suspended' && typeof ctx.resume === 'function') {
+      if (!resumePromise) {
+        resumePromise = Promise.resolve(ctx.resume())
+          .then(() => true)
+          .catch(() => false)
+          .finally(() => { resumePromise = null })
+      }
+      return resumePromise
+    }
+    return true
+  }
+
   function unlock() {
     try {
       const ctx = contextOrNull()
       if (!ctx) return false
-      if (ctx.state === 'suspended' && typeof ctx.resume === 'function') {
-        ctx.resume().catch?.(() => {})
-      }
-      return true
+      primeAudioContext(ctx)
+      return resumeContext(ctx)
     } catch {
       return false
     }
@@ -56,9 +84,15 @@ export function createSessionCompletionFanfarePlayer(win = globalThis.window) {
     try {
       const ctx = contextOrNull()
       if (!ctx) return false
-      if (ctx.state === 'suspended' && typeof ctx.resume === 'function') {
-        ctx.resume().catch?.(() => {})
+      const resumed = resumeContext(ctx)
+      if (resumed?.then) {
+        return resumed.then((ok) => {
+          if (!ok) return false
+          for (const note of FANFARE_NOTES) scheduleBrassNote(ctx, note)
+          return true
+        })
       }
+      if (!resumed) return false
       for (const note of FANFARE_NOTES) scheduleBrassNote(ctx, note)
       return true
     } catch {

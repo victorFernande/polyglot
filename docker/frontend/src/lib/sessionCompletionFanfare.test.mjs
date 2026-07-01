@@ -39,8 +39,12 @@ class FakeAudioContext {
 const win = { AudioContext: FakeAudioContext }
 const player = createSessionCompletionFanfarePlayer(win)
 
-assert.equal(player.unlock(), true, 'session completion fanfare must unlock during the continue/next click')
+assert.equal(await player.unlock(), true, 'session completion fanfare must unlock during the continue/next click')
 assert.ok(events.some(([name]) => name === 'ctx:resume'), 'unlock should resume the fanfare audio context')
+assert.ok(
+  events.some(([name]) => name === 'osc:start'),
+  'unlock should prime Web Audio with a silent oscillator during the direct touch/click gesture for mobile Safari'
+)
 
 events.length = 0
 assert.equal(player.play(), true)
@@ -70,3 +74,57 @@ assert.ok(
 assert.equal(createSessionCompletionFanfarePlayer({}).play(), false, 'missing Web Audio support should fail silently')
 assert.equal(unlockSessionCompletionFanfare({}), false, 'global unlock helper should fail silently without Web Audio')
 assert.equal(playSessionCompletionFanfare({}), false, 'global play helper should fail silently without Web Audio')
+
+const asyncEvents = []
+let resolveAsyncResume
+class DelayedResumeOscillator {
+  constructor() {
+    this.frequency = {
+      setValueAtTime: (value) => asyncEvents.push(['freq:set', value]),
+    }
+    this.type = ''
+  }
+  connect(node) { return node }
+  start() { asyncEvents.push(['osc:start']) }
+  stop() {}
+}
+class DelayedResumeGain {
+  constructor() {
+    this.gain = {
+      setValueAtTime: () => {},
+      linearRampToValueAtTime: () => {},
+      exponentialRampToValueAtTime: () => {},
+    }
+  }
+  connect(node) { return node }
+}
+class DelayedResumeAudioContext {
+  constructor() {
+    this.currentTime = 7
+    this.destination = 'destination'
+    this.state = 'suspended'
+  }
+  createOscillator() { return new DelayedResumeOscillator() }
+  createGain() { return new DelayedResumeGain() }
+  resume() {
+    asyncEvents.push(['ctx:resume:start'])
+    return new Promise((resolve) => {
+      resolveAsyncResume = () => {
+        this.state = 'running'
+        asyncEvents.push(['ctx:resume:done'])
+        resolve()
+      }
+    })
+  }
+}
+
+const delayedPlayer = createSessionCompletionFanfarePlayer({ AudioContext: DelayedResumeAudioContext })
+const delayedUnlock = delayedPlayer.unlock()
+assert.equal(typeof delayedUnlock?.then, 'function', 'fanfare unlock should expose the browser resume promise to preview buttons')
+const delayedPlay = delayedPlayer.play()
+assert.equal(typeof delayedPlay?.then, 'function', 'fanfare play should wait for a suspended context to resume before scheduling notes')
+assert.deepEqual(asyncEvents.filter(([name]) => name === 'freq:set'), [], 'fanfare notes must not be scheduled while the AudioContext is still suspended')
+resolveAsyncResume()
+assert.equal(await delayedUnlock, true)
+assert.equal(await delayedPlay, true)
+assert.ok(asyncEvents.some(([name]) => name === 'freq:set'), 'fanfare notes should be scheduled after the AudioContext resumes')

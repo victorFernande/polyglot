@@ -9,6 +9,8 @@ os.environ["DATABASE_URL"] = f"sqlite:///{TEST_DB}"
 
 from fastapi.testclient import TestClient  # noqa: E402
 from main import app  # noqa: E402
+from models import ExerciseSession, SessionLocal  # noqa: E402
+from services import ExerciseService  # noqa: E402
 
 
 def ui_payload(item):
@@ -98,7 +100,7 @@ def test_wrong_answer_records_mistake_advances_and_returns_teaching_feedback():
         assert result["mistake_feedback"]["explanation"]
 
 
-def test_starting_after_exhausted_session_returns_next_10_item_session():
+def test_starting_after_exhausted_session_returns_next_20_item_session():
     with TestClient(app) as client:
         user_id = 93011
         client.post(f"/users/{user_id}/bootstrap")
@@ -125,7 +127,7 @@ def test_starting_after_exhausted_session_returns_next_10_item_session():
         assert next_session["status"] == "in_progress"
         assert next_session["current_index"] == 0
         assert next_session["current_item"] is not None
-        assert len(next_session["items"]) == next_session["total_count"] == 10
+        assert len(next_session["items"]) == next_session["total_count"] == 20
         assert [item["id"] for item in next_session["items"]] != first_item_ids
 
 
@@ -144,13 +146,114 @@ def test_can_start_a_specific_previous_session_window_without_using_real_user():
         assert session.status_code == 200, session.text
         payload = session.json()
         assert payload["session_number"] == 4
-        assert [item["id"] for item in payload["items"]] == [item["id"] for item in full_lesson["items"][30:40]]
+        assert [item["id"] for item in payload["items"]] == [item["id"] for item in full_lesson["items"][60:80]]
 
         same_session = client.post(
             f"/exercise-lessons/{lesson['id']}/sessions",
             params={"user_id": user_id, "session_number": 4},
         ).json()
         assert same_session["id"] == payload["id"]
+
+
+def test_sessions_can_grow_beyond_initial_lesson_window_count_without_wrapping_numbers():
+    with TestClient(app) as client:
+        user_id = 93031
+        client.post(f"/users/{user_id}/bootstrap")
+        lesson = client.get("/exercise-lessons", params={"user_id": user_id}).json()[0]
+
+        db = SessionLocal()
+        try:
+            for number in range(1, lesson["total_sessions"] + 1):
+                db.add(ExerciseSession(
+                    user_id=user_id,
+                    lesson_id=lesson["id"],
+                    status="completed",
+                    session_number=number,
+                    total_count=ExerciseService.SESSION_SIZE,
+                    current_index=ExerciseService.SESSION_SIZE,
+                ))
+            db.commit()
+        finally:
+            db.close()
+
+        grown_lesson = client.get("/exercise-lessons", params={"user_id": user_id}).json()[0]
+        next_session = client.post(f"/exercise-lessons/{lesson['id']}/sessions", params={"user_id": user_id}).json()
+
+        assert grown_lesson["total_sessions"] == lesson["total_sessions"] + 1
+        assert next_session["session_number"] == lesson["total_sessions"] + 1
+        assert len(next_session["items"]) == next_session["total_count"] == 20
+
+
+def test_legacy_10_question_in_progress_session_expands_to_current_20_question_window():
+    with TestClient(app) as client:
+        user_id = 93041
+        client.post(f"/users/{user_id}/bootstrap")
+        lesson = client.get("/exercise-lessons", params={"user_id": user_id}).json()[0]
+
+        db = SessionLocal()
+        try:
+            legacy = ExerciseSession(
+                user_id=user_id,
+                lesson_id=lesson["id"],
+                status="in_progress",
+                session_number=16,
+                total_count=10,
+                current_index=1,
+            )
+            db.add(legacy)
+            db.commit()
+        finally:
+            db.close()
+
+        resumed = client.post(f"/exercise-lessons/{lesson['id']}/sessions", params={"user_id": user_id}).json()
+
+        assert resumed["session_number"] == 16
+        assert resumed["current_index"] == 1
+        assert len(resumed["items"]) == resumed["total_count"] == 20
+        assert resumed["current_item"] == resumed["items"][1]
+
+
+def test_opening_previous_session_does_not_replace_highest_active_session_on_refresh():
+    with TestClient(app) as client:
+        user_id = 93051
+        client.post(f"/users/{user_id}/bootstrap")
+        lesson = client.get("/exercise-lessons", params={"user_id": user_id}).json()[0]
+
+        db = SessionLocal()
+        try:
+            db.add(ExerciseSession(user_id=user_id, lesson_id=lesson["id"], status="in_progress", session_number=16, total_count=20, current_index=1))
+            db.commit()
+        finally:
+            db.close()
+
+        previous = client.post(f"/exercise-lessons/{lesson['id']}/sessions", params={"user_id": user_id, "session_number": 15}).json()
+        refreshed_default = client.post(f"/exercise-lessons/{lesson['id']}/sessions", params={"user_id": user_id}).json()
+
+        assert previous["session_number"] == 15
+        assert refreshed_default["session_number"] == 16
+        assert refreshed_default["current_index"] == 1
+        assert len(refreshed_default["items"]) == refreshed_default["total_count"] == 20
+
+
+def test_next_session_ignores_lower_previous_session_opened_for_review():
+    with TestClient(app) as client:
+        user_id = 93052
+        client.post(f"/users/{user_id}/bootstrap")
+        lesson = client.get("/exercise-lessons", params={"user_id": user_id}).json()[0]
+
+        db = SessionLocal()
+        try:
+            db.add(ExerciseSession(user_id=user_id, lesson_id=lesson["id"], status="in_progress", session_number=15, total_count=20, current_index=1))
+            db.add(ExerciseSession(user_id=user_id, lesson_id=lesson["id"], status="completed", session_number=16, total_count=20, current_index=20))
+            db.commit()
+        finally:
+            db.close()
+
+        next_session = client.post(f"/exercise-lessons/{lesson['id']}/sessions", params={"user_id": user_id}).json()
+
+        assert next_session["session_number"] == 17
+        assert next_session["current_index"] == 0
+        assert len(next_session["items"]) == next_session["total_count"] == 20
 
 
 def test_bootstrap_allows_independent_test_users():

@@ -195,7 +195,7 @@ class ExerciseService:
             "cultura": [("canção","song"),("filme","movie"),("notícia","news"),("jogo","game"),("arte","art"),("história","history"),("futebol","soccer"),("teatro","theater"),("museu","museum"),("internet","internet")],
         },
     }
-    SESSION_SIZE = 10
+    SESSION_SIZE = 20
     TARGET_ITEMS = 1000
 
     @staticmethod
@@ -254,6 +254,14 @@ class ExerciseService:
         return {"type":"match","prompt":prompt,"answer":{"pairs":pairs},"options":None,"tiles":None,"pairs":pairs,"hint":"Combine pelo significado, não pela aparência da palavra.","explanation":"Matching fortalece reconhecimento rápido de vocabulário.","xp_reward":12 + (idx % 4)}
 
     @staticmethod
+    def _listen_match(prompt, pairs, idx):
+        item = ExerciseService._match(prompt, pairs, idx)
+        item["type"] = "listen_match"
+        item["hint"] = "Toque em cada áudio no idioma estudado e selecione a tradução correspondente em português."
+        item["explanation"] = "Cada áudio fala uma palavra ou frase no idioma estudado; o par correto é a tradução em português."
+        return item
+
+    @staticmethod
     def _icon_svg(icon_key: str, idx: int):
         bg = ["#dbeafe", "#ffedd5", "#dcfce7", "#fae8ff", "#fef9c3", "#fee2e2"][idx % 6]
         icons = {
@@ -270,8 +278,20 @@ class ExerciseService:
             "bread": '<path d="M20 50c0-17 12-30 28-30s28 13 28 30v12c0 8-6 14-14 14H34c-8 0-14-6-14-14V50z" fill="#d97706"/><path d="M32 40c6-8 14-8 20 0M48 38c6-7 13-7 18 0" stroke="#fef3c7" stroke-width="5" fill="none" stroke-linecap="round"/>',
             "person": '<circle cx="48" cy="30" r="13" fill="#f59e0b"/><path d="M24 78c3-17 13-27 24-27s21 10 24 27" fill="#2563eb"/><path d="M34 62h28" stroke="#bfdbfe" stroke-width="4"/>',
             "clock": '<circle cx="48" cy="48" r="31" fill="#fff" stroke="#0f172a" stroke-width="5"/><path d="M48 28v22l15 9" stroke="#0f172a" stroke-width="5" fill="none" stroke-linecap="round"/>',
+            "dessert": '<path d="M24 34h48l-6 38H30L24 34z" fill="#f472b6" stroke="#be185d" stroke-width="4"/><path d="M31 34c3-10 11-16 17-16s14 6 17 16" fill="#fde68a"/><circle cx="54" cy="20" r="5" fill="#ef4444"/><path d="M36 46h24" stroke="#fff" stroke-width="5" stroke-linecap="round"/>',
+            "no_meat": '<circle cx="48" cy="48" r="32" fill="#fff7ed" stroke="#ef4444" stroke-width="5"/><path d="M32 56c6-16 28-16 32 0 2 8-4 14-16 14S30 64 32 56z" fill="#f97316"/><path d="M24 24l48 48" stroke="#ef4444" stroke-width="7" stroke-linecap="round"/>',
+            "recommendation": '<circle cx="48" cy="42" r="24" fill="#fef3c7" stroke="#f59e0b" stroke-width="4"/><path d="M48 24l6 12 13 2-10 9 3 13-12-7-12 7 3-13-10-9 13-2 6-12z" fill="#facc15"/><path d="M32 75h32" stroke="#92400e" stroke-width="5" stroke-linecap="round"/>',
+            "receipt": '<path d="M28 16h40v64l-7-5-7 5-6-5-7 5-6-5-7 5V16z" fill="#fff" stroke="#0f172a" stroke-width="4"/><path d="M38 30h20M38 44h20M38 58h14" stroke="#64748b" stroke-width="4" stroke-linecap="round"/>',
+            "menu": '<rect x="26" y="18" width="44" height="60" rx="5" fill="#fef3c7" stroke="#92400e" stroke-width="4"/><path d="M36 34h24M36 46h24M36 58h18" stroke="#92400e" stroke-width="4" stroke-linecap="round"/>',
+            "table": '<path d="M24 40h48v8H24z" fill="#92400e"/><path d="M32 48v28M64 48v28" stroke="#92400e" stroke-width="7" stroke-linecap="round"/><circle cx="48" cy="31" r="9" fill="#38bdf8"/>',
+            "soup": '<path d="M24 48h48c0 14-11 25-24 25S24 62 24 48z" fill="#f97316"/><path d="M20 48h56" stroke="#7c2d12" stroke-width="5" stroke-linecap="round"/><path d="M37 32c-4-5 4-8 0-13M49 32c-4-5 4-8 0-13" stroke="#94a3b8" stroke-width="4" fill="none"/>',
+            "speech": '<path d="M20 24h56v34H45L31 72V58H20V24z" fill="#38bdf8" stroke="#0f172a" stroke-width="4"/><path d="M32 38h32M32 48h22" stroke="#fff" stroke-width="5" stroke-linecap="round"/>',
+            "thanks": '<circle cx="36" cy="36" r="10" fill="#f59e0b"/><circle cx="60" cy="36" r="10" fill="#f59e0b"/><path d="M24 72c4-15 13-23 24-23s20 8 24 23" fill="#22c55e"/><path d="M38 58l10 8 14-18" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+            "check": '<circle cx="48" cy="48" r="32" fill="#22c55e"/><path d="M31 49l11 11 24-26" stroke="#fff" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+            "goodbye": '<circle cx="48" cy="30" r="12" fill="#f59e0b"/><path d="M29 78c2-16 10-28 19-28s17 12 19 28" fill="#6366f1"/><path d="M67 35c8 4 11 10 9 17M72 28c13 7 18 17 15 30" stroke="#38bdf8" stroke-width="5" fill="none" stroke-linecap="round"/>',
+            "question": '<circle cx="48" cy="48" r="32" fill="#fef3c7" stroke="#f59e0b" stroke-width="4"/><path d="M39 39c1-8 8-13 16-9 8 4 6 14-1 18-4 2-6 4-6 8" stroke="#92400e" stroke-width="6" fill="none" stroke-linecap="round"/><circle cx="48" cy="66" r="4" fill="#92400e"/>',
         }
-        shape = icons.get(icon_key, icons["book"])
+        shape = icons.get(icon_key, icons["speech"])
         return f'<svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg"><rect width="96" height="96" rx="22" fill="{bg}"/>{shape}</svg>'
 
     @staticmethod
@@ -280,8 +300,19 @@ class ExerciseService:
 
     @staticmethod
     def _icon_key_for_phrase(portuguese: str, foreign: str, topic: str = "") -> str:
-        text = f"{portuguese} {foreign}".casefold()
+        text = f"{portuguese} {foreign} {topic}".casefold()
         keyword_icons = [
+            (("obrigado", "agradecer", "danke", "thank", "merci", "спасибо", "ありがとうございます"), "thanks"),
+            (("até logo", "desped", "goodbye", "auf wiedersehen", "au revoir", "до свид", "さようなら"), "goodbye"),
+            (("sim", "certo", "yes", "stimmt", "correct", "oui", "да", "はい"), "check"),
+            (("sobremesa", "dessert", "десерт", "デザート"), "dessert"),
+            (("sem carne", "ohne fleisch", "no meat", "sans viande", "без мяса", "肉なし"), "no_meat"),
+            (("recomendação", "recomenda", "empfehlen", "recommend", "recommandez", "рекоменду", "おすすめ"), "recommendation"),
+            (("conta", "rechnung", "bill", "addition", "счёт", "お会計"), "receipt"),
+            (("por favor", "please", "bitte", "s'il vous plaît", "пожалуйста", "お願いします"), "speech"),
+            (("menu", "speisekarte", "меню", "メニュー"), "menu"),
+            (("mesa", "tisch", "table", "стол", "席"), "table"),
+            (("entrada", "sopa", "suppe", "soup", "soupe", "суп", "スープ"), "soup"),
             (("olá", "hallo", "hello", "bonjour", "привет", "здравствуйте", "こんにちは", "cumprimentar"), "person"),
             (("café", "kaffee", "coffee", "кофе", "コーヒー"), "coffee"),
             (("água", "wasser", "water", "eau", "воду", "вода", "水"), "water"),
@@ -290,16 +321,18 @@ class ExerciseService:
             (("casa", "moro", "moradia", "wohne", "haus", "home", "house", "maison", "дом", "家"), "house"),
             (("camisa", "casaco", "roup", "hemd", "shirt", "chemise", "рубаш", "シャツ"), "shirt"),
             (("telefone", "phone", "téléphone", "телефон", "電話"), "phone"),
-            (("livro", "estudo", "learn", "lerne", "study", "уч", "勉強", "本"), "book"),
-            (("conta", "preço", "custa", "quanto", "bill", "price", "combien", "сколько", "いくら"), "clock"),
+            (("livro", "book", "livre", "книга"), "book"),
+            (("preço", "custa", "quanto", "price", "combien", "сколько", "いくら"), "receipt"),
             (("nome", "professor", "irmã", "irmão", "mãe", "pai", "família", "victor", "teacher", "sister", "brother", "名前", "先生"), "person"),
-            (("comida", "prato", "garfo", "frango", "restaurante", "gabel", "fork", "fourchette", "вилка", "フォーク"), "fork"),
+            (("comida", "prato", "garfo", "frango", "hähnchen", "chicken", "restaurante", "gabel", "fork", "fourchette", "вилка", "フォーク"), "fork"),
             (("bola", "esporte", "futebol", "ball", "football", "футбол", "サッカー"), "ball"),
         ]
         for keywords, icon_key in keyword_icons:
             if any(keyword in text for keyword in keywords):
                 return icon_key
-        return "book"
+        if any(marker in text for marker in ("livro", "book", "livre", "книга")):
+            return "book"
+        return "speech"
 
     @staticmethod
     def _image_choice(prompt, answer, options, idx):
@@ -491,15 +524,22 @@ class ExerciseService:
         return templates[(question_index - 1) % len(templates)]
 
     @staticmethod
+    def _sequence_prompt(prefix: str, unit_title: str, sequence_pairs: list[list[str]], topic_name: str):
+        portuguese_steps = [pair[0] for pair in sequence_pairs]
+        if unit_title == "Apresente-se":
+            return f"{prefix}: monte uma apresentação curta seguindo a ordem: nome → origem → onde mora → idioma que fala"
+        return f"{prefix}: prática guiada de ordem — organize os cartões exatamente assim: primeiro {portuguese_steps[0]}; depois {portuguese_steps[1]}; em seguida {portuguese_steps[2]}; por fim {portuguese_steps[3]}"
+
+    @staticmethod
     def generate_items(code: str):
         name = ExerciseService.LANGUAGE_NAMES[code]
         items = []
         type_patterns = [
-            ["choice", "listen_choice", "image_choice", "build", "context_choice", "match", "choice", "listen_build", "sequence_dialogue", "context_choice"],
+            ["choice", "listen_choice", "image_choice", "build", "context_choice", "listen_match", "choice", "listen_build", "sequence_dialogue", "context_choice"],
             ["listen_choice", "choice", "build", "context_choice", "image_choice", "choice", "match", "sequence_dialogue", "listen_build", "context_choice"],
-            ["context_choice", "image_choice", "choice", "listen_choice", "build", "match", "sequence_dialogue", "context_choice", "listen_choice", "listen_build"],
+            ["context_choice", "image_choice", "choice", "listen_choice", "build", "listen_match", "sequence_dialogue", "context_choice", "listen_choice", "listen_build"],
             ["choice", "build", "listen_choice", "image_choice", "context_choice", "match", "listen_build", "choice", "sequence_dialogue", "listen_choice"],
-            ["image_choice", "choice", "context_choice", "build", "listen_choice", "match", "choice", "listen_choice", "listen_build", "sequence_dialogue"],
+            ["image_choice", "choice", "context_choice", "build", "listen_choice", "listen_match", "choice", "listen_choice", "listen_build", "sequence_dialogue"],
         ]
         for unit_index, unit in enumerate(A1_UNITS, 1):
             bank = ExerciseService._expanded_practice_bank(code, unit, unit_index)
@@ -520,7 +560,8 @@ class ExerciseService:
                     topic_wrong_foreign = [foreign for idx_pair, (_pt, foreign) in enumerate(unit["phrases"][code]) if idx_pair != topic_index - 1][:3]
                     topic_wrong_portuguese = [portuguese for idx_pair, (portuguese, _foreign) in enumerate(unit["phrases"][code]) if idx_pair != topic_index - 1][:3]
                     if item_type == "choice":
-                        if question_index in {6, 7, 8}:
+                        can_use_reverse = question_index in {6, 7, 8} and topic_pt.casefold() not in topic_target.casefold()
+                        if can_use_reverse:
                             reverse_prompt = f"{prefix}: entenda “{topic_target}” — qual é o significado em português?"
                             item = ExerciseService._choice(reverse_prompt, topic_pt, topic_wrong_portuguese, idx)
                         else:
@@ -530,7 +571,7 @@ class ExerciseService:
                         prompt = f"{prefix}: ouça o áudio e identifique “{topic_pt}”"
                         item = ExerciseService._listen_choice(prompt, topic_target, topic_wrong_foreign, idx)
                     elif item_type == "image_choice":
-                        sample = ExerciseService._unit_phrase_window(unit, code, topic_index + question_index, 4)
+                        sample = [(topic_pt, topic_target)] + [pair for pair in unit["phrases"][code] if pair[1] != topic_target][:3]
                         answer_pt, answer_foreign = sample[0]
                         answer = (answer_pt, answer_foreign, ExerciseService._icon_key_for_phrase(answer_pt, answer_foreign, topic_name))
                         image_options = [
@@ -540,8 +581,11 @@ class ExerciseService:
                         prompt = f"{prefix}: observe a imagem e escolha a frase que representa “{answer_pt}”"
                         item = ExerciseService._image_choice(prompt, answer, image_options, idx)
                     elif item_type in {"build", "listen_build"}:
-                        build_pt, build_target = ExerciseService._build_source_phrase(unit, code, topic_index, question_index)
+                        build_pt, build_target = topic_pt, topic_target
                         words = ExerciseService._build_tokens(code, build_target)
+                        if len(words) < 2:
+                            build_pt, build_target = ExerciseService._build_source_phrase(unit, code, topic_index, question_index)
+                            words = ExerciseService._build_tokens(code, build_target)
                         extras = [word for foreign in all_foreign[start % len(all_foreign):(start % len(all_foreign)) + 12] for word in ExerciseService._build_tokens(code, foreign)]
                         if len(extras) < 8:
                             extras.extend([word for foreign in all_foreign[:12] for word in ExerciseService._build_tokens(code, foreign)])
@@ -551,34 +595,39 @@ class ExerciseService:
                         else:
                             prompt = f"{prefix}: monte a frase em ordem natural para dizer “{build_pt}”"
                             item = ExerciseService._build(prompt, words, extras, idx)
-                    elif item_type == "match":
+                    elif item_type in {"match", "listen_match"}:
                         sample = ExerciseService._unit_phrase_window(unit, code, topic_index + question_index, 4)
                         pairs = [[foreign, portuguese] for portuguese, foreign in sample]
-                        prompt = f"{prefix}: relacione cada frase ao significado em português no tema “{topic_name}”"
-                        item = ExerciseService._match(prompt, pairs, idx)
+                        review_prefix = f"Unidade {unit_index}/10 — {unit['title']} · Revisão guiada"
+                        if item_type == "listen_match":
+                            prompt = f"{review_prefix}: ouça cada áudio em {name} e selecione a tradução em português"
+                            item = ExerciseService._listen_match(prompt, pairs, idx)
+                        else:
+                            prompt = f"{review_prefix}: relacione cada frase ao significado em português"
+                            item = ExerciseService._match(prompt, pairs, idx)
                     elif item_type == "sequence_dialogue":
                         sequence_pairs = ExerciseService._coherent_sequence_pairs(unit, code, topic_index)
                         phrases = [foreign for _portuguese, foreign in sequence_pairs]
-                        sequence_label = "apresentação curta" if unit["title"] == "Apresente-se" else "sequência curta"
-                        prompt = f"{prefix}: monte uma {sequence_label} seguindo esta ordem: nome → origem → onde mora → idioma que fala" if unit["title"] == "Apresente-se" else f"{prefix}: monte uma {sequence_label}; ordene as frases pelo fluxo lógico da situação"
+                        review_prefix = f"Unidade {unit_index}/10 — {unit['title']} · Revisão guiada"
+                        prompt = ExerciseService._sequence_prompt(review_prefix, unit["title"], sequence_pairs, topic_name)
                         item = ExerciseService._sequence_dialogue(prompt, phrases, idx)
                     else:
-                        context_sample = ExerciseService._unit_phrase_window(unit, code, topic_index * 4 + question_index * 3, 4)
-                        context_pt, context_target = context_sample[0]
-                        context_wrong = [foreign for _pt, foreign in context_sample[1:]]
-                        prompt = f"{prefix}: escolha a fala que comunica “{context_pt}” no tema “{topic_name}”"
-                        if question_index in {5, 10}:
-                            _opening_pt, opening_line = context_sample[1]
-                            prompt = ExerciseService._microdialogue_prompt(prefix, topic_name, context_pt, opening_line)
+                        context_pt, context_target = topic_pt, topic_target
+                        context_wrong = topic_wrong_foreign
+                        prompt = f"{prefix}: situação guiada — você precisa comunicar “{context_pt}” no tema “{topic_name}”. Escolha a fala correta em {name}."
                         item = ExerciseService._context_choice(prompt, context_target, context_wrong, idx)
                     if item["type"] == "listen_build":
                         item["hint"] = f"{hint} Ouça a frase, repita em voz alta e monte as palavras na ordem correta."
+                    elif item["type"] == "listen_match":
+                        item["hint"] = f"{hint} Toque em cada áudio no idioma estudado e selecione a tradução correspondente em português."
                     elif item["type"] == "sequence_dialogue":
                         item["hint"] = f"{hint} Siga a ordem indicada no enunciado e organize apenas as frases no idioma estudado."
                     else:
                         item["hint"] = hint
                     if item["type"] == "image_choice":
                         pass
+                    elif item["type"] == "listen_match":
+                        item["explanation"] = f"Cada áudio em {name} deve ser ligado à tradução em português dentro do tema “{topic_name}”."
                     elif item["type"] == "match":
                         item["explanation"] = f"Cada par conecta uma frase em {name} ao significado em português dentro do tema “{topic_name}”."
                     elif item["type"] == "sequence_dialogue":
@@ -634,24 +683,44 @@ class ExerciseService:
         return [s.id for s in sessions].index(session.id)
 
     @staticmethod
+    def _base_session_count(lesson: ExerciseLesson):
+        return max(1, (len(lesson.items) + ExerciseService.SESSION_SIZE - 1) // ExerciseService.SESSION_SIZE)
+
+    @staticmethod
+    def _session_offset(lesson: ExerciseLesson, session_number: int):
+        base_sessions = ExerciseService._base_session_count(lesson)
+        window_number = ((max(1, session_number) - 1) % base_sessions) + 1
+        return (window_number - 1) * ExerciseService.SESSION_SIZE
+
+    @staticmethod
+    def _visible_total_sessions(lesson: ExerciseLesson, completed_numbers: set[int], active: ExerciseSession | None = None):
+        base_sessions = ExerciseService._base_session_count(lesson)
+        highest_seen = max(completed_numbers | ({active.session_number} if active and active.session_number else set()), default=0)
+        return max(base_sessions, highest_seen + 1)
+
+    @staticmethod
     def session_items(db: Session, session: ExerciseSession):
         items = list(session.lesson.items)
-        chunks = max(1, (len(items) + ExerciseService.SESSION_SIZE - 1) // ExerciseService.SESSION_SIZE)
         number = (session.session_number - 1) if getattr(session, "session_number", None) else ExerciseService._session_number(db, session)
-        offset = (number % chunks) * ExerciseService.SESSION_SIZE
+        offset = ExerciseService._session_offset(session.lesson, number + 1)
         return items[offset:offset + ExerciseService.SESSION_SIZE]
 
     @staticmethod
     def session_payload(session: ExerciseSession, include_items: bool = False, include_current_item: bool = False, db: Session | None = None):
         created_db = db is None
-        db = db or SessionLocal()
-        items = ExerciseService.session_items(db, session)
+        active_db = db or SessionLocal()
+        items = ExerciseService.session_items(active_db, session)
+        if session.total_count != len(items):
+            session.total_count = len(items)
+            active_db.add(session)
+            active_db.commit()
+            active_db.refresh(session)
         current = items[session.current_index] if session.current_index < len(items) else None
-        payload = {"id": session.id, "user_id": session.user_id, "lesson_id": session.lesson_id, "status": session.status, "hearts_start": session.hearts_start, "hearts_left": session.hearts_left, "current_index": session.current_index, "correct_count": session.correct_count, "total_count": session.total_count, "session_number": session.session_number or (ExerciseService._session_number(db, session) + 1), "xp_earned": session.xp_earned, "started_at": session.started_at, "completed_at": session.completed_at, "current_item": ExerciseService.item_payload(current) if current else None}
+        payload = {"id": session.id, "user_id": session.user_id, "lesson_id": session.lesson_id, "status": session.status, "hearts_start": session.hearts_start, "hearts_left": session.hearts_left, "current_index": session.current_index, "correct_count": session.correct_count, "total_count": session.total_count, "session_number": session.session_number or (ExerciseService._session_number(active_db, session) + 1), "xp_earned": session.xp_earned, "started_at": session.started_at, "completed_at": session.completed_at, "current_item": ExerciseService.item_payload(current) if current else None}
         if include_items or include_current_item:
             payload["items"] = [ExerciseService.item_payload(i) for i in items]
         if created_db:
-            db.close()
+            active_db.close()
         return payload
 
     @staticmethod
@@ -659,10 +728,10 @@ class ExerciseService:
         ExerciseService.ensure_seed_lessons(db); out = []
         for lesson in db.query(ExerciseLesson).filter(ExerciseLesson.active == True).order_by(ExerciseLesson.order_index).all():
             sessions = db.query(ExerciseSession).filter(ExerciseSession.user_id == user_id, ExerciseSession.lesson_id == lesson.id).all()
-            active = next((s for s in sessions if s.status == "in_progress"), None)
+            active = max((s for s in sessions if s.status == "in_progress"), key=lambda s: (s.session_number or 0, s.id), default=None)
             completed = [s for s in sessions if s.status == "completed"]
             completed_numbers = {s.session_number or (idx + 1) for idx, s in enumerate(sorted(completed, key=lambda s: s.id))}
-            total_sessions = (len(lesson.items) + ExerciseService.SESSION_SIZE - 1) // ExerciseService.SESSION_SIZE
+            total_sessions = ExerciseService._visible_total_sessions(lesson, completed_numbers, active)
             out.append({"id": lesson.id, "language_code": lesson.language_code, "language": lesson.language_code, "language_name": lesson.language_name, "slug": lesson.slug, "title": lesson.title, "description": lesson.description, "order_index": lesson.order_index, "xp_base": lesson.xp_base, "active": lesson.active, "items_count": len(lesson.items), "session_size": ExerciseService.SESSION_SIZE, "total_sessions": total_sessions, "best_score": max([s.correct_count for s in completed], default=0), "completed_sessions": len(completed_numbers), "active_session_id": active.id if active else None})
         return out
 
@@ -675,30 +744,33 @@ class ExerciseService:
     def get_lesson_payload(db: Session, lesson_id: int):
         lesson = db.query(ExerciseLesson).filter(ExerciseLesson.id == lesson_id).first()
         if not lesson: return None
-        return {"id": lesson.id, "language_code": lesson.language_code, "language": lesson.language_code, "language_name": lesson.language_name, "slug": lesson.slug, "title": lesson.title, "description": lesson.description, "order_index": lesson.order_index, "xp_base": lesson.xp_base, "active": lesson.active, "items_count": len(lesson.items), "session_size": ExerciseService.SESSION_SIZE, "total_sessions": (len(lesson.items)+ExerciseService.SESSION_SIZE-1)//ExerciseService.SESSION_SIZE, "items": [ExerciseService.item_payload(i) for i in lesson.items]}
+        return {"id": lesson.id, "language_code": lesson.language_code, "language": lesson.language_code, "language_name": lesson.language_name, "slug": lesson.slug, "title": lesson.title, "description": lesson.description, "order_index": lesson.order_index, "xp_base": lesson.xp_base, "active": lesson.active, "items_count": len(lesson.items), "session_size": ExerciseService.SESSION_SIZE, "total_sessions": ExerciseService._base_session_count(lesson), "items": [ExerciseService.item_payload(i) for i in lesson.items]}
 
     @staticmethod
     def start_session(db: Session, user_id: int, lesson_id: int, session_number: int | None = None):
         lesson = db.query(ExerciseLesson).filter(ExerciseLesson.id == lesson_id).first()
         if not lesson: return None
-        total_sessions = max(1, (len(lesson.items) + ExerciseService.SESSION_SIZE - 1) // ExerciseService.SESSION_SIZE)
-        requested_number = max(1, min(int(session_number), total_sessions)) if session_number else None
+        requested_number = max(1, int(session_number)) if session_number else None
         if requested_number is not None:
             session = db.query(ExerciseSession).filter(ExerciseSession.user_id == user_id, ExerciseSession.lesson_id == lesson_id, ExerciseSession.status == "in_progress", ExerciseSession.session_number == requested_number).order_by(ExerciseSession.id.desc()).first()
-            if session and int(session.current_index or 0) < int(session.total_count or 0):
+            if session and int(session.current_index or 0) < len(ExerciseService.session_items(db, session)):
                 return session
             if session:
                 ExerciseService.complete_session(db, session.id)
         else:
-            session = db.query(ExerciseSession).filter(ExerciseSession.user_id == user_id, ExerciseSession.lesson_id == lesson_id, ExerciseSession.status == "in_progress").order_by(ExerciseSession.id.desc()).first()
-            if session:
-                if int(session.current_index or 0) < int(session.total_count or 0):
-                    return session
-                ExerciseService.complete_session(db, session.id)
             completed = db.query(ExerciseSession).filter(ExerciseSession.user_id == user_id, ExerciseSession.lesson_id == lesson_id, ExerciseSession.status == "completed").all()
             completed_numbers = {s.session_number or (idx + 1) for idx, s in enumerate(sorted(completed, key=lambda s: s.id))}
-            requested_number = (len(completed_numbers) % total_sessions) + 1
-        offset = (requested_number - 1) * ExerciseService.SESSION_SIZE
+            highest_completed = max(completed_numbers, default=0)
+            session = db.query(ExerciseSession).filter(ExerciseSession.user_id == user_id, ExerciseSession.lesson_id == lesson_id, ExerciseSession.status == "in_progress").order_by(ExerciseSession.session_number.desc(), ExerciseSession.id.desc()).first()
+            if session:
+                session_number = session.session_number or 0
+                if int(session.current_index or 0) < len(ExerciseService.session_items(db, session)) and session_number > highest_completed:
+                    return session
+                if int(session.current_index or 0) >= len(ExerciseService.session_items(db, session)):
+                    ExerciseService.complete_session(db, session.id)
+                    highest_completed = max(highest_completed, session_number)
+            requested_number = (highest_completed + 1) if highest_completed else 1
+        offset = ExerciseService._session_offset(lesson, requested_number)
         count = min(ExerciseService.SESSION_SIZE, len(lesson.items) - offset)
         session = ExerciseSession(user_id=user_id, lesson_id=lesson_id, total_count=count, session_number=requested_number, hearts_start=5, hearts_left=5, current_index=0)
         db.add(session); db.commit(); db.refresh(session); return session
@@ -740,6 +812,8 @@ class ExerciseService:
         session = db.query(ExerciseSession).filter(ExerciseSession.id == session_id).first()
         if not session or session.status == "completed": return None
         items = ExerciseService.session_items(db, session)
+        if session.total_count != len(items):
+            session.total_count = len(items)
         allowed = [i.id for i in items]
         if item_id not in allowed: return None
         item = db.query(ExerciseItem).filter(ExerciseItem.id == item_id).first()

@@ -1,0 +1,1071 @@
+import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { motion } from 'framer-motion'
+import { Check, X, Volume2, RotateCcw, Trophy, ArrowRight, Loader2, Star, ChevronLeft, ChevronRight } from 'lucide-react'
+import LanguageFlag from '../components/LanguageFlag'
+import { answerExerciseSession, bootstrapUser, completeExerciseSession, loadExerciseLessons, loadExercisePath, startExerciseSession, apiFetch, synthesizeSpeech } from '../lib/api'
+import { handleExerciseKeyDown } from '../lib/exerciseKeyboard.mjs'
+import { buildTilesForItem, stableShuffleOptions } from '../lib/exerciseOptions.mjs'
+import { speakSegmentsWithBrowser, speechLangForLanguage, voiceSegmentsForAnswerOnly, voiceSegmentsForFeedback, voiceSegmentsForItem } from '../lib/voiceMode.mjs'
+import { createSpeechPlaybackController } from '../lib/speechPlayback.mjs'
+import { buildExerciseFeedback } from '../lib/exerciseFeedback.mjs'
+import { selectableImageChoiceOptions } from '../lib/imageChoice.mjs'
+import { lessonContextForExercise } from '../lib/exerciseLessonContext.mjs'
+import { hintForExerciseType } from '../lib/exerciseTypeHint.mjs'
+import { choiceShortcutLabels } from '../lib/exerciseChoiceShortcuts.mjs'
+import { exerciseSessionProgress } from '../lib/exerciseSessionProgress.mjs'
+import { filterExerciseLessonsByLanguage, summarizeExerciseLessonProgressByLanguage } from '../lib/exerciseLessonFilters.mjs'
+import { reorderBuiltWords } from '../lib/buildWordOrder.mjs'
+import { cleanExercisePrompt, isTrailSessionEnabled, pageForSessionNumber, sessionWindowForPage, trailConnectorStateClasses, trailHeaderLayoutClasses, trailNodeStateClasses } from '../lib/exerciseTrailLayout.mjs'
+import { nextExerciseActionLabel, sessionNumberForExerciseSession } from '../lib/exerciseSessionLabels.mjs'
+import { difficultyLabelForItem, instructionForItemType, progressPercentForSession } from '../lib/exerciseLayoutState.mjs'
+import { parseMicroDialoguePrompt } from '../lib/microDialoguePrompt.mjs'
+import { playAnswerFeedbackSound, unlockAnswerFeedbackSound } from '../lib/answerFeedbackSound.mjs'
+import { playSessionCompletionFanfare, unlockSessionCompletionFanfare } from '../lib/sessionCompletionFanfare.mjs'
+import { buildLetterScramblePayload, isLetterScrambleEligible, singleWordBuildAnswer, stableScrambleLetters } from '../lib/letterScramble.mjs'
+
+import { buildListenBuildDictationPayload, canSubmitListenBuildDictation } from '../lib/listenBuildDictation.mjs'
+import { sequenceDialogueCanSubmit, sequenceDialoguePayload } from '../lib/sequenceDialogue.mjs'
+import { exercisesQaChangeLog, latestExercisesQaChange, pendingExercisesQaChanges } from '../lib/exercisesQaChangeLog.mjs'
+
+const LANG_META = {
+  de: { accent: 'Rammstein', color: 'from-red-600 to-red-900' },
+  fr: { accent: 'Chanson', color: 'from-blue-600 to-blue-900' },
+  ru: { accent: 'Cirílico', color: 'from-yellow-600 to-yellow-900' },
+  jp: { accent: 'Anime/Manga', color: 'from-pink-600 to-pink-900' },
+  en: { accent: 'Pop/Internet', color: 'from-emerald-600 to-emerald-900' },
+}
+
+const LESSON_LANGUAGE_FILTERS = [
+  { code: 'all', label: 'Todos' },
+  { code: 'de', label: 'Alemão' },
+  { code: 'fr', label: 'Francês' },
+  { code: 'ru', label: 'Russo' },
+  { code: 'jp', label: 'Japonês' },
+  { code: 'en', label: 'Inglês' },
+]
+
+const BUILD_LIKE_TYPES = ['build', 'listen_build']
+const ANSWER_FEEDBACK_SPEECH_DELAY_MS = 420
+
+function answerValue(answer) {
+  if (answer && typeof answer === 'object' && 'value' in answer) return answer.value
+  return answer
+}
+
+function readableAnswer(value) {
+  if (value == null) return '—'
+  if (Array.isArray(value)) return value.join(' ')
+  if (typeof value === 'object') {
+    if ('value' in value) return readableAnswer(value.value)
+    if ('pairs' in value && Array.isArray(value.pairs)) return value.pairs.map(([left, right]) => `${left} = ${right}`).join('; ')
+    return Object.entries(value).map(([left, right]) => `${left} = ${right}`).join('; ')
+  }
+  return String(value)
+}
+
+function matchPairs(item) {
+  if (Array.isArray(item.pairs)) return item.pairs
+  if (item.answer?.pairs) return item.answer.pairs
+  if (item.answer && typeof item.answer === 'object') return Object.entries(item.answer)
+  return []
+}
+
+export default function Exercises() {
+  const [user, setUser] = useState(null)
+  const [lessons, setLessons] = useState([])
+  const [pathData, setPathData] = useState([])
+  const [lesson, setLesson] = useState(null)
+  const [session, setSession] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState(null)
+  const [feedback, setFeedback] = useState(null)
+  const [selected, setSelected] = useState(null)
+  const [built, setBuilt] = useState([])
+  const [matched, setMatched] = useState({})
+  const [typedAnswer, setTypedAnswer] = useState('')
+  const [summary, setSummary] = useState(null)
+  const [voiceMode, setVoiceMode] = useState(false)
+  const [lessonLanguageFilter, setLessonLanguageFilter] = useState('all')
+  const [trailPage, setTrailPage] = useState(0)
+  const [mobileTrailPage, setMobileTrailPage] = useState(0)
+  const speechPlaybackRef = useRef(null)
+  if (!speechPlaybackRef.current) {
+    speechPlaybackRef.current = createSpeechPlaybackController({
+      synthesizeSpeech,
+      fallbackSpeakSegments: speakSegmentsWithBrowser,
+    })
+  }
+
+  useEffect(() => {
+    return () => speechPlaybackRef.current?.stop()
+  }, [])
+
+  useEffect(() => {
+    async function boot() {
+      try {
+        setLoading(true)
+        const u = await bootstrapUser()
+        setUser(u)
+        const data = await loadExerciseLessons(u.id)
+        setLessons(data)
+        setPathData(await loadExercisePath(u.id))
+        if (data[0]) await openLesson(data[0], u.id)
+      } catch (err) {
+        setError(err.message)
+      } finally {
+        setLoading(false)
+      }
+    }
+    boot()
+  }, [])
+
+  const currentIndex = session?.current_index || 0
+  const sessionItems = session?.items?.length ? session.items : (lesson?.items || [])
+  const currentItem = sessionItems?.[currentIndex]
+  const item = feedback?.itemSnapshot || currentItem
+  const displayIndex = feedback?.answeredIndex ?? currentIndex
+  const sessionProgress = useMemo(() => exerciseSessionProgress(session), [session])
+  const langCode = lesson?.language_code || lesson?.language || 'de'
+  const activePath = pathData.find((p) => (p.language_code || p.language) === langCode)
+  const choiceLikeTypes = ['choice', 'listen_choice', 'context_choice', 'image_choice']
+  const choiceOptions = useMemo(() => (choiceLikeTypes.includes(item?.type) ? stableShuffleOptions(item.options || [], item.id ?? item.prompt) : []), [item])
+  const lessonContext = useMemo(() => lessonContextForExercise(lesson), [lesson])
+  const lessonLanguageProgress = useMemo(() => summarizeExerciseLessonProgressByLanguage(lessons), [lessons])
+  const filteredLessons = useMemo(() => filterExerciseLessonsByLanguage(lessons, lessonLanguageFilter), [lessons, lessonLanguageFilter])
+  const currentSessionNumber = sessionNumberForExerciseSession(session, activePath)
+  const microDialogue = useMemo(() => (item?.type === 'context_choice' ? parseMicroDialoguePrompt(item.prompt) : null), [item])
+  const isUsingListenBuildDictation = item?.type === 'listen_build' && typedAnswer.trim().length > 0
+
+  useEffect(() => {
+    if (activePath) {
+      setTrailPage(pageForSessionNumber(currentSessionNumber, 5))
+      setMobileTrailPage(pageForSessionNumber(currentSessionNumber, 3))
+    }
+  }, [activePath?.language_code, currentSessionNumber])
+
+  function resetExerciseState() {
+    setSummary(null)
+    setFeedback(null)
+    setSelected(null)
+    setBuilt([])
+    setMatched({})
+    setTypedAnswer('')
+  }
+
+  async function openLesson(lessonSummary, userId = user?.id) {
+    setBusy(true)
+    setError(null)
+    setSummary(null)
+    setLesson(null)
+    setSession(null)
+    resetExerciseState()
+    try {
+      const full = await apiFetch(`/exercise-lessons/${lessonSummary.id}`)
+      const started = await startExerciseSession(lessonSummary.id, userId || user?.id || 1)
+      setLesson(full)
+      setSession(started)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function openSessionNumber(sessionNumber) {
+    if (!lesson?.id || !activePath || sessionNumber > activePath.completed_sessions + 1) return
+    setBusy(true)
+    setError(null)
+    resetExerciseState()
+    try {
+      const started = await startExerciseSession(lesson.id, user?.id || 1, sessionNumber)
+      setSession(started)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const normalizedPayload = useMemo(() => {
+    if (!item) return null
+    if (['choice', 'listen_choice', 'context_choice'].includes(item.type)) return selected
+    if (item.type === 'image_choice') return selected
+    if (isUsingListenBuildDictation) return buildListenBuildDictationPayload(typedAnswer)
+    if (item.type === 'sequence_dialogue') return sequenceDialoguePayload(built)
+    if (BUILD_LIKE_TYPES.includes(item.type)) return isLetterScrambleEligible(item) ? buildLetterScramblePayload(built) : built
+    if (['match', 'listen_match'].includes(item.type)) return matched
+    return selected
+  }, [item, selected, built, matched, typedAnswer, isUsingListenBuildDictation])
+
+  const canCheck = useMemo(() => {
+    if (!item) return false
+    if (['choice', 'listen_choice', 'context_choice'].includes(item.type)) return !!selected
+    if (item.type === 'image_choice') return !!selected
+    if (isUsingListenBuildDictation) return canSubmitListenBuildDictation(item, typedAnswer)
+    if (item.type === 'sequence_dialogue') return sequenceDialogueCanSubmit(item, built)
+    if (BUILD_LIKE_TYPES.includes(item.type)) {
+      if (isLetterScrambleEligible(item)) return built.length === singleWordBuildAnswer(item).length
+      return built.length === (answerValue(item.answer)?.length || 0)
+    }
+    if (['match', 'listen_match'].includes(item.type)) return Object.keys(matched).length === matchPairs(item).length
+    return false
+  }, [item, selected, built, matched, typedAnswer, isUsingListenBuildDictation])
+
+  async function check() {
+    if (!item || !session) return
+    unlockAnswerFeedbackSound()
+    setBusy(true)
+    try {
+      const result = await answerExerciseSession(session.id, { item_id: item.id, payload: normalizedPayload })
+      const nextFeedback = buildExerciseFeedback(result, item, currentIndex)
+      setSession(result.session)
+      setFeedback(nextFeedback)
+      playAnswerFeedbackSound(nextFeedback.type)
+      setTimeout(() => speakCurrent(voiceSegmentsForFeedback(nextFeedback, langCode)), ANSWER_FEEDBACK_SPEECH_DELAY_MS)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function next() {
+    resetExerciseState()
+    if (session?.current_index >= session?.total_count) {
+      unlockSessionCompletionFanfare()
+      await finish(true)
+      return
+    }
+  }
+
+  async function finish(continueNext = false) {
+    if (!session) return
+    setBusy(true)
+    try {
+      const done = await completeExerciseSession(session.id)
+      setSession(done.session)
+      const refreshed = await loadExerciseLessons(user?.id || 1)
+      setLessons(refreshed)
+      setPathData(await loadExercisePath(user?.id || 1))
+      if (continueNext) {
+        playSessionCompletionFanfare()
+        const currentLesson = refreshed.find((l) => l.id === lesson?.id) || lessons.find((l) => l.id === lesson?.id) || lesson
+        if (currentLesson?.id) {
+          const started = await startExerciseSession(currentLesson.id, user?.id || 1)
+          const full = await apiFetch(`/exercise-lessons/${currentLesson.id}`)
+          resetExerciseState()
+          setLesson(full)
+          setSession(started)
+          setSummary(null)
+          return
+        }
+      }
+      setSummary(done)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function restart() {
+    const current = lessons.find((l) => l.id === lesson?.id) || lessons[0]
+    if (current) await openLesson(current)
+  }
+
+  function speakCurrent(segments = voiceSegmentsForItem(item, langCode)) {
+    speechPlaybackRef.current?.speakSegments(segments)
+  }
+
+  function replayCurrentAudio() {
+    speakCurrent(feedback ? voiceSegmentsForFeedback(feedback, langCode) : voiceSegmentsForItem(item, langCode))
+  }
+
+  useEffect(() => {
+    if (voiceMode && item && !feedback) speakCurrent()
+  }, [voiceMode, item?.id, feedback])
+
+  useEffect(() => {
+    function onKeyDown(event) {
+      handleExerciseKeyDown(event, {
+        hasItem: !!item && !!session,
+        busy,
+        choiceOptions,
+        canCheck,
+        hasFeedback: !!feedback,
+        selectChoice: (option) => {
+          setFeedback(null)
+          setSelected(typeof option === 'object' && option?.value ? option.value : option)
+        },
+        check,
+        next,
+        clear: resetExerciseState,
+        speakCurrent: replayCurrentAudio,
+      })
+    }
+
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [item, session, busy, choiceOptions, canCheck, feedback])
+
+  if (loading) return <div className="flex h-64 items-center justify-center"><Loader2 className="animate-spin text-polyglot-accent" size={42} /></div>
+  if (error) return <div className="card border-red-500/30 bg-red-500/10 text-red-200">Erro: {error}</div>
+
+  return (
+    <div className="mx-auto max-w-5xl space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold mb-2">🧪 Exercícios QA — novo layout</h1>
+      </div>
+
+      <ExercisesQaChangeMenu entries={exercisesQaChangeLog} />
+
+      <div className="rounded-2xl border border-amber-400/30 bg-amber-400/10 p-4 text-sm text-amber-100">
+        <strong>Staging QA — PENDING QA APPROVAL:</strong> esta rota valida layout e variedade em <code className="rounded bg-black/30 px-1">/exercises-qa</code>. Não promover para <code className="rounded bg-black/30 px-1">/exercises</code> sem aprovação explícita no formato <code className="rounded bg-black/30 px-1">QA aprovado DD/MM HH:MM</code> correspondente ao item pendente.
+      </div>
+
+      {summary && (
+        <div className="card border-polyglot-gold/30 bg-polyglot-gold/10">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div className="flex items-center gap-4">
+              <Trophy className="text-polyglot-gold" size={48} />
+              <div>
+                <h2 className="text-2xl font-bold">Sessão concluída!</h2>
+                <p className="text-gray-300">Você acertou {summary.correct_count} de {summary.total_count} · +{summary.xp_earned} XP gravados</p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <button className="btn-secondary" onClick={() => setSummary(null)}>Fechar resumo</button>
+              <button className="btn-primary inline-flex items-center gap-2" onClick={restart} disabled={busy}>
+                <RotateCcw size={18} /> Próxima sessão
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="flex flex-wrap gap-2">
+        {LESSON_LANGUAGE_FILTERS.map((filter) => {
+          const progressSummary = lessonLanguageProgress[filter.code] || { label: '0/0 sessões' }
+          return (
+            <button
+              key={filter.code}
+              type="button"
+              onClick={() => setLessonLanguageFilter(filter.code)}
+              className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${lessonLanguageFilter === filter.code ? 'border-polyglot-accent bg-polyglot-accent/20 text-polyglot-accent' : 'border-white/10 bg-white/5 text-gray-300 hover:bg-white/10'}`}
+            >
+              <span>{filter.label}</span>
+              <span className="ml-2 text-xs font-medium opacity-75">· {progressSummary.label}</span>
+            </button>
+          )
+        })}
+      </div>
+
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {filteredLessons.map((l) => {
+          const code = l.language_code || l.language
+          return (
+            <button key={l.id} disabled={busy} onClick={() => openLesson(l)} className={`card p-4 text-left transition-all ${lesson?.id === l.id ? 'ring-2 ring-polyglot-accent' : 'hover:bg-white/5'}`}>
+              <div className="flex items-center gap-3">
+                <LanguageFlag code={code} className="h-10 w-10" />
+                <div>
+                  <div className="font-bold">{l.language_name}</div>
+                  <div className="text-xs text-gray-400">{LANG_META[code]?.accent || 'Lição'} · {l.items_count} questões</div>
+                  <div className="text-xs text-polyglot-green">{l.completed_sessions}/{l.total_sessions} sessões · até {l.session_size || 20} por sessão</div>
+                </div>
+              </div>
+            </button>
+          )
+        })}
+      </div>
+
+      {activePath && <SkillTrail path={activePath} lessonContext={lessonContext} page={trailPage} mobilePage={mobileTrailPage} onPageChange={setTrailPage} onMobilePageChange={setMobileTrailPage} currentSessionNumber={currentSessionNumber} onSessionClick={openSessionNumber} />}
+
+      {item && session && lesson && (
+        <ExerciseShell
+          activePath={activePath}
+          busy={busy}
+          canCheck={canCheck}
+          currentSessionNumber={currentSessionNumber}
+          displayIndex={displayIndex}
+          feedback={feedback}
+          item={item}
+          langCode={langCode}
+          lesson={lesson}
+          microDialogue={microDialogue}
+          onCheck={check}
+          onReplay={replayCurrentAudio}
+          onToggleVoice={() => setVoiceMode(!voiceMode)}
+          session={session}
+          sessionProgress={sessionProgress}
+          voiceMode={voiceMode}
+          feedbackSheet={(
+            <ExerciseFeedbackSheet
+              feedback={feedback}
+              langCode={langCode}
+              onContinue={next}
+              onFinish={() => finish(true)}
+              onRepeatAnswer={() => speakCurrent(voiceSegmentsForAnswerOnly(feedback, langCode))}
+              session={session}
+            />
+          )}
+        >
+          {['choice', 'listen_choice', 'context_choice'].includes(item.type) && <ChoiceExerciseBody options={choiceOptions} selected={selected} onInteract={() => setFeedback(null)} setSelected={setSelected} />}
+          {item.type === 'image_choice' && <ImageChoiceExerciseBody options={choiceOptions} selected={selected} onInteract={() => setFeedback(null)} setSelected={setSelected} />}
+          {item.type === 'listen_build' && <ListenBuildDictationExerciseBody typedAnswer={typedAnswer} setTypedAnswer={setTypedAnswer} onInteract={() => setFeedback(null)} onSubmit={check} canSubmit={canCheck} busy={busy} />}
+          {item.type === 'sequence_dialogue' && <SequenceDialogueExerciseBody item={item} built={built} onInteract={() => setFeedback(null)} setBuilt={setBuilt} />}
+          {BUILD_LIKE_TYPES.includes(item.type) && <BuildExerciseBody item={item} built={built} onInteract={() => setFeedback(null)} setBuilt={setBuilt} />}
+          {['match', 'listen_match'].includes(item.type) && <MatchExerciseBody item={item} langCode={langCode} matched={matched} onInteract={() => setFeedback(null)} onSpeakAudio={(text) => speakCurrent([{ text, lang: speechLangForLanguage(langCode) }])} setMatched={setMatched} />}
+        </ExerciseShell>
+      )}
+    </div>
+  )
+}
+
+function ExercisesQaChangeMenu({ entries }) {
+  const [open, setOpen] = useState(false)
+  const pendingChanges = pendingExercisesQaChanges(entries)
+  const latestChange = latestExercisesQaChange(entries)
+
+  if (!latestChange) return null
+
+  return (
+    <div className="rounded-2xl border border-cyan-300/30 bg-cyan-300/10 text-cyan-50">
+      <button
+        type="button"
+        onClick={() => setOpen((value) => !value)}
+        className="flex w-full flex-col gap-2 px-4 py-3 text-left sm:flex-row sm:items-center sm:justify-between"
+      >
+        <span>
+          <span className="text-xs font-black uppercase tracking-[0.22em] text-cyan-300">Alterações QA pendentes</span>
+          <span className="mt-1 block text-lg font-bold">{latestChange.timestamp} · {latestChange.title}</span>
+          <span className="mt-2 block text-xs font-semibold text-cyan-100/85">Próxima aprovação: <code className="rounded bg-black/30 px-1 py-0.5">{latestChange.approvalPhrase}</code></span>
+        </span>
+        <span className="rounded-full border border-cyan-300/30 bg-black/20 px-3 py-1 text-xs font-semibold text-cyan-100">
+          {pendingChanges.length} pendente{pendingChanges.length === 1 ? '' : 's'} · clique para ver diferenças
+        </span>
+      </button>
+      {open && (
+        <div className="border-t border-cyan-300/20 px-4 py-4">
+          <div className="space-y-4">
+            {pendingChanges.map((change) => (
+              <article key={change.id} className="rounded-2xl border border-white/10 bg-black/20 p-4">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-300">{change.timestamp}</p>
+                    <h3 className="mt-1 text-lg font-bold text-white">{change.title}</h3>
+                    <p className="mt-2 text-sm text-cyan-50/80">{change.summary}</p>
+                  </div>
+                  <code className="rounded-xl bg-black/40 px-3 py-2 text-xs text-cyan-100">{change.approvalPhrase}</code>
+                </div>
+                <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-cyan-50/85">
+                  {change.diffs.map((diff) => <li key={diff}>{diff}</li>)}
+                </ul>
+              </article>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function ExerciseShell({ activePath, busy, canCheck, children, currentSessionNumber, displayIndex, feedback, feedbackSheet, item, langCode, lesson, microDialogue, onCheck, onReplay, onToggleVoice, session, sessionProgress, voiceMode }) {
+  const progress = progressPercentForSession(session)
+  const difficultyLabel = difficultyLabelForItem(item)
+  const instruction = instructionForItemType(item)
+
+  return (
+    <div className="overflow-hidden rounded-3xl border border-white/10 bg-slate-950 shadow-2xl shadow-black/30">
+      <div className="border-b border-white/10 bg-black/20 px-4 py-4 sm:px-6">
+        <div className="flex items-center gap-3">
+          <div className="min-w-0 flex-1">
+            <div className="mb-1 text-center text-[11px] font-black uppercase tracking-[0.22em] text-cyan-300">{progress}% concluída</div>
+            <div className="h-3 overflow-hidden rounded-full bg-white/10">
+              <div className="h-full rounded-full bg-gradient-to-r from-cyan-300 to-blue-500 transition-all duration-500" style={{ width: `${progress}%` }} />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="p-4 sm:p-6">
+        <div className="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <ProgressStat label="Respondidas" value={`${sessionProgress.answered}/${sessionProgress.total}`} />
+          <ProgressStat label="Sessão" value={`${currentSessionNumber}/${activePath?.total_sessions || lesson?.total_sessions || '—'}`} />
+          <ProgressStat label="Faltam" value={sessionProgress.remaining} />
+          <ProgressStat label="Acerto parcial" value={`${sessionProgress.correct}/${sessionProgress.answered}`} detail={`${sessionProgress.accuracyPercent}%`} />
+        </div>
+
+        <QaSessionIntegrityStrip session={session} item={item} />
+
+        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start">
+          <LanguageFlag code={langCode} className="h-14 w-14 shrink-0" />
+          <div className="min-w-0 flex-1">
+            {difficultyLabel && <p className="mb-2 text-sm font-black uppercase tracking-[0.2em] text-rose-400">{difficultyLabel}</p>}
+            <p className="text-sm text-gray-400">{lesson.language_name} · questão {displayIndex + 1}/{session.total_count} · {session.xp_earned} XP na sessão</p>
+            <p className="mt-2 inline-flex rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-polyglot-accent">{hintForExerciseType(item.type)}</p>
+            <h2 className="mt-3 text-2xl font-black text-white">{instruction}</h2>
+            <div className="mt-4 rounded-2xl border border-white/10 bg-black/30 p-4 text-lg font-semibold text-white shadow-inner">
+              {cleanExercisePrompt(item.prompt, item.answer)}
+            </div>
+          </div>
+          <div className="flex gap-2 sm:ml-auto">
+            <button className="btn-secondary" title="Ouvir pergunta/correção" onClick={onReplay}><Volume2 size={18} /></button>
+            <button className={`btn-secondary text-xs ${voiceMode ? 'ring-2 ring-polyglot-accent' : ''}`} onClick={onToggleVoice}>{voiceMode ? 'Voz ligada' : 'Modo voz'}</button>
+          </div>
+        </div>
+
+        {microDialogue && <MicroDialoguePrompt dialogue={microDialogue} />}
+
+        <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-4 sm:p-5">
+          {children}
+        </div>
+
+        <div className="mt-5 rounded-xl bg-white/5 p-4 text-sm text-gray-300"><strong>Dica:</strong> {item.hint}</div>
+        <div className="mt-3 text-xs text-gray-500">Atalhos: 1-4 selecionar · O ouvir · Enter verificar/continuar · Esc limpar</div>
+
+        {!feedback && (
+          <div className="mt-6 flex justify-end">
+            <button className="btn-primary disabled:opacity-40" disabled={!canCheck || busy} onClick={onCheck}>{busy ? 'Salvando...' : 'Verificar'}</button>
+          </div>
+        )}
+      </div>
+
+      {feedbackSheet}
+    </div>
+  )
+}
+
+function QaSessionIntegrityStrip({ session, item }) {
+  const sessionItemCount = session.items?.length || 0
+  const typeCounts = (session.items || []).reduce((counts, sessionItem) => {
+    const type = sessionItem.type || 'unknown'
+    counts[type] = (counts[type] || 0) + 1
+    return counts
+  }, {})
+  const varietySummary = Object.entries(typeCounts).map(([type, count]) => `${type}: ${count}`).join(' · ') || 'sem itens em session.items'
+  const exceedsSessionLimit = session.total_count > 20
+  const hasItemCountMismatch = sessionItemCount !== session.total_count
+  const hasMissingActiveItem = session.current_index >= sessionItemCount
+  const hasIntegrityBlocker = exceedsSessionLimit || hasItemCountMismatch || hasMissingActiveItem
+
+  return (
+    <div className={`mb-6 rounded-2xl border p-4 text-sm ${hasIntegrityBlocker ? 'border-red-400/50 bg-red-500/15 text-red-100' : 'border-cyan-300/25 bg-cyan-300/10 text-cyan-50'}`}>
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-300">Integridade QA da sessão</p>
+          <p className="mt-1 font-semibold text-white">Item real da sessão backend</p>
+          {exceedsSessionLimit && <p className="mt-2 rounded-xl bg-red-500/20 px-3 py-2 font-bold text-red-100">QA BLOCKER: sessão com mais de 20 itens; dividir em nova sessão antes de promover.</p>}
+          {hasItemCountMismatch && <p className="mt-2 rounded-xl bg-red-500/20 px-3 py-2 font-bold text-red-100">QA BLOCKER: session.items não bate com total_count; validar payload backend antes de promover.</p>}
+          {hasMissingActiveItem && <p className="mt-2 rounded-xl bg-red-500/20 px-3 py-2 font-bold text-red-100">QA BLOCKER: current_index sem item real em session.items; validar janela ativa antes de promover.</p>}
+        </div>
+        <div className="grid gap-2 text-xs sm:grid-cols-2 lg:min-w-[28rem]">
+          <span className="rounded-xl bg-black/25 px-3 py-2"><strong>session.id:</strong> {session.id}</span>
+          <span className="rounded-xl bg-black/25 px-3 py-2"><strong>item.id:</strong> {item.id}</span>
+          <span className="rounded-xl bg-black/25 px-3 py-2"><strong>item.type:</strong> {item.type}</span>
+          <span className="rounded-xl bg-black/25 px-3 py-2"><strong>total_count:</strong> {session.total_count}</span>
+          <span className="rounded-xl bg-black/25 px-3 py-2"><strong>items reais:</strong> {sessionItemCount}</span>
+          <span className="rounded-xl bg-black/25 px-3 py-2"><strong>current_index:</strong> {session.current_index}</span>
+          <span className="rounded-xl bg-black/25 px-3 py-2"><strong>XP real:</strong> {session.xp_earned || 0}</span>
+          <span className="rounded-xl bg-black/25 px-3 py-2 sm:col-span-2"><strong>Variedade:</strong> {varietySummary}</span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function ExerciseFeedbackSheet({ feedback, langCode, onContinue, onFinish, onRepeatAnswer, session }) {
+  const [showExplanation, setShowExplanation] = useState(false)
+
+  useEffect(() => {
+    setShowExplanation(false)
+  }, [feedback?.itemId, feedback?.type])
+
+  if (!feedback) return null
+
+  const isCorrect = feedback.type === 'correct'
+  const hasExplanation = !!feedback.explanation || !!feedback.mistake?.message
+  const canFinish = session.current_index >= session.total_count
+  const continueLabel = isCorrect ? nextExerciseActionLabel(session) : 'Entendi, continuar'
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className={`border-t p-4 sm:p-6 ${isCorrect ? 'border-polyglot-green/30 bg-polyglot-green/15 text-polyglot-green' : 'border-red-400/30 bg-red-500/15 text-red-200'}`}>
+      <div className="mx-auto flex max-w-4xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-3 text-2xl font-black">
+            <span className={`flex h-10 w-10 items-center justify-center rounded-full ${isCorrect ? 'bg-polyglot-green text-slate-950' : 'bg-red-400 text-slate-950'}`}>{isCorrect ? <Check size={24} /> : <X size={24} />}</span>
+            {isCorrect ? 'Incrível!' : 'Revise a correção'}
+          </div>
+          {!isCorrect && (
+            <div className="mt-3 space-y-2 rounded-2xl bg-black/25 p-3 text-sm text-red-50">
+              <p><strong>Sua resposta:</strong> {readableAnswer(feedback.mistake?.your_answer)}</p>
+              <p><strong>Resposta correta:</strong> {readableAnswer(feedback.mistake?.correct_answer || feedback.correctAnswer)}</p>
+            </div>
+          )}
+          {showExplanation && hasExplanation && (
+            <div className="mt-3 rounded-2xl border border-white/10 bg-black/20 p-3 text-sm text-white/90">
+              <strong>Explicação:</strong> {feedback.explanation || feedback.mistake?.message}
+            </div>
+          )}
+        </div>
+        <div className="flex flex-col gap-2 sm:min-w-56">
+          {hasExplanation && <button type="button" className="btn-secondary border-current text-xs font-black uppercase tracking-[0.12em]" onClick={() => setShowExplanation((value) => !value)}>EXPLIQUE MINHA RESPOSTA</button>}
+          <button type="button" className="btn-secondary inline-flex items-center justify-center gap-2" onClick={onRepeatAnswer}><Volume2 size={18} /> Repetir resposta</button>
+          <button type="button" className="btn-primary inline-flex items-center justify-center gap-2" onClick={canFinish ? onFinish : onContinue}>{canFinish ? nextExerciseActionLabel(session) : continueLabel} <ArrowRight size={18} /></button>
+        </div>
+      </div>
+    </motion.div>
+  )
+}
+
+function ProgressStat({ label, value, detail }) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
+      <div className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">{label}</div>
+      <div className="mt-1 flex items-baseline gap-2">
+        <span className="text-2xl font-bold text-white">{value}</span>
+        {detail && <span className="text-sm font-semibold text-polyglot-accent">{detail}</span>}
+      </div>
+    </div>
+  )
+}
+
+function MicroDialoguePrompt({ dialogue }) {
+  return (
+    <div className="mb-5 rounded-2xl border border-white/10 bg-white/5 p-4">
+      <div className="space-y-3">
+        <div className="mr-8 rounded-2xl rounded-tl-sm bg-black/30 p-3">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-500">{dialogue.partnerLabel}</p>
+          <p className="mt-1 text-lg font-semibold text-white">{dialogue.partnerText}</p>
+        </div>
+        <div className="ml-8 rounded-2xl rounded-tr-sm border border-polyglot-accent/40 bg-polyglot-accent/10 p-3">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">{dialogue.learnerLabel}</p>
+          <p className="mt-1 text-lg font-semibold text-white">{dialogue.learnerText}</p>
+        </div>
+      </div>
+      {dialogue.instruction && <p className="mt-3 text-sm text-gray-300">{dialogue.instruction}</p>}
+    </div>
+  )
+}
+
+function SkillTrail({ path, lessonContext, page, mobilePage, onPageChange, onMobilePageChange, currentSessionNumber, onSessionClick }) {
+  const desktopWindowState = sessionWindowForPage(path.nodes, page, 5)
+  const mobileWindowState = sessionWindowForPage(path.nodes, mobilePage, 3)
+  const layout = trailHeaderLayoutClasses()
+
+  function renderDesktopNode(node, index, nodes) {
+    const isActiveSession = node.number === currentSessionNumber
+    const isEnabled = isTrailSessionEnabled(node, path.completed_sessions, currentSessionNumber)
+    const nextNode = nodes[index + 1]
+    return (
+      <div key={node.number} className="flex flex-1 items-center last:flex-none">
+        <button type="button" disabled={!isEnabled} onClick={() => onSessionClick?.(node.number)} className="flex flex-col items-center gap-2 disabled:cursor-not-allowed" title={isEnabled ? `Abrir sessão ${node.number}` : 'Sessão bloqueada'}>
+          <div className={`flex h-12 w-12 items-center justify-center rounded-full border-2 text-sm font-bold transition ${trailNodeStateClasses(node, isActiveSession)}`}>
+            {node.status === 'completed' ? '✓' : <Star size={18} />}
+          </div>
+          <span className={`${layout.nodeLabel} ${isActiveSession ? 'text-polyglot-accent' : 'text-gray-400'}`}>Sessão {node.number}</span>
+        </button>
+        {index < nodes.length - 1 && <div className={`mx-2 h-1 flex-1 rounded-full ${trailConnectorStateClasses(node, nextNode, currentSessionNumber)}`} />}
+      </div>
+    )
+  }
+
+  function renderMobileNode(node, index, nodes) {
+    const isActiveSession = node.number === currentSessionNumber
+    const isEnabled = isTrailSessionEnabled(node, path.completed_sessions, currentSessionNumber)
+    const nextNode = nodes[index + 1]
+    return (
+      <React.Fragment key={node.number}>
+        <div role={isEnabled ? 'button' : undefined} tabIndex={isEnabled ? 0 : undefined} onClick={isEnabled ? () => onSessionClick?.(node.number) : undefined} onKeyDown={isEnabled ? (event) => { if (event.key === 'Enter' || event.key === ' ') onSessionClick?.(node.number) } : undefined} className="min-w-0 flex-1 text-center" title={isEnabled ? `Abrir sessão ${node.number}` : 'Sessão bloqueada'}>
+          <div className={`mx-auto flex h-10 w-10 items-center justify-center rounded-full border-2 text-sm font-bold transition ${trailNodeStateClasses(node, isActiveSession)}`}>
+            {node.status === 'completed' ? '✓' : <Star size={16} />}
+          </div>
+          <span className={`mt-1 block truncate text-[11px] font-semibold ${isActiveSession ? 'text-polyglot-accent' : 'text-gray-400'}`}>S{node.number}</span>
+        </div>
+        {index < nodes.length - 1 && <div className={`${layout.mobileConnector} ${trailConnectorStateClasses(node, nextNode, currentSessionNumber)}`} />}
+      </React.Fragment>
+    )
+  }
+
+  return (
+    <div className="card">
+      <div className={layout.wrapper}>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h3 className="text-xl font-bold">Trilha de níveis — {path.language_name}</h3>
+            <p className="mt-1 text-sm text-gray-400">Escolha uma sessão liberada ou avance pela trilha.</p>
+          </div>
+          <span className="w-fit rounded-full bg-polyglot-accent/20 px-3 py-1 text-sm text-polyglot-accent">{path.completed_sessions}/{path.total_sessions}</span>
+        </div>
+        {lessonContext && (
+          <div className={layout.contextCard}>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-polyglot-accent">{lessonContext.label}</p>
+            <h4 className="mt-1 text-lg font-bold text-white">{lessonContext.title}</h4>
+            {lessonContext.description && <p className="mt-1 text-sm text-gray-300">{lessonContext.description}</p>}
+          </div>
+        )}
+        <div className={layout.mobileTrail}>
+          <button type="button" className="btn-secondary shrink-0 rounded-full p-3 disabled:opacity-30" disabled={!mobileWindowState.canGoPrev} onClick={() => onMobilePageChange(mobileWindowState.page - 1)} aria-label="Ver sessões anteriores">
+            <ChevronLeft size={20} />
+          </button>
+          <div className={layout.mobileTrailNodes}>
+            {mobileWindowState.visibleNodes.map(renderMobileNode)}
+          </div>
+          <button type="button" className="btn-secondary shrink-0 rounded-full p-3 disabled:opacity-30" disabled={!mobileWindowState.canGoNext} onClick={() => onMobilePageChange(mobileWindowState.page + 1)} aria-label="Ver próximas sessões">
+            <ChevronRight size={20} />
+          </button>
+        </div>
+        <div className={layout.desktopTrail}>
+          {desktopWindowState.canGoPrev && (
+            <button type="button" className="btn-secondary shrink-0 rounded-full p-3" onClick={() => onPageChange(desktopWindowState.page - 1)} aria-label="Ver sessões anteriores">
+              <ChevronLeft size={20} />
+            </button>
+          )}
+          <div className={layout.desktopTrailNodes}>
+            {desktopWindowState.visibleNodes.map(renderDesktopNode)}
+          </div>
+          {desktopWindowState.canGoNext && (
+            <button type="button" className="btn-secondary shrink-0 rounded-full p-3" onClick={() => onPageChange(desktopWindowState.page + 1)} aria-label="Ver próximas sessões">
+              <ChevronRight size={20} />
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function ChoiceExerciseBody({ options, selected, setSelected, onInteract }) {
+  const shortcutLabels = choiceShortcutLabels(options)
+  return <div className="grid gap-3 sm:grid-cols-2">{options.map((option, index) => <button key={option} onClick={() => { onInteract(); setSelected(option) }} className={`flex items-center gap-3 rounded-xl border p-4 text-left text-lg font-semibold transition ${selected === option ? 'border-polyglot-accent bg-polyglot-accent/20' : 'border-white/10 bg-white/5 hover:bg-white/10'}`}>{shortcutLabels[index] && <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-white/15 bg-black/30 text-sm font-bold text-polyglot-accent">{shortcutLabels[index]}</span>}<span>{option}</span></button>)}</div>
+}
+
+function ImageChoiceExerciseBody({ options, selected, setSelected, onInteract }) {
+  const selectable = selectableImageChoiceOptions(options)
+  const shortcutLabels = choiceShortcutLabels(selectable)
+  return (
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {selectable.map((option, index) => (
+        <button key={option.key} onClick={() => { onInteract(); setSelected(option.selectValue) }} className={`relative rounded-2xl border p-4 text-center transition ${selected === option.selectValue ? 'border-polyglot-accent bg-polyglot-accent/20' : 'border-white/10 bg-white/5 hover:bg-white/10'}`}>
+          {shortcutLabels[index] && <span className="absolute left-3 top-3 flex h-7 w-7 items-center justify-center rounded-full border border-white/15 bg-black/60 text-sm font-bold text-polyglot-accent">{shortcutLabels[index]}</span>}
+          <div className="mx-auto mb-3 flex h-24 w-24 items-center justify-center overflow-hidden rounded-2xl bg-white/90 p-2">
+            <img src={option.imageSrc} alt={option.label} className="h-full w-full object-contain" />
+          </div>
+          <div className="mt-1 text-lg font-bold text-white">{option.displayText}</div>
+        </button>
+      ))}
+    </div>
+  )
+}
+
+function ListenBuildDictationExerciseBody({ typedAnswer, setTypedAnswer, onInteract, onSubmit, canSubmit, busy }) {
+  function updateTypedAnswer(event) {
+    onInteract()
+    setTypedAnswer(event.target.value)
+  }
+
+  function handleKeyDown(event) {
+    if (event.key === 'Enter' && canSubmit && !busy) {
+      event.preventDefault()
+      onSubmit()
+    }
+  }
+
+  return (
+    <div className="mb-4 rounded-2xl border border-polyglot-accent/30 bg-polyglot-accent/10 p-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+        <label className="flex-1 text-sm font-semibold text-polyglot-accent">
+          Ditado curto: digite o que ouviu
+          <input
+            type="text"
+            value={typedAnswer}
+            onChange={updateTypedAnswer}
+            onKeyDown={handleKeyDown}
+            placeholder="Digite a frase no idioma-alvo..."
+            className="mt-2 w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-base text-white outline-none transition placeholder:text-gray-500 focus:border-polyglot-accent"
+          />
+        </label>
+        {typedAnswer && (
+          <button type="button" className="btn-secondary" onClick={() => { onInteract(); setTypedAnswer('') }}>
+            Prefiro montar com peças
+          </button>
+        )}
+      </div>
+      <p className="mt-2 text-xs text-gray-400">Pressione Enter para verificar quando a frase digitada tiver a mesma quantidade de palavras da resposta. Se preferir, deixe o campo vazio e use as peças abaixo.</p>
+    </div>
+  )
+}
+
+function SequenceDialogueExerciseBody({ item, built, setBuilt, onInteract }) {
+  const tiles = buildTilesForItem(item)
+
+  function removePhrase(index) {
+    onInteract()
+    setBuilt(built.filter((_, idx) => idx !== index))
+  }
+
+  function dragPhrase(event, index) {
+    event.dataTransfer.effectAllowed = 'move'
+    event.dataTransfer.setData('application/x-polyglot-dialogue-phrase-index', String(index))
+  }
+
+  function dropPhrase(event, toIndex) {
+    event.preventDefault()
+    const rawIndex = event.dataTransfer.getData('application/x-polyglot-dialogue-phrase-index')
+    if (rawIndex === '') return
+    onInteract()
+    setBuilt(reorderBuiltWords(built, Number(rawIndex), toIndex))
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="rounded-2xl border border-polyglot-accent/30 bg-polyglot-accent/10 p-4">
+        <p className="text-sm font-semibold text-polyglot-accent">Sequência montada</p>
+        <div className="mt-3 min-h-20 rounded-xl border border-dashed border-white/20 bg-black/20 p-3">
+          {built.length === 0 ? (
+            <span className="text-gray-500">Toque nas cartas para ordenar o diálogo...</span>
+          ) : (
+            <ol className="space-y-2">
+              {built.map((phrase, i) => (
+                <li key={`${phrase}-${i}`} className="flex items-start gap-2">
+                  <span className="mt-2 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-black/30 text-sm font-bold text-polyglot-accent">{i + 1}</span>
+                  <button
+                    type="button"
+                    draggable
+                    onDragStart={(event) => dragPhrase(event, i)}
+                    onDragOver={(event) => event.preventDefault()}
+                    onDrop={(event) => dropPhrase(event, i)}
+                    onClick={() => removePhrase(i)}
+                    aria-label={`Arraste a fala ${phrase} para mudar a ordem ou clique para remover`}
+                    className="w-full cursor-grab rounded-xl border border-polyglot-accent/40 bg-polyglot-accent/20 px-4 py-3 text-left font-semibold text-white transition hover:scale-[1.01] active:cursor-grabbing active:scale-[0.99]"
+                    title="Arraste para reordenar · Clique para remover"
+                  >
+                    {phrase}
+                  </button>
+                </li>
+              ))}
+            </ol>
+          )}
+        </div>
+        {built.length > 1 && <p className="mt-2 text-xs text-gray-400">Você pode arrastar as cartas selecionadas para ajustar a ordem antes de verificar.</p>}
+      </div>
+      <div className="grid gap-2 sm:grid-cols-2">
+        {tiles.map((tile, i) => (
+          <button key={`${tile}-${i}`} disabled={built.includes(tile)} onClick={() => { onInteract(); setBuilt([...built, tile]) }} className="rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-left font-semibold hover:bg-white/20 disabled:opacity-30">
+            {tile}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function BuildExerciseBody({ item, built, setBuilt, onInteract }) {
+  if (isLetterScrambleEligible(item)) {
+    return <LetterScrambleExerciseBody item={item} built={built} onInteract={onInteract} setBuilt={setBuilt} />
+  }
+
+  const tiles = buildTilesForItem(item)
+
+  function removeWord(index) {
+    onInteract()
+    setBuilt(built.filter((_, idx) => idx !== index))
+  }
+
+  function dragWord(event, index) {
+    event.dataTransfer.effectAllowed = 'move'
+    event.dataTransfer.setData('application/x-polyglot-built-word-index', String(index))
+  }
+
+  function dropWord(event, toIndex) {
+    event.preventDefault()
+    const rawIndex = event.dataTransfer.getData('application/x-polyglot-built-word-index')
+    if (rawIndex === '') return
+    const fromIndex = Number(rawIndex)
+    onInteract()
+    setBuilt(reorderBuiltWords(built, fromIndex, toIndex))
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="min-h-16 rounded-xl border border-dashed border-white/20 bg-white/5 p-4">
+        {built.length === 0 ? (
+          <span className="text-gray-500">Toque nas palavras para montar a frase...</span>
+        ) : (
+          <div className="flex flex-wrap gap-2">
+            {built.map((word, i) => (
+              <button
+                key={`${word}-${i}`}
+                type="button"
+                draggable
+                onDragStart={(event) => dragWord(event, i)}
+                onDragOver={(event) => event.preventDefault()}
+                onDrop={(event) => dropWord(event, i)}
+                onClick={() => removeWord(i)}
+                aria-label={`Arraste ${word} para mudar a ordem ou clique para remover`}
+                className="cursor-grab rounded-lg bg-polyglot-accent px-3 py-2 font-semibold text-white shadow-sm transition hover:scale-[1.02] active:cursor-grabbing active:scale-95"
+                title="Arraste para reordenar · Clique para remover"
+              >
+                {word}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+      {built.length > 1 && <p className="text-xs text-gray-500">Errou a ordem? Clique e arraste uma palavra selecionada para reorganizar a frase. Clique simples remove a palavra.</p>}
+      <div className="flex flex-wrap gap-2">
+        {tiles.map((tile, i) => (
+          <button key={`${tile}-${i}`} disabled={built.includes(tile)} onClick={() => { onInteract(); setBuilt([...built, tile]) }} className="rounded-lg bg-white/10 px-4 py-3 font-semibold hover:bg-white/20 disabled:opacity-30">{tile}</button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function LetterScrambleExerciseBody({ item, built, setBuilt, onInteract }) {
+  const answer = singleWordBuildAnswer(item)
+  const letters = stableScrambleLetters(answer, item.id ?? item.prompt)
+
+  function selectedLetterCount(letter) {
+    return built.filter((selected) => selected === letter).length
+  }
+
+  function availableLetterCount(letter, index) {
+    return letters.slice(0, index + 1).filter((available) => available === letter).length
+  }
+
+  function removeLetter(index) {
+    onInteract()
+    setBuilt(built.filter((_, idx) => idx !== index))
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="min-h-16 rounded-xl border border-dashed border-polyglot-accent/40 bg-polyglot-accent/10 p-4">
+        {built.length === 0 ? (
+          <span className="text-gray-500">Toque nas letras para montar a palavra...</span>
+        ) : (
+          <div className="flex flex-wrap gap-2">
+            {built.map((letter, i) => (
+              <button
+                key={`${letter}-${i}`}
+                type="button"
+                onClick={() => removeLetter(i)}
+                aria-label={`Remover letra ${letter}`}
+                className="rounded-lg bg-polyglot-accent px-3 py-2 text-xl font-bold text-white shadow-sm transition hover:scale-[1.02] active:scale-95"
+                title="Clique para remover"
+              >
+                {letter}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+      <p className="text-xs text-gray-500">Variante de embaralhar letras: reconstrua a palavra e envie como resposta curta.</p>
+      <div className="flex flex-wrap gap-2">
+        {letters.map((letter, i) => (
+          <button
+            key={`${letter}-${i}`}
+            type="button"
+            disabled={selectedLetterCount(letter) >= availableLetterCount(letter, i)}
+            onClick={() => { onInteract(); setBuilt([...built, letter]) }}
+            className="rounded-lg bg-white/10 px-4 py-3 text-xl font-bold hover:bg-white/20 disabled:opacity-30"
+          >
+            {letter}
+          </button>
+        ))}
+      </div>
+      {built.length > 0 && (
+        <button type="button" className="text-sm font-semibold text-polyglot-accent hover:underline" onClick={() => { onInteract(); setBuilt([]) }}>
+          Limpar letras
+        </button>
+      )}
+    </div>
+  )
+}
+
+function MatchExerciseBody({ item, langCode, matched, setMatched, onInteract, onSpeakAudio }) {
+  const pairs = matchPairs(item)
+  const isListenMatch = item.type === 'listen_match'
+  const [selectedLeft, setSelectedLeft] = useState(null)
+  const [wrongRight, setWrongRight] = useState(null)
+
+  useEffect(() => {
+    setSelectedLeft(null)
+    setWrongRight(null)
+  }, [item.id])
+
+  function chooseLeft(left) {
+    if (matched[left]) return
+    onInteract()
+    setSelectedLeft(left)
+    setWrongRight(null)
+    if (isListenMatch) onSpeakAudio?.(left)
+  }
+
+  function chooseRight(right) {
+    if (!selectedLeft) return
+    onInteract()
+    const expectedRight = pairs.find(([left]) => left === selectedLeft)?.[1]
+    if (expectedRight === right) {
+      setMatched({ ...matched, [selectedLeft]: right })
+      setSelectedLeft(null)
+      setWrongRight(null)
+    } else {
+      setWrongRight(right)
+    }
+  }
+
+  return (
+    <div className="space-y-3">
+      <p className="text-sm text-gray-400">{isListenMatch ? 'Toque em um áudio e selecione a tradução correspondente.' : 'Selecione os pares correspondentes. Escolha um termo e depois o par correspondente.'}</p>
+      <div className="grid gap-4 md:grid-cols-2">
+        <div className="space-y-2">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">{isListenMatch ? 'Áudios' : 'Termos'}</p>
+          {pairs.map(([left]) => {
+            const found = !!matched[left]
+            const selected = selectedLeft === left
+            return (
+              <button
+                key={left}
+                type="button"
+                onClick={() => chooseLeft(left)}
+                disabled={found}
+                className={`w-full rounded-2xl border p-4 text-left text-lg font-bold transition ${found ? 'border-polyglot-green/60 bg-polyglot-green/20 text-polyglot-green' : selected ? 'border-polyglot-accent bg-polyglot-accent/20 text-white' : 'border-white/10 bg-white/5 text-white hover:border-polyglot-accent/50 hover:bg-white/10'}`}
+              >
+                {isListenMatch ? (
+                  <span className="flex items-center gap-3">
+                    <Volume2 size={20} />
+                    <span>Áudio {pairs.findIndex(([candidate]) => candidate === left) + 1}</span>
+                    <span className="h-2 flex-1 rounded-full bg-gradient-to-r from-cyan-300 via-blue-500 to-cyan-300 opacity-80" />
+                  </span>
+                ) : left}
+                {found && <span className="ml-2 text-sm text-polyglot-green">✓</span>}
+              </button>
+            )
+          })}
+        </div>
+        <div className="space-y-2">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">{isListenMatch ? 'Traduções' : 'Pares'}</p>
+          {pairs.map(([left, right]) => {
+            const found = matched[left] === right
+            const mismatched = wrongRight === right
+            return (
+            <button
+              key={right}
+              type="button"
+              onClick={() => chooseRight(right)}
+              disabled={found}
+              className={`w-full rounded-2xl border p-4 text-left text-lg font-bold transition ${found ? 'border-polyglot-green/60 bg-polyglot-green/20 text-polyglot-green' : mismatched ? 'border-red-400/70 bg-red-500/20 text-red-100' : selectedLeft ? 'border-white/10 bg-white/5 text-white hover:border-polyglot-accent/50 hover:bg-white/10' : 'border-white/10 bg-white/5 text-gray-400'}`}
+            >
+              {right}
+              {found && <span className="ml-2 text-sm text-polyglot-green">✓</span>}
+            </button>
+            )
+          })}
+        </div>
+      </div>
+      <div className="text-xs text-gray-500">Pares encontrados: {Object.keys(matched).length}/{pairs.length}</div>
+    </div>
+  )
+}

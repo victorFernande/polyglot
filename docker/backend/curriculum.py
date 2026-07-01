@@ -89,5 +89,16 @@ _TRANSLATIONS = {
     },
 }
 
+_PT_PHRASES = {
+    "Converse sobre viagem": ["Eu viajo para a cidade.", "Eu preciso de uma passagem.", "Eu tenho um hotel.", "Onde fica a estação?", "Eu preciso de um mapa.", "Eu pego o transporte.", "A que horas sai o ônibus?", "Esta é minha bagagem.", "Eu preciso de ajuda.", "Eu chego hoje."],
+    "Peça em um restaurante": ["Eu tenho uma mesa.", "O menu, por favor.", "Eu quero uma entrada.", "Eu quero o prato principal.", "Eu gostaria de uma bebida.", "Eu gostaria de uma sobremesa.", "Sem carne, por favor.", "O que você recomenda?", "A conta, por favor.", "Muito obrigado."],
+    "Compartilhe contato": ["Meu telefone é um dois três.", "Meu email está aqui.", "Este é meu endereço.", "Meu nome é Victor.", "Meu sobrenome é Fernandes.", "O número é quatro cinco seis.", "Você pode repetir?", "Eu soletrarei meu nome.", "Eu escrevo uma mensagem.", "Aqui está meu contato."],
+    "Fale de sua família": ["Esta é minha mãe.", "Este é meu pai.", "Eu tenho um irmão.", "Eu tenho uma irmã.", "Meu filho está aqui.", "Minha filha é pequena.", "Meus avós moram aqui.", "Minha mãe tem cinquenta anos.", "Esta é minha casa.", "Minha família é grande."],
+    "Converse sobre o trabalho, use o tempo presente": ["Eu sou professor.", "Eu trabalho em uma empresa/escola.", "Eu trabalho aqui.", "Eu trabalho das nove às cinco.", "Eu tenho uma reunião.", "Eu uso o computador.", "Eu ensino o idioma.", "Eu estudo todos os dias.", "Eu trabalho hoje.", "Eu faço uma pausa."],
+    "Descreva roupas": ["A camisa é azul.", "A calça é preta.", "Os sapatos são novos.", "O casaco é quente.", "A cor é bonita.", "O tamanho é pequeno.", "O preço é bom.", "Eu vou provar isto.", "Eu compro a camisa.", "Eu gosto desta jaqueta."],
+    "Converse sobre hábitos": ["Eu acordo cedo.", "Eu tomo café da manhã às oito.", "Eu trabalho de manhã.", "Eu estudo à noite.", "Eu almoço.", "Eu faço exercício.", "À noite, eu leio.", "No fim de semana, eu descanso.", "Eu sempre estudo.", "Às vezes, eu cozinho."],
+    "Exponha preferências": ["Eu gosto de café.", "Eu não gosto de peixe.", "Eu prefiro chá.", "Eu gosto de comida brasileira.", "Eu gosto de ouvir música.", "Eu gosto de ver filmes.", "Eu gosto de futebol.", "Eu gosto desta cidade.", "Eu gosto de clima quente.", "Eu acho isso bom."],
+}
+
 for title, goal, topics in _UNIT_SPECS:
-    A1_UNITS.append({"title": title, "goal": goal, "topics": topics, "phrases": {code: [(pt, foreign) for pt, foreign in zip(topics, _TRANSLATIONS[code][title])] for code in _TRANSLATIONS}})
+    A1_UNITS.append({"title": title, "goal": goal, "topics": topics, "phrases": {code: [(pt, foreign) for pt, foreign in zip(_PT_PHRASES[title], _TRANSLATIONS[code][title])] for code in _TRANSLATIONS}})

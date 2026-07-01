@@ -122,6 +122,8 @@ export default function Sounds() {
             <button
               type="button"
               className="btn-primary inline-flex items-center justify-center gap-2"
+              onPointerDown={() => sound.unlock()}
+              onTouchStart={() => sound.unlock()}
               onClick={() => preview(sound)}
             >
               <Volume2 size={18} /> Testar som

@@ -7,6 +7,7 @@ const EXERCISE_TYPE_HINTS = {
   listen_build: 'Ouça e monte a frase.',
   sequence_dialogue: 'Ordene o diálogo ou situação.',
   match: 'Relacione cada item ao par correto.',
+  listen_match: 'Ouça cada áudio e escolha a tradução em português.',
 }
 
 export function hintForExerciseType(type) {

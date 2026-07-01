@@ -4,11 +4,12 @@ import { readFileSync } from 'node:fs'
 
 const exercisesSource = readFileSync(new URL('../pages/Exercises.jsx', import.meta.url), 'utf8')
 
-test('local practice activities render as one extra exercise item at a time', () => {
-  assert.match(exercisesSource, /<LocalPracticeCarousel/, 'Exercises page should wrap local activities in a single visible carousel')
-  assert.match(exercisesSource, /function LocalPracticeCarousel/, 'LocalPracticeCarousel component should exist')
-  assert.match(exercisesSource, /React\.Children\.toArray\(children\)/, 'Carousel should manage local activity children as items')
-  assert.match(exercisesSource, /visiblePracticeItems\[safeActiveIndex\]/, 'Carousel should render only the active local activity')
-  assert.doesNotMatch(exercisesSource, /Treino local:/, 'Local activities should no longer be labeled as Treino local panels')
-  assert.match(exercisesSource, /Exercício extra/, 'Local activities should be presented as exercise-like items')
+test('exercise page must not expose frontend-only extra/local practice blocks', () => {
+  assert.doesNotMatch(exercisesSource, /<QuestionModeSwitcher/, 'Do not add a Questão/Questão extra selector menu')
+  assert.doesNotMatch(exercisesSource, /activeLocalPracticeIndex/, 'Extra practice should not be separate frontend mode state')
+  assert.doesNotMatch(exercisesSource, /<LocalPracticeCarousel/, 'Do not render a carousel panel under the active question')
+  assert.doesNotMatch(exercisesSource, /<LocalPracticeQuestionFrame/, 'Do not wrap extras as a parallel question view')
+  assert.doesNotMatch(exercisesSource, /Exercício extra/i, 'Never render frontend-only Exercício extra panels')
+  assert.doesNotMatch(exercisesSource, /treino não altera XP\/progresso/i, 'Never render unscored local practice inside sessions')
+  assert.doesNotMatch(exercisesSource, /ChunkBuilderPractice|TypingRushPractice|WordScramblePractice|AudioABPractice|AudioBingoPractice|ArticleSorterPractice|ArticleBlitzPractice|ErrorSpotterPractice|ClozeRushPractice|OrthographyRepairPractice|DialogueReactionPractice|WordSearchPractice|LetterBlocksPractice/, 'Local practice components must not live on the Exercises page')
 })

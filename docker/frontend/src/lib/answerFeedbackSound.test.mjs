@@ -40,8 +40,12 @@ class FakeAudioContext {
 const win = { AudioContext: FakeAudioContext }
 const player = createAnswerFeedbackSoundPlayer(win)
 
-assert.equal(player.unlock(), true, 'answer sound must be unlockable during the user click before awaiting the API')
+assert.equal(await player.unlock(), true, 'answer sound must be unlockable during the user click before awaiting the API')
 assert.ok(events.some(([name]) => name === 'ctx:resume'), 'unlock should resume the context so browsers allow playback')
+assert.ok(
+  events.some(([name]) => name === 'osc:start'),
+  'unlock should prime Web Audio with a silent oscillator during the direct touch/click gesture for mobile Safari'
+)
 
 events.length = 0
 assert.equal(player.play('correct'), true)
@@ -82,3 +86,57 @@ assert.equal(createAnswerFeedbackSoundPlayer({}).play('correct'), false, 'missin
 assert.equal(player.play('other'), false, 'unknown feedback type should not play anything')
 assert.equal(unlockAnswerFeedbackSound({}), false, 'global unlock helper should fail silently without Web Audio')
 assert.equal(playAnswerFeedbackSound('correct', {}), false, 'global play helper should fail silently without Web Audio')
+
+const asyncEvents = []
+let resolveAsyncResume
+class DelayedResumeOscillator {
+  constructor() {
+    this.frequency = {
+      setValueAtTime: (value) => asyncEvents.push(['freq:set', value]),
+    }
+    this.type = ''
+  }
+  connect(node) { return node }
+  start() { asyncEvents.push(['osc:start']) }
+  stop() {}
+}
+class DelayedResumeGain {
+  constructor() {
+    this.gain = {
+      setValueAtTime: () => {},
+      linearRampToValueAtTime: () => {},
+      exponentialRampToValueAtTime: () => {},
+    }
+  }
+  connect(node) { return node }
+}
+class DelayedResumeAudioContext {
+  constructor() {
+    this.currentTime = 5
+    this.destination = 'destination'
+    this.state = 'suspended'
+  }
+  createOscillator() { return new DelayedResumeOscillator() }
+  createGain() { return new DelayedResumeGain() }
+  resume() {
+    asyncEvents.push(['ctx:resume:start'])
+    return new Promise((resolve) => {
+      resolveAsyncResume = () => {
+        this.state = 'running'
+        asyncEvents.push(['ctx:resume:done'])
+        resolve()
+      }
+    })
+  }
+}
+
+const delayedPlayer = createAnswerFeedbackSoundPlayer({ AudioContext: DelayedResumeAudioContext })
+const delayedUnlock = delayedPlayer.unlock()
+assert.equal(typeof delayedUnlock?.then, 'function', 'unlock should expose the browser resume promise to preview buttons')
+const delayedPlay = delayedPlayer.play('correct')
+assert.equal(typeof delayedPlay?.then, 'function', 'play should wait for a suspended context to resume before scheduling tones')
+assert.deepEqual(asyncEvents.filter(([name]) => name === 'freq:set'), [], 'tones must not be scheduled while the AudioContext is still suspended')
+resolveAsyncResume()
+assert.equal(await delayedUnlock, true)
+assert.equal(await delayedPlay, true)
+assert.ok(asyncEvents.some(([name]) => name === 'freq:set'), 'tones should be scheduled after the AudioContext resumes')

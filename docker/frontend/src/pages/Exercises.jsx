@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Check, Heart, X, Volume2, RotateCcw, Trophy, ArrowRight, Loader2, Star, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Check, X, Volume2, RotateCcw, Trophy, ArrowRight, Loader2, Star, ChevronLeft, ChevronRight } from 'lucide-react'
 import LanguageFlag from '../components/LanguageFlag'
 import { answerExerciseSession, bootstrapUser, completeExerciseSession, loadExerciseLessons, loadExercisePath, startExerciseSession, apiFetch, synthesizeSpeech } from '../lib/api'
 import { handleExerciseKeyDown } from '../lib/exerciseKeyboard.mjs'
@@ -17,26 +17,14 @@ import { filterExerciseLessonsByLanguage, summarizeExerciseLessonProgressByLangu
 import { reorderBuiltWords } from '../lib/buildWordOrder.mjs'
 import { cleanExercisePrompt, isTrailSessionEnabled, pageForSessionNumber, sessionWindowForPage, trailConnectorStateClasses, trailHeaderLayoutClasses, trailNodeStateClasses } from '../lib/exerciseTrailLayout.mjs'
 import { nextExerciseActionLabel, sessionNumberForExerciseSession } from '../lib/exerciseSessionLabels.mjs'
+import { difficultyLabelForItem, instructionForItemType, progressPercentForSession } from '../lib/exerciseLayoutState.mjs'
 import { parseMicroDialoguePrompt } from '../lib/microDialoguePrompt.mjs'
 import { playAnswerFeedbackSound, unlockAnswerFeedbackSound } from '../lib/answerFeedbackSound.mjs'
 import { playSessionCompletionFanfare, unlockSessionCompletionFanfare } from '../lib/sessionCompletionFanfare.mjs'
 import { buildLetterScramblePayload, isLetterScrambleEligible, singleWordBuildAnswer, stableScrambleLetters } from '../lib/letterScramble.mjs'
-import { buildMemoryMatchCards, memoryMatchSelection } from '../lib/memoryMatch.mjs'
+
 import { buildListenBuildDictationPayload, canSubmitListenBuildDictation } from '../lib/listenBuildDictation.mjs'
 import { sequenceDialogueCanSubmit, sequenceDialoguePayload } from '../lib/sequenceDialogue.mjs'
-import { eligibleWordSearchWords, generateWordSearchGrid, updateFoundWordSearchWords, validateWordSearchSelection, wordSearchSeed } from '../lib/wordSearch.mjs'
-import { eligibleLetterBlockWords, generateLetterBlocksPuzzle, validateLetterBlocksPath, updateFoundLetterBlockWords, letterBlocksSeed } from '../lib/letterBlocks.mjs'
-import { buildTypingRushQueue, validateTypingRushAnswer, typingRushPrompt } from '../lib/typingRush.mjs'
-import { buildWordScrambleQueue, validateWordScrambleAnswer } from '../lib/wordScramble.mjs'
-import { buildChunkBuilderQueue, chunkBuilderCanSubmit, validateChunkBuilderAnswer } from '../lib/chunkBuilder.mjs'
-import { buildClozeRushQueue, validateClozeRushSelection, clozeRushPrompt } from '../lib/clozeRush.mjs'
-import { buildArticleBlitzQueue, validateArticleBlitzSelection, ARTICLE_BLITZ_OPTIONS } from '../lib/articleBlitz.mjs'
-import { buildArticleSorterRound, validateArticleSorterBuckets, ARTICLE_SORTER_BUCKETS } from '../lib/articleSorter.mjs'
-import { buildErrorSpotterQueue, validateErrorSpotterSelection } from '../lib/errorSpotter.mjs'
-import { buildAudioABQueue, validateAudioABSelection } from '../lib/audioAB.mjs'
-import { buildAudioBingoQueue, validateAudioBingoSelection } from '../lib/audioBingo.mjs'
-import { buildOrthographyRepairQueue, validateOrthographyRepairAnswer, damageOrthographyRepairText } from '../lib/orthographyRepair.mjs'
-import { buildDialogueReactionQueue, validateDialogueReactionSelection } from '../lib/dialogueReaction.mjs'
 
 const LANG_META = {
   de: { accent: 'Rammstein', color: 'from-red-600 to-red-900' },
@@ -136,7 +124,6 @@ export default function Exercises() {
   const currentItem = sessionItems?.[currentIndex]
   const item = feedback?.itemSnapshot || currentItem
   const displayIndex = feedback?.answeredIndex ?? currentIndex
-  const progress = session?.total_count ? (currentIndex / session.total_count) * 100 : 0
   const sessionProgress = useMemo(() => exerciseSessionProgress(session), [session])
   const langCode = lesson?.language_code || lesson?.language || 'de'
   const activePath = pathData.find((p) => (p.language_code || p.language) === langCode)
@@ -206,7 +193,7 @@ export default function Exercises() {
     if (isUsingListenBuildDictation) return buildListenBuildDictationPayload(typedAnswer)
     if (item.type === 'sequence_dialogue') return sequenceDialoguePayload(built)
     if (BUILD_LIKE_TYPES.includes(item.type)) return isLetterScrambleEligible(item) ? buildLetterScramblePayload(built) : built
-    if (item.type === 'match') return matched
+    if (['match', 'listen_match'].includes(item.type)) return matched
     return selected
   }, [item, selected, built, matched, typedAnswer, isUsingListenBuildDictation])
 
@@ -220,7 +207,7 @@ export default function Exercises() {
       if (isLetterScrambleEligible(item)) return built.length === singleWordBuildAnswer(item).length
       return built.length === (answerValue(item.answer)?.length || 0)
     }
-    if (item.type === 'match') return Object.keys(matched).length === matchPairs(item).length
+    if (['match', 'listen_match'].includes(item.type)) return Object.keys(matched).length === matchPairs(item).length
     return false
   }, [item, selected, built, matched, typedAnswer, isUsingListenBuildDictation])
 
@@ -328,7 +315,6 @@ export default function Exercises() {
     <div className="mx-auto max-w-5xl space-y-6">
       <div>
         <h1 className="text-3xl font-bold mb-2">🎮 Exercícios por trilha</h1>
-        <p className="text-gray-400">1000 questões por idioma: 10 unidades situacionais, 10 tópicos por unidade e 10 perguntas por tópico. Cada sessão continua com 10 perguntas para manter o ritmo rápido.</p>
       </div>
 
       {summary && (
@@ -378,7 +364,7 @@ export default function Exercises() {
                 <div>
                   <div className="font-bold">{l.language_name}</div>
                   <div className="text-xs text-gray-400">{LANG_META[code]?.accent || 'Lição'} · {l.items_count} questões</div>
-                  <div className="text-xs text-polyglot-green">{l.completed_sessions}/{l.total_sessions} sessões · 10 por sessão</div>
+                  <div className="text-xs text-polyglot-green">{l.completed_sessions}/{l.total_sessions} sessões · até {l.session_size || 20} por sessão</div>
                 </div>
               </div>
             </button>
@@ -389,1085 +375,151 @@ export default function Exercises() {
       {activePath && <SkillTrail path={activePath} lessonContext={lessonContext} page={trailPage} mobilePage={mobileTrailPage} onPageChange={setTrailPage} onMobilePageChange={setMobileTrailPage} currentSessionNumber={currentSessionNumber} onSessionClick={openSessionNumber} />}
 
       {item && session && lesson && (
-        <div className="card">
-          <div className="mb-6 flex items-center gap-4">
-            <div className="flex-1 progress-bar"><div className="progress-fill" style={{ width: `${progress}%` }} /></div>
-            <div className="flex items-center gap-1 text-red-400">
-              {Array.from({ length: session.hearts_start || 5 }).map((_, i) => <Heart key={i} size={20} className={i < session.hearts_left ? 'fill-current' : 'opacity-25'} />)}
-            </div>
-          </div>
-
-          <div className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <ProgressStat label="Respondidas" value={`${sessionProgress.answered}/${sessionProgress.total}`} />
-            <ProgressStat label="Sessão" value={`${currentSessionNumber}/${activePath?.total_sessions || lesson?.total_sessions || '—'}`} />
-            <ProgressStat label="Faltam" value={sessionProgress.remaining} />
-            <ProgressStat label="Acerto parcial" value={`${sessionProgress.correct}/${sessionProgress.answered}`} detail={`${sessionProgress.accuracyPercent}%`} />
-          </div>
-
-          <div className="mb-6 flex items-center gap-3">
-            <LanguageFlag code={langCode} className="h-12 w-12" />
-            <div>
-              <p className="text-sm text-gray-400">{lesson.language_name} · questão {displayIndex + 1}/{session.total_count} · {session.xp_earned} XP na sessão</p>
-              <p className="mt-1 inline-flex rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-polyglot-accent">{hintForExerciseType(item.type)}</p>
-              <h2 className="text-2xl font-bold">{cleanExercisePrompt(item.prompt, item.answer)}</h2>
-            </div>
-            <div className="ml-auto flex gap-2">
-              <button className="btn-secondary" title="Ouvir pergunta/correção" onClick={replayCurrentAudio}><Volume2 size={18} /></button>
-              <button className={`btn-secondary text-xs ${voiceMode ? 'ring-2 ring-polyglot-accent' : ''}`} onClick={() => setVoiceMode(!voiceMode)}>{voiceMode ? 'Voz ligada' : 'Modo voz'}</button>
-            </div>
-          </div>
-
-
-          {microDialogue && <MicroDialoguePrompt dialogue={microDialogue} />}
-
-          {['choice', 'listen_choice', 'context_choice'].includes(item.type) && <Choice options={choiceOptions} selected={selected} onInteract={() => setFeedback(null)} setSelected={setSelected} />}
-          {item.type === 'image_choice' && <ImageChoice options={choiceOptions} selected={selected} onInteract={() => setFeedback(null)} setSelected={setSelected} />}
-          {item.type === 'listen_build' && <ListenBuildDictation typedAnswer={typedAnswer} setTypedAnswer={setTypedAnswer} onInteract={() => setFeedback(null)} onSubmit={check} canSubmit={canCheck} busy={busy} />}
-          {item.type === 'sequence_dialogue' && <SequenceDialogue item={item} built={built} onInteract={() => setFeedback(null)} setBuilt={setBuilt} />}
-          {BUILD_LIKE_TYPES.includes(item.type) && <Build item={item} built={built} onInteract={() => setFeedback(null)} setBuilt={setBuilt} />}
-          {item.type === 'match' && <Match item={item} matched={matched} onInteract={() => setFeedback(null)} setMatched={setMatched} />}
-
-          <div className="mt-6 rounded-xl bg-white/5 p-4 text-sm text-gray-300"><strong>Dica:</strong> {item.hint}</div>
-          <div className="mt-3 text-xs text-gray-500">Atalhos: 1-4 selecionar · O ouvir · Enter verificar/continuar · Esc limpar</div>
-
-          {feedback && (
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className={`mt-6 rounded-xl p-4 ${feedback.type === 'correct' ? 'bg-polyglot-green/20 text-polyglot-green' : 'bg-red-500/20 text-red-300'}`}>
-              <div className="flex items-center gap-2 font-bold">{feedback.type === 'correct' ? <Check size={20} /> : <X size={20} />}{feedback.type === 'correct' ? 'Correto!' : 'Marcado como erro — veja a correção antes de seguir.'}</div>
-              {feedback.type === 'wrong' && (
-                <div className="mt-3 space-y-2 rounded-lg bg-black/20 p-3 text-sm text-red-100">
-                  <p><strong>Sua resposta:</strong> {readableAnswer(feedback.mistake?.your_answer)}</p>
-                  <p><strong>Resposta correta:</strong> {readableAnswer(feedback.mistake?.correct_answer || feedback.correctAnswer)}</p>
-                  {feedback.mistake?.message && <p className="opacity-90">{feedback.mistake.message}</p>}
-                </div>
-              )}
-              {feedback.explanation && <p className="mt-2 text-sm opacity-90"><strong>Explicação:</strong> {feedback.explanation}</p>}
-            </motion.div>
+        <ExerciseShell
+          activePath={activePath}
+          busy={busy}
+          canCheck={canCheck}
+          currentSessionNumber={currentSessionNumber}
+          displayIndex={displayIndex}
+          feedback={feedback}
+          item={item}
+          langCode={langCode}
+          lesson={lesson}
+          microDialogue={microDialogue}
+          onCheck={check}
+          onReplay={replayCurrentAudio}
+          onToggleVoice={() => setVoiceMode(!voiceMode)}
+          session={session}
+          sessionProgress={sessionProgress}
+          voiceMode={voiceMode}
+          feedbackSheet={(
+            <ExerciseFeedbackSheet
+              feedback={feedback}
+              langCode={langCode}
+              onContinue={next}
+              onFinish={() => finish(true)}
+              onRepeatAnswer={() => speakCurrent(voiceSegmentsForAnswerOnly(feedback, langCode))}
+              session={session}
+            />
           )}
-
-          <div className="mt-6 flex justify-end gap-3">
-            {!feedback && <button className="btn-primary disabled:opacity-40" disabled={!canCheck || busy} onClick={check}>{busy ? 'Salvando...' : 'Verificar'}</button>}
-            {feedback && <button className="btn-secondary inline-flex items-center gap-2" onClick={() => speakCurrent(voiceSegmentsForAnswerOnly(feedback, langCode))}><Volume2 size={18} /> Repetir resposta</button>}
-            {feedback?.type === 'wrong' && (session.current_index >= session.total_count ? <button className="btn-primary inline-flex items-center gap-2" onClick={() => finish(true)}>{nextExerciseActionLabel(session)} <ArrowRight size={18} /></button> : <button className="btn-primary inline-flex items-center gap-2" onClick={next}>Entendi, continuar <ArrowRight size={18} /></button>)}
-            {feedback?.type === 'correct' && (session.current_index >= session.total_count ? <button className="btn-primary inline-flex items-center gap-2" onClick={() => finish(true)}>{nextExerciseActionLabel(session)} <ArrowRight size={18} /></button> : <button className="btn-primary inline-flex items-center gap-2" onClick={next}>{nextExerciseActionLabel(session)} <ArrowRight size={18} /></button>)}
-          </div>
-
-          <LocalPracticeCarousel>
-            <TypingRushPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
-            <OrthographyRepairPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
-            <DialogueReactionPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
-            <WordScramblePractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
-            <ChunkBuilderPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
-            <AudioABPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} langCode={langCode} speechPlayback={speechPlaybackRef.current} />
-            <AudioBingoPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} langCode={langCode} speechPlayback={speechPlaybackRef.current} />
-            <ArticleSorterPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
-            <ArticleBlitzPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
-            <ClozeRushPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
-            <ErrorSpotterPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
-            <WordSearchPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
-            <LetterBlocksPractice items={sessionItems} lesson={lesson} session={session} currentIndex={currentIndex} />
-          </LocalPracticeCarousel>
-        </div>
+        >
+          {['choice', 'listen_choice', 'context_choice'].includes(item.type) && <ChoiceExerciseBody options={choiceOptions} selected={selected} onInteract={() => setFeedback(null)} setSelected={setSelected} />}
+          {item.type === 'image_choice' && <ImageChoiceExerciseBody options={choiceOptions} selected={selected} onInteract={() => setFeedback(null)} setSelected={setSelected} />}
+          {item.type === 'listen_build' && <ListenBuildDictationExerciseBody typedAnswer={typedAnswer} setTypedAnswer={setTypedAnswer} onInteract={() => setFeedback(null)} onSubmit={check} canSubmit={canCheck} busy={busy} />}
+          {item.type === 'sequence_dialogue' && <SequenceDialogueExerciseBody item={item} built={built} onInteract={() => setFeedback(null)} setBuilt={setBuilt} />}
+          {BUILD_LIKE_TYPES.includes(item.type) && <BuildExerciseBody item={item} built={built} onInteract={() => setFeedback(null)} setBuilt={setBuilt} />}
+          {['match', 'listen_match'].includes(item.type) && <MatchExerciseBody item={item} langCode={langCode} matched={matched} onInteract={() => setFeedback(null)} onSpeakAudio={(text) => speakCurrent([{ text, lang: speechLangForLanguage(langCode) }])} setMatched={setMatched} />}
+        </ExerciseShell>
       )}
     </div>
   )
 }
 
-function LocalPracticeCarousel({ children }) {
-  const visiblePracticeItems = React.Children.toArray(children)
-  const [activeIndex, setActiveIndex] = useState(0)
-
-  useEffect(() => {
-    setActiveIndex(0)
-  }, [visiblePracticeItems.length])
-
-  if (visiblePracticeItems.length === 0) return null
-
-  const safeActiveIndex = Math.min(activeIndex, visiblePracticeItems.length - 1)
+function ExerciseShell({ activePath, busy, canCheck, children, currentSessionNumber, displayIndex, feedback, feedbackSheet, item, langCode, lesson, microDialogue, onCheck, onReplay, onToggleVoice, session, sessionProgress, voiceMode }) {
+  const progress = progressPercentForSession(session)
+  const difficultyLabel = difficultyLabelForItem(item)
+  const instruction = instructionForItemType(item)
 
   return (
-    <section className="mt-8 rounded-3xl border border-polyglot-accent/25 bg-gradient-to-br from-white/10 to-white/5 p-4 shadow-xl shadow-black/20">
-      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-polyglot-accent">Exercícios extras</p>
-          <h3 className="text-xl font-bold text-white">Prática da sessão</h3>
-          <p className="text-sm text-gray-400">Um exercício extra por vez para manter a tela limpa.</p>
-        </div>
-        <span className="w-fit rounded-full border border-white/10 bg-black/20 px-3 py-1 text-sm font-semibold text-polyglot-accent">
-          {safeActiveIndex + 1}/{visiblePracticeItems.length}
-        </span>
-      </div>
-      <div className="flex flex-wrap gap-2">
-        {visiblePracticeItems.map((_, index) => (
-          <button
-            key={index}
-            type="button"
-            onClick={() => setActiveIndex(index)}
-            className={`rounded-full border px-3 py-1 text-xs font-bold transition ${index === activeIndex ? 'border-polyglot-accent bg-polyglot-accent/25 text-white' : 'border-white/10 bg-black/20 text-gray-400 hover:border-polyglot-accent/40 hover:text-white'}`}
-          >
-            Exercício {index + 1}
-          </button>
-        ))}
-      </div>
-      <div className="mt-4">
-        {visiblePracticeItems[safeActiveIndex]}
-      </div>
-    </section>
-  )
-}
-
-function DialogueReactionPractice({ items, lesson, session, currentIndex }) {
-  const queue = useMemo(() => buildDialogueReactionQueue(items, { lesson, session, currentIndex }), [items, lesson, session, currentIndex])
-  const [cardIndex, setCardIndex] = useState(0)
-  const [selectedOption, setSelectedOption] = useState('')
-  const [result, setResult] = useState(null)
-  const [correctCount, setCorrectCount] = useState(0)
-
-  useEffect(() => {
-    setCardIndex(0)
-    setSelectedOption('')
-    setResult(null)
-    setCorrectCount(0)
-  }, [queue.map((card) => card.seed).join('|')])
-
-  if (queue.length === 0) return null
-
-  const card = queue[cardIndex % queue.length]
-
-  function selectOption(option) {
-    setSelectedOption(option)
-    setResult(null)
-  }
-
-  function verify() {
-    const nextResult = validateDialogueReactionSelection(selectedOption, card)
-    setResult(nextResult)
-    if (nextResult.status === 'correct') setCorrectCount((count) => count + 1)
-  }
-
-  function nextCard() {
-    setCardIndex((index) => (index + 1) % queue.length)
-    setSelectedOption('')
-    setResult(null)
-  }
-
-  return (
-    <div className="mt-8 rounded-2xl border border-emerald-300/30 bg-emerald-500/10 p-4">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">Exercício extra: resposta de diálogo</p>
-          <h3 className="mt-1 text-xl font-bold text-white">Escolha a melhor réplica</h3>
-          <p className="mt-1 text-sm text-gray-300">Prática situacional com microdiálogos desta sessão. Este treino não altera XP/progresso.</p>
-        </div>
-        <span className="w-fit rounded-full border border-white/10 bg-black/20 px-3 py-1 text-sm font-semibold text-polyglot-accent">{correctCount} acertos</span>
-      </div>
-
-      <div className="mt-4 rounded-xl border border-white/10 bg-black/20 p-4">
-        {card.instruction && <p className="mb-3 text-sm text-gray-300">{card.instruction}</p>}
-        <div className="mr-8 rounded-2xl rounded-tl-sm bg-white/10 p-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-500">{card.partnerLabel}</p>
-          <p className="mt-1 text-lg font-semibold text-white">{card.partnerText}</p>
-        </div>
-        <div className="ml-8 mt-3 rounded-2xl rounded-tr-sm border border-polyglot-accent/40 bg-polyglot-accent/10 p-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">{card.learnerLabel}</p>
-          <p className="mt-1 text-lg font-semibold text-white">{card.learnerText}</p>
-        </div>
-
-        <div className="mt-4 grid gap-2 sm:grid-cols-2">
-          {card.options.map((option) => (
-            <button
-              key={option}
-              type="button"
-              onClick={() => selectOption(option)}
-              className={`rounded-xl border p-3 text-left font-semibold transition ${selectedOption === option ? 'border-polyglot-accent bg-polyglot-accent/25 text-white' : 'border-white/10 bg-white/5 text-gray-200 hover:border-polyglot-accent/40 hover:bg-white/10'}`}
-            >
-              {option}
-            </button>
-          ))}
-        </div>
-
-        <div className="mt-4 flex flex-wrap items-center gap-3">
-          <button type="button" className="btn-primary disabled:opacity-40" disabled={!selectedOption} onClick={verify}>Verificar</button>
-          <button type="button" className="btn-secondary" onClick={nextCard}>Próxima situação</button>
-        </div>
-
-        {result && (
-          <div className={`mt-3 rounded-lg p-3 text-sm font-semibold ${result.status === 'correct' ? 'bg-polyglot-green/15 text-polyglot-green' : 'bg-red-500/15 text-red-200'}`}>
-            <p>{result.status === 'correct' ? 'Correto — réplica adequada ao contexto.' : `Era: ${result.expected}`}</p>
-            <p className="mt-1 font-normal opacity-90">{card.explanation}</p>
-          </div>
-        )}
-      </div>
-    </div>
-  )
-}
-
-function AudioABPractice({ items, lesson, session, currentIndex, langCode, speechPlayback }) {
-  const queue = useMemo(() => buildAudioABQueue(items, { lesson, session, currentIndex }), [items, lesson, session, currentIndex])
-  const [cardIndex, setCardIndex] = useState(0)
-  const [selectedKey, setSelectedKey] = useState('')
-  const [result, setResult] = useState(null)
-  const [correctCount, setCorrectCount] = useState(0)
-
-  useEffect(() => {
-    setCardIndex(0)
-    setSelectedKey('')
-    setResult(null)
-    setCorrectCount(0)
-  }, [queue.map((card) => card.seed).join('|')])
-
-  if (queue.length < 4) return null
-
-  const card = queue[cardIndex % queue.length]
-  const targetLang = speechLangForLanguage(langCode)
-
-  function playTarget() {
-    speechPlayback?.speakSegments([{ text: card.targetText, lang: targetLang }])
-  }
-
-  function chooseOption(key) {
-    setSelectedKey(key)
-    setResult(null)
-  }
-
-  function verify() {
-    const nextResult = validateAudioABSelection(selectedKey, card)
-    setResult(nextResult)
-    if (nextResult.status === 'correct') setCorrectCount((count) => count + 1)
-  }
-
-  function nextCard() {
-    setCardIndex((index) => (index + 1) % queue.length)
-    setSelectedKey('')
-    setResult(null)
-  }
-
-  return (
-    <div className="mt-8 rounded-2xl border border-sky-400/30 bg-sky-500/10 p-4">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">Exercício extra: Áudio A/B</p>
-          <h3 className="mt-1 text-xl font-bold text-white">Ouça e escolha a frase falada</h3>
-          <p className="mt-1 text-sm text-gray-300">Discriminação auditiva com frases desta sessão. Este treino não altera XP/progresso.</p>
-        </div>
-        <span className="w-fit rounded-full border border-white/10 bg-black/20 px-3 py-1 text-sm font-semibold text-polyglot-accent">{correctCount} acertos</span>
-      </div>
-
-      <div className="mt-4 rounded-xl border border-white/10 bg-black/20 p-4">
-        <button type="button" className="btn-secondary inline-flex items-center gap-2" onClick={playTarget}><Volume2 size={18} /> Ouvir</button>
-        <div className="mt-4 grid gap-2 sm:grid-cols-2">
-          {card.options.map((option, index) => (
-            <button
-              key={option.key}
-              type="button"
-              onClick={() => chooseOption(option.key)}
-              className={`rounded-xl border px-4 py-3 text-left text-sm font-bold transition ${selectedKey === option.key ? 'border-polyglot-accent bg-polyglot-accent/25 text-white' : 'border-white/10 bg-white/5 text-gray-200 hover:border-polyglot-accent/50 hover:bg-white/10'}`}
-            >
-              <span className="mr-2 text-xs font-black text-polyglot-accent">{index === 0 ? 'A' : 'B'}</span>
-              {option.text}
-            </button>
-          ))}
-        </div>
-        <div className="mt-4 flex flex-wrap gap-2">
-          <button type="button" className="btn-primary disabled:opacity-40" disabled={!selectedKey} onClick={verify}>Verificar</button>
-          <button type="button" className="btn-secondary" onClick={playTarget}>Ouvir de novo</button>
-          <button type="button" className="btn-secondary" onClick={nextCard}>Próxima</button>
-        </div>
-        {result && (
-          <div className={`mt-3 rounded-lg p-3 text-sm font-semibold ${result.status === 'correct' ? 'bg-polyglot-green/15 text-polyglot-green' : 'bg-red-500/15 text-red-200'}`}>
-            <p>{result.status === 'correct' ? 'Correto — você reconheceu a frase.' : `Resposta esperada: ${result.expected}`}</p>
-            <p className="mt-1 opacity-90">Frase ouvida: {result.expected}</p>
-          </div>
-        )}
-      </div>
-    </div>
-  )
-}
-
-function AudioBingoPractice({ items, lesson, session, currentIndex, langCode, speechPlayback }) {
-  const queue = useMemo(() => buildAudioBingoQueue(items, { lesson, session, currentIndex }), [items, lesson, session, currentIndex])
-  const [cardIndex, setCardIndex] = useState(0)
-  const [selectedKey, setSelectedKey] = useState('')
-  const [result, setResult] = useState(null)
-  const [correctCount, setCorrectCount] = useState(0)
-
-  useEffect(() => {
-    setCardIndex(0)
-    setSelectedKey('')
-    setResult(null)
-    setCorrectCount(0)
-  }, [queue.map((card) => card.seed).join('|')])
-
-  if (queue.length < 1) return null
-
-  const card = queue[cardIndex % queue.length]
-  const targetLang = speechLangForLanguage(langCode)
-
-  function playTarget() {
-    speechPlayback?.speakSegments([{ text: card.targetText, lang: targetLang }])
-  }
-
-  function chooseOption(key) {
-    setSelectedKey(key)
-    setResult(null)
-  }
-
-  function verify() {
-    const nextResult = validateAudioBingoSelection(selectedKey, card)
-    setResult(nextResult)
-    if (nextResult.status === 'correct') setCorrectCount((count) => count + 1)
-  }
-
-  function nextCard() {
-    setCardIndex((index) => (index + 1) % queue.length)
-    setSelectedKey('')
-    setResult(null)
-  }
-
-  return (
-    <div className="mt-8 rounded-2xl border border-cyan-400/30 bg-cyan-500/10 p-4">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">Exercício extra: Audio Bingo</p>
-          <h3 className="mt-1 text-xl font-bold text-white">Ouça e encontre na grade 3x3</h3>
-          <p className="mt-1 text-sm text-gray-300">Reconhecimento rápido com cartões no idioma-alvo desta sessão. Este treino não altera XP/progresso.</p>
-        </div>
-        <span className="w-fit rounded-full border border-white/10 bg-black/20 px-3 py-1 text-sm font-semibold text-polyglot-accent">{correctCount} acertos</span>
-      </div>
-
-      <div className="mt-4 rounded-xl border border-white/10 bg-black/20 p-4">
-        <div className="flex flex-wrap gap-2">
-          <button type="button" className="btn-secondary inline-flex items-center gap-2" onClick={playTarget}><Volume2 size={18} /> Ouvir alvo</button>
-          <button type="button" className="btn-secondary" onClick={nextCard}>Próximo alvo</button>
-        </div>
-        <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
-          {card.grid.map((option) => (
-            <button
-              key={option.key}
-              type="button"
-              onClick={() => chooseOption(option.key)}
-              className={`min-h-16 rounded-xl border px-3 py-3 text-center text-sm font-bold transition ${selectedKey === option.key ? 'border-polyglot-accent bg-polyglot-accent/25 text-white' : 'border-white/10 bg-white/5 text-gray-200 hover:border-polyglot-accent/50 hover:bg-white/10'}`}
-            >
-              {option.text}
-            </button>
-          ))}
-        </div>
-        <div className="mt-4 flex flex-wrap gap-2">
-          <button type="button" className="btn-primary disabled:opacity-40" disabled={!selectedKey} onClick={verify}>Verificar</button>
-          <button type="button" className="btn-secondary" onClick={playTarget}>Ouvir de novo</button>
-          <button type="button" className="btn-secondary" onClick={nextCard}>Próximo</button>
-        </div>
-        {result && (
-          <div className={`mt-3 rounded-lg p-3 text-sm font-semibold ${result.status === 'correct' ? 'bg-polyglot-green/15 text-polyglot-green' : 'bg-red-500/15 text-red-200'}`}>
-            <p>{result.status === 'correct' ? 'Bingo — você encontrou a frase ouvida.' : `Era: ${result.expected}`}</p>
-            {result.selected && <p className="mt-1 opacity-90">Você tocou: {result.selected}</p>}
-          </div>
-        )}
-      </div>
-    </div>
-  )
-}
-
-function ArticleSorterPractice({ items, lesson, session, currentIndex }) {
-  const round = useMemo(() => buildArticleSorterRound(items, { lesson, session, currentIndex }), [items, lesson, session, currentIndex])
-  const [assignments, setAssignments] = useState({})
-  const [result, setResult] = useState(null)
-
-  useEffect(() => {
-    setAssignments({})
-    setResult(null)
-  }, [round.cards.map((card) => card.seed).join('|')])
-
-  if (round.cards.length < 4) return null
-
-  function assignCard(cardId, bucket) {
-    setAssignments((current) => ({ ...current, [cardId]: bucket }))
-    setResult(null)
-  }
-
-  function verify() {
-    setResult(validateArticleSorterBuckets(assignments, round.cards))
-  }
-
-  function restart() {
-    setAssignments({})
-    setResult(null)
-  }
-
-  const assignedCount = round.cards.filter((card) => assignments[card.id]).length
-
-  return (
-    <div className="mt-8 rounded-2xl border border-amber-400/30 bg-amber-500/10 p-4">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">Exercício extra: classificador de artigos</p>
-          <h3 className="mt-1 text-xl font-bold text-white">Envie cada substantivo para der, die ou das</h3>
-          <p className="mt-1 text-sm text-gray-300">Classifique substantivos alemães desta sessão em buckets der, die e das. Este treino não altera XP/progresso.</p>
-        </div>
-        <span className="w-fit rounded-full border border-white/10 bg-black/20 px-3 py-1 text-sm font-semibold text-polyglot-accent">{assignedCount}/{round.cards.length} classificados</span>
-      </div>
-
-      <div className="mt-4 space-y-3">
-        {round.cards.map((card) => (
-          <div key={card.id} className="rounded-xl border border-white/10 bg-black/20 p-3">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="text-lg font-black text-white">{card.noun}</p>
-                {card.prompt && <p className="mt-1 text-xs text-gray-400">Dica da sessão: {card.prompt}</p>}
-              </div>
-              <div className="grid grid-cols-3 gap-2 sm:min-w-64">
-                {ARTICLE_SORTER_BUCKETS.map((bucket) => (
-                  <button
-                    key={`${card.id}-${bucket}`}
-                    type="button"
-                    onClick={() => assignCard(card.id, bucket)}
-                    className={`rounded-xl border px-3 py-2 text-base font-black transition ${assignments[card.id] === bucket ? 'border-polyglot-accent bg-polyglot-accent/25 text-white' : 'border-white/10 bg-white/5 text-gray-200 hover:border-polyglot-accent/50 hover:bg-white/10'}`}
-                  >
-                    {bucket}
-                  </button>
-                ))}
-              </div>
+    <div className="overflow-hidden rounded-3xl border border-white/10 bg-slate-950 shadow-2xl shadow-black/30">
+      <div className="border-b border-white/10 bg-black/20 px-4 py-4 sm:px-6">
+        <div className="flex items-center gap-3">
+          <div className="min-w-0 flex-1">
+            <div className="mb-1 text-center text-[11px] font-black uppercase tracking-[0.22em] text-cyan-300">{progress}% concluída</div>
+            <div className="h-3 overflow-hidden rounded-full bg-white/10">
+              <div className="h-full rounded-full bg-gradient-to-r from-cyan-300 to-blue-500 transition-all duration-500" style={{ width: `${progress}%` }} />
             </div>
-            {result?.items?.find((item) => item.id === card.id) && (
-              <p className={`mt-2 rounded-lg p-2 text-sm font-semibold ${result.items.find((item) => item.id === card.id).status === 'correct' ? 'bg-polyglot-green/15 text-polyglot-green' : 'bg-red-500/15 text-red-200'}`}>
-                {result.items.find((item) => item.id === card.id).status === 'correct' ? 'Correto.' : result.items.find((item) => item.id === card.id).feedback}
-              </p>
-            )}
           </div>
-        ))}
+        </div>
       </div>
 
-      <div className="mt-4 flex flex-wrap gap-2">
-        <button type="button" className="btn-primary disabled:opacity-40" disabled={assignedCount === 0} onClick={verify}>Verificar buckets</button>
-        <button type="button" className="btn-secondary" onClick={restart}>Recomeçar</button>
-      </div>
-      {result && (
-        <p className={`mt-3 rounded-lg p-3 text-sm font-semibold ${result.status === 'correct' ? 'bg-polyglot-green/15 text-polyglot-green' : 'bg-red-500/15 text-red-200'}`}>
-          {result.correct}/{result.total} corretas nos buckets.
-        </p>
-      )}
-    </div>
-  )
-}
-
-function ArticleBlitzPractice({ items, lesson, session, currentIndex }) {
-  const queue = useMemo(() => buildArticleBlitzQueue(items, { lesson, session, currentIndex }), [items, lesson, session, currentIndex])
-  const [cardIndex, setCardIndex] = useState(0)
-  const [selectedArticle, setSelectedArticle] = useState('')
-  const [result, setResult] = useState(null)
-  const [correctCount, setCorrectCount] = useState(0)
-
-  useEffect(() => {
-    setCardIndex(0)
-    setSelectedArticle('')
-    setResult(null)
-    setCorrectCount(0)
-  }, [queue.map((card) => card.seed).join('|')])
-
-  if (queue.length < 4) return null
-
-  const card = queue[cardIndex % queue.length]
-
-  function chooseArticle(article) {
-    setSelectedArticle(article)
-    setResult(null)
-  }
-
-  function verify() {
-    const nextResult = validateArticleBlitzSelection(selectedArticle, card)
-    setResult(nextResult)
-    if (nextResult.status === 'correct') setCorrectCount((count) => count + 1)
-  }
-
-  function nextCard() {
-    setCardIndex((index) => (index + 1) % queue.length)
-    setSelectedArticle('')
-    setResult(null)
-  }
-
-  return (
-    <div className="mt-8 rounded-2xl border border-yellow-400/30 bg-yellow-500/10 p-4">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">Exercício extra: artigo relâmpago</p>
-          <h3 className="mt-1 text-xl font-bold text-white">Escolha der, die ou das</h3>
-          <p className="mt-1 text-sm text-gray-300">Recupere o artigo de substantivos alemães desta sessão. Este treino não altera XP/progresso.</p>
+      <div className="p-4 sm:p-6">
+        <div className="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <ProgressStat label="Respondidas" value={`${sessionProgress.answered}/${sessionProgress.total}`} />
+          <ProgressStat label="Sessão" value={`${currentSessionNumber}/${activePath?.total_sessions || lesson?.total_sessions || '—'}`} />
+          <ProgressStat label="Faltam" value={sessionProgress.remaining} />
+          <ProgressStat label="Acerto parcial" value={`${sessionProgress.correct}/${sessionProgress.answered}`} detail={`${sessionProgress.accuracyPercent}%`} />
         </div>
-        <span className="w-fit rounded-full border border-white/10 bg-black/20 px-3 py-1 text-sm font-semibold text-polyglot-accent">{correctCount} acertos</span>
-      </div>
 
-      <div className="mt-4 rounded-xl border border-white/10 bg-black/20 p-4">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">Substantivo</p>
-        <p className="mt-2 text-4xl font-black text-white">{card.noun}</p>
-        {card.prompt && <p className="mt-2 text-sm text-gray-400">Dica da sessão: {card.prompt}</p>}
-        <div className="mt-4 grid grid-cols-3 gap-2 sm:flex sm:flex-wrap">
-          {ARTICLE_BLITZ_OPTIONS.map((article) => (
-            <button
-              key={article}
-              type="button"
-              onClick={() => chooseArticle(article)}
-              className={`rounded-xl border px-4 py-3 text-lg font-black transition ${selectedArticle === article ? 'border-polyglot-accent bg-polyglot-accent/25 text-white' : 'border-white/10 bg-white/5 text-gray-200 hover:border-polyglot-accent/50 hover:bg-white/10'}`}
-            >
-              {article}
-            </button>
-          ))}
+        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start">
+          <LanguageFlag code={langCode} className="h-14 w-14 shrink-0" />
+          <div className="min-w-0 flex-1">
+            {difficultyLabel && <p className="mb-2 text-sm font-black uppercase tracking-[0.2em] text-rose-400">{difficultyLabel}</p>}
+            <p className="text-sm text-gray-400">{lesson.language_name} · questão {displayIndex + 1}/{session.total_count} · {session.xp_earned} XP na sessão</p>
+            <p className="mt-2 inline-flex rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-polyglot-accent">{hintForExerciseType(item.type)}</p>
+            <h2 className="mt-3 text-2xl font-black text-white">{instruction}</h2>
+            <div className="mt-4 rounded-2xl border border-white/10 bg-black/30 p-4 text-lg font-semibold text-white shadow-inner">
+              {cleanExercisePrompt(item.prompt, item.answer)}
+            </div>
+          </div>
+          <div className="flex gap-2 sm:ml-auto">
+            <button className="btn-secondary" title="Ouvir pergunta/correção" onClick={onReplay}><Volume2 size={18} /></button>
+            <button className={`btn-secondary text-xs ${voiceMode ? 'ring-2 ring-polyglot-accent' : ''}`} onClick={onToggleVoice}>{voiceMode ? 'Voz ligada' : 'Modo voz'}</button>
+          </div>
         </div>
-        <div className="mt-4 flex flex-wrap gap-2">
-          <button type="button" className="btn-primary disabled:opacity-40" disabled={!selectedArticle} onClick={verify}>Verificar</button>
-          <button type="button" className="btn-secondary" onClick={nextCard}>Próxima</button>
+
+        {microDialogue && <MicroDialoguePrompt dialogue={microDialogue} />}
+
+        <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-4 sm:p-5">
+          {children}
         </div>
-        {result && (
-          <p className={`mt-3 rounded-lg p-3 text-sm font-semibold ${result.status === 'correct' ? 'bg-polyglot-green/15 text-polyglot-green' : 'bg-red-500/15 text-red-200'}`}>
-            {result.status === 'correct' ? 'Correto — artigo recuperado.' : `Resposta esperada: ${result.fullAnswer}`}
-          </p>
-        )}
-      </div>
-    </div>
-  )
-}
 
-function ErrorSpotterPractice({ items, lesson, session, currentIndex }) {
-  const queue = useMemo(() => buildErrorSpotterQueue(items, { lesson, session, currentIndex }), [items, lesson, session, currentIndex])
-  const [cardIndex, setCardIndex] = useState(0)
-  const [selectedToken, setSelectedToken] = useState('')
-  const [result, setResult] = useState(null)
-  const [correctCount, setCorrectCount] = useState(0)
+        <div className="mt-5 rounded-xl bg-white/5 p-4 text-sm text-gray-300"><strong>Dica:</strong> {item.hint}</div>
+        <div className="mt-3 text-xs text-gray-500">Atalhos: 1-4 selecionar · O ouvir · Enter verificar/continuar · Esc limpar</div>
 
-  useEffect(() => {
-    setCardIndex(0)
-    setSelectedToken('')
-    setResult(null)
-    setCorrectCount(0)
-  }, [queue.map((card) => card.seed).join('|')])
-
-  if (queue.length < 3) return null
-
-  const card = queue[cardIndex % queue.length]
-
-  function chooseToken(token, index) {
-    setSelectedToken(`${index}:${token}`)
-    setResult(null)
-  }
-
-  function verify() {
-    const token = selectedToken.replace(/^\d+:/u, '')
-    const nextResult = validateErrorSpotterSelection(token, card)
-    setResult(nextResult)
-    if (nextResult.status === 'correct') setCorrectCount((count) => count + 1)
-  }
-
-  function nextCard() {
-    setCardIndex((index) => (index + 1) % queue.length)
-    setSelectedToken('')
-    setResult(null)
-  }
-
-  function restart() {
-    setCardIndex(0)
-    setSelectedToken('')
-    setResult(null)
-    setCorrectCount(0)
-  }
-
-  return (
-    <div className="mt-8 rounded-2xl border border-orange-400/30 bg-orange-500/10 p-4">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">Exercício extra: caça-erro</p>
-          <h3 className="mt-1 text-xl font-bold text-white">Encontre a palavra intrusa</h3>
-          <p className="mt-1 text-sm text-gray-300">Clique no chip que deixou a frase errada. Este treino não altera XP/progresso.</p>
-        </div>
-        <span className="w-fit rounded-full border border-white/10 bg-black/20 px-3 py-1 text-sm font-semibold text-polyglot-accent">{correctCount} acertos</span>
-      </div>
-
-      <div className="mt-4 rounded-xl border border-white/10 bg-black/20 p-4">
-        {card.prompt && (
-          <>
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">Contexto</p>
-            <p className="mt-1 text-sm text-gray-300">{card.prompt}</p>
-          </>
-        )}
-        <div className="mt-4 flex flex-wrap gap-2">
-          {card.spottedTokens.map((token, index) => {
-            const tokenKey = `${index}:${token}`
-            return (
-              <button
-                key={tokenKey}
-                type="button"
-                onClick={() => chooseToken(token, index)}
-                className={`rounded-xl border px-4 py-3 text-lg font-black transition ${selectedToken === tokenKey ? 'border-polyglot-accent bg-polyglot-accent/25 text-white' : 'border-white/10 bg-white/5 text-gray-100 hover:border-polyglot-accent/50 hover:bg-white/10'}`}
-              >
-                {token}
-              </button>
-            )
-          })}
-        </div>
-        <div className="mt-4 flex flex-wrap gap-2">
-          <button type="button" className="btn-primary disabled:opacity-40" disabled={!selectedToken} onClick={verify}>Verificar</button>
-          <button type="button" className="btn-secondary" onClick={nextCard}>Próxima</button>
-          <button type="button" className="btn-secondary" onClick={restart}><RotateCcw className="h-4 w-4" /> Reiniciar</button>
-        </div>
-        {result && (
-          <div className={`mt-3 rounded-lg p-3 text-sm font-semibold ${result.status === 'correct' ? 'bg-polyglot-green/15 text-polyglot-green' : 'bg-red-500/15 text-red-200'}`}>
-            <p>{result.status === 'correct' ? `Sim — a palavra intrusa era ${result.intruder}.` : 'Ainda não. Compare com o sentido da frase e tente outra.'}</p>
-            <p className="mt-1 opacity-90">Frase correta: {result.correctText}</p>
-            {result.status === 'correct' && <p className="mt-1 opacity-80">No lugar dela, a frase usa: {result.correctToken}</p>}
+        {!feedback && (
+          <div className="mt-6 flex justify-end">
+            <button className="btn-primary disabled:opacity-40" disabled={!canCheck || busy} onClick={onCheck}>{busy ? 'Salvando...' : 'Verificar'}</button>
           </div>
         )}
       </div>
+
+      {feedbackSheet}
     </div>
   )
 }
 
-function ClozeRushPractice({ items, lesson, session, currentIndex }) {
-  const queue = useMemo(() => buildClozeRushQueue(items, { lesson, session, currentIndex }), [items, lesson, session, currentIndex])
-  const [cardIndex, setCardIndex] = useState(0)
-  const [selectedChip, setSelectedChip] = useState('')
-  const [result, setResult] = useState(null)
-  const [correctCount, setCorrectCount] = useState(0)
+function ExerciseFeedbackSheet({ feedback, langCode, onContinue, onFinish, onRepeatAnswer, session }) {
+  const [showExplanation, setShowExplanation] = useState(false)
 
   useEffect(() => {
-    setCardIndex(0)
-    setSelectedChip('')
-    setResult(null)
-    setCorrectCount(0)
-  }, [queue.map((card) => card.seed).join('|')])
+    setShowExplanation(false)
+  }, [feedback?.itemId, feedback?.type])
 
-  if (queue.length < 2) return null
+  if (!feedback) return null
 
-  const card = queue[cardIndex % queue.length]
-
-  function chooseChip(chip) {
-    setSelectedChip(chip)
-    setResult(null)
-  }
-
-  function verify() {
-    const nextResult = validateClozeRushSelection(selectedChip, card)
-    setResult(nextResult)
-    if (nextResult.status === 'correct') setCorrectCount((count) => count + 1)
-  }
-
-  function nextCard() {
-    setCardIndex((index) => (index + 1) % queue.length)
-    setSelectedChip('')
-    setResult(null)
-  }
+  const isCorrect = feedback.type === 'correct'
+  const hasExplanation = !!feedback.explanation || !!feedback.mistake?.message
+  const canFinish = session.current_index >= session.total_count
+  const continueLabel = isCorrect ? nextExerciseActionLabel(session) : 'Entendi, continuar'
 
   return (
-    <div className="mt-8 rounded-2xl border border-purple-400/30 bg-purple-500/10 p-4">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">Exercício extra: lacuna relâmpago</p>
-          <h3 className="mt-1 text-xl font-bold text-white">Complete a palavra que falta</h3>
-          <p className="mt-1 text-sm text-gray-300">Escolha o chip ausente em frases desta sessão. Este treino não altera XP/progresso.</p>
-        </div>
-        <span className="w-fit rounded-full border border-white/10 bg-black/20 px-3 py-1 text-sm font-semibold text-polyglot-accent">{correctCount} acertos</span>
-      </div>
-
-      <div className="mt-4 rounded-xl border border-white/10 bg-black/20 p-4">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">Contexto</p>
-        <p className="mt-1 text-sm text-gray-300">{clozeRushPrompt(card.prompt, card.fullText)}</p>
-        <p className="mt-4 rounded-xl bg-white/5 p-4 text-2xl font-black text-white">{card.clozeText}</p>
-        <div className="mt-4 flex flex-wrap gap-2">
-          {card.chips.map((chip) => (
-            <button
-              key={chip}
-              type="button"
-              onClick={() => chooseChip(chip)}
-              className={`rounded-xl border px-4 py-3 text-sm font-bold transition ${selectedChip === chip ? 'border-polyglot-accent bg-polyglot-accent/25 text-white' : 'border-white/10 bg-white/5 text-gray-200 hover:border-polyglot-accent/50 hover:bg-white/10'}`}
-            >
-              {chip}
-            </button>
-          ))}
-        </div>
-        <div className="mt-4 flex flex-wrap gap-2">
-          <button type="button" className="btn-primary disabled:opacity-40" disabled={!selectedChip} onClick={verify}>Verificar</button>
-          <button type="button" className="btn-secondary" onClick={nextCard}>Próxima</button>
-        </div>
-        {result && (
-          <div className={`mt-3 rounded-lg p-3 text-sm font-semibold ${result.status === 'correct' ? 'bg-polyglot-green/15 text-polyglot-green' : 'bg-red-500/15 text-red-200'}`}>
-            <p>{result.status === 'correct' ? 'Correto — lacuna completa.' : `Resposta esperada: ${result.expected}`}</p>
-            <p className="mt-1 opacity-90">Frase completa: {result.fullText}</p>
-            {card.explanation && <p className="mt-1 opacity-80">{card.explanation}</p>}
+    <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className={`border-t p-4 sm:p-6 ${isCorrect ? 'border-polyglot-green/30 bg-polyglot-green/15 text-polyglot-green' : 'border-red-400/30 bg-red-500/15 text-red-200'}`}>
+      <div className="mx-auto flex max-w-4xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-3 text-2xl font-black">
+            <span className={`flex h-10 w-10 items-center justify-center rounded-full ${isCorrect ? 'bg-polyglot-green text-slate-950' : 'bg-red-400 text-slate-950'}`}>{isCorrect ? <Check size={24} /> : <X size={24} />}</span>
+            {isCorrect ? 'Incrível!' : 'Revise a correção'}
           </div>
-        )}
-      </div>
-    </div>
-  )
-}
-
-function TypingRushPractice({ items, lesson, session, currentIndex }) {
-  const queue = useMemo(() => buildTypingRushQueue(items, { lesson, session, currentIndex }), [items, lesson, session, currentIndex])
-  const [cardIndex, setCardIndex] = useState(0)
-  const [input, setInput] = useState('')
-  const [result, setResult] = useState(null)
-  const [correctCount, setCorrectCount] = useState(0)
-
-  useEffect(() => {
-    setCardIndex(0)
-    setInput('')
-    setResult(null)
-    setCorrectCount(0)
-  }, [queue.map((card) => card.seed).join('|')])
-
-  if (queue.length < 2) return null
-
-  const card = queue[cardIndex % queue.length]
-  const feedbackText = {
-    correct: 'Correto — boa recuperação ativa.',
-    close: `Quase lá. Resposta esperada: ${result?.expected}`,
-    wrong: `Resposta esperada: ${result?.expected}`,
-  }
-
-  function verify() {
-    const nextResult = validateTypingRushAnswer(input, card.answer)
-    setResult(nextResult)
-    if (nextResult.status === 'correct') setCorrectCount((count) => count + 1)
-  }
-
-  function nextCard() {
-    setCardIndex((index) => (index + 1) % queue.length)
-    setInput('')
-    setResult(null)
-  }
-
-  return (
-    <div className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-4">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">Exercício extra: digitação relâmpago</p>
-          <h3 className="mt-1 text-xl font-bold text-white">Digite a resposta no idioma estudado</h3>
-          <p className="mt-1 text-sm text-gray-300">Recuperação ativa com itens desta sessão. Este treino não altera XP/progresso.</p>
-        </div>
-        <span className="w-fit rounded-full border border-white/10 bg-black/20 px-3 py-1 text-sm font-semibold text-polyglot-accent">{correctCount} acertos</span>
-      </div>
-
-      <div className="mt-4 rounded-xl border border-white/10 bg-black/20 p-4">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">Dica</p>
-        <p className="mt-1 text-lg font-bold text-white">{typingRushPrompt(card.prompt, card.answer)}</p>
-        <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-          <input
-            value={input}
-            onChange={(event) => {
-              setInput(event.target.value)
-              setResult(null)
-            }}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter' && input.trim()) verify()
-            }}
-            className="min-w-0 flex-1 rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-white outline-none focus:border-polyglot-accent"
-            placeholder="Digite aqui..."
-            aria-label="Resposta do treino de digitação relâmpago"
-          />
-          <button type="button" className="btn-primary disabled:opacity-40" disabled={!input.trim()} onClick={verify}>Verificar</button>
-          <button type="button" className="btn-secondary" onClick={nextCard}>Próxima</button>
-        </div>
-        {result && (
-          <p className={`mt-3 rounded-lg p-3 text-sm font-semibold ${result.status === 'correct' ? 'bg-polyglot-green/15 text-polyglot-green' : result.status === 'close' ? 'bg-yellow-500/15 text-yellow-200' : 'bg-red-500/15 text-red-200'}`}>
-            {feedbackText[result.status]}
-          </p>
-        )}
-      </div>
-    </div>
-  )
-}
-
-function OrthographyRepairPractice({ items, lesson, session, currentIndex }) {
-  const queue = useMemo(() => buildOrthographyRepairQueue(items, { lesson, session, currentIndex }), [items, lesson, session, currentIndex])
-  const [cardIndex, setCardIndex] = useState(0)
-  const [input, setInput] = useState('')
-  const [result, setResult] = useState(null)
-  const [correctCount, setCorrectCount] = useState(0)
-
-  useEffect(() => {
-    setCardIndex(0)
-    setInput('')
-    setResult(null)
-    setCorrectCount(0)
-  }, [queue.map((card) => card.seed).join('|')])
-
-  if (queue.length < 2) return null
-
-  const card = queue[cardIndex % queue.length]
-  const damaged = card.damaged || damageOrthographyRepairText(card.answer)
-  const feedbackText = {
-    correct: 'Correto — ortografia restaurada.',
-    close: 'Quase: palavras certas, mas revise maiúsculas/pontuação.',
-    wrong: `Resposta esperada: ${result?.expected}`,
-  }
-
-  function verify() {
-    const nextResult = validateOrthographyRepairAnswer(input, card.answer)
-    setResult(nextResult)
-    if (nextResult.status === 'correct') setCorrectCount((count) => count + 1)
-  }
-
-  function nextCard() {
-    setCardIndex((index) => (index + 1) % queue.length)
-    setInput('')
-    setResult(null)
-  }
-
-  return (
-    <div className="mt-8 rounded-2xl border border-amber-300/30 bg-amber-500/10 p-4">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">Exercício extra: reparador de ortografia</p>
-          <h3 className="mt-1 text-xl font-bold text-white">Repare a frase</h3>
-          <p className="mt-1 text-sm text-gray-300">Restaure maiúsculas, acentos e pontuação com frases desta sessão. Este treino não altera XP/progresso.</p>
-        </div>
-        <span className="w-fit rounded-full border border-white/10 bg-black/20 px-3 py-1 text-sm font-semibold text-polyglot-accent">{correctCount} acertos</span>
-      </div>
-
-      <div className="mt-4 rounded-xl border border-white/10 bg-black/20 p-4">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">Frase danificada</p>
-        <p className="mt-1 rounded-xl border border-dashed border-amber-200/30 bg-black/20 px-4 py-3 text-lg font-bold text-white">{damaged}</p>
-        <p className="mt-2 text-xs text-gray-400">Dica de contexto: {card.prompt}</p>
-        <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-          <input
-            value={input}
-            onChange={(event) => {
-              setInput(event.target.value)
-              setResult(null)
-            }}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter' && input.trim()) verify()
-            }}
-            className="min-w-0 flex-1 rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-white outline-none focus:border-polyglot-accent"
-            placeholder="Digite a frase corrigida..."
-            aria-label="Resposta do treino reparador de ortografia"
-          />
-          <button type="button" className="btn-primary disabled:opacity-40" disabled={!input.trim()} onClick={verify}>Verificar</button>
-          <button type="button" className="btn-secondary" onClick={nextCard}>Próxima</button>
-        </div>
-        {result && (
-          <p className={`mt-3 rounded-lg p-3 text-sm font-semibold ${result.status === 'correct' ? 'bg-polyglot-green/15 text-polyglot-green' : result.status === 'close' ? 'bg-yellow-500/15 text-yellow-200' : 'bg-red-500/15 text-red-200'}`}>
-            {feedbackText[result.status]}
-          </p>
-        )}
-      </div>
-    </div>
-  )
-}
-
-function WordScramblePractice({ items, lesson, session, currentIndex }) {
-  const queue = useMemo(() => buildWordScrambleQueue(items, { lesson, session, currentIndex }), [items, lesson, session, currentIndex])
-  const [cardIndex, setCardIndex] = useState(0)
-  const [selectedLetters, setSelectedLetters] = useState([])
-  const [result, setResult] = useState(null)
-  const [correctCount, setCorrectCount] = useState(0)
-
-  useEffect(() => {
-    setCardIndex(0)
-    setSelectedLetters([])
-    setResult(null)
-    setCorrectCount(0)
-  }, [queue.map((card) => card.seed).join('|')])
-
-  if (queue.length < 3) return null
-
-  const card = queue[cardIndex % queue.length]
-  const selectedText = selectedLetters.join('')
-
-  function selectedLetterCount(letter) {
-    return selectedLetters.filter((selected) => selected === letter).length
-  }
-
-  function availableLetterCount(letter, index) {
-    return card.letters.slice(0, index + 1).filter((available) => available === letter).length
-  }
-
-  function chooseLetter(letter) {
-    setSelectedLetters((letters) => [...letters, letter])
-    setResult(null)
-  }
-
-  function removeLetter(index) {
-    setSelectedLetters((letters) => letters.filter((_, idx) => idx !== index))
-    setResult(null)
-  }
-
-  function verify() {
-    const nextResult = validateWordScrambleAnswer(selectedLetters, card.answer)
-    setResult(nextResult)
-    if (nextResult.status === 'correct') setCorrectCount((count) => count + 1)
-  }
-
-  function clear() {
-    setSelectedLetters([])
-    setResult(null)
-  }
-
-  function nextCard() {
-    setCardIndex((index) => (index + 1) % queue.length)
-    setSelectedLetters([])
-    setResult(null)
-  }
-
-  return (
-    <div className="mt-8 rounded-2xl border border-fuchsia-400/30 bg-fuchsia-500/10 p-4">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">Exercício extra: palavra embaralhada</p>
-          <h3 className="mt-1 text-xl font-bold text-white">Monte a palavra com letras misturadas</h3>
-          <p className="mt-1 text-sm text-gray-300">Ortografia ativa com respostas desta sessão. Este treino não altera XP/progresso.</p>
-        </div>
-        <span className="w-fit rounded-full border border-white/10 bg-black/20 px-3 py-1 text-sm font-semibold text-polyglot-accent">{correctCount} acertos</span>
-      </div>
-
-      <div className="mt-4 rounded-xl border border-white/10 bg-black/20 p-4">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">Dica</p>
-        <p className="mt-1 text-lg font-bold text-white">{typingRushPrompt(card.prompt, card.answer)}</p>
-        <div className="mt-4 min-h-16 rounded-xl border border-dashed border-fuchsia-300/30 bg-black/20 p-3">
-          {selectedLetters.length === 0 ? (
-            <span className="text-gray-500">Toque nas letras abaixo...</span>
-          ) : (
-            <div className="flex flex-wrap gap-2">
-              {selectedLetters.map((letter, index) => (
-                <button key={`${letter}-${index}`} type="button" onClick={() => removeLetter(index)} className="rounded-lg bg-polyglot-accent px-3 py-2 text-xl font-bold text-white shadow-sm transition hover:scale-[1.02] active:scale-95" aria-label={`Remover letra ${letter}`}>
-                  {letter}
-                </button>
-              ))}
+          {!isCorrect && (
+            <div className="mt-3 space-y-2 rounded-2xl bg-black/25 p-3 text-sm text-red-50">
+              <p><strong>Sua resposta:</strong> {readableAnswer(feedback.mistake?.your_answer)}</p>
+              <p><strong>Resposta correta:</strong> {readableAnswer(feedback.mistake?.correct_answer || feedback.correctAnswer)}</p>
+            </div>
+          )}
+          {showExplanation && hasExplanation && (
+            <div className="mt-3 rounded-2xl border border-white/10 bg-black/20 p-3 text-sm text-white/90">
+              <strong>Explicação:</strong> {feedback.explanation || feedback.mistake?.message}
             </div>
           )}
         </div>
-
-        <div className="mt-3 flex flex-wrap gap-2">
-          {card.letters.map((letter, index) => (
-            <button
-              key={`${letter}-${index}`}
-              type="button"
-              disabled={selectedLetterCount(letter) >= availableLetterCount(letter, index)}
-              onClick={() => chooseLetter(letter)}
-              className="rounded-lg bg-white/10 px-4 py-3 text-xl font-bold hover:bg-white/20 disabled:opacity-30"
-            >
-              {letter}
-            </button>
-          ))}
+        <div className="flex flex-col gap-2 sm:min-w-56">
+          {hasExplanation && <button type="button" className="btn-secondary border-current text-xs font-black uppercase tracking-[0.12em]" onClick={() => setShowExplanation((value) => !value)}>EXPLIQUE MINHA RESPOSTA</button>}
+          <button type="button" className="btn-secondary inline-flex items-center justify-center gap-2" onClick={onRepeatAnswer}><Volume2 size={18} /> Repetir resposta</button>
+          <button type="button" className="btn-primary inline-flex items-center justify-center gap-2" onClick={canFinish ? onFinish : onContinue}>{canFinish ? nextExerciseActionLabel(session) : continueLabel} <ArrowRight size={18} /></button>
         </div>
-
-        <div className="mt-4 flex flex-wrap items-center gap-3">
-          <button type="button" className="btn-primary disabled:opacity-40" disabled={selectedLetters.length !== Array.from(card.answer).length} onClick={verify}>Verificar</button>
-          <button type="button" className="btn-secondary disabled:opacity-40" disabled={!selectedLetters.length} onClick={clear}>Limpar</button>
-          <button type="button" className="btn-secondary" onClick={nextCard}>Próxima</button>
-          {selectedText && <span className="text-sm text-gray-400">Sua resposta: <strong className="text-white">{selectedText}</strong></span>}
-        </div>
-
-        {result && (
-          <p className={`mt-3 rounded-lg p-3 text-sm font-semibold ${result.status === 'correct' ? 'bg-polyglot-green/15 text-polyglot-green' : 'bg-red-500/15 text-red-200'}`}>
-            {result.status === 'correct' ? 'Correto — boa ortografia.' : `Resposta esperada: ${result.expected}`}
-          </p>
-        )}
       </div>
-    </div>
-  )
-}
-
-function ChunkBuilderPractice({ items, lesson, session, currentIndex }) {
-  const queue = useMemo(() => buildChunkBuilderQueue(items, { lesson, session, currentIndex }), [items, lesson, session, currentIndex])
-  const [cardIndex, setCardIndex] = useState(0)
-  const [selectedChunks, setSelectedChunks] = useState([])
-  const [availableChunks, setAvailableChunks] = useState([])
-  const [result, setResult] = useState(null)
-  const [correctCount, setCorrectCount] = useState(0)
-
-  const queueKey = queue.map((card) => card.seed).join('|')
-  const card = queue[cardIndex % Math.max(queue.length, 1)]
-
-  useEffect(() => {
-    setCardIndex(0)
-    setSelectedChunks([])
-    setAvailableChunks(queue[0]?.shuffledChunks ?? [])
-    setResult(null)
-    setCorrectCount(0)
-  }, [queueKey])
-
-  useEffect(() => {
-    setSelectedChunks([])
-    setAvailableChunks(card?.shuffledChunks ?? [])
-    setResult(null)
-  }, [card?.seed])
-
-  if (queue.length < 3 || !card) return null
-
-  function chooseChunk(chunk, index) {
-    setSelectedChunks((chunks) => [...chunks, chunk])
-    setAvailableChunks((chunks) => chunks.filter((_, idx) => idx !== index))
-    setResult(null)
-  }
-
-  function removeChunk(index) {
-    const [removed] = selectedChunks.slice(index, index + 1)
-    setSelectedChunks((chunks) => chunks.filter((_, idx) => idx !== index))
-    if (removed) setAvailableChunks((chunks) => [...chunks, removed])
-    setResult(null)
-  }
-
-  function verify() {
-    const nextResult = validateChunkBuilderAnswer(selectedChunks, card.chunks)
-    setResult(nextResult)
-    if (nextResult.status === 'correct') setCorrectCount((count) => count + 1)
-  }
-
-  function clear() {
-    setSelectedChunks([])
-    setAvailableChunks(card.shuffledChunks)
-    setResult(null)
-  }
-
-  function nextCard() {
-    setCardIndex((index) => (index + 1) % queue.length)
-  }
-
-  return (
-    <div className="mt-8 rounded-2xl border border-amber-400/30 bg-amber-500/10 p-4">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">Exercício extra: monte por blocos</p>
-          <h3 className="mt-1 text-xl font-bold text-white">Ordene os blocos de sentido</h3>
-          <p className="mt-1 text-sm text-gray-300">Monte a frase com chunks desta sessão. Este treino não altera XP/progresso.</p>
-        </div>
-        <span className="w-fit rounded-full border border-white/10 bg-black/20 px-3 py-1 text-sm font-semibold text-polyglot-accent">{correctCount} acertos</span>
-      </div>
-
-      <div className="mt-4 rounded-xl border border-white/10 bg-black/20 p-4">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">Dica</p>
-        <p className="mt-1 text-lg font-bold text-white">{card.prompt || 'Monte a frase no idioma estudado.'}</p>
-        <div className="mt-4 min-h-16 rounded-xl border border-dashed border-amber-300/30 bg-black/20 p-3">
-          {selectedChunks.length === 0 ? (
-            <span className="text-gray-500">Toque nos blocos abaixo...</span>
-          ) : (
-            <div className="flex flex-wrap gap-2">
-              {selectedChunks.map((chunk, index) => (
-                <button key={`${chunk}-${index}`} type="button" onClick={() => removeChunk(index)} className="rounded-lg bg-polyglot-accent px-3 py-2 text-base font-bold text-white shadow-sm transition hover:scale-[1.02] active:scale-95" aria-label={`Remover bloco ${chunk}`}>
-                  {chunk}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-
-        <div className="mt-3 flex flex-wrap gap-2">
-          {availableChunks.map((chunk, index) => (
-            <button key={`${chunk}-${index}`} type="button" onClick={() => chooseChunk(chunk, index)} className="rounded-lg bg-white/10 px-4 py-3 text-base font-bold hover:bg-white/20">
-              {chunk}
-            </button>
-          ))}
-        </div>
-
-        <div className="mt-4 flex flex-wrap items-center gap-3">
-          <button type="button" className="btn-primary disabled:opacity-40" disabled={!chunkBuilderCanSubmit(selectedChunks, card.chunks)} onClick={verify}>Verificar</button>
-          <button type="button" className="btn-secondary disabled:opacity-40" disabled={!selectedChunks.length} onClick={clear}>Limpar</button>
-          <button type="button" className="btn-secondary" onClick={nextCard}>Próxima frase</button>
-        </div>
-
-        {result && (
-          <p className={`mt-3 rounded-lg p-3 text-sm font-semibold ${result.status === 'correct' ? 'bg-polyglot-green/15 text-polyglot-green' : 'bg-red-500/15 text-red-200'}`}>
-            {result.status === 'correct' ? 'Correto — os blocos formam uma frase natural.' : `Resposta esperada: ${result.expected}`}
-          </p>
-        )}
-      </div>
-    </div>
+    </motion.div>
   )
 }
 
@@ -1497,195 +549,6 @@ function MicroDialoguePrompt({ dialogue }) {
         </div>
       </div>
       {dialogue.instruction && <p className="mt-3 text-sm text-gray-300">{dialogue.instruction}</p>}
-    </div>
-  )
-}
-
-function WordSearchPractice({ items, lesson, session, currentIndex }) {
-  const seed = wordSearchSeed({ lesson, session, currentIndex })
-  const words = useMemo(() => eligibleWordSearchWords(items, 8), [items])
-  const puzzle = useMemo(() => generateWordSearchGrid(words, seed), [words, seed])
-  const [selectionStart, setSelectionStart] = useState(null)
-  const [foundWords, setFoundWords] = useState([])
-
-  useEffect(() => {
-    setSelectionStart(null)
-    setFoundWords([])
-  }, [seed])
-
-  if (words.length < 6) return null
-
-  const foundSet = new Set(foundWords)
-  const foundCells = new Set(
-    foundWords.flatMap((word) => (puzzle.placements[word]?.cells || []).map((cell) => `${cell.row}:${cell.col}`)),
-  )
-  const isComplete = foundWords.length === words.length
-
-  function chooseCell(point) {
-    if (!selectionStart) {
-      setSelectionStart(point)
-      return
-    }
-    const result = validateWordSearchSelection({ placements: puzzle.placements, from: selectionStart, to: point })
-    setFoundWords((current) => updateFoundWordSearchWords(current, result))
-    setSelectionStart(null)
-  }
-
-  return (
-    <div className="mt-8 rounded-2xl border border-polyglot-accent/30 bg-polyglot-accent/10 p-4">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">Exercício extra: caça-palavra</p>
-          <h3 className="mt-1 text-xl font-bold text-white">Encontre palavras desta sessão</h3>
-          <p className="mt-1 text-sm text-gray-300">Selecione a primeira e a última letra em linha reta. Este treino não altera XP/progresso.</p>
-        </div>
-        <span className="w-fit rounded-full border border-white/10 bg-black/20 px-3 py-1 text-sm font-semibold text-polyglot-accent">{foundWords.length}/{words.length}</span>
-      </div>
-
-      <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_220px]">
-        <div className="overflow-x-auto rounded-xl border border-white/10 bg-black/20 p-3">
-          <div className="grid w-fit gap-1" style={{ gridTemplateColumns: `repeat(${puzzle.grid.length}, minmax(2rem, 1fr))` }}>
-            {puzzle.grid.map((row, rowIndex) => row.map((letter, colIndex) => {
-              const key = `${rowIndex}:${colIndex}`
-              const isSelectedStart = selectionStart?.row === rowIndex && selectionStart?.col === colIndex
-              const isFound = foundCells.has(key)
-              return (
-                <button
-                  key={key}
-                  type="button"
-                  onClick={() => chooseCell({ row: rowIndex, col: colIndex })}
-                  className={`flex h-8 w-8 items-center justify-center rounded-lg border text-sm font-black transition ${isFound ? 'border-polyglot-green/60 bg-polyglot-green/25 text-polyglot-green' : isSelectedStart ? 'border-polyglot-accent bg-polyglot-accent/30 text-white' : 'border-white/10 bg-white/5 text-white hover:border-polyglot-accent/50 hover:bg-white/10'}`}
-                  aria-label={`Linha ${rowIndex + 1}, coluna ${colIndex + 1}, letra ${letter}`}
-                >
-                  {letter}
-                </button>
-              )
-            }))}
-          </div>
-        </div>
-        <div className="rounded-xl border border-white/10 bg-black/20 p-3">
-          <p className="text-sm font-semibold text-gray-300">Palavras-alvo</p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {words.map((word) => (
-              <span key={word} className={`rounded-full border px-3 py-1 text-sm font-bold ${foundSet.has(word) ? 'border-polyglot-green/50 bg-polyglot-green/20 text-polyglot-green line-through' : 'border-white/10 bg-white/5 text-gray-300'}`}>{word}</span>
-            ))}
-          </div>
-          {isComplete && <p className="mt-4 rounded-lg bg-polyglot-green/15 p-3 text-sm font-semibold text-polyglot-green">Treino concluído — isso não altera seu progresso.</p>}
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function LetterBlocksPractice({ items, lesson, session, currentIndex }) {
-  const seed = letterBlocksSeed({ lesson, session, currentIndex })
-  const words = useMemo(() => eligibleLetterBlockWords(items, 5), [items])
-  const puzzle = useMemo(() => generateLetterBlocksPuzzle(words, seed), [words, seed])
-  const [path, setPath] = useState([])
-  const [foundWords, setFoundWords] = useState([])
-  const [result, setResult] = useState(null)
-
-  useEffect(() => {
-    setPath([])
-    setFoundWords([])
-    setResult(null)
-  }, [seed])
-
-  if (words.length < 3) return null
-
-  const foundSet = new Set(foundWords)
-  const selectedCells = new Set(path.map((point) => `${point.row}:${point.col}`))
-  const foundCells = new Set(
-    foundWords.flatMap((word) => (puzzle.paths[word] || []).map((cell) => `${cell.row}:${cell.col}`)),
-  )
-  const currentAttempt = path.map((point) => puzzle.grid[point.row][point.col]).join('')
-  const isComplete = foundWords.length === puzzle.targets.length
-
-  function resetSelection() {
-    setPath([])
-    setResult(null)
-  }
-
-  function restartGame() {
-    setPath([])
-    setFoundWords([])
-    setResult(null)
-  }
-
-  function chooseCell(point) {
-    setResult(null)
-    if (path.some((cell) => cell.row === point.row && cell.col === point.col)) return
-    if (path.length > 0) {
-      const previous = path[path.length - 1]
-      const distance = Math.abs(previous.row - point.row) + Math.abs(previous.col - point.col)
-      if (distance !== 1) {
-        setResult({ found: false, word: null, reason: 'not-adjacent' })
-        return
-      }
-    }
-    const nextPath = [...path, point]
-    const nextResult = validateLetterBlocksPath({ grid: puzzle.grid, targets: puzzle.targets, path: nextPath })
-    if (nextResult.found) {
-      setFoundWords((current) => updateFoundLetterBlockWords(current, nextResult))
-      setResult(nextResult)
-      setPath([])
-      return
-    }
-    setPath(nextPath)
-  }
-
-  return (
-    <div className="mt-8 rounded-2xl border border-cyan-400/30 bg-cyan-500/10 p-4">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-polyglot-accent">Exercício extra: blocos de letras</p>
-          <h3 className="mt-1 text-xl font-bold text-white">Conecte letras vizinhas</h3>
-          <p className="mt-1 text-sm text-gray-300">Clique em letras horizontais/verticais adjacentes para formar palavras da sessão. Este treino não altera XP/progresso.</p>
-        </div>
-        <span className="w-fit rounded-full border border-white/10 bg-black/20 px-3 py-1 text-sm font-semibold text-polyglot-accent">{foundWords.length}/{puzzle.targets.length}</span>
-      </div>
-
-      <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_240px]">
-        <div className="rounded-xl border border-white/10 bg-black/20 p-3">
-          <div className="grid w-fit gap-2" style={{ gridTemplateColumns: `repeat(${puzzle.grid.length}, minmax(2.5rem, 1fr))` }}>
-            {puzzle.grid.map((row, rowIndex) => row.map((letter, colIndex) => {
-              const key = `${rowIndex}:${colIndex}`
-              const isSelected = selectedCells.has(key)
-              const isFound = foundCells.has(key)
-              return (
-                <button
-                  key={key}
-                  type="button"
-                  onClick={() => chooseCell({ row: rowIndex, col: colIndex })}
-                  className={`flex h-10 w-10 items-center justify-center rounded-xl border text-base font-black transition ${isFound ? 'border-polyglot-green/60 bg-polyglot-green/25 text-polyglot-green' : isSelected ? 'border-cyan-300 bg-cyan-300/25 text-white' : 'border-white/10 bg-white/5 text-white hover:border-cyan-300/60 hover:bg-white/10'}`}
-                  aria-label={`Bloco linha ${rowIndex + 1}, coluna ${colIndex + 1}, letra ${letter}`}
-                >
-                  {letter}
-                </button>
-              )
-            }))}
-          </div>
-          <div className="mt-4 flex flex-wrap items-center gap-2">
-            <span className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-gray-200">Seleção: <strong className="text-white">{currentAttempt || '—'}</strong></span>
-            <button type="button" className="btn-secondary" onClick={resetSelection}>Limpar seleção</button>
-            <button type="button" className="btn-secondary" onClick={restartGame}>Reiniciar</button>
-          </div>
-          {result && (
-            <p className={`mt-3 rounded-lg p-3 text-sm font-semibold ${result.found ? 'bg-polyglot-green/15 text-polyglot-green' : 'bg-red-500/15 text-red-200'}`}>
-              {result.found ? `Encontrou: ${result.word}` : 'Use apenas letras vizinhas na horizontal/vertical.'}
-            </p>
-          )}
-        </div>
-        <div className="rounded-xl border border-white/10 bg-black/20 p-3">
-          <p className="text-sm font-semibold text-gray-300">Palavras-alvo</p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {puzzle.targets.map((word) => (
-              <span key={word} className={`rounded-full border px-3 py-1 text-sm font-bold ${foundSet.has(word) ? 'border-polyglot-green/50 bg-polyglot-green/20 text-polyglot-green line-through' : 'border-white/10 bg-white/5 text-gray-300'}`}>{word}</span>
-            ))}
-          </div>
-          {isComplete && <p className="mt-4 rounded-lg bg-polyglot-green/15 p-3 text-sm font-semibold text-polyglot-green">Blocos concluídos — treino local sem alterar progresso.</p>}
-        </div>
-      </div>
     </div>
   )
 }
@@ -1777,12 +640,12 @@ function SkillTrail({ path, lessonContext, page, mobilePage, onPageChange, onMob
   )
 }
 
-function Choice({ options, selected, setSelected, onInteract }) {
+function ChoiceExerciseBody({ options, selected, setSelected, onInteract }) {
   const shortcutLabels = choiceShortcutLabels(options)
   return <div className="grid gap-3 sm:grid-cols-2">{options.map((option, index) => <button key={option} onClick={() => { onInteract(); setSelected(option) }} className={`flex items-center gap-3 rounded-xl border p-4 text-left text-lg font-semibold transition ${selected === option ? 'border-polyglot-accent bg-polyglot-accent/20' : 'border-white/10 bg-white/5 hover:bg-white/10'}`}>{shortcutLabels[index] && <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-white/15 bg-black/30 text-sm font-bold text-polyglot-accent">{shortcutLabels[index]}</span>}<span>{option}</span></button>)}</div>
 }
 
-function ImageChoice({ options, selected, setSelected, onInteract }) {
+function ImageChoiceExerciseBody({ options, selected, setSelected, onInteract }) {
   const selectable = selectableImageChoiceOptions(options)
   const shortcutLabels = choiceShortcutLabels(selectable)
   return (
@@ -1800,7 +663,7 @@ function ImageChoice({ options, selected, setSelected, onInteract }) {
   )
 }
 
-function ListenBuildDictation({ typedAnswer, setTypedAnswer, onInteract, onSubmit, canSubmit, busy }) {
+function ListenBuildDictationExerciseBody({ typedAnswer, setTypedAnswer, onInteract, onSubmit, canSubmit, busy }) {
   function updateTypedAnswer(event) {
     onInteract()
     setTypedAnswer(event.target.value)
@@ -1838,7 +701,7 @@ function ListenBuildDictation({ typedAnswer, setTypedAnswer, onInteract, onSubmi
   )
 }
 
-function SequenceDialogue({ item, built, setBuilt, onInteract }) {
+function SequenceDialogueExerciseBody({ item, built, setBuilt, onInteract }) {
   const tiles = buildTilesForItem(item)
 
   function removePhrase(index) {
@@ -1902,9 +765,9 @@ function SequenceDialogue({ item, built, setBuilt, onInteract }) {
   )
 }
 
-function Build({ item, built, setBuilt, onInteract }) {
+function BuildExerciseBody({ item, built, setBuilt, onInteract }) {
   if (isLetterScrambleEligible(item)) {
-    return <LetterScramble item={item} built={built} onInteract={onInteract} setBuilt={setBuilt} />
+    return <LetterScrambleExerciseBody item={item} built={built} onInteract={onInteract} setBuilt={setBuilt} />
   }
 
   const tiles = buildTilesForItem(item)
@@ -1964,7 +827,7 @@ function Build({ item, built, setBuilt, onInteract }) {
   )
 }
 
-function LetterScramble({ item, built, setBuilt, onInteract }) {
+function LetterScrambleExerciseBody({ item, built, setBuilt, onInteract }) {
   const answer = singleWordBuildAnswer(item)
   const letters = stableScrambleLetters(answer, item.id ?? item.prompt)
 
@@ -2026,66 +889,86 @@ function LetterScramble({ item, built, setBuilt, onInteract }) {
   )
 }
 
-function Match({ item, matched, setMatched, onInteract }) {
+function MatchExerciseBody({ item, langCode, matched, setMatched, onInteract, onSpeakAudio }) {
   const pairs = matchPairs(item)
-  const cards = useMemo(() => buildMemoryMatchCards(pairs, item.id ?? item.prompt), [item.id, item.prompt, pairs])
-  const [selectedCards, setSelectedCards] = useState([])
-  const [mismatchedIds, setMismatchedIds] = useState([])
+  const isListenMatch = item.type === 'listen_match'
+  const [selectedLeft, setSelectedLeft] = useState(null)
+  const [wrongRight, setWrongRight] = useState(null)
 
   useEffect(() => {
-    setSelectedCards([])
-    setMismatchedIds([])
+    setSelectedLeft(null)
+    setWrongRight(null)
   }, [item.id])
 
-  function isCardFound(card) {
-    if (card.side === 'left') return matched[card.value] === card.matchValue
-    return matched[card.matchValue] === card.value
+  function chooseLeft(left) {
+    if (matched[left]) return
+    onInteract()
+    setSelectedLeft(left)
+    setWrongRight(null)
+    if (isListenMatch) onSpeakAudio?.(left)
   }
 
-  function chooseCard(card) {
-    if (isCardFound(card) || selectedCards.some((selected) => selected.id === card.id)) return
+  function chooseRight(right) {
+    if (!selectedLeft) return
     onInteract()
-    const nextSelected = selectedCards.length >= 2 ? [card] : [...selectedCards, card]
-    setSelectedCards(nextSelected)
-
-    if (nextSelected.length === 2) {
-      const result = memoryMatchSelection({ selectedCards: nextSelected, matched })
-      if (result.isPairFound) setMatched(result.matched)
-      if (!result.isPairFound) setMismatchedIds(nextSelected.map((selected) => selected.id))
-      window.setTimeout(() => {
-        setSelectedCards([])
-        setMismatchedIds([])
-      }, result.isPairFound ? 250 : 700)
+    const expectedRight = pairs.find(([left]) => left === selectedLeft)?.[1]
+    if (expectedRight === right) {
+      setMatched({ ...matched, [selectedLeft]: right })
+      setSelectedLeft(null)
+      setWrongRight(null)
+    } else {
+      setWrongRight(right)
     }
   }
 
   return (
     <div className="space-y-3">
-      <p className="text-sm text-gray-400">Vire duas cartas para encontrar cada par. Pares corretos ficam revelados e a resposta final continua no mesmo formato de associação.</p>
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {cards.map((card) => {
-          const found = isCardFound(card)
-          const selected = selectedCards.some((candidate) => candidate.id === card.id)
-          const mismatched = mismatchedIds.includes(card.id)
-          const revealed = found || selected
-          return (
+      <p className="text-sm text-gray-400">{isListenMatch ? 'Toque em um áudio e selecione a tradução correspondente.' : 'Selecione os pares correspondentes. Escolha um termo e depois o par correspondente.'}</p>
+      <div className="grid gap-4 md:grid-cols-2">
+        <div className="space-y-2">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">{isListenMatch ? 'Áudios' : 'Termos'}</p>
+          {pairs.map(([left]) => {
+            const found = !!matched[left]
+            const selected = selectedLeft === left
+            return (
+              <button
+                key={left}
+                type="button"
+                onClick={() => chooseLeft(left)}
+                disabled={found}
+                className={`w-full rounded-2xl border p-4 text-left text-lg font-bold transition ${found ? 'border-polyglot-green/60 bg-polyglot-green/20 text-polyglot-green' : selected ? 'border-polyglot-accent bg-polyglot-accent/20 text-white' : 'border-white/10 bg-white/5 text-white hover:border-polyglot-accent/50 hover:bg-white/10'}`}
+              >
+                {isListenMatch ? (
+                  <span className="flex items-center gap-3">
+                    <Volume2 size={20} />
+                    <span>Áudio {pairs.findIndex(([candidate]) => candidate === left) + 1}</span>
+                    <span className="h-2 flex-1 rounded-full bg-gradient-to-r from-cyan-300 via-blue-500 to-cyan-300 opacity-80" />
+                  </span>
+                ) : left}
+                {found && <span className="ml-2 text-sm text-polyglot-green">✓</span>}
+              </button>
+            )
+          })}
+        </div>
+        <div className="space-y-2">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">{isListenMatch ? 'Traduções' : 'Pares'}</p>
+          {pairs.map(([left, right]) => {
+            const found = matched[left] === right
+            const mismatched = wrongRight === right
+            return (
             <button
-              key={card.id}
+              key={right}
               type="button"
-              onClick={() => chooseCard(card)}
-              aria-pressed={revealed}
+              onClick={() => chooseRight(right)}
               disabled={found}
-              className={`min-h-24 rounded-2xl border p-3 text-center font-bold transition ${found ? 'border-polyglot-green/60 bg-polyglot-green/20 text-polyglot-green' : mismatched ? 'border-red-400/70 bg-red-500/20 text-red-100' : selected ? 'border-polyglot-accent bg-polyglot-accent/20 text-white' : 'border-white/10 bg-white/5 text-gray-500 hover:border-polyglot-accent/50 hover:bg-white/10'}`}
+              className={`w-full rounded-2xl border p-4 text-left text-lg font-bold transition ${found ? 'border-polyglot-green/60 bg-polyglot-green/20 text-polyglot-green' : mismatched ? 'border-red-400/70 bg-red-500/20 text-red-100' : selectedLeft ? 'border-white/10 bg-white/5 text-white hover:border-polyglot-accent/50 hover:bg-white/10' : 'border-white/10 bg-white/5 text-gray-400'}`}
             >
-              {revealed ? (
-                <span className="block text-lg text-white">{card.value}</span>
-              ) : (
-                <span className="block text-2xl text-polyglot-accent">?</span>
-              )}
-              {revealed && <span className="mt-2 block text-[11px] font-semibold uppercase tracking-[0.16em] text-gray-400">{card.side === 'left' ? 'termo' : 'par'}</span>}
+              {right}
+              {found && <span className="ml-2 text-sm text-polyglot-green">✓</span>}
             </button>
-          )
-        })}
+            )
+          })}
+        </div>
       </div>
       <div className="text-xs text-gray-500">Pares encontrados: {Object.keys(matched).length}/{pairs.length}</div>
     </div>

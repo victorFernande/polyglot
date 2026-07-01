@@ -1,16 +1,11 @@
 import assert from 'node:assert/strict'
-import { readFileSync } from 'node:fs'
 import test from 'node:test'
+import { readFileSync } from 'node:fs'
 
 const exercisesSource = readFileSync(new URL('../pages/Exercises.jsx', import.meta.url), 'utf8')
 
-test('Exercises renders word scramble as an explicitly local optional training panel', () => {
-  assert.match(exercisesSource, /import \{[^}]*buildWordScrambleQueue[^}]*validateWordScrambleAnswer/s)
-  assert.match(exercisesSource, /Exercício extra: palavra embaralhada/)
-  assert.match(exercisesSource, /não altera XP\/progresso/)
-})
-
-test('WordScramblePractice receives session items without progress-changing callbacks', () => {
-  assert.match(exercisesSource, /<WordScramblePractice\s+items=\{sessionItems\}\s+lesson=\{lesson\}\s+session=\{session\}\s+currentIndex=\{currentIndex\}/)
-  assert.doesNotMatch(exercisesSource, /<WordScramblePractice[^>]*(answerExerciseSession|completeExerciseSession|startExerciseSession|setSession|setSummary)/s)
+test('Exercises page does not mount frontend-only local practice panels', () => {
+  assert.doesNotMatch(exercisesSource, /Exercício extra/i)
+  assert.doesNotMatch(exercisesSource, /treino não altera XP\/progresso/i)
+  assert.doesNotMatch(exercisesSource, /ChunkBuilderPractice|TypingRushPractice|WordScramblePractice|AudioABPractice|AudioBingoPractice|ArticleSorterPractice|ArticleBlitzPractice|ErrorSpotterPractice|ClozeRushPractice|OrthographyRepairPractice|DialogueReactionPractice|WordSearchPractice|LetterBlocksPractice/)
 })

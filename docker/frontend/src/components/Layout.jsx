@@ -5,6 +5,7 @@ import { Globe, Trophy, Users, User, Menu, X, Gamepad2, Layers, Volume2 } from '
 const navItems = [
   { path: '/', label: 'Dashboard', icon: Globe },
   { path: '/exercises', label: 'Exercícios', icon: Gamepad2 },
+  { path: '/exercises-qa', label: 'Exercícios QA', icon: Gamepad2 },
   { path: '/flashcards', label: 'Flashcards', icon: Layers },
   { path: '/achievements', label: 'Conquistas', icon: Trophy },
   { path: '/leaderboard', label: 'Ranking', icon: Users },
