@@ -23,6 +23,16 @@ test('QA session integrity strip keeps the 20-item real-session guard visible', 
   assert.doesNotMatch(qaSource, /Treino local|Questão extra|Exercício extra|frontend-only/i)
 })
 
+test('QA session integrity strip audits repeated answers from real backend session items', () => {
+  assert.match(qaSource, /const answerBuckets = \(session\.items \|\| \[\]\)\.reduce/)
+  assert.match(qaSource, /bucket\.itemIds\.push\(sessionItem\.id \|\| 'sem-id'\)/)
+  assert.match(qaSource, /const duplicateAnswerSummary = Object\.entries\(answerBuckets\)/)
+  assert.match(qaSource, /`\$\{answer\}: \$\{bucket\.count\}x \(\$\{bucket\.itemIds\.join\(', '\)\}\)`/)
+  assert.match(qaSource, /const hasDuplicateAnswerCluster = Object\.values\(answerBuckets\)\.some\(\(bucket\) => bucket\.count > 2\)/)
+  assert.match(qaSource, /QA REVISE: mesma resposta aparece mais de 2 vezes na sessão/)
+  assert.match(qaSource, /Respostas repetidas:/)
+})
+
 test('QA route suppresses lesson item fallback instead of rendering a non-session exercise', () => {
   assert.match(qaSource, /const currentSessionItem = session\?\.items\?\.\[currentIndex\]/)
   assert.match(qaSource, /const currentLessonFallbackItem = lesson\?\.items\?\.\[currentIndex\]/)

@@ -322,7 +322,7 @@ export default function Exercises() {
       <ExercisesQaChangeMenu entries={exercisesQaChangeLog} />
 
       <div className="rounded-2xl border border-emerald-400/30 bg-emerald-400/10 p-4 text-sm text-emerald-100">
-        <strong>QA separado de produção:</strong> esta rota valida layout e variedade em <code className="rounded bg-black/30 px-1">/exercises-qa</code>. O checklist de alterações QA está aprovado; qualquer promoção futura para <code className="rounded bg-black/30 px-1">/exercises</code> deve ser uma ação separada, sem levar menus ou banners de QA para produção.
+        <strong>QA separado de produção:</strong> esta rota valida layout e variedade em <code className="rounded bg-black/30 px-1">/exercises-qa</code>. O menu acima é o registro vivo de aprovações aguardando ação, quando existirem; qualquer promoção futura para <code className="rounded bg-black/30 px-1">/exercises</code> deve ser uma ação separada, sem levar menus ou banners de QA para produção.
       </div>
 
       {summary && (
@@ -563,6 +563,19 @@ function QaSessionIntegrityStrip({ session, item, feedback }) {
     return counts
   }, {})
   const varietySummary = Object.entries(typeCounts).map(([type, count]) => `${type}: ${count}`).join(' · ') || 'sem itens em session.items'
+  const answerBuckets = (session.items || []).reduce((counts, sessionItem) => {
+    const answerKey = readableAnswer(answerValue(sessionItem.answer)).trim().toLocaleLowerCase() || '—'
+    const bucket = counts[answerKey] || { count: 0, itemIds: [] }
+    bucket.count += 1
+    bucket.itemIds.push(sessionItem.id || 'sem-id')
+    counts[answerKey] = bucket
+    return counts
+  }, {})
+  const duplicateAnswerSummary = Object.entries(answerBuckets)
+    .filter(([, bucket]) => bucket.count > 1)
+    .map(([answer, bucket]) => `${answer}: ${bucket.count}x (${bucket.itemIds.join(', ')})`)
+    .join(' · ') || 'sem respostas repetidas na sessão'
+  const hasDuplicateAnswerCluster = Object.values(answerBuckets).some((bucket) => bucket.count > 2)
   const exceedsSessionLimit = session.total_count > 20
   const hasItemCountMismatch = sessionItemCount !== session.total_count
   const isAwaitingFinish = session.current_index >= session.total_count
@@ -580,6 +593,7 @@ function QaSessionIntegrityStrip({ session, item, feedback }) {
           {hasItemCountMismatch && <p className="mt-2 rounded-xl bg-red-500/20 px-3 py-2 font-bold text-red-100">QA BLOCKER: session.items não bate com total_count; validar payload backend antes de promover.</p>}
           {hasMissingActiveItem && <p className="mt-2 rounded-xl bg-red-500/20 px-3 py-2 font-bold text-red-100">QA BLOCKER: current_index sem item real em session.items; validar janela ativa antes de promover.</p>}
           {hasRenderedItemMismatch && <p className="mt-2 rounded-xl bg-red-500/20 px-3 py-2 font-bold text-red-100">QA BLOCKER: item renderizado não corresponde ao item real da sessão; remover fallback local antes de promover.</p>}
+          {hasDuplicateAnswerCluster && <p className="mt-2 rounded-xl bg-amber-400/15 px-3 py-2 font-bold text-amber-100">QA REVISE: mesma resposta aparece mais de 2 vezes na sessão; revisar variedade pedagógica antes de promover.</p>}
         </div>
         <div className="grid gap-2 text-xs sm:grid-cols-2 lg:min-w-[28rem]">
           <span className="rounded-xl bg-black/25 px-3 py-2"><strong>session.id:</strong> {session.id}</span>
@@ -593,6 +607,7 @@ function QaSessionIntegrityStrip({ session, item, feedback }) {
           <span className="rounded-xl bg-black/25 px-3 py-2"><strong>XP real:</strong> {session.xp_earned || 0}</span>
           <span className="rounded-xl bg-black/25 px-3 py-2 sm:col-span-2"><strong>Origem renderizada:</strong> {renderedItemSource}</span>
           <span className="rounded-xl bg-black/25 px-3 py-2 sm:col-span-2"><strong>Variedade:</strong> {varietySummary}</span>
+          <span className="rounded-xl bg-black/25 px-3 py-2 sm:col-span-2"><strong>Respostas repetidas:</strong> {duplicateAnswerSummary}</span>
         </div>
       </div>
     </div>

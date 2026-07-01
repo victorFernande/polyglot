@@ -13,6 +13,10 @@ const approvedPhrases = [
   'QA aprovado 30/06 22:02',
   'QA aprovado 30/06 23:02',
   'QA aprovado 01/07 10:02',
+  'QA aprovado 01/07 14:02',
+  'QA aprovado 01/07 16:01',
+  'QA aprovado 01/07 17:02',
+  'QA aprovado 01/07 18:02',
 ]
 
 test('all reviewed QA changelog entries are approved and retained for audit', () => {
@@ -107,9 +111,53 @@ test('rendered-item source audit fix entry is approved and retained for audit', 
   assert.match(entry.summary, /snapshot de feedback/)
 })
 
-test('latest pending QA change remains the unapproved 14:02 fallback suppression entry', () => {
-  assert.deepEqual(pendingExercisesQaChanges().map((entry) => entry.approvalPhrase), ['QA aprovado 01/07 14:02'])
-  assert.equal(latestExercisesQaChange()?.approvalPhrase, 'QA aprovado 01/07 14:02')
+test('all open QA changes are approved and no pending changelog item remains', () => {
+  assert.deepEqual(pendingExercisesQaChanges().map((entry) => entry.approvalPhrase), [])
+  assert.equal(latestExercisesQaChange(), null)
+})
+
+test('lesson item fallback suppression QA entry is approved with scoped evidence', () => {
+  const entry = exercisesQaChangeLog.find((change) => change.id === '2026-07-01-1402-qa-suppress-lesson-item-fallback')
+
+  assert.ok(entry, 'visible QA-only lesson fallback suppression must be recorded')
+  assert.equal(entry.approved, true)
+  assert.equal(entry.timestamp, '01/07 14:02')
+  assert.equal(entry.approvalPhrase, 'QA aprovado 01/07 14:02')
+  assert.match(entry.summary, /lesson\.items/)
+})
+
+test('live approvals banner QA entry is approved with scoped evidence', () => {
+  const entry = exercisesQaChangeLog.find((change) => change.id === '2026-07-01-1601-qa-separation-banner-live-approvals')
+
+  assert.ok(entry, 'visible QA-only live approvals banner must be recorded')
+  assert.equal(entry.approved, true)
+  assert.equal(entry.timestamp, '01/07 16:01')
+  assert.equal(entry.approvalPhrase, 'QA aprovado 01/07 16:01')
+  assert.match(entry.summary, /banner/)
+})
+
+test('repeated-answer QA audit is approved with scoped evidence', () => {
+  const entry = exercisesQaChangeLog.find((change) => change.id === '2026-07-01-1702-qa-repeated-answer-audit')
+
+  assert.ok(entry, 'visible QA-only repeated-answer audit must be recorded')
+  assert.equal(entry.approved, true)
+  assert.equal(entry.timestamp, '01/07 17:02')
+  assert.equal(entry.approvalPhrase, 'QA aprovado 01/07 17:02')
+  assert.match(entry.summary, /respostas repetidas/)
+  assert.ok(entry.diffs.some((diff) => /session\.items reais/.test(diff)))
+  assert.ok(entry.diffs.some((diff) => /produção \/exercises permanecem inalterados/.test(diff)))
+})
+
+test('repeated-answer item id QA audit is approved with scoped evidence', () => {
+  const entry = exercisesQaChangeLog.find((change) => change.id === '2026-07-01-1802-qa-repeated-answer-item-ids')
+
+  assert.ok(entry, 'visible QA-only repeated-answer item id audit must be recorded')
+  assert.equal(entry.approved, true)
+  assert.equal(entry.timestamp, '01/07 18:02')
+  assert.equal(entry.approvalPhrase, 'QA aprovado 01/07 18:02')
+  assert.match(entry.summary, /item\.id/)
+  assert.ok(entry.diffs.some((diff) => /session\.items reais/.test(diff)))
+  assert.ok(entry.diffs.some((diff) => /produção \/exercises permanecem inalterados/.test(diff)))
 })
 
 test('changelog copy avoids stale raw PENDING QA APPROVAL wording even for unapproved entries', () => {
