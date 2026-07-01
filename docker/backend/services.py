@@ -232,6 +232,16 @@ class ExerciseService:
     TARGET_ITEMS = 1000
     INCREMENTAL_ITEM_TARGETS = {"de": 1095, "fr": 1005, "ru": 1005, "jp": 1005, "en": 1005}
     JP_BEGINNER_KANA = {
+        "私の名前はビクトルです。": "わたしのなまえはビクトルです。",
+        "ブラジル出身です。": "ブラジルしゅっしんです。",
+        "サンパウロに住んでいます。": "サンパウロにすんでいます。",
+        "ポルトガル語を話します。": "ポルトガルごをはなします。",
+        "私は先生です。": "わたしはせんせいです。",
+        "日本語を勉強しています。": "にほんごをべんきょうしています。",
+        "お名前は何ですか。": "おなまえはなんですか。",
+        "どこの出身ですか。": "どこのしゅっしんですか。",
+        "音楽が好きです。": "おんがくがすきです。",
+        "よろしくお願いします。": "よろしくおねがいします。",
         "コーヒーをお願いします。": "コーヒーをおねがいします。",
         "水をお願いします。": "みずをおねがいします。",
         "パンをお願いします。": "パンをおねがいします。",
@@ -243,6 +253,23 @@ class ExerciseService:
         "会": "かい",
         "計": "けい",
         "合": "あ",
+        "私": "わたし",
+        "名": "な",
+        "前": "まえ",
+        "出": "しゅつ",
+        "身": "しん",
+        "住": "す",
+        "語": "ご",
+        "話": "はな",
+        "先": "せん",
+        "生": "せい",
+        "日": "に",
+        "勉": "べん",
+        "強": "きょう",
+        "何": "なん",
+        "音": "おん",
+        "楽": "がく",
+        "好": "す",
         "言": "こと",
         "葉": "ば",
         "聞": "き",
@@ -264,6 +291,19 @@ class ExerciseService:
         "十": "じゅう",
     }
     JP_BEGINNER_DISTRACTOR_CHUNKS = ["はい", "いいえ", "どうぞ", "です", "か", "を", "は", "。", "ありがとう", "ください"]
+    JP_BEGINNER_ROMAJI_DISTRACTOR_CHUNKS = ["hai", "iie", "douzo", "desu", "ka", "o", "wa", "arigatou", "kudasai"]
+    JP_BEGINNER_ROMAJI = {
+        "こんにちは": "konnichiwa",
+        "コーヒーをおねがいします。": "koohii o onegaishimasu",
+        "みずをおねがいします。": "mizu o onegaishimasu",
+        "パンをおねがいします。": "pan o onegaishimasu",
+        "おねがいします。": "onegaishimasu",
+        "ありがとうございます。": "arigatou gozaimasu",
+        "いくらですか。": "ikura desu ka",
+        "おかいけいをおねがいします。": "okaikei o onegaishimasu",
+        "はい、あっています。": "hai, atte imasu",
+        "さようなら。": "sayounara",
+    }
     JP_BEGINNER_CHUNKS = {
         "こんにちは": ["こ", "ん", "に", "ち", "は"],
         "コーヒーをおねがいします。": ["コーヒー", "を", "おねがいします", "。"],
@@ -275,6 +315,28 @@ class ExerciseService:
         "おかいけいをおねがいします。": ["おかいけい", "を", "おねがいします", "。"],
         "はい、あっています。": ["はい", "、", "あっています", "。"],
         "さようなら。": ["さようなら", "。"],
+        "わたしのなまえはビクトルです。": ["わたし", "の", "なまえ", "は", "ビクトル", "です", "。"],
+        "ブラジルしゅっしんです。": ["ブラジル", "しゅっしん", "です", "。"],
+        "サンパウロにすんでいます。": ["サンパウロ", "に", "すんで", "います", "。"],
+        "ポルトガルごをはなします。": ["ポルトガルご", "を", "はなします", "。"],
+        "わたしはせんせいです。": ["わたし", "は", "せんせい", "です", "。"],
+        "にほんごをべんきょうしています。": ["にほんご", "を", "べんきょう", "しています", "。"],
+        "おなまえはなんですか。": ["おなまえ", "は", "なん", "です", "か", "。"],
+        "どこのしゅっしんですか。": ["どこ", "の", "しゅっしん", "です", "か", "。"],
+        "おんがくがすきです。": ["おんがく", "が", "すき", "です", "。"],
+        "よろしくおねがいします。": ["よろしく", "おねがいします", "。"],
+    }
+    JP_BEGINNER_ROMAJI_CHUNKS = {
+        "konnichiwa": ["kon", "nichi", "wa"],
+        "koohii o onegaishimasu": ["koohii", "o", "onegaishimasu"],
+        "mizu o onegaishimasu": ["mizu", "o", "onegaishimasu"],
+        "pan o onegaishimasu": ["pan", "o", "onegaishimasu"],
+        "onegaishimasu": ["onegai", "shimasu"],
+        "arigatou gozaimasu": ["arigatou", "gozaimasu"],
+        "ikura desu ka": ["ikura", "desu", "ka"],
+        "okaikei o onegaishimasu": ["okaikei", "o", "onegaishimasu"],
+        "hai, atte imasu": ["hai", "atte", "imasu"],
+        "sayounara": ["sayou", "nara"],
     }
 
     @staticmethod
@@ -488,40 +550,53 @@ class ExerciseService:
         return phrases[start]
 
     @staticmethod
-    def _japanese_beginner_text(value: str):
+    def _japanese_beginner_text(value: str, script: str = "kana"):
         text = str(value)
         for original, kana in sorted(ExerciseService.JP_BEGINNER_KANA.items(), key=lambda item: len(item[0]), reverse=True):
             text = text.replace(original, kana)
+        if script == "romaji":
+            for kana, romaji in sorted(ExerciseService.JP_BEGINNER_ROMAJI.items(), key=lambda item: len(item[0]), reverse=True):
+                text = text.replace(kana, romaji)
         return text
 
     @staticmethod
-    def _japanese_beginner_value(value):
+    def _japanese_beginner_value(value, script: str = "kana"):
         if isinstance(value, str):
-            return ExerciseService._japanese_beginner_text(value)
+            return ExerciseService._japanese_beginner_text(value, script)
         if isinstance(value, list):
-            return [ExerciseService._japanese_beginner_value(item) for item in value]
+            return [ExerciseService._japanese_beginner_value(item, script) for item in value]
         if isinstance(value, dict):
-            return {key: ExerciseService._japanese_beginner_value(item) for key, item in value.items()}
+            return {key: ExerciseService._japanese_beginner_value(item, script) for key, item in value.items()}
         return value
 
     @staticmethod
-    def _japanese_beginner_tokens(tokens):
+    def _japanese_beginner_tokens(tokens, script: str = "kana"):
         joined = "".join(str(token) for token in tokens)
-        kana = ExerciseService._japanese_beginner_text(joined)
+        kana = ExerciseService._japanese_beginner_text(joined, "kana")
+        if script == "romaji":
+            romaji = ExerciseService._japanese_beginner_text(kana, "romaji")
+            if romaji in ExerciseService.JP_BEGINNER_ROMAJI_CHUNKS:
+                return ExerciseService.JP_BEGINNER_ROMAJI_CHUNKS[romaji]
+            return romaji.replace(",", "").split()
         if kana in ExerciseService.JP_BEGINNER_CHUNKS:
             return ExerciseService.JP_BEGINNER_CHUNKS[kana]
         return [chunk for chunk in ExerciseService._build_tokens("jp", kana) if chunk]
 
     @staticmethod
-    def _scaffold_japanese_beginner_item(item: dict):
+    def _scaffold_japanese_beginner_item(item: dict, script: str = "kana"):
         original_answer = item.get("answer") or {}
-        scaffolded = ExerciseService._japanese_beginner_value(item)
+        scaffolded = ExerciseService._japanese_beginner_value(item, script)
         if item.get("type") in {"build", "listen_build"} and isinstance(original_answer.get("value"), list):
-            answer_tokens = ExerciseService._japanese_beginner_tokens(original_answer["value"])
+            answer_tokens = ExerciseService._japanese_beginner_tokens(original_answer["value"], script)
+            distractors = ExerciseService.JP_BEGINNER_ROMAJI_DISTRACTOR_CHUNKS if script == "romaji" else ExerciseService.JP_BEGINNER_DISTRACTOR_CHUNKS
             scaffolded["answer"]["value"] = answer_tokens
-            scaffolded["tiles"] = list(dict.fromkeys(ExerciseService.JP_BEGINNER_DISTRACTOR_CHUNKS + answer_tokens))
-            scaffolded["explanation"] = f"A frase correta em kana é: “{' '.join(answer_tokens)}”. Kanji será introduzido depois."
-        scaffolded["hint"] = f"{scaffolded.get('hint', '')} Primeiro leia em kana; o kanji entra só depois que o básico estiver firme."
+            scaffolded["tiles"] = list(dict.fromkeys(distractors + answer_tokens))
+            label = "romaji" if script == "romaji" else "kana"
+            scaffolded["explanation"] = f"A frase correta em {label} é: “{' '.join(answer_tokens)}”. Kana e kanji serão introduzidos depois."
+        if script == "romaji":
+            scaffolded["hint"] = f"{scaffolded.get('hint', '')} Comece pela leitura em letras latinas (romaji). Depois vamos ligar cada som aos símbolos japoneses."
+        else:
+            scaffolded["hint"] = f"{scaffolded.get('hint', '')} Primeiro leia em kana; o kanji entra só depois que o básico estiver firme."
         return scaffolded
 
     @staticmethod
@@ -1714,7 +1789,9 @@ class ExerciseService:
                     else:
                         item["explanation"] = f"{unit['title']}: “{item['answer']['value']}” comunica a ideia pedida em {name}."
                     if code == "jp" and idx <= 100:
-                        item = ExerciseService._scaffold_japanese_beginner_item(item)
+                        item = ExerciseService._scaffold_japanese_beginner_item(item, "romaji")
+                    elif code == "jp" and idx <= 200:
+                        item = ExerciseService._scaffold_japanese_beginner_item(item, "kana")
                     items.append(item)
         target_count = ExerciseService.target_items_for_language(code)
         if target_count > ExerciseService.TARGET_ITEMS:

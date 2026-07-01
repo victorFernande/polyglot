@@ -25,20 +25,24 @@ KANJI_RE = re.compile(r"[\u4e00-\u9fff]")
 KANA_RE = re.compile(r"[\u3040-\u30ff]")
 
 
-def test_japanese_first_unit_teaches_kana_before_kanji():
+def test_japanese_progression_starts_with_romaji_then_kana_then_kanji():
     japanese_items = ExerciseService.generate_items("jp")
-    beginner_window = japanese_items[:100]
-    later_window = japanese_items[100:200]
+    romaji_window = japanese_items[:100]
+    kana_window = japanese_items[100:200]
+    kanji_window = japanese_items[200:300]
 
-    rendered_beginner = json.dumps(beginner_window, ensure_ascii=False)
-    rendered_later = json.dumps(later_window, ensure_ascii=False)
+    rendered_romaji = json.dumps(romaji_window, ensure_ascii=False)
+    rendered_kana = json.dumps(kana_window, ensure_ascii=False)
+    rendered_kanji = json.dumps(kanji_window, ensure_ascii=False)
 
-    assert beginner_window
-    assert not KANJI_RE.search(rendered_beginner)
-    assert KANA_RE.search(rendered_beginner)
-    assert "みずをおねがいします。" in rendered_beginner
-    assert "おかいけいをおねがいします。" in rendered_beginner
-    assert KANJI_RE.search(rendered_later)
+    assert romaji_window
+    assert not KANJI_RE.search(rendered_romaji)
+    assert not KANA_RE.search(rendered_romaji)
+    assert "mizu o onegaishimasu" in rendered_romaji
+    assert "okaikei o onegaishimasu" in rendered_romaji
+    assert KANA_RE.search(rendered_kana)
+    assert not KANJI_RE.search(rendered_kana)
+    assert KANJI_RE.search(rendered_kanji)
 
 
 def test_seed_lessons_is_long_varied_and_idempotent():
