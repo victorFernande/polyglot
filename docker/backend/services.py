@@ -230,7 +230,7 @@ class ExerciseService:
     }
     SESSION_SIZE = 20
     TARGET_ITEMS = 1000
-    INCREMENTAL_ITEM_TARGETS = {"de": 1100, "fr": 1010, "ru": 1010, "jp": 1010, "en": 1010}
+    INCREMENTAL_ITEM_TARGETS = {"de": 1105, "fr": 1015, "ru": 1015, "jp": 1015, "en": 1015}
     JP_BEGINNER_KANA = {
         "私の名前はビクトルです。": "わたしのなまえはビクトルです。",
         "ブラジル出身です。": "ブラジルしゅっしんです。",
@@ -1673,6 +1673,63 @@ class ExerciseService:
             if item["type"] in {"build", "listen_build"}:
                 item["explanation"] = f"A frase correta é: “{' '.join(item['answer']['value'])}”."
             elif item["type"] not in {"image_choice", "listen_match", "sequence_dialogue"}:
+                item["explanation"] = f"{unit['title']}: “{item['answer']['value']}” comunica a ideia pedida em {name}."
+
+        unit = A1_UNITS[6]
+        session_56_start = len(items)
+        phrases = unit["phrases"][code]
+        prefix = "Sessão 56 — Revisão incremental · Trabalho em contexto"
+        options = [foreign for _pt, foreign in phrases]
+
+        pt, target = phrases[0]
+        items.append(ExerciseService._choice(
+            f"{prefix}: escolha como dizer “{pt}” em {name}",
+            target,
+            [foreign for foreign in options[1:4]],
+            start_index + len(items),
+        ))
+
+        pt, target = phrases[1]
+        items.append(ExerciseService._listen_choice(
+            f"{prefix}: ouça o áudio e identifique a fala que comunica “{pt}”",
+            target,
+            [foreign for foreign in options[2:5]],
+            start_index + len(items),
+        ))
+
+        image_sample = phrases[2:6]
+        answer_pt, answer_foreign = image_sample[0]
+        items.append(ExerciseService._image_choice(
+            f"{prefix}: observe a imagem e escolha a frase que representa “{answer_pt}”",
+            (answer_pt, answer_foreign, ExerciseService._icon_key_for_phrase(answer_pt, answer_foreign, unit["topics"][2])),
+            [(pt, foreign, ExerciseService._icon_key_for_phrase(pt, foreign, unit["topics"][2])) for pt, foreign in image_sample[1:]],
+            start_index + len(items),
+        ))
+
+        pt, target = phrases[3]
+        words = ExerciseService._build_tokens(code, target)
+        extras = [word for foreign in options[:8] for word in ExerciseService._build_tokens(code, foreign)]
+        items.append(ExerciseService._build(
+            f"{prefix}: monte a frase em ordem natural para dizer “{pt}”",
+            words,
+            extras,
+            start_index + len(items),
+        ))
+
+        pt, target = phrases[4]
+        items.append(ExerciseService._context_choice(
+            f"{prefix}: situação guiada — fale de uma tarefa de trabalho no presente. Escolha a fala que comunica “{pt}” em {name}.",
+            target,
+            [foreign for foreign in options[5:8]],
+            start_index + len(items),
+        ))
+
+        hint = f"Mini-aula: {unit['goal']} Esta revisão inicia um novo bloco com 5 questões reais, sem ultrapassar 20 questões por sessão."
+        for item in items[session_56_start:]:
+            item["hint"] = hint
+            if item["type"] == "build":
+                item["explanation"] = f"A frase correta é: “{' '.join(item['answer']['value'])}”."
+            elif item["type"] != "image_choice":
                 item["explanation"] = f"{unit['title']}: “{item['answer']['value']}” comunica a ideia pedida em {name}."
         return items[:count]
 
