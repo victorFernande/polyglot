@@ -546,7 +546,8 @@ function QaSessionIntegrityStrip({ session, item }) {
   const varietySummary = Object.entries(typeCounts).map(([type, count]) => `${type}: ${count}`).join(' · ') || 'sem itens em session.items'
   const exceedsSessionLimit = session.total_count > 20
   const hasItemCountMismatch = sessionItemCount !== session.total_count
-  const hasMissingActiveItem = session.current_index >= sessionItemCount
+  const isAwaitingFinish = session.current_index >= session.total_count
+  const hasMissingActiveItem = !isAwaitingFinish && session.current_index >= sessionItemCount
   const hasIntegrityBlocker = exceedsSessionLimit || hasItemCountMismatch || hasMissingActiveItem
 
   return (
@@ -566,6 +567,7 @@ function QaSessionIntegrityStrip({ session, item }) {
           <span className="rounded-xl bg-black/25 px-3 py-2"><strong>total_count:</strong> {session.total_count}</span>
           <span className="rounded-xl bg-black/25 px-3 py-2"><strong>items reais:</strong> {sessionItemCount}</span>
           <span className="rounded-xl bg-black/25 px-3 py-2"><strong>current_index:</strong> {session.current_index}</span>
+          <span className="rounded-xl bg-black/25 px-3 py-2"><strong>janela ativa:</strong> {isAwaitingFinish ? 'fim aguardando conclusão' : 'item em progresso'}</span>
           <span className="rounded-xl bg-black/25 px-3 py-2"><strong>XP real:</strong> {session.xp_earned || 0}</span>
           <span className="rounded-xl bg-black/25 px-3 py-2 sm:col-span-2"><strong>Variedade:</strong> {varietySummary}</span>
         </div>
