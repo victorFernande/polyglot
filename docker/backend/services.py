@@ -230,7 +230,7 @@ class ExerciseService:
     }
     SESSION_SIZE = 20
     TARGET_ITEMS = 1000
-    INCREMENTAL_ITEM_TARGETS = {"de": 1020}
+    INCREMENTAL_ITEM_TARGETS = {"de": 1030}
 
     @staticmethod
     def target_items_for_language(code: str):
@@ -649,6 +649,114 @@ class ExerciseService:
             elif item["type"] == "listen_match":
                 item["hint"] = f"{hint} Toque em cada áudio no idioma estudado e selecione a tradução correspondente em português."
                 item["explanation"] = f"Cada áudio em {name} deve ser ligado à tradução em português dentro da revisão de preferências."
+            elif item["type"] == "sequence_dialogue":
+                item["hint"] = f"{hint} Siga a ordem indicada no enunciado e organize apenas as frases no idioma estudado."
+            else:
+                item["hint"] = hint
+            if item["type"] in {"build", "listen_build"}:
+                item["explanation"] = f"A frase correta é: “{' '.join(item['answer']['value'])}”."
+            elif item["type"] not in {"image_choice", "listen_match", "sequence_dialogue"}:
+                item["explanation"] = f"{unit['title']}: “{item['answer']['value']}” comunica a ideia pedida em {name}."
+
+        unit = A1_UNITS[2]
+        session_52_start = len(items)
+        phrases = unit["phrases"][code]
+        prefix = "Sessão 52 — Revisão incremental · Viagem em contexto"
+        options = [foreign for _pt, foreign in phrases]
+        portuguese_options = [pt for pt, _foreign in phrases]
+
+        pt, target = phrases[0]
+        display_pt = "Eu viajo para Berlim." if code == "de" else pt
+        items.append(ExerciseService._choice(
+            f"{prefix}: escolha como dizer “{display_pt}” em {name}",
+            target,
+            [foreign for foreign in options[1:4]],
+            start_index + len(items),
+        ))
+
+        pt, target = phrases[1]
+        items.append(ExerciseService._listen_choice(
+            f"{prefix}: ouça o áudio e identifique a fala que comunica “{pt}”",
+            target,
+            [foreign for foreign in options[2:5]],
+            start_index + len(items),
+        ))
+
+        image_sample = phrases[2:6]
+        answer_pt, answer_foreign = image_sample[0]
+        items.append(ExerciseService._image_choice(
+            f"{prefix}: observe a imagem e escolha a frase que representa “{answer_pt}”",
+            (answer_pt, answer_foreign, ExerciseService._icon_key_for_phrase(answer_pt, answer_foreign, unit["topics"][2])),
+            [(pt, foreign, ExerciseService._icon_key_for_phrase(pt, foreign, unit["topics"][2])) for pt, foreign in image_sample[1:]],
+            start_index + len(items),
+        ))
+
+        pt, target = phrases[3]
+        words = ExerciseService._build_tokens(code, target)
+        extras = [word for foreign in options[:8] for word in ExerciseService._build_tokens(code, foreign)]
+        items.append(ExerciseService._build(
+            f"{prefix}: monte a frase em ordem natural para dizer “{pt}”",
+            words,
+            extras,
+            start_index + len(items),
+        ))
+
+        pt, target = phrases[4]
+        items.append(ExerciseService._context_choice(
+            f"{prefix}: situação guiada — você precisa se orientar na viagem. Escolha a fala que comunica “{pt}” em {name}.",
+            target,
+            [foreign for foreign in options[5:8]],
+            start_index + len(items),
+        ))
+
+        listen_pairs = [[foreign, portuguese] for portuguese, foreign in phrases[5:9]]
+        items.append(ExerciseService._listen_match(
+            f"{prefix}: ouça cada áudio em {name} e selecione a tradução em português",
+            listen_pairs,
+            start_index + len(items),
+        ))
+
+        pt, target = phrases[7]
+        wrong_portuguese = [option for option in portuguese_options[0:4] if option != pt][:3]
+        items.append(ExerciseService._choice(
+            f"{prefix}: entenda “{target}” — qual é o significado em português?",
+            pt,
+            wrong_portuguese,
+            start_index + len(items),
+        ))
+
+        pt, target = phrases[8]
+        words = ExerciseService._build_tokens(code, target)
+        extras = [word for foreign in options[2:10] for word in ExerciseService._build_tokens(code, foreign)]
+        items.append(ExerciseService._listen_build(
+            f"{prefix}: ouça e monte em ordem natural — “{pt}”",
+            words,
+            extras,
+            start_index + len(items),
+        ))
+
+        sequence_pairs = [phrases[1], phrases[3], phrases[8], phrases[9]]
+        items.append(ExerciseService._sequence_dialogue(
+            f"{prefix}: prática guiada de ordem — organize os cartões exatamente assim: primeiro passagem; depois estação; em seguida ajuda; por fim chegada",
+            [foreign for _portuguese, foreign in sequence_pairs],
+            start_index + len(items),
+        ))
+
+        pt, target = phrases[9]
+        items.append(ExerciseService._context_choice(
+            f"{prefix}: situação guiada — avise sobre a chegada. Escolha a fala que comunica “{pt}” em {name}.",
+            target,
+            [foreign for foreign in options[0:3]],
+            start_index + len(items),
+        ))
+
+        hint = f"Mini-aula: {unit['goal']} Esta revisão acrescenta prática real sem ultrapassar 20 questões no bloco atual."
+        for item in items[session_52_start:]:
+            if item["type"] == "listen_build":
+                item["hint"] = f"{hint} Ouça a frase, repita em voz alta e monte as palavras na ordem correta."
+            elif item["type"] == "listen_match":
+                item["hint"] = f"{hint} Toque em cada áudio no idioma estudado e selecione a tradução correspondente em português."
+                item["explanation"] = f"Cada áudio em {name} deve ser ligado à tradução em português dentro da revisão de viagem."
             elif item["type"] == "sequence_dialogue":
                 item["hint"] = f"{hint} Siga a ordem indicada no enunciado e organize apenas as frases no idioma estudado."
             else:
