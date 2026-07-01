@@ -4,7 +4,30 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "shared/tools"))
 
-from polyglot_agent_review import review_item  # noqa: E402
+import polyglot_agent_review  # noqa: E402
+from polyglot_agent_review import context_for_index, review_item  # noqa: E402
+
+
+def test_model_review_calls_9router_endpoint_and_prefixed_model(monkeypatch):
+    captured = {}
+
+    def fake_urlopen(request, timeout):
+        captured["url"] = request.full_url
+        captured["body"] = request.data.decode("utf-8")
+
+        class Response:
+            def read(self):
+                return b'{"choices":[{"message":{"content":"PASS"}}]}'
+
+        return Response()
+
+    monkeypatch.setattr(polyglot_agent_review.urllib.request, "urlopen", fake_urlopen)
+
+    result = polyglot_agent_review.call_9router_review("9router/cx/gpt-5.5", [], {}, {})
+
+    assert result["status"] == "ok"
+    assert captured["url"] == "http://127.0.0.1:20128/v1/chat/completions"
+    assert '"model": "9router/cx/gpt-5.5"' in captured["body"]
 
 
 def test_polyglot_qa_blocks_sequence_dialogue_without_explicit_order():
@@ -72,6 +95,15 @@ def test_polyglot_qa_blocks_topic_label_prompt_with_full_sentence_answer():
 
     assert result["verdict"] == "BLOCK"
     assert any(issue["code"] == "topic_label_sentence_mismatch" for issue in result["issues"])
+
+
+def test_polyglot_qa_context_handles_incremental_items_after_base_track():
+    context = context_for_index(1009)
+
+    assert context["unit_number"] == 10
+    assert context["unit_title"] == "Exponha preferências"
+    assert context["session_number"] == 51
+    assert context["question_in_session"] == 10
 
 
 def test_polyglot_qa_blocks_match_translation_pairs_that_are_only_topic_labels():

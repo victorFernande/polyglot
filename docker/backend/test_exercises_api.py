@@ -36,7 +36,13 @@ def test_bootstrap_lists_lessons_and_persists_full_session_flow():
         lessons = lessons_response.json()
         assert len(lessons) == 5
         assert {lesson["language"] for lesson in lessons} == {"de", "fr", "ru", "jp", "en"}
-        assert all(lesson["items_count"] == 1000 for lesson in lessons)
+        assert {lesson["language_code"]: lesson["items_count"] for lesson in lessons} == {
+            "de": ExerciseService.target_items_for_language("de"),
+            "fr": ExerciseService.target_items_for_language("fr"),
+            "ru": ExerciseService.target_items_for_language("ru"),
+            "jp": ExerciseService.target_items_for_language("jp"),
+            "en": ExerciseService.target_items_for_language("en"),
+        }
 
         lesson_id = lessons[0]["id"]
         session_response = client.post(f"/exercise-lessons/{lesson_id}/sessions", params={"user_id": 1})
@@ -342,10 +348,11 @@ def test_dashboard_reports_active_language_progress_across_1000_exercises():
         )
 
         assert german_progress["completed_exercises"] == 250
-        assert german_progress["total_exercises"] == 1000
-        assert german_progress["progress_percent"] == 25
+        expected_percent = round(250 / ExerciseService.target_items_for_language("de") * 100, 2)
+        assert german_progress["total_exercises"] == ExerciseService.target_items_for_language("de")
+        assert german_progress["progress_percent"] == expected_percent
         assert dashboard["active_language_progress"]["language_code"] == "de"
-        assert dashboard["active_language_progress"]["progress_percent"] == 25
+        assert dashboard["active_language_progress"]["progress_percent"] == expected_percent
         assert round(dashboard["active_wave"]["hours_input"], 2) == round(250 / 60, 2)
 
 def test_recent_activity_uses_learning_path_session_number_not_database_id():

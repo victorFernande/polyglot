@@ -81,8 +81,13 @@ def canonical_answer_leaks_in_prompt(answer, prompt: str) -> bool:
 
 
 def context_for_index(idx_zero: int) -> dict[str, int | str]:
-    unit_number = idx_zero // 100 + 1
-    within_unit = idx_zero % 100
+    base_count = len(A1_UNITS) * 100
+    if idx_zero >= base_count:
+        base_idx = (len(A1_UNITS) - 1) * 100 + ((idx_zero - base_count) % 10) + 90
+    else:
+        base_idx = idx_zero
+    unit_number = base_idx // 100 + 1
+    within_unit = base_idx % 100
     topic_number = within_unit // 10 + 1
     question_in_session = idx_zero % 10 + 1
     unit = A1_UNITS[unit_number - 1]
@@ -92,7 +97,7 @@ def context_for_index(idx_zero: int) -> dict[str, int | str]:
         "unit_title": unit["title"],
         "topic_number": topic_number,
         "topic": topic,
-        "session_number": idx_zero // 10 + 1,
+        "session_number": idx_zero // 20 + 1,
         "question_in_session": question_in_session,
     }
 
@@ -248,7 +253,7 @@ def call_9router_review(model: str, rows: list[dict], counts: Counter, issues: C
         "stream": False,
     }
     request = urllib.request.Request(
-        "http://127.0.0.1:11434/v1/chat/completions",
+        "http://127.0.0.1:20128/v1/chat/completions",
         data=json.dumps(payload).encode("utf-8"),
         headers={"Content-Type": "application/json"},
         method="POST",
@@ -282,8 +287,8 @@ def call_9router_review(model: str, rows: list[dict], counts: Counter, issues: C
 
 def run_model_reviews(rows: list[dict], counts: Counter, issues: Counter) -> list[dict]:
     return [
-        call_9router_review("cx/gpt-5.5", rows, counts, issues),
-        call_9router_review("kimi/kimi-k2.6", rows, counts, issues),
+        call_9router_review("9router/cx/gpt-5.5", rows, counts, issues),
+        call_9router_review("9router/kimi/kimi-k2.6", rows, counts, issues),
     ]
 
 

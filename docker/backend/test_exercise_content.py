@@ -34,7 +34,7 @@ def test_seed_lessons_is_long_varied_and_idempotent():
 
         for lesson in lessons:
             items = db.query(ExerciseItem).filter(ExerciseItem.lesson_id == lesson.id).all()
-            assert len(items) == ExerciseService.TARGET_ITEMS
+            assert len(items) == ExerciseService.target_items_for_language(lesson.language_code)
             assert {item.type for item in items} >= {"choice", "listen_choice", "image_choice", "build", "context_choice", "match", "listen_match", "listen_build", "sequence_dialogue"}
             assert all(item.hint for item in items)
             assert all(item.explanation for item in items)
@@ -83,7 +83,10 @@ def test_seed_lessons_is_long_varied_and_idempotent():
                         assert "áudio" in item.hint.casefold()
 
         assert db.query(ExerciseLesson).count() == len(LANGUAGES)
-        assert db.query(ExerciseItem).count() == len(LANGUAGES) * ExerciseService.TARGET_ITEMS
+        assert db.query(ExerciseItem).count() == sum(
+            ExerciseService.target_items_for_language(language)
+            for language in LANGUAGES
+        )
     finally:
         db.close()
 
@@ -118,6 +121,86 @@ def test_seed_lessons_deactivates_legacy_prototype_lessons():
         }
         db.refresh(legacy)
         assert legacy.active is False
+    finally:
+        db.close()
+
+
+def test_incremental_cron_target_extends_only_active_german_by_ten_items():
+    assert ExerciseService.SESSION_SIZE == 20
+    assert ExerciseService.TARGET_ITEMS == 1000
+    assert ExerciseService.target_items_for_language("de") == 1010
+    assert {language: ExerciseService.target_items_for_language(language) for language in LANGUAGES - {"de"}} == {
+        "fr": 1000,
+        "ru": 1000,
+        "jp": 1000,
+        "en": 1000,
+    }
+
+    german_items = ExerciseService.generate_items("de")
+    last_block_size = len(german_items) % ExerciseService.SESSION_SIZE
+
+    assert len(german_items) == 1010
+    assert last_block_size == 10
+    assert [item["type"] for item in german_items[-10:]] == [
+        "choice",
+        "listen_choice",
+        "image_choice",
+        "build",
+        "context_choice",
+        "listen_match",
+        "choice",
+        "listen_build",
+        "sequence_dialogue",
+        "context_choice",
+    ]
+
+
+def test_seed_lessons_appends_incremental_items_without_replacing_existing_ids():
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
+    db = SessionLocal()
+    try:
+        lesson = ExerciseLesson(
+            language_code="de",
+            language_name="Alemão",
+            slug="de-trilha-a1-situacional-1000",
+            title="Trilha A1 Situacional 1000 — Alemão",
+            description="fixture with previous hourly state",
+            order_index=1,
+            active=True,
+        )
+        db.add(lesson)
+        db.flush()
+        for idx, item in enumerate(ExerciseService.generate_items("de")[:1000], 1):
+            db.add(ExerciseItem(
+                lesson_id=lesson.id,
+                order_index=idx,
+                type=item["type"],
+                prompt=item["prompt"],
+                answer=item["answer"],
+                options=item["options"],
+                tiles=item["tiles"],
+                pairs=item["pairs"],
+                hint=item["hint"],
+                explanation=item["explanation"],
+                xp_reward=item["xp_reward"],
+            ))
+        db.commit()
+        preserved_ids = [
+            item.id
+            for item in db.query(ExerciseItem)
+            .filter(ExerciseItem.lesson_id == lesson.id)
+            .order_by(ExerciseItem.order_index)
+            .limit(5)
+        ]
+
+        ExerciseService.seed_lessons(db)
+
+        items = db.query(ExerciseItem).filter(ExerciseItem.lesson_id == lesson.id).order_by(ExerciseItem.order_index).all()
+        assert len(items) == 1010
+        assert [item.id for item in items[:5]] == preserved_ids
+        assert [item.order_index for item in items[-10:]] == list(range(1001, 1011))
+        assert len(items) % ExerciseService.SESSION_SIZE == 10
     finally:
         db.close()
 
@@ -441,5 +524,5 @@ def test_full_german_track_has_broad_answer_bank_not_ten_phrases_per_unit():
     items = ExerciseService.generate_items("de")
     unique_answers = {_answer_signature(item) for item in items}
 
-    assert len(items) == 1000
+    assert len(items) == ExerciseService.target_items_for_language("de")
     assert len(unique_answers) >= 220
