@@ -129,7 +129,7 @@ def test_seed_lessons_deactivates_legacy_prototype_lessons():
 def test_incremental_cron_target_closes_active_german_session_54_with_twenty_contact_items():
     assert ExerciseService.SESSION_SIZE == 20
     assert ExerciseService.TARGET_ITEMS == 1000
-    assert ExerciseService.target_items_for_language("de") == 1080
+    assert ExerciseService.target_items_for_language("de") == 1090
     assert {language: ExerciseService.target_items_for_language(language) for language in LANGUAGES - {"de"}} == {
         "fr": 1000,
         "ru": 1000,
@@ -142,8 +142,8 @@ def test_incremental_cron_target_closes_active_german_session_54_with_twenty_con
     session_54 = german_items[1060:1080]
     session_54_second_half = german_items[1070:1080]
 
-    assert len(german_items) == 1080
-    assert last_block_size == 0
+    assert len(german_items) >= 1080
+    assert len(german_items[:1080]) % ExerciseService.SESSION_SIZE == 0
     assert len(session_54) == ExerciseService.SESSION_SIZE
     assert len(session_54_second_half) == 10
     assert [item["type"] for item in session_54_second_half] == [
@@ -174,6 +174,55 @@ def test_incremental_cron_target_closes_active_german_session_54_with_twenty_con
         "Ich buchstabiere meinen Namen.",
         "Ich schreibe eine Nachricht.",
         "Hier ist mein Kontakt.",
+    ]
+
+
+def test_incremental_cron_target_opens_active_german_session_55_with_ten_family_items():
+    assert ExerciseService.SESSION_SIZE == 20
+    assert ExerciseService.TARGET_ITEMS == 1000
+    assert ExerciseService.target_items_for_language("de") == 1090
+    assert {language: ExerciseService.target_items_for_language(language) for language in LANGUAGES - {"de"}} == {
+        "fr": 1000,
+        "ru": 1000,
+        "jp": 1000,
+        "en": 1000,
+    }
+
+    german_items = ExerciseService.generate_items("de")
+    last_block_size = len(german_items) % ExerciseService.SESSION_SIZE
+    session_55_first_half = german_items[1080:1090]
+
+    assert len(german_items) == 1090
+    assert last_block_size == 10
+    assert len(session_55_first_half) == 10
+    assert [item["type"] for item in session_55_first_half] == [
+        "choice",
+        "listen_choice",
+        "image_choice",
+        "build",
+        "context_choice",
+        "listen_match",
+        "choice",
+        "listen_build",
+        "sequence_dialogue",
+        "context_choice",
+    ]
+    assert all("Sessão 55" in item["prompt"] for item in session_55_first_half)
+    assert any("Das ist meine Mutter." in repr(item) for item in session_55_first_half)
+    assert any("Ich habe einen Bruder." in repr(item) for item in session_55_first_half)
+    assert any("Meine Familie ist groß." in repr(item) for item in session_55_first_half)
+    assert all("a palavra" not in item["prompt"].casefold() for item in session_55_first_half)
+    assert all("das Wort" not in repr(item) for item in session_55_first_half)
+    sequence = session_55_first_half[-2]
+    assert sequence["type"] == "sequence_dialogue"
+    assert sequence["options"] is None
+    assert sequence["pairs"] is None
+    assert "português" not in "\n".join(sequence["tiles"]).casefold()
+    assert sequence["answer"]["value"] == [
+        "Das ist meine Mutter.",
+        "Das ist mein Vater.",
+        "Ich habe einen Bruder.",
+        "Ich habe eine Schwester.",
     ]
 
 
@@ -372,10 +421,10 @@ def test_seed_lessons_appends_incremental_items_without_replacing_existing_ids()
         ExerciseService.seed_lessons(db)
 
         items = db.query(ExerciseItem).filter(ExerciseItem.lesson_id == lesson.id).order_by(ExerciseItem.order_index).all()
-        assert len(items) == 1080
+        assert len(items) == 1090
         assert [item.id for item in items[:5]] == preserved_ids
-        assert [item.order_index for item in items[-10:]] == list(range(1071, 1081))
-        assert len(items) % ExerciseService.SESSION_SIZE == 0
+        assert [item.order_index for item in items[-10:]] == list(range(1081, 1091))
+        assert len(items) % ExerciseService.SESSION_SIZE == 10
     finally:
         db.close()
 
