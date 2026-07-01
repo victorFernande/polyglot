@@ -3,7 +3,7 @@
 > **Duração:** 8 semanas (56 dias)  
 > **Meta:** Compreender uma cena de *Amélie* e se comunicar em situações básicas  
 > **Âncora:** Chanson française (música francesa tradicional e moderna)  
-> **Boss Final:** Entender uma cena de *Amélie Poulain* sem legenda + pedir um café em Paris
+> **Boss Final:** Cantar e entender "Non, je ne regrette rien" (Édith Piaf) sem letra + explicar a ideia central em francês simples
 
 ---
 
@@ -71,11 +71,11 @@
 ### FASE 4: "Le Boss" — Immersion avec Chanson (Semanas 7-8)
 
 **Boss Final:**
-- [ ] Entender uma cena de *Amélie Poulain* sem legenda
-- [ ] Pedir um café em francês (simulação)
-- [ ] Apresentar-se em 1 minuto
-- [ ] Cantar uma chanson completa sem letra
-- [ ] Explicar o que é "la vie en rose"
+- [ ] Ouvir "Non, je ne regrette rien" sem letra e reconhecer o refrão
+- [ ] Cantar "Non, je ne regrette rien" inteira sem letra
+- [ ] Explicar em francês simples: "Je ne regrette rien"
+- [ ] Identificar negação, passado e vocabulário emocional na chanson
+- [ ] Fazer uma performance final: cantar + resumir a música em 1 minuto
 
 ---
 
@@ -91,7 +91,7 @@
 | ⭐⭐ | "Je Veux" | Zaz | Energética, vocabulário de desejos |
 | ⭐⭐⭐ | "L'Aigle Noir" | Barbara | Poética, complexa, vocabulário rico |
 | ⭐⭐⭐ | "La Bohème" | Charles Aznavour | Nostálgica, cultural, vocabulário artístico |
-| ⭐⭐⭐ | "Non, Je Ne Regrette Rien" | Édith Piaf | Icônica, negação, passado |
+| ⭐⭐⭐ | "Non, je ne regrette rien" | Édith Piaf | Boss final: icônica, negação, passado e emoção |
 | ⭐⭐⭐⭐ | "La Marseillaise" | Hino Nacional | Histórica, vocabulário político |
 
 ---

@@ -13,4 +13,4 @@ Construir uma base A1 prática para cumprimentar, pedir comida, se apresentar, f
 - `progress/` — checkpoints e registros da onda.
 
 ## Boss final
-Entender uma cena curta de *Amélie* ou uma música francesa simples com apoio mínimo.
+Cantar e entender **"Non, je ne regrette rien"**, de **Édith Piaf**, sem letra, depois explicar em francês simples a ideia central: *Je ne regrette rien*.
