@@ -230,7 +230,7 @@ class ExerciseService:
     }
     SESSION_SIZE = 20
     TARGET_ITEMS = 1000
-    INCREMENTAL_ITEM_TARGETS = {"de": 1010}
+    INCREMENTAL_ITEM_TARGETS = {"de": 1020}
 
     @staticmethod
     def target_items_for_language(code: str):
@@ -555,6 +555,90 @@ class ExerciseService:
             f"{prefix}: situação guiada — feche uma opinião simples. Escolha a fala que comunica “{pt}” em {name}.",
             target,
             [foreign for foreign in options[0:3]],
+            start_index + len(items),
+        ))
+
+        pt, target = phrases[5]
+        items.append(ExerciseService._choice(
+            f"{prefix}: escolha como dizer “{pt}” em {name}",
+            target,
+            [foreign for foreign in options[6:9]],
+            start_index + len(items),
+        ))
+
+        pt, target = phrases[6]
+        items.append(ExerciseService._listen_choice(
+            f"{prefix}: ouça o áudio e identifique a fala que comunica “{pt}”",
+            target,
+            [foreign for foreign in options[7:10]],
+            start_index + len(items),
+        ))
+
+        image_sample = phrases[7:10] + phrases[0:1]
+        answer_pt, answer_foreign = image_sample[0]
+        items.append(ExerciseService._image_choice(
+            f"{prefix}: observe a imagem e escolha a frase que representa “{answer_pt}”",
+            (answer_pt, answer_foreign, ExerciseService._icon_key_for_phrase(answer_pt, answer_foreign, unit["topics"][7])),
+            [(pt, foreign, ExerciseService._icon_key_for_phrase(pt, foreign, unit["topics"][7])) for pt, foreign in image_sample[1:]],
+            start_index + len(items),
+        ))
+
+        pt, target = phrases[8]
+        words = ExerciseService._build_tokens(code, target)
+        extras = [word for foreign in options[0:10] for word in ExerciseService._build_tokens(code, foreign)]
+        items.append(ExerciseService._build(
+            f"{prefix}: monte a frase em ordem natural para dizer “{pt}”",
+            words,
+            extras,
+            start_index + len(items),
+        ))
+
+        pt, target = phrases[9]
+        items.append(ExerciseService._context_choice(
+            f"{prefix}: situação guiada — você dá uma opinião curta. Escolha a fala que comunica “{pt}” em {name}.",
+            target,
+            [foreign for foreign in options[0:3]],
+            start_index + len(items),
+        ))
+
+        listen_pairs = [[foreign, portuguese] for portuguese, foreign in phrases[1:5]]
+        items.append(ExerciseService._listen_match(
+            f"{prefix}: ouça cada áudio em {name} e selecione a tradução em português",
+            listen_pairs,
+            start_index + len(items),
+        ))
+
+        pt, target = phrases[4]
+        wrong_portuguese = [option for option in portuguese_options[5:9] if option != pt][:3]
+        items.append(ExerciseService._choice(
+            f"{prefix}: entenda “{target}” — qual é o significado em português?",
+            pt,
+            wrong_portuguese,
+            start_index + len(items),
+        ))
+
+        pt, target = phrases[3]
+        words = ExerciseService._build_tokens(code, target)
+        extras = [word for foreign in options[0:10] for word in ExerciseService._build_tokens(code, foreign)]
+        items.append(ExerciseService._listen_build(
+            f"{prefix}: ouça e monte em ordem natural — “{pt}”",
+            words,
+            extras,
+            start_index + len(items),
+        ))
+
+        sequence_pairs = phrases[5:9]
+        items.append(ExerciseService._sequence_dialogue(
+            f"{prefix}: prática guiada de ordem — organize os cartões exatamente assim: primeiro filme; depois esporte; em seguida cidade; por fim clima",
+            [foreign for _portuguese, foreign in sequence_pairs],
+            start_index + len(items),
+        ))
+
+        pt, target = phrases[2]
+        items.append(ExerciseService._context_choice(
+            f"{prefix}: situação guiada — compare preferências. Escolha a fala que comunica “{pt}” em {name}.",
+            target,
+            [foreign for foreign in options[0:2] + options[3:4]],
             start_index + len(items),
         ))
 

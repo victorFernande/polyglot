@@ -21,6 +21,7 @@ METALINGUISTIC_MARKERS = {
 
 
 def test_seed_lessons_is_long_varied_and_idempotent():
+    Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
     db = SessionLocal()
     try:
@@ -125,10 +126,10 @@ def test_seed_lessons_deactivates_legacy_prototype_lessons():
         db.close()
 
 
-def test_incremental_cron_target_extends_only_active_german_by_ten_items():
+def test_incremental_cron_target_closes_active_german_session_51_at_twenty_items():
     assert ExerciseService.SESSION_SIZE == 20
     assert ExerciseService.TARGET_ITEMS == 1000
-    assert ExerciseService.target_items_for_language("de") == 1010
+    assert ExerciseService.target_items_for_language("de") == 1020
     assert {language: ExerciseService.target_items_for_language(language) for language in LANGUAGES - {"de"}} == {
         "fr": 1000,
         "ru": 1000,
@@ -139,8 +140,8 @@ def test_incremental_cron_target_extends_only_active_german_by_ten_items():
     german_items = ExerciseService.generate_items("de")
     last_block_size = len(german_items) % ExerciseService.SESSION_SIZE
 
-    assert len(german_items) == 1010
-    assert last_block_size == 10
+    assert len(german_items) == 1020
+    assert last_block_size == 0
     assert [item["type"] for item in german_items[-10:]] == [
         "choice",
         "listen_choice",
@@ -152,6 +153,20 @@ def test_incremental_cron_target_extends_only_active_german_by_ten_items():
         "listen_build",
         "sequence_dialogue",
         "context_choice",
+    ]
+    assert all("Sessão 51" in item["prompt"] for item in german_items[-20:])
+    assert all("a palavra" not in item["prompt"].casefold() for item in german_items[-20:])
+    assert all("das Wort" not in repr(item) for item in german_items[-20:])
+    sequence = german_items[-2]
+    assert sequence["type"] == "sequence_dialogue"
+    assert sequence["options"] is None
+    assert sequence["pairs"] is None
+    assert "português" not in "\n".join(sequence["tiles"]).casefold()
+    assert sequence["answer"]["value"] == [
+        "Ich sehe gern Filme.",
+        "Ich mag Fußball.",
+        "Ich mag diese Stadt.",
+        "Ich mag warmes Wetter.",
     ]
 
 
@@ -197,10 +212,10 @@ def test_seed_lessons_appends_incremental_items_without_replacing_existing_ids()
         ExerciseService.seed_lessons(db)
 
         items = db.query(ExerciseItem).filter(ExerciseItem.lesson_id == lesson.id).order_by(ExerciseItem.order_index).all()
-        assert len(items) == 1010
+        assert len(items) == 1020
         assert [item.id for item in items[:5]] == preserved_ids
-        assert [item.order_index for item in items[-10:]] == list(range(1001, 1011))
-        assert len(items) % ExerciseService.SESSION_SIZE == 10
+        assert [item.order_index for item in items[-20:]] == list(range(1001, 1021))
+        assert len(items) % ExerciseService.SESSION_SIZE == 0
     finally:
         db.close()
 
