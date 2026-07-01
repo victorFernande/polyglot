@@ -126,10 +126,10 @@ def test_seed_lessons_deactivates_legacy_prototype_lessons():
         db.close()
 
 
-def test_incremental_cron_target_closes_active_german_session_52_at_twenty_items():
+def test_incremental_cron_target_opens_active_german_session_53_with_ten_restaurant_items():
     assert ExerciseService.SESSION_SIZE == 20
     assert ExerciseService.TARGET_ITEMS == 1000
-    assert ExerciseService.target_items_for_language("de") == 1040
+    assert ExerciseService.target_items_for_language("de") == 1050
     assert {language: ExerciseService.target_items_for_language(language) for language in LANGUAGES - {"de"}} == {
         "fr": 1000,
         "ru": 1000,
@@ -139,13 +139,12 @@ def test_incremental_cron_target_closes_active_german_session_52_at_twenty_items
 
     german_items = ExerciseService.generate_items("de")
     last_block_size = len(german_items) % ExerciseService.SESSION_SIZE
-    session_52 = german_items[1020:1040]
-    new_items = session_52[-10:]
+    session_53 = german_items[1040:1050]
 
-    assert len(german_items) == 1040
-    assert last_block_size == 0
-    assert len(session_52) == ExerciseService.SESSION_SIZE
-    assert [item["type"] for item in new_items] == [
+    assert len(german_items) == 1050
+    assert last_block_size == 10
+    assert len(session_53) == 10
+    assert [item["type"] for item in session_53] == [
         "choice",
         "listen_choice",
         "image_choice",
@@ -157,16 +156,33 @@ def test_incremental_cron_target_closes_active_german_session_52_at_twenty_items
         "sequence_dialogue",
         "context_choice",
     ]
-    assert all("Sessão 52" in item["prompt"] for item in session_52)
-    assert all("Eu viajo para a cidade" not in item["prompt"] for item in session_52)
-    assert any("Eu viajo para Berlim" in item["prompt"] for item in session_52)
-    assert all("a palavra" not in item["prompt"].casefold() for item in new_items)
-    assert all("das Wort" not in repr(item) for item in new_items)
-    sequence = new_items[-2]
+    assert all("Sessão 53" in item["prompt"] for item in session_53)
+    assert any("Ich habe einen Tisch." in repr(item) for item in session_53)
+    assert any("Die Speisekarte, bitte." in repr(item) for item in session_53)
+    assert all("a palavra" not in item["prompt"].casefold() for item in session_53)
+    assert all("das Wort" not in repr(item) for item in session_53)
+    sequence = session_53[-2]
     assert sequence["type"] == "sequence_dialogue"
     assert sequence["options"] is None
     assert sequence["pairs"] is None
     assert "português" not in "\n".join(sequence["tiles"]).casefold()
+    assert sequence["answer"]["value"] == [
+        "Ich habe einen Tisch.",
+        "Die Speisekarte, bitte.",
+        "Ich nehme eine Suppe.",
+        "Ich nehme das Hähnchen.",
+    ]
+
+
+def test_previous_incremental_german_session_52_remains_closed_at_twenty_items():
+    german_items = ExerciseService.generate_items("de")
+    session_52 = german_items[1020:1040]
+
+    assert len(session_52) == ExerciseService.SESSION_SIZE
+    assert all("Sessão 52" in item["prompt"] for item in session_52)
+    assert all("Eu viajo para a cidade" not in item["prompt"] for item in session_52)
+    assert any("Eu viajo para Berlim" in item["prompt"] for item in session_52)
+    sequence = session_52[-2]
     assert sequence["answer"]["value"] == [
         "Ich nehme den Zug.",
         "Wann fährt der Bus?",
@@ -258,10 +274,10 @@ def test_seed_lessons_appends_incremental_items_without_replacing_existing_ids()
         ExerciseService.seed_lessons(db)
 
         items = db.query(ExerciseItem).filter(ExerciseItem.lesson_id == lesson.id).order_by(ExerciseItem.order_index).all()
-        assert len(items) == 1040
+        assert len(items) == 1050
         assert [item.id for item in items[:5]] == preserved_ids
-        assert [item.order_index for item in items[-20:]] == list(range(1021, 1041))
-        assert len(items) % ExerciseService.SESSION_SIZE == 0
+        assert [item.order_index for item in items[-10:]] == list(range(1041, 1051))
+        assert len(items) % ExerciseService.SESSION_SIZE == 10
     finally:
         db.close()
 
