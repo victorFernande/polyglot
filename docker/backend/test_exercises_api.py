@@ -10,7 +10,7 @@ os.environ["DATABASE_URL"] = f"sqlite:///{TEST_DB}"
 
 from fastapi.testclient import TestClient  # noqa: E402
 from main import app  # noqa: E402
-from models import ExerciseItem, ExerciseLesson, ExerciseSession, SessionLocal  # noqa: E402
+from models import ExerciseAnswer, ExerciseItem, ExerciseLesson, ExerciseSession, SessionLocal  # noqa: E402
 from services import ExerciseService  # noqa: E402
 
 
@@ -379,7 +379,8 @@ def test_dashboard_active_language_follows_latest_exercise_activity():
                 started_at=datetime.utcnow() - timedelta(hours=2),
                 completed_at=datetime.utcnow() - timedelta(hours=1),
             ))
-            db.add(ExerciseSession(
+            french_item = db.query(ExerciseItem).filter(ExerciseItem.lesson_id == french["id"]).order_by(ExerciseItem.order_index).first()
+            french_session = ExerciseSession(
                 user_id=user_id,
                 lesson_id=french["id"],
                 status="in_progress",
@@ -388,6 +389,16 @@ def test_dashboard_active_language_follows_latest_exercise_activity():
                 xp_earned=80,
                 session_number=1,
                 started_at=datetime.utcnow(),
+            )
+            db.add(french_session)
+            db.flush()
+            db.add(ExerciseAnswer(
+                session_id=french_session.id,
+                item_id=french_item.id,
+                payload=french_item.answer,
+                is_correct=True,
+                xp_earned=10,
+                answered_at=datetime.utcnow(),
             ))
             db.commit()
         finally:
@@ -400,6 +411,59 @@ def test_dashboard_active_language_follows_latest_exercise_activity():
         assert dashboard["active_wave"]["language_name"] == french["language_name"]
         assert dashboard["active_wave"]["hours_input"] == 0
         assert {item["language_code"] for item in dashboard["exercise_language_progress"]} >= {"de", "fr"}
+
+def test_dashboard_ignores_empty_new_session_when_a_language_has_answer_activity():
+    user_id = 94009
+    with TestClient(app) as client:
+        client.post(f"/users/{user_id}/bootstrap")
+        lessons = client.get("/exercise-lessons", params={"user_id": user_id}).json()
+        german = next(lesson for lesson in lessons if lesson["language_code"] == "de")
+        japanese = next(lesson for lesson in lessons if lesson["language_code"] == "jp")
+
+        db = SessionLocal()
+        try:
+            db.query(ExerciseSession).filter(ExerciseSession.user_id == user_id).delete()
+            db.commit()
+            german_item = db.query(ExerciseItem).filter(ExerciseItem.lesson_id == german["id"]).order_by(ExerciseItem.order_index).first()
+            german_session = ExerciseSession(
+                user_id=user_id,
+                lesson_id=german["id"],
+                status="in_progress",
+                total_count=20,
+                correct_count=1,
+                xp_earned=10,
+                session_number=3,
+                started_at=datetime.utcnow() - timedelta(hours=3),
+            )
+            db.add(german_session)
+            db.flush()
+            db.add(ExerciseAnswer(
+                session_id=german_session.id,
+                item_id=german_item.id,
+                payload=german_item.answer,
+                is_correct=True,
+                xp_earned=10,
+                answered_at=datetime.utcnow() - timedelta(minutes=5),
+            ))
+            db.add(ExerciseSession(
+                user_id=user_id,
+                lesson_id=japanese["id"],
+                status="in_progress",
+                total_count=20,
+                correct_count=0,
+                xp_earned=0,
+                session_number=1,
+                started_at=datetime.utcnow(),
+            ))
+            db.commit()
+        finally:
+            db.close()
+
+        dashboard = client.get(f"/users/{user_id}/dashboard").json()
+
+        assert dashboard["active_language_progress"]["language_code"] == "de"
+        assert dashboard["active_wave"]["language"] == "de"
+        assert dashboard["active_wave"]["language_name"] == german["language_name"]
 
 def test_recent_activity_uses_learning_path_session_number_not_database_id():
     user_id = 94003

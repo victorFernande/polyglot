@@ -332,13 +332,21 @@ def get_dashboard(user_id: int, db: Session = Depends(get_db)):
             "total_exercises": total_exercises,
             "progress_percent": progress_percent,
         })
-    latest_exercise_session = db.query(ExerciseSession).join(ExerciseLesson).filter(
+    latest_answer_activity = db.query(ExerciseSession).join(ExerciseLesson).join(ExerciseAnswer).filter(
         ExerciseSession.user_id == user_id,
+    ).order_by(
+        ExerciseAnswer.answered_at.desc(),
+        ExerciseAnswer.id.desc(),
+    ).first()
+    latest_completed_session = db.query(ExerciseSession).join(ExerciseLesson).filter(
+        ExerciseSession.user_id == user_id,
+        ExerciseSession.status == "completed",
     ).order_by(
         func.coalesce(ExerciseSession.completed_at, ExerciseSession.started_at).desc(),
         ExerciseSession.id.desc(),
     ).first()
-    active_language_code = latest_exercise_session.lesson.language_code if latest_exercise_session else None
+    active_language_source = latest_answer_activity or latest_completed_session
+    active_language_code = active_language_source.lesson.language_code if active_language_source else None
     if not active_language_code:
         active_language_code = language_code_by_wave_language.get(str(active_wave.language).casefold()) if active_wave else None
     active_language_progress = next((progress for progress in exercise_language_progress if progress["language_code"] == active_language_code), None)
