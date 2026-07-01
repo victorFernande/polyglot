@@ -230,7 +230,7 @@ class ExerciseService:
     }
     SESSION_SIZE = 20
     TARGET_ITEMS = 1000
-    INCREMENTAL_ITEM_TARGETS = {"de": 1125, "fr": 1035, "ru": 1035, "jp": 1035, "en": 1035}
+    INCREMENTAL_ITEM_TARGETS = {"de": 1130, "fr": 1040, "ru": 1040, "jp": 1040, "en": 1040}
     JP_BEGINNER_KANA = {
         "私の名前はビクトルです。": "わたしのなまえはビクトルです。",
         "ブラジル出身です。": "ブラジルしゅっしんです。",
@@ -1871,6 +1871,7 @@ class ExerciseService:
         phrases = unit["phrases"][code]
         prefix = "Sessão 57 — Revisão incremental · Roupas em contexto"
         options = [foreign for _pt, foreign in phrases]
+        portuguese_options = [pt for pt, _foreign in phrases]
 
         pt, target = phrases[0]
         items.append(ExerciseService._choice(
@@ -1915,9 +1916,58 @@ class ExerciseService:
             start_index + len(items),
         ))
 
-        hint = f"Mini-aula: {unit['goal']} Esta revisão abre um novo bloco com 5 questões reais, sem ultrapassar 20 questões por sessão."
+        listen_pairs = [[foreign, portuguese] for portuguese, foreign in [phrases[5], phrases[6], phrases[7], phrases[8]]]
+        items.append(ExerciseService._listen_match(
+            f"{prefix}: ouça cada áudio em {name} e selecione a tradução em português",
+            listen_pairs,
+            start_index + len(items),
+        ))
+
+        pt, target = phrases[5]
+        wrong_portuguese = [option for option in portuguese_options[2:6] if option != pt][:3]
+        items.append(ExerciseService._choice(
+            f"{prefix}: entenda “{target}” — qual é o significado em português?",
+            pt,
+            wrong_portuguese,
+            start_index + len(items),
+        ))
+
+        pt, target = phrases[6]
+        words = ExerciseService._build_tokens(code, target)
+        extras = [word for foreign in options[0:10] for word in ExerciseService._build_tokens(code, foreign)]
+        items.append(ExerciseService._listen_build(
+            f"{prefix}: ouça e monte em ordem natural — “{pt}”",
+            words,
+            extras,
+            start_index + len(items),
+        ))
+
+        sequence_pairs = [phrases[4], phrases[5], phrases[6], phrases[7]]
+        items.append(ExerciseService._sequence_dialogue(
+            f"{prefix}: prática guiada de ordem — organize os cartões exatamente assim: primeiro cor; depois tamanho; em seguida preço; por fim provar",
+            [foreign for _portuguese, foreign in sequence_pairs],
+            start_index + len(items),
+        ))
+
+        pt, target = phrases[8]
+        items.append(ExerciseService._context_choice(
+            f"{prefix}: situação guiada — diga que você vai comprar a roupa. Escolha a fala que comunica “{pt}” em {name}.",
+            target,
+            [foreign for foreign in options[0:3]],
+            start_index + len(items),
+        ))
+
+        hint = f"Mini-aula: {unit['goal']} Esta revisão continua o bloco com questões reais, sem ultrapassar 20 questões por sessão."
         for item in items[session_57_start:]:
-            item["hint"] = hint
+            if item["type"] == "listen_build":
+                item["hint"] = f"{hint} Ouça a frase, repita em voz alta e monte as palavras na ordem correta."
+            elif item["type"] == "listen_match":
+                item["hint"] = f"{hint} Toque em cada áudio no idioma estudado e selecione a tradução correspondente em português."
+                item["explanation"] = f"Cada áudio em {name} deve ser ligado à tradução em português dentro da revisão de roupas."
+            elif item["type"] == "sequence_dialogue":
+                item["hint"] = f"{hint} Siga a ordem indicada no enunciado e organize apenas as frases no idioma estudado."
+            else:
+                item["hint"] = hint
             if item["type"] in {"build", "listen_build"}:
                 item["explanation"] = f"A frase correta é: “{' '.join(item['answer']['value'])}”."
             elif item["type"] not in {"image_choice", "listen_match", "sequence_dialogue"}:
