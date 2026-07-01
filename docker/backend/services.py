@@ -853,7 +853,8 @@ class ExerciseService:
         session.status = "completed"; session.completed_at = datetime.utcnow(); user = session.user
         wave = db.query(Wave).filter(Wave.user_id == user.id, Wave.language == ExerciseService.LANGUAGE_TO_WAVE.get(session.lesson.language_code)).first()
         if wave: wave.total_xp += session.xp_earned; wave.vocabulary_count += vocab; wave.phrases_count += phrases
-        db.add(StudyLog(user_id=user.id, activity_type="srs", duration_minutes=max(1, session.total_count), xp_earned=session.xp_earned, notes=f"Exercícios: {session.lesson.title} — sessão {session.id}"))
+        visible_session_number = session.session_number or (ExerciseService._session_number(db, session) + 1)
+        db.add(StudyLog(user_id=user.id, activity_type="srs", duration_minutes=max(1, session.total_count), xp_earned=session.xp_earned, notes=f"Exercícios: {session.lesson.title} — sessão {visible_session_number}"))
         GamificationService.check_streak(user); user.total_xp += session.xp_earned; user.level = GamificationService.calculate_level(user.total_xp); user.last_study_date = datetime.utcnow()
         new = GamificationService.check_achievements(db, user); db.commit(); db.refresh(session)
         return {"id": session.id, "status": session.status, "session": ExerciseService.session_payload(session, db=db), "xp_earned": session.xp_earned, "correct_count": session.correct_count, "total_count": session.total_count, "hearts_left": session.hearts_left, "vocabulary_added": vocab, "phrases_added": phrases, "new_achievements": [a.name for a in new], "already_completed": False}

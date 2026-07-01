@@ -307,3 +307,62 @@ def test_image_choice_can_be_played_by_separate_test_user_without_touching_user_
         after_user_one = client.get("/exercise-lessons", params={"user_id": 1}).json()[0]
         assert after_user_one["completed_sessions"] == before_user_one["completed_sessions"]
         assert after_user_one["active_session_id"] == before_user_one["active_session_id"]
+
+def test_dashboard_reports_active_language_progress_across_1000_exercises():
+    user_id = 94002
+    with TestClient(app) as client:
+        client.post(f"/users/{user_id}/bootstrap")
+        lessons = client.get("/exercise-lessons", params={"user_id": user_id}).json()
+        german = next(lesson for lesson in lessons if lesson["language_code"] == "de")
+
+        db = SessionLocal()
+        try:
+            db.query(ExerciseSession).filter(ExerciseSession.user_id == user_id).delete()
+            db.commit()
+            for number in range(1, 26):
+                db.add(ExerciseSession(
+                    user_id=user_id,
+                    lesson_id=german["id"],
+                    status="completed",
+                    total_count=10,
+                    correct_count=10,
+                    xp_earned=100,
+                    session_number=number,
+                ))
+            db.commit()
+        finally:
+            db.close()
+
+        response = client.get(f"/users/{user_id}/dashboard")
+        assert response.status_code == 200, response.text
+        dashboard = response.json()
+        german_progress = next(
+            item for item in dashboard["exercise_language_progress"]
+            if item["language_code"] == "de"
+        )
+
+        assert german_progress["completed_exercises"] == 250
+        assert german_progress["total_exercises"] == 1000
+        assert german_progress["progress_percent"] == 25
+        assert dashboard["active_language_progress"]["language_code"] == "de"
+        assert dashboard["active_language_progress"]["progress_percent"] == 25
+
+def test_recent_activity_uses_learning_path_session_number_not_database_id():
+    user_id = 94003
+    with TestClient(app) as client:
+        client.post(f"/users/{user_id}/bootstrap")
+        lesson = next(lesson for lesson in client.get("/exercise-lessons", params={"user_id": user_id}).json() if lesson["language_code"] == "de")
+        session = client.post(
+            f"/exercise-lessons/{lesson['id']}/sessions",
+            params={"user_id": user_id, "session_number": 17},
+        ).json()
+        db_id = session["id"]
+
+        complete = client.post(f"/exercise-sessions/{db_id}/complete")
+        assert complete.status_code == 200, complete.text
+        dashboard = client.get(f"/users/{user_id}/dashboard").json()
+        recent_note = dashboard["recent_logs"][0]["notes"]
+
+        assert "sessão 17" in recent_note
+        assert f"sessão {db_id}" not in recent_note
+

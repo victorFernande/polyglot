@@ -285,12 +285,54 @@ def get_dashboard(user_id: int, db: Session = Depends(get_db)):
     
     # Weekly stats
     weekly_stats = GamificationService.get_weekly_stats(user)
+
+    # Exercise-language progress: dashboard wave progress must reflect the real
+    # 1,000 exercise path for the language, not the older phase task checklist.
+    language_code_by_wave_language = {
+        "german": "de",
+        "alemão": "de",
+        "de": "de",
+        "french": "fr",
+        "francês": "fr",
+        "fr": "fr",
+        "russian": "ru",
+        "russo": "ru",
+        "ru": "ru",
+        "japanese": "jp",
+        "japonês": "jp",
+        "jp": "jp",
+        "english": "en",
+        "inglês": "en",
+        "en": "en",
+    }
+    exercise_lessons = ExerciseService.list_lessons(db, user_id)
+    exercise_language_progress = []
+    for lesson in exercise_lessons:
+        total_exercises = int(lesson.get("items_count") or 1000)
+        completed_sessions = db.query(ExerciseSession).filter(
+            ExerciseSession.user_id == user_id,
+            ExerciseSession.lesson_id == lesson["id"],
+            ExerciseSession.status == "completed",
+        ).all()
+        completed_exercises = min(total_exercises, sum(int(session.total_count or 0) for session in completed_sessions))
+        progress_percent = round((completed_exercises / total_exercises) * 100, 2) if total_exercises else 0
+        exercise_language_progress.append({
+            "language_code": lesson["language_code"],
+            "language_name": lesson["language_name"],
+            "completed_exercises": completed_exercises,
+            "total_exercises": total_exercises,
+            "progress_percent": progress_percent,
+        })
+    active_language_code = language_code_by_wave_language.get(str(active_wave.language).casefold()) if active_wave else None
+    active_language_progress = next((progress for progress in exercise_language_progress if progress["language_code"] == active_language_code), None)
     
     return {
         "user": UserResponse.model_validate(user),
         "stats": stats,
         "active_wave": WaveResponse.model_validate(active_wave) if active_wave else None,
         "active_phase": PhaseResponse.model_validate(active_phase) if active_phase else None,
+        "active_language_progress": active_language_progress,
+        "exercise_language_progress": exercise_language_progress,
         "recent_logs": [StudyLogResponse.model_validate(log) for log in recent_logs],
         "achievements": achievements,
         "level_info": level_info,

@@ -8,16 +8,19 @@ import StreakCalendar from '../components/StreakCalendar'
 import WeeklyChart from '../components/WeeklyChart'
 import LanguageFlag from '../components/LanguageFlag'
 import { getDashboard } from '../lib/api'
+import { normalizedLanguageProgress } from '../lib/dashboardLanguageProgress.mjs'
 
 export default function Dashboard() {
   const { 
-    user, stats, activeWave, activePhase, recentLogs, 
+    user, stats, activeWave, activeLanguageProgress, recentLogs, 
     achievements, levelInfo, dailyGoal, weeklyStats,
     showXpAnimation, xpAmount, newAchievement,
     setDashboard, setLoading, setError 
   } = useStore()
   
   const [refreshing, setRefreshing] = useState(false)
+  const languageProgress = normalizedLanguageProgress(activeLanguageProgress)
+  const activeLanguageCode = activeLanguageProgress?.language_code || 'de'
 
   useEffect(() => {
     fetchDashboard()
@@ -121,24 +124,26 @@ export default function Dashboard() {
             <span className="text-6xl">🌊</span>
           </div>
           <h3 className="text-lg font-semibold mb-2">Onda Atual</h3>
-          <div className="flex items-center gap-4 mb-4">
-            <LanguageFlag code="de" className="h-12 w-12" />
+          <div className="flex items-center gap-5 mb-4">
+            <CircularLanguageGauge code={activeLanguageCode} percent={languageProgress.percent} />
             <div>
               <p className="text-xl font-bold">{activeWave.language_name}</p>
               <p className="text-sm text-gray-400">Âncora: 🎸 {activeWave.anchor}</p>
+              <p className="mt-1 text-xs text-gray-500">Progresso total da língua: {languageProgress.completed} de {languageProgress.total}</p>
             </div>
           </div>
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
               <span className="text-gray-400">Progresso</span>
-              <span>{activePhase.tasks_completed}/{activePhase.total_tasks} tarefas</span>
+              <span>{languageProgress.label}</span>
             </div>
             <div className="progress-bar">
               <div 
                 className="progress-fill" 
-                style={{ width: `${activePhase.progress_percent}%` }}
+                style={{ width: `${languageProgress.percent}%` }}
               />
             </div>
+            <p className="text-xs text-gray-500">{languageProgress.percent}% da trilha da língua</p>
           </div>
           <div className="mt-4 flex gap-4 text-sm">
             <span className="flex items-center gap-1">
@@ -150,34 +155,6 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Active Phase */}
-        <div className="card">
-          <h3 className="text-lg font-semibold mb-4">Fase Atual: {activePhase.name}</h3>
-          <div className="space-y-3">
-            {(activePhase.tasks || []).map((task, i) => (
-              <div 
-                key={i}
-                className={`flex items-center justify-between p-3 rounded-lg ${
-                  task.completed ? 'bg-polyglot-green/10 border border-polyglot-green/30' : 'bg-white/5'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                    task.completed 
-                      ? 'bg-polyglot-green border-polyglot-green' 
-                      : 'border-gray-500'
-                  }`}>
-                    {task.completed && <span className="text-xs">✓</span>}
-                  </div>
-                  <span className={task.completed ? 'line-through text-gray-500' : ''}>
-                    {task.title}
-                  </span>
-                </div>
-                <span className="text-sm xp-text">+{task.xp_reward} XP</span>
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
 
       {/* Daily Goals & Weekly Stats */}
@@ -264,6 +241,24 @@ export default function Dashboard() {
         {showXpAnimation && <XPAnimation amount={xpAmount} />}
         {newAchievement && <AchievementPopup achievement={newAchievement} />}
       </AnimatePresence>
+    </div>
+  )
+}
+
+function CircularLanguageGauge({ code, percent }) {
+  const safePercent = Math.max(0, Math.min(100, Number(percent || 0)))
+  return (
+    <div
+      className="relative grid h-20 w-20 shrink-0 place-items-center rounded-full"
+      style={{ background: `conic-gradient(#22d3ee ${safePercent}%, rgba(255,255,255,0.12) 0)` }}
+      aria-label={`Progresso da língua ${safePercent}%`}
+    >
+      <div className="grid h-16 w-16 place-items-center rounded-full bg-polyglot-dark/95 shadow-inner shadow-black/40">
+        <LanguageFlag code={code} className="h-10 w-10 rounded-full" />
+      </div>
+      <div className="absolute -bottom-1 rounded-full border border-cyan-300/40 bg-black/70 px-2 py-0.5 text-[10px] font-bold text-cyan-100">
+        {safePercent}%
+      </div>
     </div>
   )
 }
