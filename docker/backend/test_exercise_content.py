@@ -1,4 +1,6 @@
+import json
 import os
+import re
 import tempfile
 
 os.environ["DATABASE_URL"] = f"sqlite:///{tempfile.NamedTemporaryFile(delete=False).name}"
@@ -18,6 +20,25 @@ METALINGUISTIC_MARKERS = {
     "jp": ["という言葉"],
     "en": ["the word "],
 }
+
+KANJI_RE = re.compile(r"[\u4e00-\u9fff]")
+KANA_RE = re.compile(r"[\u3040-\u30ff]")
+
+
+def test_japanese_first_unit_teaches_kana_before_kanji():
+    japanese_items = ExerciseService.generate_items("jp")
+    beginner_window = japanese_items[:100]
+    later_window = japanese_items[100:200]
+
+    rendered_beginner = json.dumps(beginner_window, ensure_ascii=False)
+    rendered_later = json.dumps(later_window, ensure_ascii=False)
+
+    assert beginner_window
+    assert not KANJI_RE.search(rendered_beginner)
+    assert KANA_RE.search(rendered_beginner)
+    assert "みずをおねがいします。" in rendered_beginner
+    assert "おかいけいをおねがいします。" in rendered_beginner
+    assert KANJI_RE.search(rendered_later)
 
 
 def test_seed_lessons_is_long_varied_and_idempotent():
