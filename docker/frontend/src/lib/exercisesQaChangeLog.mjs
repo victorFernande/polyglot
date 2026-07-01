@@ -113,6 +113,36 @@ export const exercisesQaChangeLog = [
       'docker/frontend/src/pages/Exercises.jsx e produção /exercises permanecem inalterados.',
     ],
   },
+  {
+    id: '2026-07-01-1002-qa-rendered-item-source-audit-fix',
+    timestamp: '01/07 10:02',
+    title: 'Correção da auditoria de origem do item renderizado',
+    approved: true,
+    approvalPhrase: 'QA aprovado 01/07 10:02',
+    summary: 'Implementa de fato em /exercises-qa a comparação visual entre item renderizado e item real esperado em session.items, preservando o estado legítimo de snapshot de feedback após responder.',
+    diffs: [
+      '/exercises-qa passa a mostrar “item.id renderizado”, “session item.id” e “Origem renderizada” na faixa Integridade QA da sessão.',
+      'A página exibe QA BLOCKER quando o item renderizado não corresponde ao item real esperado da sessão backend.',
+      'O estado de feedback usa session.items[answeredIndex] como item esperado, evitando falso bloqueio quando a correção ainda mostra o item recém-respondido.',
+      'A mudança é apenas em ExercisesQA.jsx/testes/changelog QA; não cria treino local, Questão extra, painel frontend-only ou atividade sem XP/progresso.',
+      'docker/frontend/src/pages/Exercises.jsx e produção /exercises permanecem inalterados; promoção continua separada e exige aprovação explícita própria.',
+    ],
+  },
+  {
+    id: '2026-07-01-1402-qa-suppress-lesson-item-fallback',
+    timestamp: '01/07 14:02',
+    title: 'Bloqueio visual para fallback de lesson.items',
+    approved: false,
+    approvalPhrase: 'QA aprovado 01/07 14:02',
+    summary: 'Impede que /exercises-qa renderize lesson.items como exercício ativo quando a sessão backend não traz item real em session.items, substituindo o fallback por um painel QA BLOCKER.',
+    diffs: [
+      '/exercises-qa passa a usar apenas session.items[current_index] como item ativo renderizável; feedback continua usando snapshot do item respondido.',
+      'Quando existe lesson.items[current_index] mas falta session.items[current_index], a página mostra painel “QA BLOCKER · fallback de lesson.items suprimido” em vez de renderizar o exercício.',
+      'O painel expõe session.id, current_index, total_count e o id do item de lesson.items que foi suprimido para facilitar auditoria do payload backend.',
+      'A mudança fica limitada a ExercisesQA.jsx, testes de contrato/integridade QA e changelog QA; docker/frontend/src/pages/Exercises.jsx e produção /exercises permanecem inalterados.',
+      'Promoção para produção permanece aguardando aprovação explícita do Victor em uma frase própria.',
+    ],
+  },
 ]
 
 export function pendingExercisesQaChanges(entries = exercisesQaChangeLog) {

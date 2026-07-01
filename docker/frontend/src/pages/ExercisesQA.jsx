@@ -121,9 +121,10 @@ export default function Exercises() {
   }, [])
 
   const currentIndex = session?.current_index || 0
-  const sessionItems = session?.items?.length ? session.items : (lesson?.items || [])
-  const currentItem = sessionItems?.[currentIndex]
-  const item = feedback?.itemSnapshot || currentItem
+  const currentSessionItem = session?.items?.[currentIndex]
+  const currentLessonFallbackItem = lesson?.items?.[currentIndex]
+  const item = feedback?.itemSnapshot || currentSessionItem
+  const hasSuppressedLessonItemFallback = !!session && !currentSessionItem && !!currentLessonFallbackItem && currentIndex < (session?.total_count || 0)
   const displayIndex = feedback?.answeredIndex ?? currentIndex
   const sessionProgress = useMemo(() => exerciseSessionProgress(session), [session])
   const langCode = lesson?.language_code || lesson?.language || 'de'
@@ -381,6 +382,13 @@ export default function Exercises() {
 
       {activePath && <SkillTrail path={activePath} lessonContext={lessonContext} page={trailPage} mobilePage={mobileTrailPage} onPageChange={setTrailPage} onMobilePageChange={setMobileTrailPage} currentSessionNumber={currentSessionNumber} onSessionClick={openSessionNumber} />}
 
+      {hasSuppressedLessonItemFallback && (
+        <QaSuppressedLessonFallbackPanel
+          fallbackItem={currentLessonFallbackItem}
+          session={session}
+        />
+      )}
+
       {item && session && lesson && (
         <ExerciseShell
           activePath={activePath}
@@ -503,7 +511,7 @@ function ExerciseShell({ activePath, busy, canCheck, children, currentSessionNum
           <ProgressStat label="Acerto parcial" value={`${sessionProgress.correct}/${sessionProgress.answered}`} detail={`${sessionProgress.accuracyPercent}%`} />
         </div>
 
-        <QaSessionIntegrityStrip session={session} item={item} />
+        <QaSessionIntegrityStrip session={session} item={item} feedback={feedback} />
 
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start">
           <LanguageFlag code={langCode} className="h-14 w-14 shrink-0" />
@@ -543,8 +551,12 @@ function ExerciseShell({ activePath, busy, canCheck, children, currentSessionNum
   )
 }
 
-function QaSessionIntegrityStrip({ session, item }) {
+function QaSessionIntegrityStrip({ session, item, feedback }) {
   const sessionItemCount = session.items?.length || 0
+  const activeSessionItem = session.items?.[session.current_index]
+  const feedbackSessionItem = feedback?.answeredIndex != null ? session.items?.[feedback.answeredIndex] : null
+  const expectedSessionItem = feedbackSessionItem || activeSessionItem
+  const renderedItemSource = feedbackSessionItem ? 'snapshot de feedback da sessão' : (activeSessionItem ? 'session.items[current_index]' : 'sem item ativo em session.items')
   const typeCounts = (session.items || []).reduce((counts, sessionItem) => {
     const type = sessionItem.type || 'unknown'
     counts[type] = (counts[type] || 0) + 1
@@ -555,7 +567,8 @@ function QaSessionIntegrityStrip({ session, item }) {
   const hasItemCountMismatch = sessionItemCount !== session.total_count
   const isAwaitingFinish = session.current_index >= session.total_count
   const hasMissingActiveItem = !isAwaitingFinish && session.current_index >= sessionItemCount
-  const hasIntegrityBlocker = exceedsSessionLimit || hasItemCountMismatch || hasMissingActiveItem
+  const hasRenderedItemMismatch = !!expectedSessionItem?.id && !!item?.id && expectedSessionItem.id !== item.id
+  const hasIntegrityBlocker = exceedsSessionLimit || hasItemCountMismatch || hasMissingActiveItem || hasRenderedItemMismatch
 
   return (
     <div className={`mb-6 rounded-2xl border p-4 text-sm ${hasIntegrityBlocker ? 'border-red-400/50 bg-red-500/15 text-red-100' : 'border-cyan-300/25 bg-cyan-300/10 text-cyan-50'}`}>
@@ -566,18 +579,39 @@ function QaSessionIntegrityStrip({ session, item }) {
           {exceedsSessionLimit && <p className="mt-2 rounded-xl bg-red-500/20 px-3 py-2 font-bold text-red-100">QA BLOCKER: sessão com mais de 20 itens; dividir em nova sessão antes de promover.</p>}
           {hasItemCountMismatch && <p className="mt-2 rounded-xl bg-red-500/20 px-3 py-2 font-bold text-red-100">QA BLOCKER: session.items não bate com total_count; validar payload backend antes de promover.</p>}
           {hasMissingActiveItem && <p className="mt-2 rounded-xl bg-red-500/20 px-3 py-2 font-bold text-red-100">QA BLOCKER: current_index sem item real em session.items; validar janela ativa antes de promover.</p>}
+          {hasRenderedItemMismatch && <p className="mt-2 rounded-xl bg-red-500/20 px-3 py-2 font-bold text-red-100">QA BLOCKER: item renderizado não corresponde ao item real da sessão; remover fallback local antes de promover.</p>}
         </div>
         <div className="grid gap-2 text-xs sm:grid-cols-2 lg:min-w-[28rem]">
           <span className="rounded-xl bg-black/25 px-3 py-2"><strong>session.id:</strong> {session.id}</span>
-          <span className="rounded-xl bg-black/25 px-3 py-2"><strong>item.id:</strong> {item.id}</span>
+          <span className="rounded-xl bg-black/25 px-3 py-2"><strong>item.id renderizado:</strong> {item.id}</span>
+          <span className="rounded-xl bg-black/25 px-3 py-2"><strong>session item.id:</strong> {expectedSessionItem?.id || '—'}</span>
           <span className="rounded-xl bg-black/25 px-3 py-2"><strong>item.type:</strong> {item.type}</span>
           <span className="rounded-xl bg-black/25 px-3 py-2"><strong>total_count:</strong> {session.total_count}</span>
           <span className="rounded-xl bg-black/25 px-3 py-2"><strong>items reais:</strong> {sessionItemCount}</span>
           <span className="rounded-xl bg-black/25 px-3 py-2"><strong>current_index:</strong> {session.current_index}</span>
           <span className="rounded-xl bg-black/25 px-3 py-2"><strong>janela ativa:</strong> {isAwaitingFinish ? 'fim aguardando conclusão' : 'item em progresso'}</span>
           <span className="rounded-xl bg-black/25 px-3 py-2"><strong>XP real:</strong> {session.xp_earned || 0}</span>
+          <span className="rounded-xl bg-black/25 px-3 py-2 sm:col-span-2"><strong>Origem renderizada:</strong> {renderedItemSource}</span>
           <span className="rounded-xl bg-black/25 px-3 py-2 sm:col-span-2"><strong>Variedade:</strong> {varietySummary}</span>
         </div>
+      </div>
+    </div>
+  )
+}
+
+function QaSuppressedLessonFallbackPanel({ fallbackItem, session }) {
+  return (
+    <div className="rounded-3xl border border-red-400/60 bg-red-500/15 p-5 text-red-50 shadow-2xl shadow-red-950/20">
+      <p className="text-xs font-black uppercase tracking-[0.22em] text-red-200">QA BLOCKER · fallback de lesson.items suprimido</p>
+      <h3 className="mt-2 text-xl font-black text-white">A sessão backend não trouxe um item real para renderizar.</h3>
+      <p className="mt-2 text-sm text-red-50/85">
+        /exercises-qa encontrou um item correspondente em lesson.items, mas não renderizou esse fallback para evitar prática paralela fora da sessão pontuada. Corrigir o payload de session.items antes de qualquer promoção.
+      </p>
+      <div className="mt-4 grid gap-2 text-xs sm:grid-cols-2 lg:grid-cols-4">
+        <span className="rounded-xl bg-black/25 px-3 py-2"><strong>session.id:</strong> {session?.id || '—'}</span>
+        <span className="rounded-xl bg-black/25 px-3 py-2"><strong>current_index:</strong> {session?.current_index ?? '—'}</span>
+        <span className="rounded-xl bg-black/25 px-3 py-2"><strong>total_count:</strong> {session?.total_count ?? '—'}</span>
+        <span className="rounded-xl bg-black/25 px-3 py-2"><strong>fallback lesson item:</strong> {fallbackItem?.id || '—'}</span>
       </div>
     </div>
   )

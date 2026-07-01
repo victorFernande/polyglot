@@ -12,6 +12,7 @@ const approvedPhrases = [
   'QA aprovado 30/06 21:11',
   'QA aprovado 30/06 22:02',
   'QA aprovado 30/06 23:02',
+  'QA aprovado 01/07 10:02',
 ]
 
 test('all reviewed QA changelog entries are approved and retained for audit', () => {
@@ -94,6 +95,27 @@ test('approved QA changelog copy does not still say changes are pending', () => 
     .join('\n')
 
   assert.doesNotMatch(approvedText, /alterações pendentes|item pendente|pendente mais novo|menu de alterações pendentes|PENDING QA APPROVAL/i)
+})
+
+test('rendered-item source audit fix entry is approved and retained for audit', () => {
+  const entry = exercisesQaChangeLog.find((change) => change.id === '2026-07-01-1002-qa-rendered-item-source-audit-fix')
+
+  assert.ok(entry, 'visible QA-only rendered-item source audit fix must be recorded')
+  assert.equal(entry.approved, true)
+  assert.equal(entry.timestamp, '01/07 10:02')
+  assert.equal(entry.approvalPhrase, 'QA aprovado 01/07 10:02')
+  assert.match(entry.summary, /snapshot de feedback/)
+})
+
+test('latest pending QA change remains the unapproved 14:02 fallback suppression entry', () => {
+  assert.deepEqual(pendingExercisesQaChanges().map((entry) => entry.approvalPhrase), ['QA aprovado 01/07 14:02'])
+  assert.equal(latestExercisesQaChange()?.approvalPhrase, 'QA aprovado 01/07 14:02')
+})
+
+test('changelog copy avoids stale raw PENDING QA APPROVAL wording even for unapproved entries', () => {
+  const allText = exercisesQaChangeLog.flatMap((entry) => [entry.title, entry.summary, ...entry.diffs]).join('\n')
+
+  assert.doesNotMatch(allText, /PENDING QA APPROVAL/)
 })
 
 test('pendingExercisesQaChanges still returns only unapproved entries for custom lists', () => {
