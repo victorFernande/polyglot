@@ -9,6 +9,7 @@ import Achievements from './pages/Achievements'
 import Leaderboard from './pages/Leaderboard'
 import Profile from './pages/Profile'
 import Sounds from './pages/Sounds'
+import Words from './pages/Words'
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
         <Route path="/leaderboard" element={<Leaderboard />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/sounds" element={<Sounds />} />
+        <Route path="/words" element={<Words />} />
       </Routes>
     </Layout>
   )

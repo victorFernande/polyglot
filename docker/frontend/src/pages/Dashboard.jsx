@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Flame, TrendingUp, Target, Award, Clock, BookOpen, Zap } from 'lucide-react'
 import { useStore } from '../stores/useStore'
@@ -91,6 +92,7 @@ export default function Dashboard() {
           value={stats.vocabulary_count}
           label="Palavras"
           suffix="📚"
+          to="/words"
         />
       </div>
 
@@ -263,15 +265,21 @@ function CircularLanguageGauge({ code, percent }) {
   )
 }
 
-function StatCard({ icon, value, label, suffix }) {
-  return (
-    <div className="stat-card">
+function StatCard({ icon, value, label, suffix, to }) {
+  const content = (
+    <>
       <div className="mb-2">{icon}</div>
       <div className="stat-value">{value}</div>
       <div className="stat-label">{label}</div>
       {suffix && <div className="text-xs text-gray-500 mt-1">{suffix}</div>}
-    </div>
+    </>
   )
+
+  if (to) {
+    return <Link to={to} className="stat-card block transition hover:border-polyglot-blue/40 hover:bg-white/10">{content}</Link>
+  }
+
+  return <div className="stat-card">{content}</div>
 }
 
 function GoalProgress({ label, current, goal, unit }) {

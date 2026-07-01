@@ -3,9 +3,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from datetime import datetime
+import re
 from typing import List, Optional
 
-from models import init_db, SessionLocal, User, Wave, Phase, Task, StudyLog, Achievement, ExerciseLesson, ExerciseSession
+from models import init_db, SessionLocal, User, Wave, Phase, Task, StudyLog, Achievement, ExerciseLesson, ExerciseSession, ExerciseAnswer
 from schemas import *
 from services import GamificationService, WaveService, ExerciseService
 from tts_service import TTSService
@@ -325,6 +326,17 @@ def get_dashboard(user_id: int, db: Session = Depends(get_db)):
         })
     active_language_code = language_code_by_wave_language.get(str(active_wave.language).casefold()) if active_wave else None
     active_language_progress = next((progress for progress in exercise_language_progress if progress["language_code"] == active_language_code), None)
+    if active_wave and active_language_code:
+        active_lesson_ids = [lesson["id"] for lesson in exercise_lessons if lesson["language_code"] == active_language_code]
+        completed_minutes = sum(
+            int(session.total_count or 0)
+            for session in db.query(ExerciseSession).filter(
+                ExerciseSession.user_id == user_id,
+                ExerciseSession.lesson_id.in_(active_lesson_ids),
+                ExerciseSession.status == "completed",
+            ).all()
+        ) if active_lesson_ids else 0
+        active_wave.hours_input = completed_minutes / 60
     
     return {
         "user": UserResponse.model_validate(user),
@@ -339,6 +351,91 @@ def get_dashboard(user_id: int, db: Session = Depends(get_db)):
         "daily_goal_progress": daily_goals,
         "weekly_stats": weekly_stats
     }
+
+def _learned_word_values(answer):
+    if isinstance(answer, dict):
+        if "value" in answer:
+            value = answer["value"]
+            return [" ".join(map(str, value))] if isinstance(value, list) else [str(value)]
+        if "pairs" in answer and isinstance(answer["pairs"], list):
+            return [str(left) for left, _right in answer["pairs"]]
+    if isinstance(answer, list):
+        return [" ".join(map(str, answer))]
+    if answer is None:
+        return []
+    return [str(answer)]
+
+
+def _learned_translation_pt(item, word: str):
+    if isinstance(item.options, list):
+        for option in item.options:
+            if not isinstance(option, dict):
+                continue
+            if str(option.get("value", "")).casefold() == word.casefold() and option.get("label_pt"):
+                return str(option["label_pt"])
+    if isinstance(item.pairs, list):
+        for left, right in item.pairs:
+            if str(left).casefold() == word.casefold():
+                return str(right)
+    prompt = (item.prompt or "").strip()
+    guided_match = re.search(r"comunicar [“\"]([^”\"]+)[”\"]", prompt, flags=re.IGNORECASE)
+    if guided_match:
+        return guided_match.group(1).strip()
+    quote_match = re.search(r"[“\"]([^”\"]+)[”\"]", prompt)
+    if quote_match and len(quote_match.group(1).strip()) <= 80:
+        return quote_match.group(1).strip()
+    for prefix in ["Traduza esta frase:", "Traduza:", "Escolha a melhor tradução:", "Escolha:"]:
+        if prompt.casefold().startswith(prefix.casefold()):
+            prompt = prompt[len(prefix):].strip()
+    return prompt or word
+
+
+@app.get("/users/{user_id}/words")
+def get_learned_words(user_id: int, db: Session = Depends(get_db)):
+    if not db.query(User).filter(User.id == user_id).first():
+        ExerciseService.bootstrap_user(db, user_id)
+
+    correct_answers = db.query(ExerciseAnswer).join(ExerciseSession).filter(
+        ExerciseAnswer.is_correct == True,
+        ExerciseSession.user_id == user_id,
+        ExerciseSession.status == "completed",
+    ).all()
+    correct_answer_by_item_id = {answer.item_id: answer for answer in correct_answers}
+    completed_sessions = db.query(ExerciseSession).filter(
+        ExerciseSession.user_id == user_id,
+        ExerciseSession.status == "completed",
+    ).order_by(ExerciseSession.completed_at.desc(), ExerciseSession.id.desc()).all()
+
+    seen = set()
+    words = []
+    for session in completed_sessions:
+        for item in ExerciseService.session_items(db, session):
+            lesson = item.lesson
+            correct_answer = correct_answer_by_item_id.get(item.id)
+            for value in _learned_word_values(item.answer):
+                word = value.strip()
+                if not word:
+                    continue
+                key = (lesson.language_code, word.casefold())
+                if key in seen:
+                    continue
+                seen.add(key)
+                words.append({
+                    "language_code": lesson.language_code,
+                    "language_name": lesson.language_name,
+                    "word": word,
+                    "translation_pt": _learned_translation_pt(item, word),
+                    "source": "exercise_answer" if correct_answer else "completed_session",
+                    "learned_at": correct_answer.answered_at if correct_answer else session.completed_at,
+                })
+
+    languages = []
+    for code in sorted({word["language_code"] for word in words}):
+        lang_words = [word for word in words if word["language_code"] == code]
+        language_name = lang_words[0]["language_name"] if lang_words else code
+        languages.append({"language_code": code, "language_name": language_name, "count": len(lang_words), "words": lang_words})
+    return {"total": len(words), "languages": languages, "words": words}
+
 
 # ============== LEADERBOARD ==============
 @app.get("/leaderboard", response_model=List[LeaderboardEntry])

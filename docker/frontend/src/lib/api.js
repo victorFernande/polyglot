@@ -73,6 +73,11 @@ export async function loadFlashcards(language = '', limit = 100) {
   return apiFetch(`/flashcards?${params.toString()}`)
 }
 
+export async function loadLearnedWords(userId = getStoredUserId()) {
+  const user = await bootstrapUser()
+  return apiFetch(`/users/${encodeURIComponent(user?.id || userId)}/words`)
+}
+
 export async function startExerciseSession(lessonId, userId = getStoredUserId(), sessionNumber = null) {
   const params = new URLSearchParams({ user_id: String(userId) })
   if (sessionNumber) params.set('session_number', String(sessionNumber))

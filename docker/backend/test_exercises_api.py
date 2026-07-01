@@ -346,6 +346,7 @@ def test_dashboard_reports_active_language_progress_across_1000_exercises():
         assert german_progress["progress_percent"] == 25
         assert dashboard["active_language_progress"]["language_code"] == "de"
         assert dashboard["active_language_progress"]["progress_percent"] == 25
+        assert round(dashboard["active_wave"]["hours_input"], 2) == round(250 / 60, 2)
 
 def test_recent_activity_uses_learning_path_session_number_not_database_id():
     user_id = 94003
@@ -365,4 +366,28 @@ def test_recent_activity_uses_learning_path_session_number_not_database_id():
 
         assert "sessão 17" in recent_note
         assert f"sessão {db_id}" not in recent_note
+
+def test_words_endpoint_lists_learned_correct_answers_by_language():
+    user_id = 94004
+    with TestClient(app) as client:
+        client.post(f"/users/{user_id}/bootstrap")
+        lesson = next(lesson for lesson in client.get("/exercise-lessons", params={"user_id": user_id}).json() if lesson["language_code"] == "de")
+        session = client.post(f"/exercise-lessons/{lesson['id']}/sessions", params={"user_id": user_id}).json()
+        item = session["current_item"]
+        answer = client.post(f"/exercise-sessions/{session['id']}/answer", json={"item_id": item["id"], "payload": item["answer"]})
+        assert answer.status_code == 200, answer.text
+        client.post(f"/exercise-sessions/{session['id']}/complete")
+
+        response = client.get(f"/users/{user_id}/words")
+        assert response.status_code == 200, response.text
+        payload = response.json()
+
+        assert payload["total"] >= 1
+        assert payload["languages"][0]["language_code"] == "de"
+        first = payload["languages"][0]["words"][0]
+        assert first["language_code"] == "de"
+        assert first["language_name"] == "Alemão"
+        assert first["word"]
+        assert first["translation_pt"]
+        assert first["source"] == "exercise_answer"
 
