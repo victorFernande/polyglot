@@ -178,12 +178,12 @@ def test_seed_lessons_deactivates_legacy_prototype_lessons():
 def test_incremental_cron_target_closes_active_german_session_54_with_twenty_contact_items():
     assert ExerciseService.SESSION_SIZE == 20
     assert ExerciseService.TARGET_ITEMS == 1000
-    assert ExerciseService.target_items_for_language("de") == 1115
+    assert ExerciseService.target_items_for_language("de") == 1120
     assert {language: ExerciseService.target_items_for_language(language) for language in LANGUAGES - {"de"}} == {
-        "fr": 1025,
-        "ru": 1025,
-        "jp": 1025,
-        "en": 1025,
+        "fr": 1030,
+        "ru": 1030,
+        "jp": 1030,
+        "en": 1030,
     }
 
     german_items = ExerciseService.generate_items("de")
@@ -229,12 +229,12 @@ def test_incremental_cron_target_closes_active_german_session_54_with_twenty_con
 def test_incremental_cron_target_opens_active_german_session_55_with_ten_family_items():
     assert ExerciseService.SESSION_SIZE == 20
     assert ExerciseService.TARGET_ITEMS == 1000
-    assert ExerciseService.target_items_for_language("de") == 1115
+    assert ExerciseService.target_items_for_language("de") == 1120
     assert {language: ExerciseService.target_items_for_language(language) for language in LANGUAGES - {"de"}} == {
-        "fr": 1025,
-        "ru": 1025,
-        "jp": 1025,
-        "en": 1025,
+        "fr": 1030,
+        "ru": 1030,
+        "jp": 1030,
+        "en": 1030,
     }
 
     german_items = ExerciseService.generate_items("de")
@@ -278,11 +278,11 @@ def test_incremental_cron_target_opens_active_german_session_55_with_ten_family_
 def test_hourly_incremental_cron_adds_five_real_items_to_every_active_language_without_overfilling_blocks():
     assert ExerciseService.SESSION_SIZE == 20
     assert {language: ExerciseService.target_items_for_language(language) for language in LANGUAGES} == {
-        "de": 1115,
-        "fr": 1025,
-        "ru": 1025,
-        "jp": 1025,
-        "en": 1025,
+        "de": 1120,
+        "fr": 1030,
+        "ru": 1030,
+        "jp": 1030,
+        "en": 1030,
     }
 
     expected_first_targets = {
@@ -294,7 +294,7 @@ def test_hourly_incremental_cron_adds_five_real_items_to_every_active_language_w
     for language in LANGUAGES:
         items = ExerciseService.generate_items(language)
         last_block_size = len(items) % ExerciseService.SESSION_SIZE
-        expected_block_size = 15 if language == "de" else 5
+        expected_block_size = 0 if language == "de" else 10
         assert last_block_size == expected_block_size
         assert last_block_size <= ExerciseService.SESSION_SIZE
 
@@ -331,11 +331,11 @@ def test_hourly_incremental_cron_adds_five_real_items_to_every_active_language_w
 def test_next_hourly_incremental_cron_adds_five_more_items_per_active_language_without_overfilling_blocks():
     assert ExerciseService.SESSION_SIZE == 20
     assert {language: ExerciseService.target_items_for_language(language) for language in LANGUAGES} == {
-        "de": 1115,
-        "fr": 1025,
-        "ru": 1025,
-        "jp": 1025,
-        "en": 1025,
+        "de": 1120,
+        "fr": 1030,
+        "ru": 1030,
+        "jp": 1030,
+        "en": 1030,
     }
 
     for language in LANGUAGES:
@@ -346,7 +346,7 @@ def test_next_hourly_incremental_cron_adds_five_more_items_per_active_language_w
 
         assert len(items) >= after_count
         assert len(new_items) == 5
-        assert (len(items) % ExerciseService.SESSION_SIZE) == (15 if language == "de" else 5)
+        assert (len(items) % ExerciseService.SESSION_SIZE) == (0 if language == "de" else 10)
         assert [item["type"] for item in new_items] == [
             "listen_match",
             "choice",
@@ -370,26 +370,26 @@ def test_next_hourly_incremental_cron_adds_five_more_items_per_active_language_w
 def test_current_hourly_incremental_cron_adds_five_items_to_all_active_languages_without_overfill():
     assert ExerciseService.SESSION_SIZE == 20
     assert {language: ExerciseService.target_items_for_language(language) for language in LANGUAGES} == {
-        "de": 1115,
-        "fr": 1025,
-        "ru": 1025,
-        "jp": 1025,
-        "en": 1025,
+        "de": 1120,
+        "fr": 1030,
+        "ru": 1030,
+        "jp": 1030,
+        "en": 1030,
     }
 
     expected_counts = {
-        "de": (1110, 1115, 15, "Sessão 56"),
-        "fr": (1020, 1025, 5, "Sessão 52"),
-        "ru": (1020, 1025, 5, "Sessão 52"),
-        "jp": (1020, 1025, 5, "Sessão 52"),
-        "en": (1020, 1025, 5, "Sessão 52"),
+        "de": (1115, 1120, 0, "Sessão 56"),
+        "fr": (1025, 1030, 10, "Sessão 52"),
+        "ru": (1025, 1030, 10, "Sessão 52"),
+        "jp": (1025, 1030, 10, "Sessão 52"),
+        "en": (1025, 1030, 10, "Sessão 52"),
     }
     expected_targets = {
-        "de": "Ich arbeite von neun bis fünf.",
-        "fr": "Je voyage à Paris.",
-        "ru": "Я еду в Москву.",
-        "jp": "東京へ旅行します。",
-        "en": "I travel to London.",
+        "de": "Ich mache eine Pause.",
+        "fr": "Je prends le train.",
+        "ru": "Я еду на поезде.",
+        "jp": "電車に乗ります。",
+        "en": "I take the train.",
     }
 
     for language in LANGUAGES:
@@ -401,10 +401,10 @@ def test_current_hourly_incremental_cron_adds_five_items_to_all_active_languages
         assert len(new_items) == 5
         assert len(items) % ExerciseService.SESSION_SIZE == last_block_size
         assert [item["type"] for item in new_items] == [
+            "listen_match",
             "choice",
-            "listen_choice",
-            "image_choice",
-            "build",
+            "listen_build",
+            "sequence_dialogue",
             "context_choice",
         ]
         assert all(session_label in item["prompt"] for item in new_items)
@@ -610,10 +610,10 @@ def test_seed_lessons_appends_incremental_items_without_replacing_existing_ids()
         ExerciseService.seed_lessons(db)
 
         items = db.query(ExerciseItem).filter(ExerciseItem.lesson_id == lesson.id).order_by(ExerciseItem.order_index).all()
-        assert len(items) == 1115
+        assert len(items) == 1120
         assert [item.id for item in items[:5]] == preserved_ids
-        assert [item.order_index for item in items[-5:]] == list(range(1111, 1116))
-        assert len(items) % ExerciseService.SESSION_SIZE == 15
+        assert [item.order_index for item in items[-5:]] == list(range(1116, 1121))
+        assert len(items) % ExerciseService.SESSION_SIZE == 0
     finally:
         db.close()
 
