@@ -1,8 +1,26 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
+const buildId = process.env.VITE_BUILD_ID || new Date().toISOString()
+
+function buildVersionPlugin() {
+  return {
+    name: 'polyglot-build-version',
+    generateBundle() {
+      this.emitFile({
+        type: 'asset',
+        fileName: 'version.json',
+        source: JSON.stringify({ buildId }, null, 2),
+      })
+    },
+  }
+}
+
 export default defineConfig({
-  plugins: [react()],
+  define: {
+    'import.meta.env.VITE_BUILD_ID': JSON.stringify(buildId),
+  },
+  plugins: [react(), buildVersionPlugin()],
   server: {
     port: 3000,
     proxy: {

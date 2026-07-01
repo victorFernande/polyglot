@@ -10,8 +10,11 @@ import Leaderboard from './pages/Leaderboard'
 import Profile from './pages/Profile'
 import Sounds from './pages/Sounds'
 import Words from './pages/Words'
+import { useCacheInvalidator } from './lib/cacheInvalidator.mjs'
 
 function App() {
+  useCacheInvalidator()
+
   return (
     <Layout>
       <Routes>
