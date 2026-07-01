@@ -230,7 +230,7 @@ class ExerciseService:
     }
     SESSION_SIZE = 20
     TARGET_ITEMS = 1000
-    INCREMENTAL_ITEM_TARGETS = {"de": 1130, "fr": 1040, "ru": 1040, "jp": 1040, "en": 1040}
+    INCREMENTAL_ITEM_TARGETS = {"de": 1135, "fr": 1045, "ru": 1045, "jp": 1045, "en": 1045}
     JP_BEGINNER_KANA = {
         "私の名前はビクトルです。": "わたしのなまえはビクトルです。",
         "ブラジル出身です。": "ブラジルしゅっしんです。",
@@ -1952,6 +1952,49 @@ class ExerciseService:
         pt, target = phrases[8]
         items.append(ExerciseService._context_choice(
             f"{prefix}: situação guiada — diga que você vai comprar a roupa. Escolha a fala que comunica “{pt}” em {name}.",
+            target,
+            [foreign for foreign in options[0:3]],
+            start_index + len(items),
+        ))
+
+        pt, target = phrases[7]
+        items.append(ExerciseService._choice(
+            f"{prefix}: escolha como dizer “{pt}” em {name}",
+            target,
+            [foreign for foreign in options[4:7]],
+            start_index + len(items),
+        ))
+
+        pt, target = phrases[8]
+        items.append(ExerciseService._listen_choice(
+            f"{prefix}: ouça o áudio e identifique a fala que comunica “{pt}”",
+            target,
+            [foreign for foreign in options[5:8]],
+            start_index + len(items),
+        ))
+
+        image_sample = phrases[0:2] + phrases[8:10]
+        answer_pt, answer_foreign = image_sample[0]
+        items.append(ExerciseService._image_choice(
+            f"{prefix}: observe a imagem e escolha a frase que representa “{answer_pt}”",
+            (answer_pt, answer_foreign, ExerciseService._icon_key_for_phrase(answer_pt, answer_foreign, unit["topics"][0])),
+            [(pt, foreign, ExerciseService._icon_key_for_phrase(pt, foreign, unit["topics"][0])) for pt, foreign in image_sample[1:]],
+            start_index + len(items),
+        ))
+
+        pt, target = phrases[9]
+        words = ExerciseService._build_tokens(code, target)
+        extras = [word for foreign in options[0:10] for word in ExerciseService._build_tokens(code, foreign)]
+        items.append(ExerciseService._build(
+            f"{prefix}: monte a frase em ordem natural para dizer “{pt}”",
+            words,
+            extras,
+            start_index + len(items),
+        ))
+
+        pt, target = phrases[6]
+        items.append(ExerciseService._context_choice(
+            f"{prefix}: situação guiada — fale do preço da peça. Escolha a fala que comunica “{pt}” em {name}.",
             target,
             [foreign for foreign in options[0:3]],
             start_index + len(items),
