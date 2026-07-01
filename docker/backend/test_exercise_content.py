@@ -126,10 +126,10 @@ def test_seed_lessons_deactivates_legacy_prototype_lessons():
         db.close()
 
 
-def test_incremental_cron_target_opens_active_german_session_53_with_ten_restaurant_items():
+def test_incremental_cron_target_closes_active_german_session_53_with_twenty_restaurant_items():
     assert ExerciseService.SESSION_SIZE == 20
     assert ExerciseService.TARGET_ITEMS == 1000
-    assert ExerciseService.target_items_for_language("de") == 1050
+    assert ExerciseService.target_items_for_language("de") == 1060
     assert {language: ExerciseService.target_items_for_language(language) for language in LANGUAGES - {"de"}} == {
         "fr": 1000,
         "ru": 1000,
@@ -139,12 +139,12 @@ def test_incremental_cron_target_opens_active_german_session_53_with_ten_restaur
 
     german_items = ExerciseService.generate_items("de")
     last_block_size = len(german_items) % ExerciseService.SESSION_SIZE
-    session_53 = german_items[1040:1050]
+    session_53 = german_items[1040:1060]
 
-    assert len(german_items) == 1050
-    assert last_block_size == 10
-    assert len(session_53) == 10
-    assert [item["type"] for item in session_53] == [
+    assert len(german_items) == 1060
+    assert last_block_size == 0
+    assert len(session_53) == ExerciseService.SESSION_SIZE
+    assert [item["type"] for item in session_53[-10:]] == [
         "choice",
         "listen_choice",
         "image_choice",
@@ -159,6 +159,7 @@ def test_incremental_cron_target_opens_active_german_session_53_with_ten_restaur
     assert all("Sessão 53" in item["prompt"] for item in session_53)
     assert any("Ich habe einen Tisch." in repr(item) for item in session_53)
     assert any("Die Speisekarte, bitte." in repr(item) for item in session_53)
+    assert any("Die Rechnung, bitte." in repr(item) for item in session_53)
     assert all("a palavra" not in item["prompt"].casefold() for item in session_53)
     assert all("das Wort" not in repr(item) for item in session_53)
     sequence = session_53[-2]
@@ -166,6 +167,33 @@ def test_incremental_cron_target_opens_active_german_session_53_with_ten_restaur
     assert sequence["options"] is None
     assert sequence["pairs"] is None
     assert "português" not in "\n".join(sequence["tiles"]).casefold()
+    assert sequence["answer"]["value"] == [
+        "Ich möchte Wasser.",
+        "Ohne Fleisch, bitte.",
+        "Was empfehlen Sie?",
+        "Die Rechnung, bitte.",
+    ]
+
+
+def test_previous_incremental_german_session_53_first_half_remains_unchanged():
+    german_items = ExerciseService.generate_items("de")
+    session_53_first_half = german_items[1040:1050]
+
+    assert len(session_53_first_half) == 10
+    assert all("Sessão 53" in item["prompt"] for item in session_53_first_half)
+    assert [item["type"] for item in session_53_first_half] == [
+        "choice",
+        "listen_choice",
+        "image_choice",
+        "build",
+        "context_choice",
+        "listen_match",
+        "choice",
+        "listen_build",
+        "sequence_dialogue",
+        "context_choice",
+    ]
+    sequence = session_53_first_half[-2]
     assert sequence["answer"]["value"] == [
         "Ich habe einen Tisch.",
         "Die Speisekarte, bitte.",
@@ -274,10 +302,10 @@ def test_seed_lessons_appends_incremental_items_without_replacing_existing_ids()
         ExerciseService.seed_lessons(db)
 
         items = db.query(ExerciseItem).filter(ExerciseItem.lesson_id == lesson.id).order_by(ExerciseItem.order_index).all()
-        assert len(items) == 1050
+        assert len(items) == 1060
         assert [item.id for item in items[:5]] == preserved_ids
-        assert [item.order_index for item in items[-10:]] == list(range(1041, 1051))
-        assert len(items) % ExerciseService.SESSION_SIZE == 10
+        assert [item.order_index for item in items[-10:]] == list(range(1051, 1061))
+        assert len(items) % ExerciseService.SESSION_SIZE == 0
     finally:
         db.close()
 
