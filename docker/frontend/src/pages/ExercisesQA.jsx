@@ -320,8 +320,8 @@ export default function Exercises() {
 
       <ExercisesQaChangeMenu entries={exercisesQaChangeLog} />
 
-      <div className="rounded-2xl border border-amber-400/30 bg-amber-400/10 p-4 text-sm text-amber-100">
-        <strong>Staging QA — PENDING QA APPROVAL:</strong> esta rota valida layout e variedade em <code className="rounded bg-black/30 px-1">/exercises-qa</code>. Não promover para <code className="rounded bg-black/30 px-1">/exercises</code> sem aprovação explícita no formato <code className="rounded bg-black/30 px-1">QA aprovado DD/MM HH:MM</code> correspondente ao item pendente.
+      <div className="rounded-2xl border border-emerald-400/30 bg-emerald-400/10 p-4 text-sm text-emerald-100">
+        <strong>QA separado de produção:</strong> esta rota valida layout e variedade em <code className="rounded bg-black/30 px-1">/exercises-qa</code>. O checklist de alterações QA está aprovado; qualquer promoção futura para <code className="rounded bg-black/30 px-1">/exercises</code> deve ser uma ação separada, sem levar menus ou banners de QA para produção.
       </div>
 
       {summary && (

@@ -2,13 +2,13 @@ export const exercisesQaChangeLog = [
   {
     id: '2026-06-30-1758-qa-change-menu',
     timestamp: '30/06 18:00',
-    title: 'Menu de alterações pendentes no Exercícios QA',
+    title: 'Menu de histórico QA no Exercícios QA',
     approved: true,
     approvalPhrase: 'qa aprovado 30/06 18:00',
-    summary: 'Adiciona no topo da página Exercícios QA um menu clicável com o histórico de mudanças ainda não aprovadas.',
+    summary: 'Adiciona no topo da página Exercícios QA um menu clicável com o histórico de mudanças de QA registradas.',
     diffs: [
-      '/exercises-qa mostra a data/hora das alterações pendentes no topo.',
-      'Ao clicar no menu, a página lista os diffs de QA que ainda não foram aprovados.',
+      '/exercises-qa mostra a data/hora do histórico de QA no topo.',
+      'Ao clicar no menu, a página lista os diffs de QA registrados.',
       'O texto de aprovação esperado aparece em cada entrada, por exemplo “qa aprovado 30/06 18:00”.',
       'A mudança fica apenas em ExercisesQA.jsx; produção /exercises não recebe este menu por ser chrome de QA.',
     ],
@@ -34,12 +34,12 @@ export const exercisesQaChangeLog = [
     title: 'Formato explícito da frase de aprovação QA',
     approved: true,
     approvalPhrase: 'QA aprovado 30/06 20:02',
-    summary: 'Clarifica no banner de /exercises-qa que a aprovação precisa usar exatamente o formato “QA aprovado DD/MM HH:MM” do item pendente antes de qualquer promoção para produção.',
+    summary: 'Clarifica no banner de /exercises-qa que a aprovação precisa usar exatamente o formato “QA aprovado DD/MM HH:MM” da entrada de QA antes de qualquer promoção para produção.',
     diffs: [
       '/exercises-qa passa a mostrar o formato completo da frase de aprovação no banner de staging.',
-      'O menu de alterações pendentes registra a frase exata “QA aprovado 30/06 20:02” para esta alteração visível.',
+      'O menu de histórico QA registra a frase exata “QA aprovado 30/06 20:02” para esta alteração visível.',
       'A mudança é apenas em QA/changelog; não cria treino local, exercício extra, painel frontend-only ou atividade sem XP/progresso.',
-      'docker/frontend/src/pages/Exercises.jsx e produção /exercises permanecem PENDING QA APPROVAL.',
+      'docker/frontend/src/pages/Exercises.jsx e produção /exercises permanecem sem menus ou banners de QA.',
     ],
   },
   {
@@ -48,12 +48,12 @@ export const exercisesQaChangeLog = [
     title: 'Frase de aprovação visível no menu fechado',
     approved: true,
     approvalPhrase: 'QA aprovado 30/06 20:11',
-    summary: 'Mostra a frase exata de aprovação do item pendente mais novo diretamente no menu fechado de /exercises-qa, sem exigir que Victor abra os detalhes para copiar a aprovação correta.',
+    summary: 'Mostra a frase exata de aprovação da entrada de QA mais nova diretamente no menu fechado de /exercises-qa, sem exigir que Victor abra os detalhes para copiar a aprovação correta.',
     diffs: [
-      '/exercises-qa passa a mostrar “Próxima aprovação: QA aprovado 30/06 20:11” no estado fechado do menu de alterações pendentes.',
-      'A frase continua vinculada a latestExercisesQaChange(), então o menu fechado acompanha o item pendente mais novo.',
+      '/exercises-qa passa a mostrar “Próxima aprovação: QA aprovado 30/06 20:11” no estado fechado do menu de histórico QA.',
+      'A frase continua vinculada a latestExercisesQaChange(), então o menu fechado acompanha a entrada de QA mais nova.',
       'A mudança é apenas em ExercisesQA.jsx e no changelog QA; não cria treino local, exercício extra, painel frontend-only ou atividade sem XP/progresso.',
-      'docker/frontend/src/pages/Exercises.jsx e produção /exercises permanecem PENDING QA APPROVAL.',
+      'docker/frontend/src/pages/Exercises.jsx e produção /exercises permanecem sem menus ou banners de QA.',
     ],
   },
   {
@@ -67,7 +67,7 @@ export const exercisesQaChangeLog = [
       '/exercises-qa passa a mostrar “items reais” e “current_index” na faixa Integridade QA da sessão.',
       'A página exibe QA BLOCKER quando session.items.length não bate com session.total_count, evitando promover payload backend truncado ou inconsistente.',
       'A verificação continua usando apenas session.items reais vindos do backend; não cria treino local, Questão extra, painel frontend-only ou atividade sem XP/progresso.',
-      'docker/frontend/src/pages/Exercises.jsx e produção /exercises permanecem PENDING QA APPROVAL.',
+      'docker/frontend/src/pages/Exercises.jsx e produção /exercises permanecem sem menus ou banners de QA.',
     ],
   },
   {
@@ -81,7 +81,7 @@ export const exercisesQaChangeLog = [
       '/exercises-qa passa a mostrar “item.id” na faixa Integridade QA da sessão para validar o item ativo vindo do backend.',
       'A página exibe QA BLOCKER quando current_index sem item real em session.items, cobrindo janelas ativas esgotadas ou truncadas antes de qualquer promoção.',
       'A checagem continua usando apenas session.items reais; não cria treino local, Questão extra, painel frontend-only ou atividade sem XP/progresso.',
-      'docker/frontend/src/pages/Exercises.jsx e produção /exercises permanecem PENDING QA APPROVAL.',
+      'docker/frontend/src/pages/Exercises.jsx e produção /exercises permanecem sem menus ou banners de QA.',
     ],
   },
   {
@@ -95,7 +95,7 @@ export const exercisesQaChangeLog = [
       '/exercises-qa passa a mostrar “janela ativa: fim aguardando conclusão” quando current_index alcança total_count.',
       'O QA BLOCKER “current_index sem item real” agora só aparece quando ainda há exercício em progresso e o índice não aponta para session.items.',
       'A auditoria continua usando apenas session.items reais do backend; não cria treino local, Questão extra, painel frontend-only ou atividade sem XP/progresso.',
-      'docker/frontend/src/pages/Exercises.jsx e produção /exercises permanecem PENDING QA APPROVAL.',
+      'docker/frontend/src/pages/Exercises.jsx e produção /exercises permanecem sem menus ou banners de QA.',
     ],
   },
 ]

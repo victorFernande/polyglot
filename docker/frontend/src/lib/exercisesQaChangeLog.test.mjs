@@ -25,7 +25,7 @@ test('approving QA chrome does not imply production promotion', () => {
   const qaText = exercisesQaChangeLog.flatMap((entry) => [entry.title, entry.summary, ...entry.diffs]).join('\n')
 
   assert.match(qaText, /\/exercises-qa/)
-  assert.match(qaText, /produção \/exercises permanecem|produção \/exercises não recebe|produção \/exercises permanecem PENDING QA APPROVAL/i)
+  assert.match(qaText, /produção \/exercises permanecem|produção \/exercises não recebe/i)
 })
 
 test('QA changelog does not keep removed stale scope-badge changes pending', () => {
@@ -79,6 +79,15 @@ test('finish window integrity state entry is approved with original evidence', (
 test('pending helpers return no current QA approvals after Victor approved all listed entries', () => {
   assert.deepEqual(pendingExercisesQaChanges(), [])
   assert.equal(latestExercisesQaChange(), null)
+})
+
+test('approved QA changelog copy does not still say changes are pending', () => {
+  const approvedText = exercisesQaChangeLog
+    .filter((entry) => entry.approved)
+    .flatMap((entry) => [entry.title, entry.summary, ...entry.diffs])
+    .join('\n')
+
+  assert.doesNotMatch(approvedText, /alterações pendentes|item pendente|pendente mais novo|menu de alterações pendentes|PENDING QA APPROVAL/i)
 })
 
 test('pendingExercisesQaChanges still returns only unapproved entries for custom lists', () => {
