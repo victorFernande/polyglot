@@ -5,7 +5,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "shared/tools"))
 
 import polyglot_agent_review  # noqa: E402
-from polyglot_agent_review import context_for_index, review_item  # noqa: E402
+from polyglot_agent_review import context_for_index, review_item, add_repetition_verdicts  # noqa: E402
 
 
 def test_model_review_calls_9router_endpoint_and_prefixed_model(monkeypatch):
@@ -120,3 +120,21 @@ def test_polyglot_qa_blocks_match_translation_pairs_that_are_only_topic_labels()
 
     assert result["verdict"] == "BLOCK"
     assert any(issue["code"] == "match_translation_is_topic_label" for issue in result["issues"])
+
+
+def test_polyglot_qa_blocks_sessions_with_more_than_five_repeated_same_phrase():
+    rows = []
+    for idx in range(6):
+        rows.append(review_item("de", idx, {
+            "type": "choice",
+            "prompt": "Unidade 1/10 — Café · Tópico 1/10 — cumprimentar: escolha como dizer “Olá.” em Alemão",
+            "answer": {"value": "Hallo."},
+            "options": ["Hallo.", "Danke.", "Bitte.", "Tschüss."],
+            "tiles": None,
+            "pairs": None,
+        }))
+
+    add_repetition_verdicts(rows)
+
+    assert {row["verdict"] for row in rows} == {"BLOCK"}
+    assert all(any(issue["code"] == "same_phrase_repeated_more_than_five_in_session" for issue in row["issues"]) for row in rows)

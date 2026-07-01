@@ -30,6 +30,7 @@ from curriculum import A1_UNITS  # noqa: E402
 
 LANGS = ["de", "fr", "ru", "jp", "en"]
 LANG_NAMES = ExerciseService.LANGUAGE_NAMES
+CURRICULUM_TOPIC_LABELS = {topic.casefold() for unit in A1_UNITS for topic in unit["topics"]}
 
 GENERIC_PROMPTS = [
     "combine itens do contexto",
@@ -107,6 +108,24 @@ def answer_value(item: dict):
     return answer.get("value", answer.get("pairs"))
 
 
+def phrase_keys_for_repetition(item: dict) -> set[str]:
+    keys: set[str] = set()
+    answer = answer_value(item)
+    if isinstance(answer, str):
+        keys.add(answer.casefold().strip())
+    elif isinstance(answer, list):
+        if all(isinstance(part, str) for part in answer):
+            keys.add(" ".join(answer).casefold().strip())
+        else:
+            for pair in answer:
+                if isinstance(pair, list) and pair and isinstance(pair[0], str):
+                    keys.add(pair[0].casefold().strip())
+    for pair in item.get("pairs") or []:
+        if isinstance(pair, list) and pair and isinstance(pair[0], str):
+            keys.add(pair[0].casefold().strip())
+    return {key for key in keys if key}
+
+
 def visible_prompt(prompt: str) -> str:
     return prompt.split(": ", 1)[-1] if ": " in prompt else prompt
 
@@ -175,7 +194,7 @@ def review_item(language: str, idx_zero: int, item: dict) -> dict:
                 if isinstance(pair, list)
                 and len(pair) == 2
                 and looks_like_sentence(str(pair[0]))
-                and looks_like_topic_label(str(pair[1]))
+                and str(pair[1]).strip().casefold() in CURRICULUM_TOPIC_LABELS
             ]
             if bad_translation_labels:
                 issues.append({"severity": "high", "code": "match_translation_is_topic_label", "message": "Match/listen_match promete tradução, mas o português é só rótulo/tópico."})
@@ -219,6 +238,40 @@ def review_item(language: str, idx_zero: int, item: dict) -> dict:
     }
 
 
+def add_repetition_verdicts(rows: list[dict], max_repetitions: int = 5) -> list[dict]:
+    """BLOCK a session when the same phrase appears in more than five exercises.
+
+    Individual items can be valid, but a session with 6+ exercises anchored on
+    the same phrase feels repetitive and must be regenerated/refeita by QA.
+    """
+    grouped: dict[tuple[str, int], list[dict]] = {}
+    for row in rows:
+        grouped.setdefault((row["language"], row["session_number"]), []).append(row)
+
+    for (_language, session_number), session_rows in grouped.items():
+        counts: Counter[str] = Counter()
+        row_keys: dict[int, set[str]] = {}
+        for row in session_rows:
+            item = {"answer": {"value": row.get("answer")}, "pairs": row.get("pairs")}
+            keys = phrase_keys_for_repetition(item)
+            row_keys[id(row)] = keys
+            counts.update(keys)
+        over_limit = {phrase: count for phrase, count in counts.items() if count > max_repetitions}
+        if not over_limit:
+            continue
+        message = (
+            f"Sessão {session_number} repete a mesma frase em mais de {max_repetitions} exercícios; "
+            "POLYGLOT-QA deve pedir para refazer/regenerar o bloco. "
+            f"Repetições: {dict(over_limit)}"
+        )
+        for row in session_rows:
+            if row_keys[id(row)] & set(over_limit):
+                row["issues"].append({"severity": "high", "code": "same_phrase_repeated_more_than_five_in_session", "message": message})
+                row["severity"] = "high"
+                row["verdict"] = "BLOCK"
+    return rows
+
+
 def generate_reviews(limit: int | None, recent: int | None, languages: list[str]) -> list[dict]:
     rows: list[dict] = []
     for language in languages:
@@ -229,7 +282,7 @@ def generate_reviews(limit: int | None, recent: int | None, languages: list[str]
         if limit:
             indexed = indexed[:limit]
         rows.extend(review_item(language, idx, item) for idx, item in indexed)
-    return rows
+    return add_repetition_verdicts(rows)
 
 
 def call_9router_review(model: str, rows: list[dict], counts: Counter, issues: Counter) -> dict:

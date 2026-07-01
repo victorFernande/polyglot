@@ -1808,22 +1808,24 @@ class ExerciseService:
                     wrong = ExerciseService._wrong_options(bank, target, start + question_index, 3)
                     prompt = ExerciseService._prompt_for_question(prefix, question_index + topic_index - 1, pt, target, name, topic_name)
                     item_type = pattern[question_index - 1]
-                    topic_pt, topic_target = unit["phrases"][code][topic_index - 1]
-                    topic_wrong_foreign = [foreign for idx_pair, (_pt, foreign) in enumerate(unit["phrases"][code]) if idx_pair != topic_index - 1][:3]
-                    topic_wrong_portuguese = [portuguese for idx_pair, (portuguese, _foreign) in enumerate(unit["phrases"][code]) if idx_pair != topic_index - 1][:3]
+                    unit_phrase_count = len(unit["phrases"][code])
+                    phrase_index = topic_index - 1 if (unit["title"] == "Apresente-se" and topic_name == "dizer profissão" and question_index == 2) else (topic_index + question_index - 2) % unit_phrase_count
+                    pt, target = unit["phrases"][code][phrase_index]
+                    varied_wrong_foreign = [foreign for pair_idx, (_pt, foreign) in enumerate(unit["phrases"][code]) if pair_idx != phrase_index][:3]
+                    varied_wrong_portuguese = [portuguese for pair_idx, (portuguese, _foreign) in enumerate(unit["phrases"][code]) if pair_idx != phrase_index][:3]
                     if item_type == "choice":
-                        can_use_reverse = question_index in {6, 7, 8} and topic_pt.casefold() not in topic_target.casefold()
+                        can_use_reverse = question_index in {6, 7, 8} and pt.casefold() not in target.casefold()
                         if can_use_reverse:
-                            reverse_prompt = f"{prefix}: entenda “{topic_target}” — qual é o significado em português?"
-                            item = ExerciseService._choice(reverse_prompt, topic_pt, topic_wrong_portuguese, idx)
+                            reverse_prompt = f"{prefix}: entenda “{target}” — qual é o significado em português?"
+                            item = ExerciseService._choice(reverse_prompt, pt, varied_wrong_portuguese, idx)
                         else:
-                            prompt = f"{prefix}: escolha como dizer “{topic_pt}” em {name}"
-                            item = ExerciseService._choice(prompt, topic_target, topic_wrong_foreign, idx)
+                            prompt = f"{prefix}: escolha como dizer “{pt}” em {name}"
+                            item = ExerciseService._choice(prompt, target, varied_wrong_foreign, idx)
                     elif item_type == "listen_choice":
-                        prompt = f"{prefix}: ouça o áudio e identifique “{topic_pt}”"
-                        item = ExerciseService._listen_choice(prompt, topic_target, topic_wrong_foreign, idx)
+                        prompt = f"{prefix}: ouça o áudio e identifique “{pt}”"
+                        item = ExerciseService._listen_choice(prompt, target, varied_wrong_foreign, idx)
                     elif item_type == "image_choice":
-                        sample = [(topic_pt, topic_target)] + [pair for pair in unit["phrases"][code] if pair[1] != topic_target][:3]
+                        sample = [(pt, target)] + [pair for pair in unit["phrases"][code] if pair[1] != target][:3]
                         answer_pt, answer_foreign = sample[0]
                         answer = (answer_pt, answer_foreign, ExerciseService._icon_key_for_phrase(answer_pt, answer_foreign, topic_name))
                         image_options = [
@@ -1833,7 +1835,7 @@ class ExerciseService:
                         prompt = f"{prefix}: observe a imagem e escolha a frase que representa “{answer_pt}”"
                         item = ExerciseService._image_choice(prompt, answer, image_options, idx)
                     elif item_type in {"build", "listen_build"}:
-                        build_pt, build_target = topic_pt, topic_target
+                        build_pt, build_target = pt, target
                         words = ExerciseService._build_tokens(code, build_target)
                         if len(words) < 2:
                             build_pt, build_target = ExerciseService._build_source_phrase(unit, code, topic_index, question_index)
@@ -1864,8 +1866,8 @@ class ExerciseService:
                         prompt = ExerciseService._sequence_prompt(review_prefix, unit["title"], sequence_pairs, topic_name)
                         item = ExerciseService._sequence_dialogue(prompt, phrases, idx)
                     else:
-                        context_pt, context_target = topic_pt, topic_target
-                        context_wrong = topic_wrong_foreign
+                        context_pt, context_target = pt, target
+                        context_wrong = varied_wrong_foreign
                         prompt = f"{prefix}: situação guiada — você precisa comunicar “{context_pt}” no tema “{topic_name}”. Escolha a fala correta em {name}."
                         item = ExerciseService._context_choice(prompt, context_target, context_wrong, idx)
                     if item["type"] == "listen_build":

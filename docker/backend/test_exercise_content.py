@@ -603,6 +603,35 @@ def test_image_choice_options_include_frontend_ready_image_src():
     assert all("%3Csvg" in option["image_src"] for option in item["options"])
 
 
+def _exercise_phrase_keys(item):
+    answer = item.get("answer") or {}
+    value = answer.get("value", answer.get("pairs"))
+    if isinstance(value, str):
+        yield value.casefold().strip()
+    elif isinstance(value, list):
+        if all(isinstance(part, str) for part in value):
+            yield " ".join(value).casefold().strip()
+        else:
+            for pair in value:
+                if isinstance(pair, list) and pair and isinstance(pair[0], str):
+                    yield pair[0].casefold().strip()
+    for pair in item.get("pairs") or []:
+        if isinstance(pair, list) and pair and isinstance(pair[0], str):
+            yield pair[0].casefold().strip()
+
+
+def test_no_session_repeats_the_same_target_phrase_more_than_five_times():
+    for language in LANGUAGES:
+        items = ExerciseService.generate_items(language)
+        for offset in range(0, len(items), ExerciseService.SESSION_SIZE):
+            counts = {}
+            for item in items[offset:offset + ExerciseService.SESSION_SIZE]:
+                for phrase in set(_exercise_phrase_keys(item)):
+                    counts[phrase] = counts.get(phrase, 0) + 1
+            repeated = {phrase: count for phrase, count in counts.items() if phrase and count > 5}
+            assert repeated == {}, f"{language} session {offset // ExerciseService.SESSION_SIZE + 1}: {repeated}"
+
+
 def test_first_five_exercises_are_not_repetitive_variations_of_same_task():
     first_five = ExerciseService.generate_items("de")[:5]
     types = [item["type"] for item in first_five]
