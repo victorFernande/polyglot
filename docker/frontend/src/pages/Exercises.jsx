@@ -25,6 +25,7 @@ import { buildLetterScramblePayload, isLetterScrambleEligible, singleWordBuildAn
 
 import { buildListenBuildDictationPayload, canSubmitListenBuildDictation } from '../lib/listenBuildDictation.mjs'
 import { sequenceDialogueCanSubmit, sequenceDialoguePayload } from '../lib/sequenceDialogue.mjs'
+import { orderedMatchColumns } from '../lib/matchExerciseOrder.mjs'
 
 const LANG_META = {
   de: { accent: 'Rammstein', color: 'from-red-600 to-red-900' },
@@ -891,6 +892,7 @@ function LetterScrambleExerciseBody({ item, built, setBuilt, onInteract }) {
 
 function MatchExerciseBody({ item, langCode, matched, setMatched, onInteract, onSpeakAudio }) {
   const pairs = matchPairs(item)
+  const { leftItems, rightItems } = useMemo(() => orderedMatchColumns({ ...item, pairs }), [item, pairs])
   const isListenMatch = item.type === 'listen_match'
   const [selectedLeft, setSelectedLeft] = useState(null)
   const [wrongRight, setWrongRight] = useState(null)
@@ -927,7 +929,7 @@ function MatchExerciseBody({ item, langCode, matched, setMatched, onInteract, on
       <div className="grid gap-4 md:grid-cols-2">
         <div className="space-y-2">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">{isListenMatch ? 'Áudios' : 'Termos'}</p>
-          {pairs.map(([left]) => {
+          {leftItems.map((left, index) => {
             const found = !!matched[left]
             const selected = selectedLeft === left
             return (
@@ -941,7 +943,7 @@ function MatchExerciseBody({ item, langCode, matched, setMatched, onInteract, on
                 {isListenMatch ? (
                   <span className="flex items-center gap-3">
                     <Volume2 size={20} />
-                    <span>Áudio {pairs.findIndex(([candidate]) => candidate === left) + 1}</span>
+                    <span>Áudio {index + 1}</span>
                     <span className="h-2 flex-1 rounded-full bg-gradient-to-r from-cyan-300 via-blue-500 to-cyan-300 opacity-80" />
                   </span>
                 ) : left}
@@ -952,8 +954,9 @@ function MatchExerciseBody({ item, langCode, matched, setMatched, onInteract, on
         </div>
         <div className="space-y-2">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">{isListenMatch ? 'Traduções' : 'Pares'}</p>
-          {pairs.map(([left, right]) => {
-            const found = matched[left] === right
+          {rightItems.map((right) => {
+            const matchedLeft = pairs.find(([left, pairRight]) => pairRight === right && matched[left] === right)?.[0]
+            const found = !!matchedLeft
             const mismatched = wrongRight === right
             return (
             <button
