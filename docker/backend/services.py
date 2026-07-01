@@ -230,7 +230,7 @@ class ExerciseService:
     }
     SESSION_SIZE = 20
     TARGET_ITEMS = 1000
-    INCREMENTAL_ITEM_TARGETS = {"de": 1110, "fr": 1020, "ru": 1020, "jp": 1020, "en": 1020}
+    INCREMENTAL_ITEM_TARGETS = {"de": 1115, "fr": 1025, "ru": 1025, "jp": 1025, "en": 1025}
     JP_BEGINNER_KANA = {
         "私の名前はビクトルです。": "わたしのなまえはビクトルです。",
         "ブラジル出身です。": "ブラジルしゅっしんです。",
@@ -1766,7 +1766,50 @@ class ExerciseService:
             start_index + len(items),
         ))
 
-        hint = f"Mini-aula: {unit['goal']} Esta revisão inicia um novo bloco com 5 questões reais, sem ultrapassar 20 questões por sessão."
+        pt, target = phrases[3]
+        items.append(ExerciseService._choice(
+            f"{prefix}: escolha como dizer “{pt}” em {name}",
+            target,
+            [foreign for foreign in options[0:3]],
+            start_index + len(items),
+        ))
+
+        pt, target = phrases[5]
+        items.append(ExerciseService._listen_choice(
+            f"{prefix}: ouça o áudio e identifique a fala que comunica “{pt}”",
+            target,
+            [foreign for foreign in options[6:9]],
+            start_index + len(items),
+        ))
+
+        image_sample = [phrases[6], phrases[4], phrases[7], phrases[9]]
+        answer_pt, answer_foreign = image_sample[0]
+        items.append(ExerciseService._image_choice(
+            f"{prefix}: observe a imagem e escolha a frase que representa “{answer_pt}”",
+            (answer_pt, answer_foreign, ExerciseService._icon_key_for_phrase(answer_pt, answer_foreign, unit["topics"][6])),
+            [(pt, foreign, ExerciseService._icon_key_for_phrase(pt, foreign, unit["topics"][6])) for pt, foreign in image_sample[1:]],
+            start_index + len(items),
+        ))
+
+        pt, target = phrases[7]
+        words = ExerciseService._build_tokens(code, target)
+        extras = [word for foreign in options[0:10] for word in ExerciseService._build_tokens(code, foreign)]
+        items.append(ExerciseService._build(
+            f"{prefix}: monte a frase em ordem natural para dizer “{pt}”",
+            words,
+            extras,
+            start_index + len(items),
+        ))
+
+        pt, target = phrases[9]
+        items.append(ExerciseService._context_choice(
+            f"{prefix}: situação guiada — finalize uma fala de rotina de trabalho. Escolha a fala que comunica “{pt}” em {name}.",
+            target,
+            [foreign for foreign in options[0:3]],
+            start_index + len(items),
+        ))
+
+        hint = f"Mini-aula: {unit['goal']} Esta revisão continua o bloco com questões reais, sem ultrapassar 20 questões por sessão."
         for item in items[session_56_start:]:
             if item["type"] == "listen_build":
                 item["hint"] = f"{hint} Ouça a frase, repita em voz alta e monte as palavras na ordem correta."
