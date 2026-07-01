@@ -98,6 +98,21 @@ export const exercisesQaChangeLog = [
       'docker/frontend/src/pages/Exercises.jsx e produção /exercises permanecem sem menus ou banners de QA.',
     ],
   },
+  {
+    id: '2026-06-30-2302-qa-rendered-item-source-audit',
+    timestamp: '30/06 23:02',
+    title: 'Auditoria QA da origem do item renderizado',
+    approved: true,
+    approvalPhrase: 'QA aprovado 30/06 23:02',
+    summary: 'Amplia a faixa de integridade em /exercises-qa para bloquear visualmente quando o exercício renderizado vem de fallback local/lesson.items em vez de session.items reais do backend.',
+    diffs: [
+      '/exercises-qa passa a mostrar item.id renderizado, session item.id e origem do item ativo na faixa Integridade QA da sessão.',
+      'A página exibe QA BLOCKER quando o item renderizado não corresponde ao item real em session.items[current_index].',
+      'O estado legítimo de fim aguardando conclusão continua sem falso bloqueio de origem do item.',
+      'A mudança é apenas QA/changelog; não cria treino local, Questão extra, painel frontend-only ou atividade sem XP/progresso.',
+      'docker/frontend/src/pages/Exercises.jsx e produção /exercises permanecem inalterados.',
+    ],
+  },
 ]
 
 export function pendingExercisesQaChanges(entries = exercisesQaChangeLog) {

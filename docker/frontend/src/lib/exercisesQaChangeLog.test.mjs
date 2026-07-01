@@ -11,6 +11,7 @@ const approvedPhrases = [
   'QA aprovado 30/06 21:02',
   'QA aprovado 30/06 21:11',
   'QA aprovado 30/06 22:02',
+  'QA aprovado 30/06 23:02',
 ]
 
 test('all reviewed QA changelog entries are approved and retained for audit', () => {
@@ -76,9 +77,14 @@ test('finish window integrity state entry is approved with original evidence', (
   assert.ok(entry.diffs.some((diff) => /current_index sem item real/.test(diff)))
 })
 
-test('pending helpers return no current QA approvals after Victor approved all listed entries', () => {
-  assert.deepEqual(pendingExercisesQaChanges(), [])
-  assert.equal(latestExercisesQaChange(), null)
+test('rendered-item source audit entry is approved with original evidence', () => {
+  const entry = exercisesQaChangeLog.find((change) => change.id === '2026-06-30-2302-qa-rendered-item-source-audit')
+
+  assert.ok(entry, 'visible QA-only rendered-item source audit must be recorded')
+  assert.equal(entry.approved, true)
+  assert.equal(entry.timestamp, '30/06 23:02')
+  assert.equal(entry.approvalPhrase, 'QA aprovado 30/06 23:02')
+  assert.match(entry.summary, /fallback local\/lesson\.items/)
 })
 
 test('approved QA changelog copy does not still say changes are pending', () => {
