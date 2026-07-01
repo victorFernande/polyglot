@@ -245,25 +245,32 @@ def init_db():
     db = SessionLocal()
     try:
         achievements = [
-            Achievement(code="first_step", name="Primeiro Passo", description="Complete sua primeira tarefa", icon="👣", xp_reward=10, requirement_type="task", requirement_value=1),
+            Achievement(code="first_step", name="Primeiro Passo", description="Complete sua primeira sessão de exercícios", icon="👣", xp_reward=10, requirement_type="exercise_sessions", requirement_value=1),
             Achievement(code="streak_3", name="Fogo Baixo", description="3 dias de streak", icon="🔥", xp_reward=30, requirement_type="streak", requirement_value=3),
             Achievement(code="streak_7", name="Fogo Médio", description="7 dias de streak", icon="🔥", xp_reward=70, requirement_type="streak", requirement_value=7),
             Achievement(code="streak_14", name="Fogo Alto", description="14 dias de streak", icon="🔥", xp_reward=150, requirement_type="streak", requirement_value=14),
             Achievement(code="streak_30", name="Fogo Infernal", description="30 dias de streak", icon="🔥", xp_reward=500, requirement_type="streak", requirement_value=30),
             Achievement(code="vocab_50", name="Colecionador", description="Aprenda 50 palavras", icon="📚", xp_reward=50, requirement_type="vocabulary", requirement_value=50),
             Achievement(code="vocab_100", name="Linguista", description="Aprenda 100 palavras", icon="🎓", xp_reward=100, requirement_type="vocabulary", requirement_value=100),
-            Achievement(code="phase_1", name="Despertar", description="Complete a FASE 1", icon="🌅", xp_reward=50, requirement_type="phase", requirement_value=1),
-            Achievement(code="phase_2", name="Primeiras Palavras", description="Complete a FASE 2", icon="💬", xp_reward=100, requirement_type="phase", requirement_value=2),
-            Achievement(code="phase_3", name="Estruturas", description="Complete a FASE 3", icon="🏗️", xp_reward=150, requirement_type="phase", requirement_value=3),
-            Achievement(code="boss_defeated", name="Caçador de Bosses", description="Derrote seu primeiro Boss", icon="⚔️", xp_reward=300, requirement_type="wave", requirement_value=1),
-            Achievement(code="wave_1", name="Ondas Iniciante", description="Complete a Onda 1", icon="🌊", xp_reward=500, requirement_type="wave", requirement_value=1),
-            Achievement(code="polyglot", name="Poliglota", description="Complete todas as 4 ondas", icon="🌍", xp_reward=5000, requirement_type="wave", requirement_value=4),
+            Achievement(code="phase_1", name="Despertar", description="Complete 5 sessões de exercícios", icon="🌅", xp_reward=50, requirement_type="exercise_sessions", requirement_value=5),
+            Achievement(code="phase_2", name="Primeiras Palavras", description="Complete 10 sessões de exercícios", icon="💬", xp_reward=100, requirement_type="exercise_sessions", requirement_value=10),
+            Achievement(code="phase_3", name="Estruturas", description="Complete 25 sessões de exercícios", icon="🏗️", xp_reward=150, requirement_type="exercise_sessions", requirement_value=25),
+            Achievement(code="boss_defeated", name="Caçador de Bosses", description="Complete 1 língua inteira", icon="⚔️", xp_reward=300, requirement_type="completed_languages", requirement_value=1),
+            Achievement(code="wave_1", name="Onda Dominada", description="Complete 1 língua inteira", icon="🌊", xp_reward=500, requirement_type="completed_languages", requirement_value=1),
+            Achievement(code="polyglot", name="Poliglota", description="Complete todas as 5 línguas", icon="🌍", xp_reward=5000, requirement_type="completed_languages", requirement_value=5),
         ]
         
         for ach in achievements:
             existing = db.query(Achievement).filter(Achievement.code == ach.code).first()
             if not existing:
                 db.add(ach)
+            else:
+                existing.name = ach.name
+                existing.description = ach.description
+                existing.icon = ach.icon
+                existing.xp_reward = ach.xp_reward
+                existing.requirement_type = ach.requirement_type
+                existing.requirement_value = ach.requirement_value
         
         db.commit()
     finally:

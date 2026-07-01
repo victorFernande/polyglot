@@ -9,6 +9,7 @@ from typing import List, Optional
 from models import init_db, SessionLocal, User, Wave, Phase, Task, StudyLog, Achievement, ExerciseLesson, ExerciseSession, ExerciseAnswer
 from schemas import *
 from services import GamificationService, WaveService, ExerciseService
+from curriculum import A1_UNITS
 from tts_service import TTSService
 
 app = FastAPI(
@@ -192,6 +193,9 @@ def get_achievements(user_id: int, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
+    GamificationService.check_achievements(db, user)
+    db.commit()
+    db.refresh(user)
     
     all_achievements = db.query(Achievement).all()
     user_achievements = {ua.achievement_id: ua for ua in user.achievements}
@@ -264,6 +268,9 @@ def get_dashboard(user_id: int, db: Session = Depends(get_db)):
     ).order_by(StudyLog.date.desc()).limit(10).all()
     
     # Achievements
+    GamificationService.check_achievements(db, user)
+    db.commit()
+    db.refresh(user)
     all_achievements = db.query(Achievement).all()
     user_achievements = {ua.achievement_id: ua for ua in user.achievements}
     achievements = []
@@ -352,10 +359,29 @@ def get_dashboard(user_id: int, db: Session = Depends(get_db)):
         "weekly_stats": weekly_stats
     }
 
-def _learned_word_values(answer):
+def _curriculum_translation_map(language_code: str):
+    translations = {}
+    for unit in A1_UNITS:
+        for pt, target in unit.get("phrases", {}).get(language_code, []):
+            translations[str(target).strip().casefold()] = str(pt).strip()
+    return translations
+
+
+def _curriculum_target_map(language_code: str):
+    targets = {}
+    for unit in A1_UNITS:
+        for pt, target in unit.get("phrases", {}).get(language_code, []):
+            targets[str(pt).strip().casefold()] = str(target).strip()
+    return targets
+
+
+def _learned_word_values(item):
+    answer = item.answer
     if isinstance(answer, dict):
         if "value" in answer:
             value = answer["value"]
+            if item.type == "sequence_dialogue" and isinstance(value, list):
+                return [str(v) for v in value]
             return [" ".join(map(str, value))] if isinstance(value, list) else [str(value)]
         if "pairs" in answer and isinstance(answer["pairs"], list):
             return [str(left) for left, _right in answer["pairs"]]
@@ -367,6 +393,9 @@ def _learned_word_values(answer):
 
 
 def _learned_translation_pt(item, word: str):
+    curriculum_translation = _curriculum_translation_map(item.lesson.language_code).get(word.strip().casefold())
+    if curriculum_translation:
+        return curriculum_translation
     if isinstance(item.options, list):
         for option in item.options:
             if not isinstance(option, dict):
@@ -409,22 +438,35 @@ def get_learned_words(user_id: int, db: Session = Depends(get_db)):
     seen = set()
     words = []
     for session in completed_sessions:
+        if not session.lesson.active:
+            continue
         for item in ExerciseService.session_items(db, session):
             lesson = item.lesson
+            if not lesson.active:
+                continue
             correct_answer = correct_answer_by_item_id.get(item.id)
-            for value in _learned_word_values(item.answer):
+            for value in _learned_word_values(item):
                 word = value.strip()
                 if not word:
                     continue
                 key = (lesson.language_code, word.casefold())
                 if key in seen:
                     continue
-                seen.add(key)
+                translation_pt = _learned_translation_pt(item, word)
+                target_for_pt = _curriculum_target_map(lesson.language_code).get(word.casefold())
+                if target_for_pt and translation_pt.casefold() == target_for_pt.casefold():
+                    word, translation_pt = target_for_pt, word
+                    key = (lesson.language_code, word.casefold())
+                    if key in seen:
+                        continue
+                    seen.add(key)
+                else:
+                    seen.add(key)
                 words.append({
                     "language_code": lesson.language_code,
                     "language_name": lesson.language_name,
                     "word": word,
-                    "translation_pt": _learned_translation_pt(item, word),
+                    "translation_pt": translation_pt,
                     "source": "exercise_answer" if correct_answer else "completed_session",
                     "learned_at": correct_answer.answered_at if correct_answer else session.completed_at,
                 })

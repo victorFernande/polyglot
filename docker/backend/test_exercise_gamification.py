@@ -56,7 +56,7 @@ def test_completing_exercise_session_updates_gamification_once(tmp_path):
     assert first["xp_earned"] == expected_xp
     assert second["already_completed"] is True
     assert second["xp_earned"] == first["xp_earned"]
-    assert after["stats"]["total_xp"] - before["stats"]["total_xp"] == expected_xp
+    assert after["stats"]["total_xp"] - before["stats"]["total_xp"] == expected_xp + 10
     assert after["stats"]["current_streak"] >= 1
     assert after["stats"]["vocabulary_count"] >= first["vocabulary_added"]
     assert after["stats"]["phrases_count"] >= first["phrases_added"]
@@ -80,3 +80,58 @@ def test_completing_unanswered_session_is_idempotent_zero_xp(tmp_path):
     assert first["correct_count"] == 0
     assert second["already_completed"] is True
     assert second["xp_earned"] == 0
+
+def test_first_step_achievement_unlocks_after_first_completed_exercise_session(tmp_path):
+    client = make_client(tmp_path)
+    user_id = client.post("/users/1/bootstrap").json()["id"]
+    lesson = client.get("/exercise-lessons", params={"user_id": user_id}).json()[0]
+    session = client.post(f"/exercise-lessons/{lesson['id']}/sessions", params={"user_id": user_id}).json()
+
+    complete = client.post(f"/exercise-sessions/{session['id']}/complete")
+    assert complete.status_code == 200, complete.text
+
+    achievements = client.get(f"/users/{user_id}/achievements").json()
+    first_step = next(item for item in achievements if item["code"] == "first_step")
+
+    assert first_step["requirement_type"] == "exercise_sessions"
+    assert first_step["earned"] is True
+
+
+def test_seeded_achievements_use_supported_current_progress_requirements(tmp_path):
+    client = make_client(tmp_path)
+    user_id = client.post("/users/1/bootstrap").json()["id"]
+    achievements = client.get(f"/users/{user_id}/achievements").json()
+
+    supported = {"streak", "vocabulary", "exercise_sessions", "completed_languages"}
+    assert {item["requirement_type"] for item in achievements} <= supported
+    polyglot = next(item for item in achievements if item["code"] == "polyglot")
+    assert polyglot["requirement_type"] == "completed_languages"
+    assert polyglot["requirement_value"] == 5
+    assert "5" in polyglot["description"]
+
+def test_achievements_endpoint_refreshes_preexisting_completed_session_milestones(tmp_path):
+    client = make_client(tmp_path)
+    user_id = client.post("/users/1/bootstrap").json()["id"]
+    lesson = client.get("/exercise-lessons", params={"user_id": user_id}).json()[0]
+
+    modules = sys.modules
+    models = modules["models"]
+    db = models.SessionLocal()
+    try:
+        db.add(models.ExerciseSession(
+            user_id=user_id,
+            lesson_id=lesson["id"],
+            status="completed",
+            total_count=20,
+            correct_count=20,
+            session_number=1,
+        ))
+        db.commit()
+    finally:
+        db.close()
+
+    achievements = client.get(f"/users/{user_id}/achievements").json()
+    first_step = next(item for item in achievements if item["code"] == "first_step")
+
+    assert first_step["earned"] is True
+

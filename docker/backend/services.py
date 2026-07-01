@@ -41,9 +41,38 @@ class GamificationService:
         return 1.0
 
     @staticmethod
+    def completed_exercise_sessions_count(db: Session, user: User) -> int:
+        return db.query(ExerciseSession).filter(
+            ExerciseSession.user_id == user.id,
+            ExerciseSession.status == "completed",
+        ).count()
+
+    @staticmethod
+    def completed_languages_count(db: Session, user: User) -> int:
+        completed = 0
+        lessons = db.query(ExerciseLesson).filter(ExerciseLesson.active == True).all()
+        for lesson in lessons:
+            total_items = len(lesson.items)
+            if total_items <= 0:
+                continue
+            answered_items = sum(
+                int(session.total_count or 0)
+                for session in db.query(ExerciseSession).filter(
+                    ExerciseSession.user_id == user.id,
+                    ExerciseSession.lesson_id == lesson.id,
+                    ExerciseSession.status == "completed",
+                ).all()
+            )
+            if answered_items >= total_items:
+                completed += 1
+        return completed
+
+    @staticmethod
     def check_achievements(db: Session, user: User) -> list:
         earned = []
         existing = {ua.achievement_id for ua in user.achievements}
+        completed_sessions = GamificationService.completed_exercise_sessions_count(db, user)
+        completed_languages = GamificationService.completed_languages_count(db, user)
         for achievement in db.query(Achievement).all():
             if achievement.id in existing:
                 continue
@@ -52,6 +81,10 @@ class GamificationService:
                 ok = user.current_streak >= achievement.requirement_value
             elif achievement.requirement_type == "vocabulary":
                 ok = sum(w.vocabulary_count for w in user.waves) >= achievement.requirement_value
+            elif achievement.requirement_type == "exercise_sessions":
+                ok = completed_sessions >= achievement.requirement_value
+            elif achievement.requirement_type == "completed_languages":
+                ok = completed_languages >= achievement.requirement_value
             if ok:
                 db.add(UserAchievement(user_id=user.id, achievement_id=achievement.id))
                 user.total_xp += achievement.xp_reward
@@ -851,6 +884,8 @@ class ExerciseService:
         if session.status == "completed":
             return {"id": session.id, "status": session.status, "session": ExerciseService.session_payload(session, db=db), "xp_earned": session.xp_earned, "correct_count": session.correct_count, "total_count": session.total_count, "hearts_left": session.hearts_left, "vocabulary_added": vocab, "phrases_added": phrases, "new_achievements": [], "already_completed": True}
         session.status = "completed"; session.completed_at = datetime.utcnow(); user = session.user
+        db.add(session)
+        db.flush()
         wave = db.query(Wave).filter(Wave.user_id == user.id, Wave.language == ExerciseService.LANGUAGE_TO_WAVE.get(session.lesson.language_code)).first()
         if wave: wave.total_xp += session.xp_earned; wave.vocabulary_count += vocab; wave.phrases_count += phrases
         visible_session_number = session.session_number or (ExerciseService._session_number(db, session) + 1)

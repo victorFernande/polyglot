@@ -9,7 +9,7 @@ os.environ["DATABASE_URL"] = f"sqlite:///{TEST_DB}"
 
 from fastapi.testclient import TestClient  # noqa: E402
 from main import app  # noqa: E402
-from models import ExerciseSession, SessionLocal  # noqa: E402
+from models import ExerciseItem, ExerciseLesson, ExerciseSession, SessionLocal  # noqa: E402
 from services import ExerciseService  # noqa: E402
 
 
@@ -390,4 +390,132 @@ def test_words_endpoint_lists_learned_correct_answers_by_language():
         assert first["word"]
         assert first["translation_pt"]
         assert first["source"] == "exercise_answer"
+
+def test_words_endpoint_ignores_inactive_mislabeled_lessons():
+    user_id = 94005
+    with TestClient(app) as client:
+        client.post(f"/users/{user_id}/bootstrap")
+        db = SessionLocal()
+        try:
+            stale = ExerciseLesson(
+                language_code="fr",
+                language_name="Francês",
+                slug="stale-german-content",
+                title="Stale German content mislabeled as French",
+                description="legacy bad seed",
+                order_index=999,
+                active=False,
+            )
+            db.add(stale)
+            db.commit()
+            db.refresh(stale)
+            item = ExerciseItem(
+                lesson_id=stale.id,
+                order_index=1,
+                type="choice",
+                prompt="Como dizer olá?",
+                answer={"value": "Hallo"},
+                options=[{"value": "Hallo", "label_pt": "Olá"}],
+                xp_reward=10,
+            )
+            db.add(item)
+            db.commit()
+            db.refresh(item)
+            db.add(ExerciseSession(
+                user_id=user_id,
+                lesson_id=stale.id,
+                status="completed",
+                total_count=1,
+                correct_count=1,
+                session_number=1,
+            ))
+            db.commit()
+        finally:
+            db.close()
+
+        payload = client.get(f"/users/{user_id}/words").json()
+        assert all(lang["language_code"] != "fr" for lang in payload["languages"])
+        assert all(word["word"] != "Hallo" for word in payload["words"])
+
+
+def test_words_endpoint_splits_sequence_dialogue_into_short_phrase_translations():
+    user_id = 94006
+    with TestClient(app) as client:
+        client.post(f"/users/{user_id}/bootstrap")
+        lesson = next(lesson for lesson in client.get("/exercise-lessons", params={"user_id": user_id}).json() if lesson["language_code"] == "de")
+        db = SessionLocal()
+        try:
+            item = db.query(ExerciseItem).filter(
+                ExerciseItem.lesson_id == lesson["id"],
+                ExerciseItem.type == "sequence_dialogue",
+            ).first()
+            assert item is not None
+            session = ExerciseSession(
+                user_id=user_id,
+                lesson_id=lesson["id"],
+                status="completed",
+                total_count=20,
+                correct_count=20,
+                session_number=1,
+            )
+            db.add(session)
+            db.commit()
+        finally:
+            db.close()
+
+        payload = client.get(f"/users/{user_id}/words").json()
+        rows = {word["word"]: word["translation_pt"] for word in payload["words"]}
+
+        assert rows.get("Ja, das stimmt.") == "Sim, está certo."
+        assert rows.get("Auf Wiedersehen.") == "Até logo."
+        assert all("Unidade " not in translation for translation in rows.values())
+        assert all("organize os cartões" not in translation for translation in rows.values())
+
+def test_words_endpoint_normalizes_reversed_match_pairs_to_target_language_first():
+    user_id = 94007
+    with TestClient(app) as client:
+        client.post(f"/users/{user_id}/bootstrap")
+        db = SessionLocal()
+        try:
+            lesson = ExerciseLesson(
+                language_code="de",
+                language_name="Alemão",
+                slug="pair-direction-test",
+                title="Pair direction test",
+                description="test",
+                order_index=2001,
+                active=True,
+            )
+            db.add(lesson)
+            db.commit()
+            db.refresh(lesson)
+            item = ExerciseItem(
+                lesson_id=lesson.id,
+                order_index=1,
+                type="match",
+                prompt="Combine.",
+                answer={"pairs": [["Eu quero o prato principal.", "Ich nehme das Hähnchen."]]},
+                pairs=[["Eu quero o prato principal.", "Ich nehme das Hähnchen."]],
+                xp_reward=10,
+            )
+            db.add(item)
+            db.commit()
+            db.refresh(item)
+            db.add(ExerciseSession(
+                user_id=user_id,
+                lesson_id=lesson.id,
+                status="completed",
+                total_count=1,
+                correct_count=1,
+                session_number=1,
+            ))
+            db.commit()
+        finally:
+            db.close()
+
+        payload = client.get(f"/users/{user_id}/words").json()
+        rows = {word["word"]: word["translation_pt"] for word in payload["words"]}
+
+        assert rows.get("Ich nehme das Hähnchen.") == "Eu quero o prato principal."
+        assert "Eu quero o prato principal." not in rows
 
