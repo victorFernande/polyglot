@@ -230,7 +230,7 @@ class ExerciseService:
     }
     SESSION_SIZE = 20
     TARGET_ITEMS = 1000
-    INCREMENTAL_ITEM_TARGETS = {"de": 1105, "fr": 1015, "ru": 1015, "jp": 1015, "en": 1015}
+    INCREMENTAL_ITEM_TARGETS = {"de": 1110, "fr": 1020, "ru": 1020, "jp": 1020, "en": 1020}
     JP_BEGINNER_KANA = {
         "私の名前はビクトルです。": "わたしのなまえはビクトルです。",
         "ブラジル出身です。": "ブラジルしゅっしんです。",
@@ -1680,6 +1680,7 @@ class ExerciseService:
         phrases = unit["phrases"][code]
         prefix = "Sessão 56 — Revisão incremental · Trabalho em contexto"
         options = [foreign for _pt, foreign in phrases]
+        portuguese_options = [pt for pt, _foreign in phrases]
 
         pt, target = phrases[0]
         items.append(ExerciseService._choice(
@@ -1724,12 +1725,61 @@ class ExerciseService:
             start_index + len(items),
         ))
 
+        listen_pairs = [[foreign, portuguese] for portuguese, foreign in phrases[5:9]]
+        items.append(ExerciseService._listen_match(
+            f"{prefix}: ouça cada áudio em {name} e selecione a tradução em português",
+            listen_pairs,
+            start_index + len(items),
+        ))
+
+        pt, target = phrases[7]
+        wrong_portuguese = [option for option in portuguese_options[4:8] if option != pt][:3]
+        items.append(ExerciseService._choice(
+            f"{prefix}: entenda “{target}” — qual é o significado em português?",
+            pt,
+            wrong_portuguese,
+            start_index + len(items),
+        ))
+
+        pt, target = phrases[8]
+        words = ExerciseService._build_tokens(code, target)
+        extras = [word for foreign in options[0:10] for word in ExerciseService._build_tokens(code, foreign)]
+        items.append(ExerciseService._listen_build(
+            f"{prefix}: ouça e monte em ordem natural — “{pt}”",
+            words,
+            extras,
+            start_index + len(items),
+        ))
+
+        sequence_pairs = [phrases[5], phrases[6], phrases[7], phrases[8]]
+        items.append(ExerciseService._sequence_dialogue(
+            f"{prefix}: prática guiada de ordem — organize os cartões exatamente assim: primeiro computador; depois ensinar; em seguida estudar; por fim trabalhar hoje",
+            [foreign for _portuguese, foreign in sequence_pairs],
+            start_index + len(items),
+        ))
+
+        pt, target = phrases[9]
+        items.append(ExerciseService._context_choice(
+            f"{prefix}: situação guiada — encerre a fala de trabalho com uma pausa. Escolha a fala que comunica “{pt}” em {name}.",
+            target,
+            [foreign for foreign in options[0:3]],
+            start_index + len(items),
+        ))
+
         hint = f"Mini-aula: {unit['goal']} Esta revisão inicia um novo bloco com 5 questões reais, sem ultrapassar 20 questões por sessão."
         for item in items[session_56_start:]:
-            item["hint"] = hint
-            if item["type"] == "build":
+            if item["type"] == "listen_build":
+                item["hint"] = f"{hint} Ouça a frase, repita em voz alta e monte as palavras na ordem correta."
+            elif item["type"] == "listen_match":
+                item["hint"] = f"{hint} Toque em cada áudio no idioma estudado e selecione a tradução correspondente em português."
+                item["explanation"] = f"Cada áudio em {name} deve ser ligado à tradução em português dentro da revisão de trabalho."
+            elif item["type"] == "sequence_dialogue":
+                item["hint"] = f"{hint} Siga a ordem indicada no enunciado e organize apenas as frases no idioma estudado."
+            else:
+                item["hint"] = hint
+            if item["type"] in {"build", "listen_build"}:
                 item["explanation"] = f"A frase correta é: “{' '.join(item['answer']['value'])}”."
-            elif item["type"] != "image_choice":
+            elif item["type"] not in {"image_choice", "listen_match", "sequence_dialogue"}:
                 item["explanation"] = f"{unit['title']}: “{item['answer']['value']}” comunica a ideia pedida em {name}."
         return items[:count]
 

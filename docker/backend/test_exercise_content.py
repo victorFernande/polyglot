@@ -178,12 +178,12 @@ def test_seed_lessons_deactivates_legacy_prototype_lessons():
 def test_incremental_cron_target_closes_active_german_session_54_with_twenty_contact_items():
     assert ExerciseService.SESSION_SIZE == 20
     assert ExerciseService.TARGET_ITEMS == 1000
-    assert ExerciseService.target_items_for_language("de") == 1105
+    assert ExerciseService.target_items_for_language("de") == 1110
     assert {language: ExerciseService.target_items_for_language(language) for language in LANGUAGES - {"de"}} == {
-        "fr": 1015,
-        "ru": 1015,
-        "jp": 1015,
-        "en": 1015,
+        "fr": 1020,
+        "ru": 1020,
+        "jp": 1020,
+        "en": 1020,
     }
 
     german_items = ExerciseService.generate_items("de")
@@ -229,20 +229,20 @@ def test_incremental_cron_target_closes_active_german_session_54_with_twenty_con
 def test_incremental_cron_target_opens_active_german_session_55_with_ten_family_items():
     assert ExerciseService.SESSION_SIZE == 20
     assert ExerciseService.TARGET_ITEMS == 1000
-    assert ExerciseService.target_items_for_language("de") == 1105
+    assert ExerciseService.target_items_for_language("de") == 1110
     assert {language: ExerciseService.target_items_for_language(language) for language in LANGUAGES - {"de"}} == {
-        "fr": 1015,
-        "ru": 1015,
-        "jp": 1015,
-        "en": 1015,
+        "fr": 1020,
+        "ru": 1020,
+        "jp": 1020,
+        "en": 1020,
     }
 
     german_items = ExerciseService.generate_items("de")
     last_block_size = len(german_items) % ExerciseService.SESSION_SIZE
     session_55_first_half = german_items[1080:1090]
 
-    assert len(german_items) == 1105
-    assert last_block_size == 5
+    assert len(german_items) == 1110
+    assert last_block_size == 10
     assert len(session_55_first_half) == 10
     assert [item["type"] for item in session_55_first_half] == [
         "choice",
@@ -278,11 +278,11 @@ def test_incremental_cron_target_opens_active_german_session_55_with_ten_family_
 def test_hourly_incremental_cron_adds_five_real_items_to_every_active_language_without_overfilling_blocks():
     assert ExerciseService.SESSION_SIZE == 20
     assert {language: ExerciseService.target_items_for_language(language) for language in LANGUAGES} == {
-        "de": 1105,
-        "fr": 1015,
-        "ru": 1015,
-        "jp": 1015,
-        "en": 1015,
+        "de": 1110,
+        "fr": 1020,
+        "ru": 1020,
+        "jp": 1020,
+        "en": 1020,
     }
 
     expected_first_targets = {
@@ -294,23 +294,23 @@ def test_hourly_incremental_cron_adds_five_real_items_to_every_active_language_w
     for language in LANGUAGES:
         items = ExerciseService.generate_items(language)
         last_block_size = len(items) % ExerciseService.SESSION_SIZE
-        expected_block_size = 5 if language == "de" else 15
+        expected_block_size = 10 if language == "de" else 0
         assert last_block_size == expected_block_size
         assert last_block_size <= ExerciseService.SESSION_SIZE
 
-        new_items = items[1095:1100] if language == "de" else items[1005:1010]
+        new_items = items[1100:1105] if language == "de" else items[1000:1005]
         assert len(new_items) == 5
         expected_types = [
-            "listen_match",
             "choice",
-            "listen_build",
-            "sequence_dialogue",
+            "listen_choice",
+            "image_choice",
+            "build",
             "context_choice",
         ] if language == "de" else [
-            "listen_match",
             "choice",
-            "listen_build",
-            "sequence_dialogue",
+            "listen_choice",
+            "image_choice",
+            "build",
             "context_choice",
         ]
         assert [item["type"] for item in new_items] == expected_types
@@ -321,37 +321,37 @@ def test_hourly_incremental_cron_adds_five_real_items_to_every_active_language_w
         assert all("português" not in "\n".join(item.get("tiles") or []).casefold() for item in new_items if item["type"] == "sequence_dialogue")
 
     assert any(
-        "Meine Tochter ist klein." in repr(item) or "Meine Großeltern wohnen hier." in repr(item)
-        for item in ExerciseService.generate_items("de")[1095:1100]
+        "Ich arbeite von neun bis fünf." in repr(item) or "Ich mache eine Pause." in repr(item)
+        for item in ExerciseService.generate_items("de")[1100:1105]
     )
     for language, target in expected_first_targets.items():
-        assert any(target in repr(item) for item in ExerciseService.generate_items(language)[1000:1010])
+        assert any(target in repr(item) for item in ExerciseService.generate_items(language)[1000:1005])
 
 
 def test_next_hourly_incremental_cron_adds_five_more_items_per_active_language_without_overfilling_blocks():
     assert ExerciseService.SESSION_SIZE == 20
     assert {language: ExerciseService.target_items_for_language(language) for language in LANGUAGES} == {
-        "de": 1105,
-        "fr": 1015,
-        "ru": 1015,
-        "jp": 1015,
-        "en": 1015,
+        "de": 1110,
+        "fr": 1020,
+        "ru": 1020,
+        "jp": 1020,
+        "en": 1020,
     }
 
     for language in LANGUAGES:
         items = ExerciseService.generate_items(language)
-        before_count = 1100 if language == "de" else 1010
-        after_count = 1105 if language == "de" else 1015
+        before_count = 1105 if language == "de" else 1015
+        after_count = 1110 if language == "de" else 1020
         new_items = items[before_count:after_count]
 
         assert len(items) == after_count
         assert len(new_items) == 5
-        assert len(items) % ExerciseService.SESSION_SIZE == 5 if language == "de" else 15
+        assert (len(items) % ExerciseService.SESSION_SIZE) == (10 if language == "de" else 0)
         assert [item["type"] for item in new_items] == [
+            "listen_match",
             "choice",
-            "listen_choice",
-            "image_choice",
-            "build",
+            "listen_build",
+            "sequence_dialogue",
             "context_choice",
         ]
         assert all(item["prompt"] and item["answer"] and item["hint"] and item["explanation"] for item in new_items)
@@ -360,11 +360,59 @@ def test_next_hourly_incremental_cron_adds_five_more_items_per_active_language_w
         assert all("Sessão 56" in item["prompt"] for item in new_items) if language == "de" else all("Sessão 51" in item["prompt"] for item in new_items)
         assert all(len(item.get("answer", {}).get("value", [])) >= 2 for item in new_items if item["type"] == "build")
 
-    assert any("Ich bin Lehrer." in repr(item) for item in ExerciseService.generate_items("de")[1100:1105])
-    assert any("J'aime regarder des films." in repr(item) for item in ExerciseService.generate_items("fr")[1010:1015])
-    assert any("Я люблю смотреть фильмы." in repr(item) for item in ExerciseService.generate_items("ru")[1010:1015])
-    assert any("映画を見るのが好きです。" in repr(item) for item in ExerciseService.generate_items("jp")[1010:1015])
-    assert any("I like watching movies." in repr(item) for item in ExerciseService.generate_items("en")[1010:1015])
+    assert any("Ich mache eine Pause." in repr(item) for item in ExerciseService.generate_items("de")[1105:1110])
+    assert any("J'aime regarder des films." in repr(item) for item in ExerciseService.generate_items("fr")[1015:1020])
+    assert any("Я люблю смотреть фильмы." in repr(item) for item in ExerciseService.generate_items("ru")[1015:1020])
+    assert any("映画を見るのが好きです。" in repr(item) for item in ExerciseService.generate_items("jp")[1015:1020])
+    assert any("I like watching movies." in repr(item) for item in ExerciseService.generate_items("en")[1015:1020])
+
+
+def test_current_hourly_incremental_cron_closes_multilingual_blocks_or_adds_five_without_overfill():
+    assert ExerciseService.SESSION_SIZE == 20
+    assert {language: ExerciseService.target_items_for_language(language) for language in LANGUAGES} == {
+        "de": 1110,
+        "fr": 1020,
+        "ru": 1020,
+        "jp": 1020,
+        "en": 1020,
+    }
+
+    expected_counts = {
+        "de": (1105, 1110, 10, "Sessão 56"),
+        "fr": (1015, 1020, 0, "Sessão 51"),
+        "ru": (1015, 1020, 0, "Sessão 51"),
+        "jp": (1015, 1020, 0, "Sessão 51"),
+        "en": (1015, 1020, 0, "Sessão 51"),
+    }
+    expected_targets = {
+        "de": "Ich mache eine Pause.",
+        "fr": "J'aime regarder des films.",
+        "ru": "Я люблю смотреть фильмы.",
+        "jp": "映画を見るのが好きです。",
+        "en": "I like watching movies.",
+    }
+
+    for language in LANGUAGES:
+        before_count, after_count, last_block_size, session_label = expected_counts[language]
+        items = ExerciseService.generate_items(language)
+        new_items = items[before_count:after_count]
+
+        assert len(items) == after_count
+        assert len(new_items) == 5
+        assert len(items) % ExerciseService.SESSION_SIZE == last_block_size
+        assert [item["type"] for item in new_items] == [
+            "listen_match",
+            "choice",
+            "listen_build",
+            "sequence_dialogue",
+            "context_choice",
+        ]
+        assert all(session_label in item["prompt"] for item in new_items)
+        assert all(item["prompt"] and item["answer"] and item["hint"] and item["explanation"] for item in new_items)
+        assert all("a palavra" not in item["prompt"].casefold() for item in new_items)
+        assert all("the word" not in repr(item).casefold() for item in new_items)
+        assert all("português" not in "\n".join(item.get("tiles") or []).casefold() for item in new_items if item["type"] == "sequence_dialogue")
+        assert any(expected_targets[language] in repr(item) for item in new_items)
 
 
 def test_previous_incremental_german_session_54_first_half_remains_unchanged():
@@ -562,10 +610,10 @@ def test_seed_lessons_appends_incremental_items_without_replacing_existing_ids()
         ExerciseService.seed_lessons(db)
 
         items = db.query(ExerciseItem).filter(ExerciseItem.lesson_id == lesson.id).order_by(ExerciseItem.order_index).all()
-        assert len(items) == 1105
+        assert len(items) == 1110
         assert [item.id for item in items[:5]] == preserved_ids
-        assert [item.order_index for item in items[-5:]] == list(range(1101, 1106))
-        assert len(items) % ExerciseService.SESSION_SIZE == 5
+        assert [item.order_index for item in items[-5:]] == list(range(1106, 1111))
+        assert len(items) % ExerciseService.SESSION_SIZE == 10
     finally:
         db.close()
 
