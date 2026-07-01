@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from datetime import datetime
 import re
@@ -331,24 +332,35 @@ def get_dashboard(user_id: int, db: Session = Depends(get_db)):
             "total_exercises": total_exercises,
             "progress_percent": progress_percent,
         })
-    active_language_code = language_code_by_wave_language.get(str(active_wave.language).casefold()) if active_wave else None
+    latest_exercise_session = db.query(ExerciseSession).join(ExerciseLesson).filter(
+        ExerciseSession.user_id == user_id,
+    ).order_by(
+        func.coalesce(ExerciseSession.completed_at, ExerciseSession.started_at).desc(),
+        ExerciseSession.id.desc(),
+    ).first()
+    active_language_code = latest_exercise_session.lesson.language_code if latest_exercise_session else None
+    if not active_language_code:
+        active_language_code = language_code_by_wave_language.get(str(active_wave.language).casefold()) if active_wave else None
     active_language_progress = next((progress for progress in exercise_language_progress if progress["language_code"] == active_language_code), None)
-    if active_wave and active_language_code:
-        active_lesson_ids = [lesson["id"] for lesson in exercise_lessons if lesson["language_code"] == active_language_code]
-        completed_minutes = sum(
-            int(session.total_count or 0)
-            for session in db.query(ExerciseSession).filter(
-                ExerciseSession.user_id == user_id,
-                ExerciseSession.lesson_id.in_(active_lesson_ids),
-                ExerciseSession.status == "completed",
-            ).all()
-        ) if active_lesson_ids else 0
-        active_wave.hours_input = completed_minutes / 60
+    active_lesson_ids = [lesson["id"] for lesson in exercise_lessons if lesson["language_code"] == active_language_code]
+    completed_minutes = sum(
+        int(session.total_count or 0)
+        for session in db.query(ExerciseSession).filter(
+            ExerciseSession.user_id == user_id,
+            ExerciseSession.lesson_id.in_(active_lesson_ids),
+            ExerciseSession.status == "completed",
+        ).all()
+    ) if active_lesson_ids else 0
+    active_wave_payload = WaveResponse.model_validate(active_wave).model_dump(mode="json") if active_wave else None
+    if active_wave_payload and active_language_progress:
+        active_wave_payload["language"] = active_language_progress["language_code"]
+        active_wave_payload["language_name"] = active_language_progress["language_name"]
+        active_wave_payload["hours_input"] = completed_minutes / 60
     
     return {
         "user": UserResponse.model_validate(user),
         "stats": stats,
-        "active_wave": WaveResponse.model_validate(active_wave) if active_wave else None,
+        "active_wave": active_wave_payload,
         "active_phase": PhaseResponse.model_validate(active_phase) if active_phase else None,
         "active_language_progress": active_language_progress,
         "exercise_language_progress": exercise_language_progress,

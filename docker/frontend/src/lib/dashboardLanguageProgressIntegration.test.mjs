@@ -23,3 +23,12 @@ test('Dashboard current wave progress renders 1-1000 language exercise progress'
   assert.doesNotMatch(dashboardSource, /Fase Atual/)
   assert.doesNotMatch(dashboardSource, /style=\{\{ width: `\$\{activePhase\.progress_percent\}%` \}\}/)
 })
+
+test('Dashboard renders a compact normal gauge list for every exercise language', () => {
+  assert.match(dashboardSource, /exerciseLanguageProgress/)
+  assert.match(dashboardSource, /languageGaugeSummaries/)
+  assert.match(dashboardSource, /Todas as línguas/)
+  assert.match(dashboardSource, /LanguageGaugeList/)
+  assert.match(dashboardSource, /gauges\.map/)
+  assert.match(dashboardSource, /gauge\.language_code/)
+})

@@ -1,4 +1,5 @@
 import os
+from datetime import datetime, timedelta
 from pathlib import Path
 
 TEST_DB = Path(__file__).with_name("test_polyglot_exercises.db")
@@ -354,6 +355,51 @@ def test_dashboard_reports_active_language_progress_across_1000_exercises():
         assert dashboard["active_language_progress"]["language_code"] == "de"
         assert dashboard["active_language_progress"]["progress_percent"] == expected_percent
         assert round(dashboard["active_wave"]["hours_input"], 2) == round(250 / 60, 2)
+
+def test_dashboard_active_language_follows_latest_exercise_activity():
+    user_id = 94008
+    with TestClient(app) as client:
+        client.post(f"/users/{user_id}/bootstrap")
+        lessons = client.get("/exercise-lessons", params={"user_id": user_id}).json()
+        german = next(lesson for lesson in lessons if lesson["language_code"] == "de")
+        french = next(lesson for lesson in lessons if lesson["language_code"] == "fr")
+
+        db = SessionLocal()
+        try:
+            db.query(ExerciseSession).filter(ExerciseSession.user_id == user_id).delete()
+            db.commit()
+            db.add(ExerciseSession(
+                user_id=user_id,
+                lesson_id=german["id"],
+                status="completed",
+                total_count=20,
+                correct_count=20,
+                xp_earned=200,
+                session_number=1,
+                started_at=datetime.utcnow() - timedelta(hours=2),
+                completed_at=datetime.utcnow() - timedelta(hours=1),
+            ))
+            db.add(ExerciseSession(
+                user_id=user_id,
+                lesson_id=french["id"],
+                status="in_progress",
+                total_count=10,
+                correct_count=8,
+                xp_earned=80,
+                session_number=1,
+                started_at=datetime.utcnow(),
+            ))
+            db.commit()
+        finally:
+            db.close()
+
+        dashboard = client.get(f"/users/{user_id}/dashboard").json()
+
+        assert dashboard["active_language_progress"]["language_code"] == "fr"
+        assert dashboard["active_wave"]["language"] == "fr"
+        assert dashboard["active_wave"]["language_name"] == french["language_name"]
+        assert dashboard["active_wave"]["hours_input"] == 0
+        assert {item["language_code"] for item in dashboard["exercise_language_progress"]} >= {"de", "fr"}
 
 def test_recent_activity_uses_learning_path_session_number_not_database_id():
     user_id = 94003

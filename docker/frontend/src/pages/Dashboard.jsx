@@ -13,7 +13,7 @@ import { normalizedLanguageProgress } from '../lib/dashboardLanguageProgress.mjs
 
 export default function Dashboard() {
   const { 
-    user, stats, activeWave, activeLanguageProgress, recentLogs, 
+    user, stats, activeWave, activeLanguageProgress, exerciseLanguageProgress, recentLogs, 
     achievements, levelInfo, dailyGoal, weeklyStats,
     showXpAnimation, xpAmount, newAchievement,
     setDashboard, setLoading, setError 
@@ -22,6 +22,10 @@ export default function Dashboard() {
   const [refreshing, setRefreshing] = useState(false)
   const languageProgress = normalizedLanguageProgress(activeLanguageProgress)
   const activeLanguageCode = activeLanguageProgress?.language_code || 'de'
+  const languageGaugeSummaries = (exerciseLanguageProgress || []).map((progress) => ({
+    ...progress,
+    ...normalizedLanguageProgress(progress),
+  }))
 
   useEffect(() => {
     fetchDashboard()
@@ -157,6 +161,7 @@ export default function Dashboard() {
           </div>
         </div>
 
+        <LanguageGaugeList gauges={languageGaugeSummaries} activeLanguageCode={activeLanguageCode} />
       </div>
 
       {/* Daily Goals & Weekly Stats */}
@@ -247,16 +252,41 @@ export default function Dashboard() {
   )
 }
 
-function CircularLanguageGauge({ code, percent }) {
+function LanguageGaugeList({ gauges, activeLanguageCode }) {
+  return (
+    <div className="card">
+      <h3 className="text-lg font-semibold mb-4">Todas as línguas</h3>
+      <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-4">
+        {gauges.map((gauge) => (
+          <div
+            key={gauge.language_code}
+            className={`rounded-2xl border p-4 text-center transition ${gauge.language_code === activeLanguageCode ? 'border-cyan-300/60 bg-cyan-300/10' : 'border-white/10 bg-white/5'}`}
+          >
+            <div className="mx-auto mb-3 flex justify-center">
+              <CircularLanguageGauge code={gauge.language_code} percent={gauge.percent} size="sm" />
+            </div>
+            <p className="text-sm font-semibold">{gauge.language_name}</p>
+            <p className="mt-1 text-lg font-bold text-cyan-100">{gauge.percent}%</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function CircularLanguageGauge({ code, percent, size = 'md' }) {
   const safePercent = Math.max(0, Math.min(100, Number(percent || 0)))
+  const outerSize = size === 'sm' ? 'h-16 w-16' : 'h-20 w-20'
+  const innerSize = size === 'sm' ? 'h-12 w-12' : 'h-16 w-16'
+  const flagSize = size === 'sm' ? 'h-8 w-8' : 'h-10 w-10'
   return (
     <div
-      className="relative grid h-20 w-20 shrink-0 place-items-center rounded-full"
+      className={`relative grid ${outerSize} shrink-0 place-items-center rounded-full`}
       style={{ background: `conic-gradient(#22d3ee ${safePercent}%, rgba(255,255,255,0.12) 0)` }}
       aria-label={`Progresso da língua ${safePercent}%`}
     >
-      <div className="grid h-16 w-16 place-items-center rounded-full bg-polyglot-dark/95 shadow-inner shadow-black/40">
-        <LanguageFlag code={code} className="h-10 w-10 rounded-full" />
+      <div className={`grid ${innerSize} place-items-center rounded-full bg-polyglot-dark/95 shadow-inner shadow-black/40`}>
+        <LanguageFlag code={code} className={`${flagSize} rounded-full`} />
       </div>
       <div className="absolute -bottom-1 rounded-full border border-cyan-300/40 bg-black/70 px-2 py-0.5 text-[10px] font-bold text-cyan-100">
         {safePercent}%
