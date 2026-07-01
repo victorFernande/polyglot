@@ -338,6 +338,23 @@ class ExerciseService:
         "hai, atte imasu": ["hai", "atte", "imasu"],
         "sayounara": ["sayou", "nara"],
     }
+    RU_BEGINNER_LATIN = {
+        "Здравствуйте": "zdravstvuyte",
+        "Я хочу кофе.": "ya khochu kofe",
+        "Воду, пожалуйста.": "vodu pozhaluysta",
+        "Я хочу хлеб.": "ya khochu khleb",
+        "Пожалуйста.": "pozhaluysta",
+        "Спасибо.": "spasibo",
+        "Сколько это стоит?": "skolko eto stoit",
+        "Счёт, пожалуйста.": "schyot pozhaluysta",
+        "Да, правильно.": "da pravilno",
+        "До свидания.": "do svidaniya",
+    }
+    RU_TRANSLIT = {
+        "а":"a","б":"b","в":"v","г":"g","д":"d","е":"e","ё":"yo","ж":"zh","з":"z","и":"i","й":"y","к":"k","л":"l","м":"m","н":"n","о":"o","п":"p","р":"r","с":"s","т":"t","у":"u","ф":"f","х":"kh","ц":"ts","ч":"ch","ш":"sh","щ":"sch","ъ":"","ы":"y","ь":"","э":"e","ю":"yu","я":"ya",
+        "А":"a","Б":"b","В":"v","Г":"g","Д":"d","Е":"e","Ё":"yo","Ж":"zh","З":"z","И":"i","Й":"y","К":"k","Л":"l","М":"m","Н":"n","О":"o","П":"p","Р":"r","С":"s","Т":"t","У":"u","Ф":"f","Х":"kh","Ц":"ts","Ч":"ch","Ш":"sh","Щ":"sch","Ъ":"","Ы":"y","Ь":"","Э":"e","Ю":"yu","Я":"ya",
+    }
+    RU_BEGINNER_DISTRACTOR_CHUNKS = ["da", "net", "pozhaluysta", "spasibo", "ya", "eto", "kofe", "voda"]
 
     @staticmethod
     def target_items_for_language(code: str):
@@ -597,6 +614,40 @@ class ExerciseService:
             scaffolded["hint"] = f"{scaffolded.get('hint', '')} Comece pela leitura em letras latinas (romaji). Depois vamos ligar cada som aos símbolos japoneses."
         else:
             scaffolded["hint"] = f"{scaffolded.get('hint', '')} Primeiro leia em kana; o kanji entra só depois que o básico estiver firme."
+        return scaffolded
+
+    @staticmethod
+    def _russian_beginner_text(value: str):
+        text = str(value)
+        for original, latin in sorted(ExerciseService.RU_BEGINNER_LATIN.items(), key=lambda item: len(item[0]), reverse=True):
+            text = text.replace(original, latin)
+        return "".join(ExerciseService.RU_TRANSLIT.get(char, char) for char in text).replace(",", "").replace(".", "").replace("?", "")
+
+    @staticmethod
+    def _russian_beginner_value(value):
+        if isinstance(value, str):
+            return ExerciseService._russian_beginner_text(value)
+        if isinstance(value, list):
+            return [ExerciseService._russian_beginner_value(item) for item in value]
+        if isinstance(value, dict):
+            return {key: ExerciseService._russian_beginner_value(item) for key, item in value.items()}
+        return value
+
+    @staticmethod
+    def _russian_beginner_tokens(tokens):
+        latin = ExerciseService._russian_beginner_text(" ".join(str(token) for token in tokens))
+        return [token for token in latin.split() if token]
+
+    @staticmethod
+    def _scaffold_russian_beginner_item(item: dict):
+        original_answer = item.get("answer") or {}
+        scaffolded = ExerciseService._russian_beginner_value(item)
+        if item.get("type") in {"build", "listen_build"} and isinstance(original_answer.get("value"), list):
+            answer_tokens = ExerciseService._russian_beginner_tokens(original_answer["value"])
+            scaffolded["answer"]["value"] = answer_tokens
+            scaffolded["tiles"] = list(dict.fromkeys(ExerciseService.RU_BEGINNER_DISTRACTOR_CHUNKS + answer_tokens))
+            scaffolded["explanation"] = f"A frase correta em letras latinas é: “{' '.join(answer_tokens)}”. O alfabeto cirílico será introduzido depois."
+        scaffolded["hint"] = f"{scaffolded.get('hint', '')} Comece pela pronúncia em letras latinas; depois vamos ligar cada som ao alfabeto cirílico."
         return scaffolded
 
     @staticmethod
@@ -1792,6 +1843,8 @@ class ExerciseService:
                         item = ExerciseService._scaffold_japanese_beginner_item(item, "romaji")
                     elif code == "jp" and idx <= 200:
                         item = ExerciseService._scaffold_japanese_beginner_item(item, "kana")
+                    elif code == "ru" and idx <= 100:
+                        item = ExerciseService._scaffold_russian_beginner_item(item)
                     items.append(item)
         target_count = ExerciseService.target_items_for_language(code)
         if target_count > ExerciseService.TARGET_ITEMS:

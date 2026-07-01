@@ -23,6 +23,7 @@ METALINGUISTIC_MARKERS = {
 
 KANJI_RE = re.compile(r"[\u4e00-\u9fff]")
 KANA_RE = re.compile(r"[\u3040-\u30ff]")
+CYRILLIC_RE = re.compile(r"[\u0400-\u04ff]")
 
 
 def test_japanese_progression_starts_with_romaji_then_kana_then_kanji():
@@ -43,6 +44,29 @@ def test_japanese_progression_starts_with_romaji_then_kana_then_kanji():
     assert KANA_RE.search(rendered_kana)
     assert not KANJI_RE.search(rendered_kana)
     assert KANJI_RE.search(rendered_kanji)
+
+
+def test_russian_progression_starts_with_latin_transliteration_then_cyrillic():
+    russian_items = ExerciseService.generate_items("ru")
+    latin_window = russian_items[:100]
+    cyrillic_window = russian_items[100:200]
+
+    rendered_latin = json.dumps(latin_window, ensure_ascii=False)
+    rendered_cyrillic = json.dumps(cyrillic_window, ensure_ascii=False)
+
+    assert latin_window
+    assert not CYRILLIC_RE.search(rendered_latin)
+    assert "vodu pozhaluysta" in rendered_latin
+    assert "schyot pozhaluysta" in rendered_latin
+    assert CYRILLIC_RE.search(rendered_cyrillic)
+
+
+def test_latin_alphabet_languages_do_not_need_script_scaffolding():
+    for language in {"de", "fr", "en"}:
+        rendered = json.dumps(ExerciseService.generate_items(language)[:100], ensure_ascii=False)
+        assert not CYRILLIC_RE.search(rendered)
+        assert not KANA_RE.search(rendered)
+        assert not KANJI_RE.search(rendered)
 
 
 def test_seed_lessons_is_long_varied_and_idempotent():
