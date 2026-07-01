@@ -427,7 +427,14 @@ function ExercisesQaChangeMenu({ entries }) {
   const pendingChanges = pendingExercisesQaChanges(entries)
   const latestChange = latestExercisesQaChange(entries)
 
-  if (!latestChange) return null
+  if (pendingChanges.length === 0) {
+    return (
+      <div className="rounded-2xl border border-emerald-300/30 bg-emerald-300/10 px-4 py-3 text-emerald-50">
+        <p className="text-xs font-black uppercase tracking-[0.22em] text-emerald-300">Nenhuma alteração QA pendente</p>
+        <p className="mt-1 text-sm font-semibold text-emerald-50/85">Todas as alterações listadas foram aprovadas. O histórico fica registrado no changelog, mas não há próxima aprovação aguardando ação.</p>
+      </div>
+    )
+  }
 
   return (
     <div className="rounded-2xl border border-cyan-300/30 bg-cyan-300/10 text-cyan-50">
@@ -437,12 +444,12 @@ function ExercisesQaChangeMenu({ entries }) {
         className="flex w-full flex-col gap-2 px-4 py-3 text-left sm:flex-row sm:items-center sm:justify-between"
       >
         <span>
-          <span className="text-xs font-black uppercase tracking-[0.22em] text-cyan-300">Alterações QA pendentes</span>
-          <span className="mt-1 block text-lg font-bold">{latestChange.timestamp} · {latestChange.title}</span>
-          <span className="mt-2 block text-xs font-semibold text-cyan-100/85">Próxima aprovação: <code className="rounded bg-black/30 px-1 py-0.5">{latestChange.approvalPhrase}</code></span>
+          <span className="text-xs font-black uppercase tracking-[0.22em] text-cyan-300">Alterações QA aguardando aprovação</span>
+          <span className="mt-1 block text-lg font-bold">{latestChange?.timestamp} · {latestChange?.title}</span>
+          <span className="mt-2 block text-xs font-semibold text-cyan-100/85">Próxima aprovação: <code className="rounded bg-black/30 px-1 py-0.5">{latestChange?.approvalPhrase}</code></span>
         </span>
         <span className="rounded-full border border-cyan-300/30 bg-black/20 px-3 py-1 text-xs font-semibold text-cyan-100">
-          {pendingChanges.length} pendente{pendingChanges.length === 1 ? '' : 's'} · clique para ver diferenças
+          {pendingChanges.length} aguardando aprovação · clique para ver diferenças
         </span>
       </button>
       {open && (
