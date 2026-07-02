@@ -178,12 +178,12 @@ def test_seed_lessons_deactivates_legacy_prototype_lessons():
 def test_incremental_cron_target_closes_active_german_session_54_with_twenty_contact_items():
     assert ExerciseService.SESSION_SIZE == 20
     assert ExerciseService.TARGET_ITEMS == 1000
-    assert ExerciseService.target_items_for_language("de") == 1210
+    assert ExerciseService.target_items_for_language("de") == 1215
     assert {language: ExerciseService.target_items_for_language(language) for language in LANGUAGES - {"de"}} == {
-        "fr": 1120,
-        "ru": 1120,
-        "jp": 1120,
-        "en": 1120,
+        "fr": 1125,
+        "ru": 1125,
+        "jp": 1125,
+        "en": 1125,
     }
 
     german_items = ExerciseService.generate_items("de")
@@ -229,12 +229,12 @@ def test_incremental_cron_target_closes_active_german_session_54_with_twenty_con
 def test_incremental_cron_target_opens_active_german_session_55_with_ten_family_items():
     assert ExerciseService.SESSION_SIZE == 20
     assert ExerciseService.TARGET_ITEMS == 1000
-    assert ExerciseService.target_items_for_language("de") == 1210
+    assert ExerciseService.target_items_for_language("de") == 1215
     assert {language: ExerciseService.target_items_for_language(language) for language in LANGUAGES - {"de"}} == {
-        "fr": 1120,
-        "ru": 1120,
-        "jp": 1120,
-        "en": 1120,
+        "fr": 1125,
+        "ru": 1125,
+        "jp": 1125,
+        "en": 1125,
     }
 
     german_items = ExerciseService.generate_items("de")
@@ -278,11 +278,11 @@ def test_incremental_cron_target_opens_active_german_session_55_with_ten_family_
 def test_hourly_incremental_cron_adds_five_real_items_to_every_active_language_without_overfilling_blocks():
     assert ExerciseService.SESSION_SIZE == 20
     assert {language: ExerciseService.target_items_for_language(language) for language in LANGUAGES} == {
-        "de": 1210,
-        "fr": 1120,
-        "ru": 1120,
-        "jp": 1120,
-        "en": 1120,
+        "de": 1215,
+        "fr": 1125,
+        "ru": 1125,
+        "jp": 1125,
+        "en": 1125,
     }
 
     expected_first_targets = {
@@ -332,11 +332,11 @@ def test_hourly_incremental_cron_adds_five_real_items_to_every_active_language_w
 def test_next_hourly_incremental_cron_adds_five_more_items_per_active_language_without_overfilling_blocks():
     assert ExerciseService.SESSION_SIZE == 20
     assert {language: ExerciseService.target_items_for_language(language) for language in LANGUAGES} == {
-        "de": 1210,
-        "fr": 1120,
-        "ru": 1120,
-        "jp": 1120,
-        "en": 1120,
+        "de": 1215,
+        "fr": 1125,
+        "ru": 1125,
+        "jp": 1125,
+        "en": 1125,
     }
 
     for language in LANGUAGES:
@@ -371,11 +371,11 @@ def test_next_hourly_incremental_cron_adds_five_more_items_per_active_language_w
 def test_current_hourly_incremental_cron_adds_five_items_to_all_active_languages_without_overfill():
     assert ExerciseService.SESSION_SIZE == 20
     assert {language: ExerciseService.target_items_for_language(language) for language in LANGUAGES} == {
-        "de": 1210,
-        "fr": 1120,
-        "ru": 1120,
-        "jp": 1120,
-        "en": 1120,
+        "de": 1215,
+        "fr": 1125,
+        "ru": 1125,
+        "jp": 1125,
+        "en": 1125,
     }
 
     expected_counts = {
@@ -419,11 +419,11 @@ def test_current_hourly_incremental_cron_adds_five_items_to_all_active_languages
 def test_next_hourly_incremental_cron_opens_or_extends_blocks_by_five_for_every_active_language():
     assert ExerciseService.SESSION_SIZE == 20
     assert {language: ExerciseService.target_items_for_language(language) for language in LANGUAGES} == {
-        "de": 1210,
-        "fr": 1120,
-        "ru": 1120,
-        "jp": 1120,
-        "en": 1120,
+        "de": 1215,
+        "fr": 1125,
+        "ru": 1125,
+        "jp": 1125,
+        "en": 1125,
     }
 
     expected_counts = {
@@ -460,11 +460,11 @@ def test_next_hourly_incremental_cron_opens_or_extends_blocks_by_five_for_every_
 def test_current_hourly_incremental_cron_adds_five_more_items_to_every_active_language_without_overfill():
     assert ExerciseService.SESSION_SIZE == 20
     assert {language: ExerciseService.target_items_for_language(language) for language in LANGUAGES} == {
-        "de": 1210,
-        "fr": 1120,
-        "ru": 1120,
-        "jp": 1120,
-        "en": 1120,
+        "de": 1215,
+        "fr": 1125,
+        "ru": 1125,
+        "jp": 1125,
+        "en": 1125,
     }
 
     expected_counts = {
@@ -501,11 +501,11 @@ def test_current_hourly_incremental_cron_adds_five_more_items_to_every_active_la
 def test_next_hourly_incremental_cron_extends_or_opens_blocks_by_five_for_all_active_languages():
     assert ExerciseService.SESSION_SIZE == 20
     assert {language: ExerciseService.target_items_for_language(language) for language in LANGUAGES} == {
-        "de": 1210,
-        "fr": 1120,
-        "ru": 1120,
-        "jp": 1120,
-        "en": 1120,
+        "de": 1215,
+        "fr": 1125,
+        "ru": 1125,
+        "jp": 1125,
+        "en": 1125,
     }
 
     expected_counts = {
@@ -542,11 +542,11 @@ def test_next_hourly_incremental_cron_extends_or_opens_blocks_by_five_for_all_ac
 def test_current_hourly_incremental_cron_closes_or_extends_active_blocks_by_five_for_all_languages():
     assert ExerciseService.SESSION_SIZE == 20
     assert {language: ExerciseService.target_items_for_language(language) for language in LANGUAGES} == {
-        "de": 1210,
-        "fr": 1120,
-        "ru": 1120,
-        "jp": 1120,
-        "en": 1120,
+        "de": 1215,
+        "fr": 1125,
+        "ru": 1125,
+        "jp": 1125,
+        "en": 1125,
     }
 
     expected_counts = {
@@ -584,11 +584,11 @@ def test_current_hourly_incremental_cron_closes_or_extends_active_blocks_by_five
 def test_hourly_incremental_cron_opens_german_session_59_and_extends_contact_blocks_for_other_active_languages():
     assert ExerciseService.SESSION_SIZE == 20
     assert {language: ExerciseService.target_items_for_language(language) for language in LANGUAGES} == {
-        "de": 1210,
-        "fr": 1120,
-        "ru": 1120,
-        "jp": 1120,
-        "en": 1120,
+        "de": 1215,
+        "fr": 1125,
+        "ru": 1125,
+        "jp": 1125,
+        "en": 1125,
     }
 
     expected_counts = {
@@ -626,11 +626,11 @@ def test_hourly_incremental_cron_opens_german_session_59_and_extends_contact_blo
 def test_hourly_incremental_cron_extends_german_session_59_and_closes_contact_blocks_for_other_active_languages():
     assert ExerciseService.SESSION_SIZE == 20
     assert {language: ExerciseService.target_items_for_language(language) for language in LANGUAGES} == {
-        "de": 1210,
-        "fr": 1120,
-        "ru": 1120,
-        "jp": 1120,
-        "en": 1120,
+        "de": 1215,
+        "fr": 1125,
+        "ru": 1125,
+        "jp": 1125,
+        "en": 1125,
     }
 
     expected_counts = {
@@ -667,11 +667,11 @@ def test_hourly_incremental_cron_extends_german_session_59_and_closes_contact_bl
 def test_current_hourly_incremental_cron_adds_five_real_items_for_each_active_language_without_overfilling_blocks():
     assert ExerciseService.SESSION_SIZE == 20
     assert {language: ExerciseService.target_items_for_language(language) for language in LANGUAGES} == {
-        "de": 1210,
-        "fr": 1120,
-        "ru": 1120,
-        "jp": 1120,
-        "en": 1120,
+        "de": 1215,
+        "fr": 1125,
+        "ru": 1125,
+        "jp": 1125,
+        "en": 1125,
     }
 
     expected_counts = {
@@ -708,11 +708,11 @@ def test_current_hourly_incremental_cron_adds_five_real_items_for_each_active_la
 def test_hourly_incremental_cron_closes_german_session_59_and_extends_family_blocks_for_other_active_languages():
     assert ExerciseService.SESSION_SIZE == 20
     assert {language: ExerciseService.target_items_for_language(language) for language in LANGUAGES} == {
-        "de": 1210,
-        "fr": 1120,
-        "ru": 1120,
-        "jp": 1120,
-        "en": 1120,
+        "de": 1215,
+        "fr": 1125,
+        "ru": 1125,
+        "jp": 1125,
+        "en": 1125,
     }
 
     expected_counts = {
@@ -749,11 +749,11 @@ def test_hourly_incremental_cron_closes_german_session_59_and_extends_family_blo
 def test_current_hourly_incremental_cron_opens_or_extends_five_items_for_all_active_languages():
     assert ExerciseService.SESSION_SIZE == 20
     assert {language: ExerciseService.target_items_for_language(language) for language in LANGUAGES} == {
-        "de": 1210,
-        "fr": 1120,
-        "ru": 1120,
-        "jp": 1120,
-        "en": 1120,
+        "de": 1215,
+        "fr": 1125,
+        "ru": 1125,
+        "jp": 1125,
+        "en": 1125,
     }
 
     expected_counts = {
@@ -790,11 +790,11 @@ def test_current_hourly_incremental_cron_opens_or_extends_five_items_for_all_act
 def test_hourly_incremental_cron_extends_german_cafe_block_and_closes_family_blocks_for_other_active_languages():
     assert ExerciseService.SESSION_SIZE == 20
     assert {language: ExerciseService.target_items_for_language(language) for language in LANGUAGES} == {
-        "de": 1210,
-        "fr": 1120,
-        "ru": 1120,
-        "jp": 1120,
-        "en": 1120,
+        "de": 1215,
+        "fr": 1125,
+        "ru": 1125,
+        "jp": 1125,
+        "en": 1125,
     }
 
     expected_counts = {
@@ -829,7 +829,7 @@ def test_hourly_incremental_cron_extends_german_cafe_block_and_closes_family_blo
 
 
 def test_hourly_incremental_cron_extends_cafe_and_opens_work_blocks_for_all_active_languages():
-    expected_targets = {"de": 1210, "fr": 1120, "ru": 1120, "jp": 1120, "en": 1120}
+    expected_targets = {"de": 1215, "fr": 1125, "ru": 1125, "jp": 1125, "en": 1125}
     expected_windows = {
         "de": (1190, 1195, 15, "Sessão 60", "Ein Wasser, bitte."),
         "fr": (1100, 1105, 5, "Sessão 56", "Je suis professeur."),
@@ -863,7 +863,7 @@ def test_hourly_incremental_cron_extends_cafe_and_opens_work_blocks_for_all_acti
 
 
 def test_hourly_incremental_cron_closes_german_cafe_block_and_extends_work_blocks_for_other_active_languages():
-    expected_targets = {"de": 1210, "fr": 1120, "ru": 1120, "jp": 1120, "en": 1120}
+    expected_targets = {"de": 1215, "fr": 1125, "ru": 1125, "jp": 1125, "en": 1125}
     expected_windows = {
         "de": (1195, 1200, 0, "Sessão 60", "Die Rechnung, bitte."),
         "fr": (1105, 1110, 10, "Sessão 56", "J'enseigne le français."),
@@ -896,7 +896,7 @@ def test_hourly_incremental_cron_closes_german_cafe_block_and_extends_work_block
 
 
 def test_current_hourly_incremental_cron_opens_german_intro_block_and_extends_work_blocks_by_five():
-    expected_targets = {"de": 1210, "fr": 1120, "ru": 1120, "jp": 1120, "en": 1120}
+    expected_targets = {"de": 1215, "fr": 1125, "ru": 1125, "jp": 1125, "en": 1125}
     expected_windows = {
         "de": (1200, 1205, 5, "Sessão 61", "Ich heiße Victor."),
         "fr": (1110, 1115, 15, "Sessão 56", "Je fais une pause."),
@@ -930,7 +930,7 @@ def test_current_hourly_incremental_cron_opens_german_intro_block_and_extends_wo
 
 
 def test_current_hourly_incremental_cron_extends_german_intro_and_closes_work_blocks_for_all_languages():
-    expected_targets = {"de": 1210, "fr": 1120, "ru": 1120, "jp": 1120, "en": 1120}
+    expected_targets = {"de": 1215, "fr": 1125, "ru": 1125, "jp": 1125, "en": 1125}
     expected_windows = {
         "de": (1205, 1210, 10, "Sessão 61", "Ich mag Musik."),
         "fr": (1115, 1120, 0, "Sessão 56", "Je travaille aujourd'hui."),
@@ -953,6 +953,41 @@ def test_current_hourly_incremental_cron_extends_german_intro_and_closes_work_bl
             "choice",
             "listen_build",
             "sequence_dialogue",
+            "context_choice",
+        ]
+        assert all(session_label in item["prompt"] for item in new_items)
+        assert all(item["prompt"] and item["answer"] and item["hint"] and item["explanation"] for item in new_items)
+        assert all("a palavra" not in item["prompt"].casefold() for item in new_items)
+        assert all("the word" not in repr(item).casefold() for item in new_items)
+        assert all("português" not in "\n".join(item.get("tiles") or []).casefold() for item in new_items if item["type"] == "sequence_dialogue")
+        assert any(target_phrase in repr(item) for item in new_items)
+
+
+def test_hourly_incremental_cron_extends_german_intro_and_opens_clothing_blocks_for_other_languages():
+    expected_targets = {"de": 1215, "fr": 1125, "ru": 1125, "jp": 1125, "en": 1125}
+    expected_windows = {
+        "de": (1210, 1215, 15, "Sessão 61", "Wie heißt du?"),
+        "fr": (1120, 1125, 5, "Sessão 57", "La chemise est bleue."),
+        "ru": (1120, 1125, 5, "Sessão 57", "Рубашка синяя."),
+        "jp": (1120, 1125, 5, "Sessão 57", "シャツは青いです。"),
+        "en": (1120, 1125, 5, "Sessão 57", "The shirt is blue."),
+    }
+
+    assert ExerciseService.INCREMENTAL_ITEM_TARGETS == expected_targets
+    for language, (before_count, after_count, last_block_size, session_label, target_phrase) in expected_windows.items():
+        items = ExerciseService.generate_items(language)
+        new_items = items[before_count:after_count]
+
+        assert len(items) == expected_targets[language]
+        assert len(new_items) == 5
+        assert len(items[:before_count]) % ExerciseService.SESSION_SIZE in {0, 10}
+        assert len(items[:after_count]) % ExerciseService.SESSION_SIZE == last_block_size
+        assert last_block_size <= ExerciseService.SESSION_SIZE
+        assert [item["type"] for item in new_items] == [
+            "choice",
+            "listen_choice",
+            "image_choice",
+            "build",
             "context_choice",
         ]
         assert all(session_label in item["prompt"] for item in new_items)
@@ -1158,23 +1193,23 @@ def test_seed_lessons_appends_incremental_items_without_replacing_existing_ids()
         ExerciseService.seed_lessons(db)
 
         items = db.query(ExerciseItem).filter(ExerciseItem.lesson_id == lesson.id).order_by(ExerciseItem.order_index).all()
-        assert len(items) == 1210
+        assert len(items) == 1215
         assert [item.id for item in items[:5]] == preserved_ids
-        assert [item.order_index for item in items[-5:]] == [1206, 1207, 1208, 1209, 1210]
+        assert [item.order_index for item in items[-5:]] == [1211, 1212, 1213, 1214, 1215]
 
     finally:
         db.close()
 
 
 def test_incremental_generation_targets_add_at_most_five_items_per_active_language_this_round():
-    expected_targets = {"de": 1210, "fr": 1120, "ru": 1120, "jp": 1120, "en": 1120}
+    expected_targets = {"de": 1215, "fr": 1125, "ru": 1125, "jp": 1125, "en": 1125}
 
     assert ExerciseService.INCREMENTAL_ITEM_TARGETS == expected_targets
     for language, expected_target in expected_targets.items():
         items = ExerciseService.generate_items(language)
         assert len(items) == expected_target
         assert expected_target % ExerciseService.SESSION_SIZE in {0, 5, 10, 15}
-        assert expected_target - {"de": 1205, "fr": 1115, "ru": 1115, "jp": 1115, "en": 1115}[language] == 5
+        assert expected_target - {"de": 1210, "fr": 1120, "ru": 1120, "jp": 1120, "en": 1120}[language] == 5
 
 
 def test_incremental_cron_target_opens_active_german_session_58_with_five_habits_items():
@@ -1200,7 +1235,7 @@ def test_incremental_cron_target_opens_active_german_session_58_with_five_habits
 
 
 def test_current_hourly_incremental_cron_extends_every_active_language_by_five_without_overfill():
-    expected_targets = {"de": 1210, "fr": 1120, "ru": 1120, "jp": 1120, "en": 1120}
+    expected_targets = {"de": 1215, "fr": 1125, "ru": 1125, "jp": 1125, "en": 1125}
     expected_windows = {
         "de": (1145, 1150, 10, "Sessão 58", "Ich mache Sport."),
         "fr": (1055, 1060, 0, "Sessão 53", "Merci beaucoup."),
@@ -1233,7 +1268,7 @@ def test_current_hourly_incremental_cron_extends_every_active_language_by_five_w
 
 
 def test_current_hourly_incremental_cron_adds_next_five_items_to_every_active_language_without_overfill():
-    expected_targets = {"de": 1210, "fr": 1120, "ru": 1120, "jp": 1120, "en": 1120}
+    expected_targets = {"de": 1215, "fr": 1125, "ru": 1125, "jp": 1125, "en": 1125}
     expected_windows = {
         "de": (1150, 1155, 15, "Sessão 58", "Am Abend lese ich."),
         "fr": (1060, 1065, 5, "Sessão 54", "Mon nom de famille est Fernandes."),
