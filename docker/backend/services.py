@@ -230,7 +230,7 @@ class ExerciseService:
     }
     SESSION_SIZE = 20
     TARGET_ITEMS = 1000
-    INCREMENTAL_ITEM_TARGETS = {"de": 1135, "fr": 1045, "ru": 1045, "jp": 1045, "en": 1045}
+    INCREMENTAL_ITEM_TARGETS = {"de": 1140, "fr": 1050, "ru": 1050, "jp": 1050, "en": 1050}
     JP_BEGINNER_KANA = {
         "私の名前はビクトルです。": "わたしのなまえはビクトルです。",
         "ブラジル出身です。": "ブラジルしゅっしんです。",
@@ -1995,6 +1995,47 @@ class ExerciseService:
         pt, target = phrases[6]
         items.append(ExerciseService._context_choice(
             f"{prefix}: situação guiada — fale do preço da peça. Escolha a fala que comunica “{pt}” em {name}.",
+            target,
+            [foreign for foreign in options[0:3]],
+            start_index + len(items),
+        ))
+
+        listen_pairs = [[foreign, portuguese] for portuguese, foreign in [phrases[0], phrases[2], phrases[4], phrases[9]]]
+        items.append(ExerciseService._listen_match(
+            f"{prefix}: ouça cada áudio em {name} e selecione a tradução em português",
+            listen_pairs,
+            start_index + len(items),
+        ))
+
+        pt, target = phrases[9]
+        wrong_portuguese = [option for option in portuguese_options[4:8] if option != pt][:3]
+        items.append(ExerciseService._choice(
+            f"{prefix}: entenda “{target}” — qual é o significado em português?",
+            pt,
+            wrong_portuguese,
+            start_index + len(items),
+        ))
+
+        pt, target = phrases[4]
+        words = ExerciseService._build_tokens(code, target)
+        extras = [word for foreign in options[0:10] for word in ExerciseService._build_tokens(code, foreign)]
+        items.append(ExerciseService._listen_build(
+            f"{prefix}: ouça e monte em ordem natural — “{pt}”",
+            words,
+            extras,
+            start_index + len(items),
+        ))
+
+        sequence_pairs = [phrases[0], phrases[4], phrases[6], phrases[8]]
+        items.append(ExerciseService._sequence_dialogue(
+            f"{prefix}: prática guiada de ordem — organize os cartões exatamente assim: primeiro peça; depois cor; em seguida preço; por fim compra",
+            [foreign for _portuguese, foreign in sequence_pairs],
+            start_index + len(items),
+        ))
+
+        pt, target = phrases[5]
+        items.append(ExerciseService._context_choice(
+            f"{prefix}: situação guiada — peça um tamanho menor. Escolha a fala que comunica “{pt}” em {name}.",
             target,
             [foreign for foreign in options[0:3]],
             start_index + len(items),
