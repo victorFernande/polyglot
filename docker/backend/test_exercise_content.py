@@ -26,6 +26,33 @@ KANA_RE = re.compile(r"[\u3040-\u30ff]")
 CYRILLIC_RE = re.compile(r"[\u0400-\u04ff]")
 
 
+def test_add_next_incremental_batch_adds_up_to_five_items_and_respects_session_size():
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
+    db = SessionLocal()
+    try:
+        ExerciseService.ensure_seed_lessons(db)
+        for code in LANGUAGES:
+            lesson = db.query(ExerciseLesson).filter(ExerciseLesson.language_code == code, ExerciseLesson.active == True).first()
+            before = db.query(ExerciseItem).filter(ExerciseItem.lesson_id == lesson.id).count()
+            added = ExerciseService.add_next_incremental_batch(db, code)
+            after = db.query(ExerciseItem).filter(ExerciseItem.lesson_id == lesson.id).count()
+            last_block = before % ExerciseService.SESSION_SIZE
+            if last_block == 0:
+                expected = min(5, ExerciseService.SESSION_SIZE)
+            elif last_block <= 15:
+                expected = min(5, ExerciseService.SESSION_SIZE - last_block)
+            else:
+                expected = ExerciseService.SESSION_SIZE - last_block
+            assert added == expected, f"{code}: expected {expected} added, got {added}"
+            assert after == before + expected, f"{code}: count before={before} after={after} expected={before+expected}"
+            new_items = db.query(ExerciseItem).filter(ExerciseItem.lesson_id == lesson.id, ExerciseItem.order_index > before).order_by(ExerciseItem.order_index).all()
+            assert len(new_items) == expected
+            assert all(item.type and item.prompt and item.answer for item in new_items)
+    finally:
+        db.close()
+
+
 def test_japanese_progression_starts_with_romaji_then_kana_then_kanji():
     japanese_items = ExerciseService.generate_items("jp")
     romaji_window = japanese_items[:100]
@@ -1752,3 +1779,66 @@ def test_full_german_track_has_broad_answer_bank_not_ten_phrases_per_unit():
 
     assert len(items) == ExerciseService.target_items_for_language("de")
     assert len(unique_answers) >= 220
+
+
+def test_cron_round_adds_five_items_to_each_active_language_without_overfill():
+    """Regression for the daily cron round: every active language grows by +5 items."""
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
+    db = SessionLocal()
+    try:
+        ExerciseService.ensure_seed_lessons(db)
+        # Pre-seed counts observed before this cron round (from reports/polyglot-cron/2026-07-03-run2.md)
+        initial_counts = {"de": 1240, "fr": 1150, "ru": 1150, "jp": 1150, "en": 1155}
+        for code, count in initial_counts.items():
+            lesson = db.query(ExerciseLesson).filter(ExerciseLesson.language_code == code, ExerciseLesson.active == True).first()
+            assert lesson, f"missing active lesson for {code}"
+            current = db.query(ExerciseItem).filter(ExerciseItem.lesson_id == lesson.id).count()
+            assert current <= count, f"expected seed count {current} <= target {count} for {code}"
+            # Simulate previous cron rounds by inserting placeholder items beyond the seed target.
+            for i in range(current + 1, count + 1):
+                db.add(ExerciseItem(
+                    lesson_id=lesson.id,
+                    order_index=i,
+                    type="choice",
+                    prompt=f"placeholder {i}",
+                    answer={"value": f"answer {i}"},
+                    hint="hint",
+                    explanation="explanation",
+                    xp_reward=10,
+                ))
+            db.commit()
+
+        for code in LANGUAGES:
+            lesson = db.query(ExerciseLesson).filter(ExerciseLesson.language_code == code, ExerciseLesson.active == True).first()
+            before = db.query(ExerciseItem).filter(ExerciseItem.lesson_id == lesson.id).count()
+            added = ExerciseService.add_next_incremental_batch(db, code)
+            after = db.query(ExerciseItem).filter(ExerciseItem.lesson_id == lesson.id).count()
+            last_block = before % ExerciseService.SESSION_SIZE
+            if last_block == 0:
+                expected = min(5, ExerciseService.SESSION_SIZE)
+            elif last_block <= 15:
+                expected = min(5, ExerciseService.SESSION_SIZE - last_block)
+            else:
+                expected = ExerciseService.SESSION_SIZE - last_block
+            assert added == expected, f"{code}: expected {expected} added, got {added}"
+            assert after == before + expected, f"{code}: before={before} after={after} expected={before+expected}"
+            assert expected == 5, f"{code}: expected +5 in this round, got {expected}"
+            new_items = db.query(ExerciseItem).filter(ExerciseItem.lesson_id == lesson.id, ExerciseItem.order_index > before).order_by(ExerciseItem.order_index).all()
+            assert len(new_items) == expected
+            assert all(item.type and item.prompt and item.answer for item in new_items)
+            assert all(item.xp_reward and item.xp_reward > 0 for item in new_items)
+            # Pedagogical coherence: every new item must not leak the answer and must have a hint/explanation.
+            for item in new_items:
+                assert item.hint and item.explanation
+                if item.type == "choice":
+                    assert item.answer["value"] in item.options
+                elif item.type == "image_choice":
+                    assert item.answer["value"] in [option["value"] for option in item.options]
+                elif item.type in {"build", "listen_build"}:
+                    assert all(word in item.tiles for word in item.answer["value"])
+                elif item.type == "sequence_dialogue":
+                    assert len(item.answer["value"]) == 4
+                    assert all(phrase in item.tiles for phrase in item.answer["value"])
+    finally:
+        db.close()

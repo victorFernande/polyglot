@@ -671,6 +671,150 @@ class ExerciseService:
         return False
 
     @staticmethod
+    def _generic_review_block(code: str, start_index: int):
+        """Generate one mini-batch of up to 5 incremental review items deterministically.
+
+        Used when the cron asks for more items beyond the current hardcoded targets.
+        The block is pedagogically tied to the unit implied by the block position so
+        that session/topic coherence is preserved.
+        """
+        name = ExerciseService.LANGUAGE_NAMES[code]
+        # Rotate units every 20-item block to keep review varied and coherent.
+        unit_index = ((start_index - 1) // ExerciseService.SESSION_SIZE) % 10
+        unit = A1_UNITS[unit_index]
+        phrases = unit["phrases"][code]
+        options = [foreign for _pt, foreign in phrases]
+        portuguese_options = [pt for pt, _foreign in phrases]
+        session_number = (start_index - 1) // ExerciseService.SESSION_SIZE + 1
+        prefix = f"Sessão {session_number} — Revisão incremental · {unit['title']} em contexto"
+        # Deterministic phrase rotation within the unit.
+        phrase_offset = (start_index - 1) % len(phrases)
+        p1 = phrases[phrase_offset % len(phrases)]
+        p2 = phrases[(phrase_offset + 1) % len(phrases)]
+        p3 = phrases[(phrase_offset + 2) % len(phrases)]
+        p4 = phrases[(phrase_offset + 3) % len(phrases)]
+        p5 = phrases[(phrase_offset + 4) % len(phrases)]
+        items = []
+        idx = start_index
+
+        items.append(ExerciseService._choice(
+            f"{prefix}: escolha como dizer “{p1[0]}” em {name}",
+            p1[1],
+            [options[(phrase_offset + 1) % len(phrases)], options[(phrase_offset + 2) % len(phrases)], options[(phrase_offset + 3) % len(phrases)]],
+            idx,
+        ))
+        items.append(ExerciseService._listen_choice(
+            f"{prefix}: ouça o áudio e identifique a fala que comunica “{p2[0]}”",
+            p2[1],
+            [options[(phrase_offset + 2) % len(phrases)], options[(phrase_offset + 3) % len(phrases)], options[(phrase_offset + 4) % len(phrases)]],
+            idx + 1,
+        ))
+        image_sample = [p3, p1, p2, p4]
+        items.append(ExerciseService._image_choice(
+            f"{prefix}: observe a imagem e escolha a frase que representa “{image_sample[0][0]}”",
+            (image_sample[0][0], image_sample[0][1], ExerciseService._icon_key_for_phrase(image_sample[0][0], image_sample[0][1], unit["topics"][2])),
+            [(pt, foreign, ExerciseService._icon_key_for_phrase(pt, foreign, unit["topics"][2])) for pt, foreign in image_sample[1:]],
+            idx + 2,
+        ))
+        words = ExerciseService._build_tokens(code, p4[1])
+        extras = [word for foreign in options[:10] for word in ExerciseService._build_tokens(code, foreign)]
+        if len(words) < 2:
+            words = ExerciseService._build_tokens(code, p3[1])
+        items.append(ExerciseService._build(
+            f"{prefix}: monte a frase em ordem natural para dizer “{p4[0]}”",
+            words,
+            extras,
+            idx + 3,
+        ))
+        items.append(ExerciseService._context_choice(
+            f"{prefix}: situação guiada — pratique uma fala do tema. Escolha a opção que comunica “{p5[0]}” em {name}.",
+            p5[1],
+            [options[(phrase_offset + 1) % len(phrases)], options[(phrase_offset + 2) % len(phrases)], options[(phrase_offset + 3) % len(phrases)]],
+            idx + 4,
+        ))
+
+        hint = f"Mini-aula: {unit['goal']} Esta revisão acrescenta prática real sem ultrapassar 20 questões no bloco atual."
+        for item in items:
+            if item["type"] == "listen_build":
+                item["hint"] = f"{hint} Ouça a frase, repita em voz alta e monte as palavras na ordem correta."
+            elif item["type"] == "listen_match":
+                item["hint"] = f"{hint} Toque em cada áudio no idioma estudado e selecione a tradução correspondente em português."
+                item["explanation"] = f"Cada áudio em {name} deve ser ligado à tradução em português dentro da revisão de {unit['title'].lower()}."
+            elif item["type"] == "sequence_dialogue":
+                item["hint"] = f"{hint} Siga a ordem indicada no enunciado e organize apenas as frases no idioma estudado."
+            else:
+                item["hint"] = hint
+            if item["type"] in {"build", "listen_build"}:
+                item["explanation"] = f"A frase correta é: “{' '.join(item['answer']['value'])}”."
+            elif item["type"] not in {"image_choice", "listen_match", "sequence_dialogue"}:
+                item["explanation"] = f"{unit['title']}: “{item['answer']['value']}” comunica a ideia pedida em {name}."
+
+        return items
+
+    @staticmethod
+    def generate_incremental_batch(code: str, current_count: int, max_new: int = 5):
+        """Return up to `max_new` items starting at `current_count`.
+
+        Uses the deterministic hardcoded generator when available; falls back to
+        generic review blocks beyond the current target so the cron never runs out
+        of real ExerciseItems to add.
+        """
+        if max_new <= 0:
+            return []
+        generated = ExerciseService.generate_items(code)
+        if current_count + max_new <= len(generated):
+            return generated[current_count:current_count + max_new]
+        items = generated[current_count:]
+        index = len(generated) + 1
+        while len(items) < max_new:
+            block = ExerciseService._generic_review_block(code, index + len(items))
+            still_need = max_new - len(items)
+            items.extend(block[:still_need])
+        return items[:max_new]
+
+    @staticmethod
+    def add_next_incremental_batch(db: Session, code: str, max_new: int = 5):
+        """Add the next incremental batch to an active lesson, respecting session size.
+
+        Rules from the cron contract:
+        - 0 or 1-15 items in the last block -> add at most 5
+        - 16-19 items in the last block -> add only enough to close 20
+        - never exceed 20 per session
+        """
+        lesson = db.query(ExerciseLesson).filter(ExerciseLesson.language_code == code, ExerciseLesson.active == True).first()
+        if not lesson:
+            return 0
+        current_count = db.query(ExerciseItem).filter(ExerciseItem.lesson_id == lesson.id).count()
+        last_block_size = current_count % ExerciseService.SESSION_SIZE
+        if last_block_size == 0:
+            to_add = min(max_new, ExerciseService.SESSION_SIZE)
+        elif last_block_size <= 15:
+            to_add = min(max_new, ExerciseService.SESSION_SIZE - last_block_size)
+        else:
+            to_add = ExerciseService.SESSION_SIZE - last_block_size
+        if to_add <= 0:
+            return 0
+        batch = ExerciseService.generate_incremental_batch(code, current_count, to_add)
+        if not batch:
+            return 0
+        for idx, item in enumerate(batch, current_count + 1):
+            db.add(ExerciseItem(
+                lesson_id=lesson.id,
+                order_index=idx,
+                type=item["type"],
+                prompt=item["prompt"],
+                answer=item["answer"],
+                options=item["options"],
+                tiles=item["tiles"],
+                pairs=item["pairs"],
+                hint=item["hint"],
+                explanation=item["explanation"],
+                xp_reward=item["xp_reward"],
+            ))
+        db.commit()
+        return to_add
+
+    @staticmethod
     def _incremental_review_items(code: str, start_index: int, count: int):
         if count <= 0:
             return []
