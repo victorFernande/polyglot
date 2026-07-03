@@ -67,6 +67,7 @@
 | 2026-06-30 | Auto-populamento: vocabulário de “Du Hast”, treino `hast/hasst`, `ch` fino e quiz de sons parecidos | 20-30 min | Conteúdo novo criado para FASE 1
 | 2026-07-01 | Auto-populamento: vocabulário de “Ich Will”, treino `w`→`v`, `ö` arredondado e quiz de sons | 20-30 min | Conteúdo novo criado para FASE 1
 | 2026-07-02 | Auto-populamento: vocabulário de “Engel”, treino `ng` nasal, contraste `hell/dunkel` e quiz fonético | 20-30 min | Conteúdo novo criado para FASE 1
+| 2026-07-03 | Auto-populamento: vocabulário de “Engel”, treino `ie/ei`, `ng` compacto e quiz fonético | 20-30 min | Conteúdo novo criado para FASE 1
 ```
 
 ### Semana 2
@@ -90,4 +91,4 @@ DATA | ATIVIDADE | TEMPO | NOTA
 
 ---
 
-*Última atualização: 2026-07-02*
+*Última atualização: 2026-07-03*
