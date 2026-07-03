@@ -230,7 +230,7 @@ class ExerciseService:
     }
     SESSION_SIZE = 20
     TARGET_ITEMS = 1000
-    INCREMENTAL_ITEM_TARGETS = {"de": 1225, "fr": 1135, "ru": 1135, "jp": 1135, "en": 1135}
+    INCREMENTAL_ITEM_TARGETS = {"de": 1230, "fr": 1140, "ru": 1140, "jp": 1140, "en": 1140}
     JP_BEGINNER_KANA = {
         "私の名前はビクトルです。": "わたしのなまえはビクトルです。",
         "ブラジル出身です。": "ブラジルしゅっしんです。",
@@ -2943,9 +2943,58 @@ class ExerciseService:
             start_index + len(items),
         ))
 
+        listen_pairs = [[foreign, portuguese] for portuguese, foreign in phrases[1:5]]
+        items.append(ExerciseService._listen_match(
+            f"{prefix}: ouça cada áudio em {name} e selecione a tradução em português",
+            listen_pairs,
+            start_index + len(items),
+        ))
+
+        pt, target = phrases[7]
+        wrong_portuguese = [portuguese for portuguese, _foreign in phrases[0:4] if portuguese != pt][:3]
+        items.append(ExerciseService._choice(
+            f"{prefix}: entenda “{target}” — qual é o significado em português?",
+            pt,
+            wrong_portuguese,
+            start_index + len(items),
+        ))
+
+        pt, target = phrases[8]
+        words = ExerciseService._build_tokens(code, target)
+        extras = [word for foreign in options[0:10] for word in ExerciseService._build_tokens(code, foreign)]
+        items.append(ExerciseService._listen_build(
+            f"{prefix}: ouça e monte em ordem natural — “{pt}”",
+            words,
+            extras,
+            start_index + len(items),
+        ))
+
+        sequence_pairs = [phrases[1], phrases[3], phrases[8], phrases[9]]
+        items.append(ExerciseService._sequence_dialogue(
+            f"{prefix}: prática guiada de ordem — organize os cartões exatamente assim: primeiro passagem; depois estação; em seguida ajuda; por fim chegada",
+            [foreign for _portuguese, foreign in sequence_pairs],
+            start_index + len(items),
+        ))
+
+        pt, target = phrases[9]
+        items.append(ExerciseService._context_choice(
+            f"{prefix}: situação guiada — confirme a chegada de hoje. Escolha a fala que comunica “{pt}” em {name}.",
+            target,
+            [foreign for foreign in options[0:3]],
+            start_index + len(items),
+        ))
+
         hint = f"Mini-aula: {unit['goal']} Esta revisão abre um novo bloco real de viagem sem ultrapassar 20 questões."
         for item in items[session_62_start:]:
-            item["hint"] = hint
+            if item["type"] == "listen_build":
+                item["hint"] = f"{hint} Ouça a frase, repita em voz alta e monte as palavras na ordem correta."
+            elif item["type"] == "listen_match":
+                item["hint"] = f"{hint} Toque em cada áudio no idioma estudado e selecione a tradução correspondente em português."
+                item["explanation"] = f"Cada áudio em {name} deve ser ligado à tradução em português dentro da revisão de viagem."
+            elif item["type"] == "sequence_dialogue":
+                item["hint"] = f"{hint} Siga a ordem indicada no enunciado e organize apenas as frases no idioma estudado."
+            else:
+                item["hint"] = hint
             if item["type"] in {"build", "listen_build"}:
                 item["explanation"] = f"A frase correta é: “{' '.join(item['answer']['value'])}”."
             elif item["type"] not in {"image_choice", "listen_match", "sequence_dialogue"}:
@@ -2990,6 +3039,13 @@ class ExerciseService:
     @staticmethod
     def _windowed_pairs(bank, start, size):
         return [bank[(start + offset) % len(bank)] for offset in range(size)]
+
+    @staticmethod
+    def _real_phrase_window(code: str, start: int, size: int):
+        bank = [pair for unit in A1_UNITS for pair in unit["phrases"][code]]
+        if code == "jp" and start < 350:
+            bank = A1_UNITS[0]["phrases"][code]
+        return ExerciseService._windowed_pairs(bank, start, size)
 
     @staticmethod
     def _wrong_options(bank, target, start, size=3):
@@ -3056,6 +3112,8 @@ class ExerciseService:
         portuguese_steps = [pair[0] for pair in sequence_pairs]
         if unit_title == "Apresente-se":
             return f"{prefix}: monte uma apresentação curta seguindo a ordem: nome → origem → onde mora → idioma que fala"
+        if unit_title:
+            return f"{prefix}: prática guiada de ordem — organize os cartões exatamente assim: primeiro contexto; depois detalhe; em seguida resposta; por fim fechamento"
         return f"{prefix}: prática guiada de ordem — organize os cartões exatamente assim: primeiro {portuguese_steps[0]}; depois {portuguese_steps[1]}; em seguida {portuguese_steps[2]}; por fim {portuguese_steps[3]}"
 
     @staticmethod
@@ -3126,17 +3184,17 @@ class ExerciseService:
                             prompt = f"{prefix}: monte a frase em ordem natural para dizer “{build_pt}”"
                             item = ExerciseService._build(prompt, words, extras, idx)
                     elif item_type in {"match", "listen_match"}:
-                        sample = ExerciseService._unit_phrase_window(unit, code, topic_index + question_index, 4)
+                        sample = ExerciseService._real_phrase_window(code, unit_index * 23 + topic_index * 11 + question_index * 4, 4)
                         pairs = [[foreign, portuguese] for portuguese, foreign in sample]
                         review_prefix = f"Unidade {unit_index}/10 — {unit['title']} · Revisão guiada"
                         if item_type == "listen_match":
-                            prompt = f"{review_prefix}: ouça cada áudio em {name} e selecione a tradução em português"
+                            prompt = f"{review_prefix}: tópico {topic_index} bloco {question_index} — ouça cada áudio em {name} e selecione a tradução em português"
                             item = ExerciseService._listen_match(prompt, pairs, idx)
                         else:
-                            prompt = f"{review_prefix}: relacione cada frase ao significado em português"
+                            prompt = f"{review_prefix}: tópico {topic_index} bloco {question_index} — relacione cada frase ao significado em português"
                             item = ExerciseService._match(prompt, pairs, idx)
                     elif item_type == "sequence_dialogue":
-                        sequence_pairs = ExerciseService._coherent_sequence_pairs(unit, code, topic_index)
+                        sequence_pairs = ExerciseService._coherent_sequence_pairs(unit, code, topic_index) if unit["title"] == "Apresente-se" else ExerciseService._real_phrase_window(code, unit_index * 31 + topic_index * 13 + question_index * 4, 4)
                         phrases = [foreign for _portuguese, foreign in sequence_pairs]
                         review_prefix = f"Unidade {unit_index}/10 — {unit['title']} · Revisão guiada"
                         prompt = ExerciseService._sequence_prompt(review_prefix, unit["title"], sequence_pairs, topic_name)

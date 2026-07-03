@@ -138,3 +138,50 @@ def test_polyglot_qa_blocks_sessions_with_more_than_five_repeated_same_phrase():
 
     assert {row["verdict"] for row in rows} == {"BLOCK"}
     assert all(any(issue["code"] == "same_phrase_repeated_more_than_five_in_session" for issue in row["issues"]) for row in rows)
+
+
+def test_polyglot_qa_blocks_out_of_context_phrase_inside_current_session_topic():
+    item = {
+        "type": "listen_match",
+        "prompt": "Unidade 1/10 — Fazendo um pedido no café · Revisão guiada: ouça cada áudio em Alemão e selecione a tradução em português",
+        "answer": {"pairs": [["Ich möchte einen Kaffee.", "Eu gostaria de um café."], ["Das ist mein Gepäck.", "Esta é minha bagagem."], ["Ein Wasser, bitte.", "Uma água, por favor."], ["Danke.", "Obrigado."]]},
+        "options": None,
+        "tiles": None,
+        "pairs": [["Ich möchte einen Kaffee.", "Eu gostaria de um café."], ["Das ist mein Gepäck.", "Esta é minha bagagem."], ["Ein Wasser, bitte.", "Uma água, por favor."], ["Danke.", "Obrigado."]],
+    }
+
+    result = review_item("de", 2, item)
+
+    assert result["verdict"] == "BLOCK"
+    assert any(issue["code"] == "session_topic_semantic_drift" for issue in result["issues"])
+    assert any("bagagem" in issue["message"] or "Gepäck" in issue["message"] for issue in result["issues"])
+
+
+def test_polyglot_qa_allows_current_unit_phrases_inside_current_session_topic():
+    item = {
+        "type": "listen_match",
+        "prompt": "Unidade 1/10 — Fazendo um pedido no café · Revisão guiada: ouça cada áudio em Alemão e selecione a tradução em português",
+        "answer": {"pairs": [["Ich möchte einen Kaffee.", "Eu gostaria de um café."], ["Ein Wasser, bitte.", "Uma água, por favor."], ["Ich möchte ein Brot.", "Eu gostaria de um pão."], ["Danke.", "Obrigado."]]},
+        "options": None,
+        "tiles": None,
+        "pairs": [["Ich möchte einen Kaffee.", "Eu gostaria de um café."], ["Ein Wasser, bitte.", "Uma água, por favor."], ["Ich möchte ein Brot.", "Eu gostaria de um pão."], ["Danke.", "Obrigado."]],
+    }
+
+    result = review_item("de", 2, item)
+
+    assert not any(issue["code"] == "session_topic_semantic_drift" for issue in result["issues"])
+
+
+def test_polyglot_qa_allows_incremental_review_items_when_prompt_declares_the_source_unit():
+    item = {
+        "type": "listen_match",
+        "prompt": "Sessão 62 — Revisão incremental · Viagem em contexto: ouça cada áudio em Alemão e selecione a tradução em português",
+        "answer": {"pairs": [["Ich brauche ein Ticket.", "Eu preciso de uma passagem."], ["Wo ist der Bahnhof?", "Onde fica a estação?"], ["Ich brauche Hilfe.", "Eu preciso de ajuda."], ["Ich komme heute an.", "Eu chego hoje."]]},
+        "options": None,
+        "tiles": None,
+        "pairs": [["Ich brauche ein Ticket.", "Eu preciso de uma passagem."], ["Wo ist der Bahnhof?", "Onde fica a estação?"], ["Ich brauche Hilfe.", "Eu preciso de ajuda."], ["Ich komme heute an.", "Eu chego hoje."]],
+    }
+
+    result = review_item("de", 1225, item)
+
+    assert not any(issue["code"] == "session_topic_semantic_drift" for issue in result["issues"])

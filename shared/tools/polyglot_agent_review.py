@@ -31,6 +31,27 @@ from curriculum import A1_UNITS  # noqa: E402
 LANGS = ["de", "fr", "ru", "jp", "en"]
 LANG_NAMES = ExerciseService.LANGUAGE_NAMES
 CURRICULUM_TOPIC_LABELS = {topic.casefold() for unit in A1_UNITS for topic in unit["topics"]}
+CURRICULUM_PHRASE_UNITS: dict[str, set[int]] = {}
+for unit_idx, unit in enumerate(A1_UNITS, start=1):
+    for phrases in unit["phrases"].values():
+        for portuguese, target in phrases:
+            for text in [portuguese, target]:
+                key = re.sub(r"\s+", " ", str(text).strip().casefold())
+                if key:
+                    CURRICULUM_PHRASE_UNITS.setdefault(key, set()).add(unit_idx)
+
+INCREMENTAL_PROMPT_UNIT_MARKERS = {
+    "café em contexto": 1,
+    "apresentação em contexto": 2,
+    "viagem em contexto": 3,
+    "restaurante em contexto": 4,
+    "contato em contexto": 5,
+    "família em contexto": 6,
+    "trabalho em contexto": 7,
+    "roupas em contexto": 8,
+    "hábitos em contexto": 9,
+    "preferências em contexto": 10,
+}
 
 GENERIC_PROMPTS = [
     "combine itens do contexto",
@@ -130,12 +151,71 @@ def visible_prompt(prompt: str) -> str:
     return prompt.split(": ", 1)[-1] if ": " in prompt else prompt
 
 
+def learner_visible_phrase_values(value) -> list[str]:
+    phrases: list[str] = []
+    if isinstance(value, str):
+        phrases.append(value)
+    elif isinstance(value, list):
+        for part in value:
+            phrases.extend(learner_visible_phrase_values(part))
+    elif isinstance(value, dict):
+        for key in ["value", "label", "label_pt", "text", "audio_text"]:
+            phrases.extend(learner_visible_phrase_values(value.get(key)))
+    return [phrase for phrase in phrases if phrase and phrase.strip()]
+
+
+def unit_number_for_item(idx_zero: int, item: dict) -> int:
+    prompt = str(item.get("prompt") or "").casefold()
+    for marker, unit_number in INCREMENTAL_PROMPT_UNIT_MARKERS.items():
+        if marker in prompt:
+            return unit_number
+    return int(context_for_index(idx_zero)["unit_number"])
+
+
+def out_of_context_curriculum_phrases(language: str, idx_zero: int, item: dict) -> list[dict[str, str]]:
+    """Find known curriculum phrases from another unit inside this session item."""
+    context = context_for_index(idx_zero)
+    current_unit = unit_number_for_item(idx_zero, item)
+    values: list[str] = []
+    values.extend(learner_visible_phrase_values(answer_value(item)))
+    values.extend(learner_visible_phrase_values(item.get("pairs")))
+    values.extend(learner_visible_phrase_values(item.get("options")))
+    values.extend(learner_visible_phrase_values(item.get("tiles")))
+
+    findings: list[dict[str, str]] = []
+    seen: set[str] = set()
+    for value in values:
+        normalized = re.sub(r"\s+", " ", value.strip().casefold())
+        if not normalized or normalized in seen:
+            continue
+        seen.add(normalized)
+        unit_hits = CURRICULUM_PHRASE_UNITS.get(normalized)
+        if unit_hits and current_unit not in unit_hits:
+            source_units = ", ".join(str(unit) for unit in sorted(unit_hits))
+            findings.append({
+                "phrase": value,
+                "source_units": source_units,
+                "current_unit": str(current_unit),
+                "current_topic": str(context.get("topic", "")),
+            })
+    return findings
+
+
 def review_item(language: str, idx_zero: int, item: dict) -> dict:
     issues: list[dict[str, str]] = []
     prompt = item.get("prompt") or ""
     folded = prompt.casefold()
     item_type = item.get("type")
     answer = answer_value(item)
+
+    semantic_drifts = out_of_context_curriculum_phrases(language, idx_zero, item)
+    if semantic_drifts:
+        sample = semantic_drifts[0]
+        issues.append({
+            "severity": "high",
+            "code": "session_topic_semantic_drift",
+            "message": f"Frase fora do contexto da sessão/tópico: “{sample['phrase']}” pertence à(s) unidade(s) {sample['source_units']}, mas a sessão atual é unidade {sample['current_unit']} / tópico “{sample['current_topic']}”.",
+        })
 
     for fragment in GENERIC_PROMPTS:
         if fragment in folded:
