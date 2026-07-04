@@ -72,3 +72,5 @@
 - 2026-07-03T00:22:17-03:00 — Cron GPT de geração incremental multilíngue: adicionadas 5 questões reais backend para cada lesson ativa (`de`, `fr`, `ru`, `jp`, `en`), elevando Alemão de 1225→1230 (sessão 62 em 10/20, viagem) e fechando Francês/Russo/Japonês/Inglês de 1135→1140 (sessão 57 em 20/20, roupas); regressão TDD, QA determinístico e probe API local com usuário descartável validados. Cost: execução local via cron/Hermes; sem gasto externo de API registrado.
 
 - 2026-07-03T09:00:00-03:00 — Auto-populamento diário Polyglot: adicionados vocabulário, tarefas, dica e quiz da FASE 1 de alemão com âncora “Engel”; progress tracker atualizado para Dia 4 e vocabulário ativo ajustado para 33. Cost: execução local via cron/Hermes; sem gasto externo de API registrado.
+
+- 2026-07-04T09:00:00-03:00 — Auto-populamento diário Polyglot: adicionados vocabulário, tarefas, dica e quiz da FASE 1 de alemão com âncora “Mein Herz brennt”; progress tracker atualizado para Dia 5 e vocabulário ativo ajustado para 41. Cost: execução local via cron/Hermes; sem gasto externo de API registrado.
