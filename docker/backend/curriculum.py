@@ -38,7 +38,7 @@ _UNIT_SPECS = [
 
 _TRANSLATIONS = {
     "de": {
-        "Converse sobre viagem": ["Ich reise nach Berlin.", "Ich brauche ein Ticket.", "Ich habe ein Hotel.", "Wo ist der Bahnhof?", "Ich brauche eine Karte.", "Ich nehme den Zug.", "Wann fährt der Bus?", "Das ist mein Gepäck.", "Ich brauche Hilfe.", "Ich komme heute an."],
+        "Converse sobre viagem": ["Ich reise nach Berlin.", "Ich brauche ein Ticket.", "Ich habe eine Hotelreservierung.", "Wo ist der Bahnhof?", "Ich brauche eine Karte.", "Ich nehme den Zug.", "Wann fährt der Bus?", "Das ist mein Gepäck.", "Ich brauche Hilfe.", "Ich komme heute an."],
         "Peça em um restaurante": ["Ich habe einen Tisch.", "Die Speisekarte, bitte.", "Ich nehme eine Suppe.", "Ich nehme das Hähnchen.", "Ich möchte Wasser.", "Ich möchte ein Dessert.", "Ohne Fleisch, bitte.", "Was empfehlen Sie?", "Die Rechnung, bitte.", "Vielen Dank."],
         "Compartilhe contato": ["Meine Telefonnummer ist eins zwei drei.", "Meine E-Mail ist hier.", "Das ist meine Adresse.", "Mein Name ist Victor.", "Mein Nachname ist Fernandes.", "Die Nummer ist vier fünf sechs.", "Können Sie das wiederholen?", "Ich buchstabiere meinen Namen.", "Ich schreibe eine Nachricht.", "Hier ist mein Kontakt."],
         "Fale de sua família": ["Das ist meine Mutter.", "Das ist mein Vater.", "Ich habe einen Bruder.", "Ich habe eine Schwester.", "Mein Sohn ist hier.", "Meine Tochter ist klein.", "Meine Großeltern wohnen hier.", "Meine Mutter ist fünfzig Jahre alt.", "Das ist mein Haus.", "Meine Familie ist groß."],
@@ -90,7 +90,7 @@ _TRANSLATIONS = {
 }
 
 _PT_PHRASES = {
-    "Converse sobre viagem": ["Eu viajo para a cidade.", "Eu preciso de uma passagem.", "Eu tenho um hotel.", "Onde fica a estação?", "Eu preciso de um mapa.", "Eu pego o transporte.", "A que horas sai o ônibus?", "Esta é minha bagagem.", "Eu preciso de ajuda.", "Eu chego hoje."],
+    "Converse sobre viagem": ["Eu viajo para Berlim.", "Eu preciso de uma passagem.", "Eu tenho uma reserva de hotel.", "Onde fica a estação?", "Eu preciso de um mapa.", "Eu pego o trem.", "A que horas sai o ônibus?", "Esta é minha bagagem.", "Eu preciso de ajuda.", "Eu chego hoje."],
     "Peça em um restaurante": ["Eu tenho uma mesa.", "O menu, por favor.", "Eu quero uma entrada.", "Eu quero o prato principal.", "Eu gostaria de uma bebida.", "Eu gostaria de uma sobremesa.", "Sem carne, por favor.", "O que você recomenda?", "A conta, por favor.", "Muito obrigado."],
     "Compartilhe contato": ["Meu telefone é um dois três.", "Meu email está aqui.", "Este é meu endereço.", "Meu nome é Victor.", "Meu sobrenome é Fernandes.", "O número é quatro cinco seis.", "Você pode repetir?", "Eu soletrarei meu nome.", "Eu escrevo uma mensagem.", "Aqui está meu contato."],
     "Fale de sua família": ["Esta é minha mãe.", "Este é meu pai.", "Eu tenho um irmão.", "Eu tenho uma irmã.", "Meu filho está aqui.", "Minha filha é pequena.", "Meus avós moram aqui.", "Minha mãe tem cinquenta anos.", "Esta é minha casa.", "Minha família é grande."],

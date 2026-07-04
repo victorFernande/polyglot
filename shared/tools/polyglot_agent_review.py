@@ -111,7 +111,7 @@ def context_for_index(idx_zero: int) -> dict[str, int | str]:
     unit_number = base_idx // 100 + 1
     within_unit = base_idx % 100
     topic_number = within_unit // 10 + 1
-    question_in_session = idx_zero % 10 + 1
+    question_in_session = idx_zero % 20 + 1
     unit = A1_UNITS[unit_number - 1]
     topic = unit["topics"][topic_number - 1]
     return {

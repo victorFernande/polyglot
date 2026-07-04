@@ -106,6 +106,16 @@ def test_polyglot_qa_context_handles_incremental_items_after_base_track():
     assert context["question_in_session"] == 10
 
 
+def test_polyglot_qa_context_numbers_twenty_question_sessions_without_wrapping_at_ten():
+    first_half = context_for_index(1220)
+    second_half = context_for_index(1230)
+
+    assert first_half["session_number"] == 62
+    assert first_half["question_in_session"] == 1
+    assert second_half["session_number"] == 62
+    assert second_half["question_in_session"] == 11
+
+
 def test_polyglot_qa_blocks_match_translation_pairs_that_are_only_topic_labels():
     item = {
         "type": "listen_match",
