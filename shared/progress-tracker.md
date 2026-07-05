@@ -10,7 +10,7 @@
 ### Status Atual
 - **Onda:** 1 de 4
 - **Fase:** FASE 1 — Alfabeto & Fonética
-- **Dia da Onda:** 5 / 56
+- **Dia da Onda:** 6 / 56
 - **Início:** 2026-06-29
 - **Previsão de Término:** 2026-08-23
 
@@ -25,7 +25,7 @@
 ### Métricas Acumuladas
 | Métrica | Valor | Meta da Onda |
 |---------|-------|--------------|
-| Vocabulário ativo | 41 | 200 |
+| Vocabulário ativo | 49 | 200 |
 | Frases construídas | 0 | 70 |
 | Horas de input | 0h | 18h |
 | Músicas analisadas | 0 | 10 |
@@ -69,6 +69,7 @@
 | 2026-07-02 | Auto-populamento: vocabulário de “Engel”, treino `ng` nasal, contraste `hell/dunkel` e quiz fonético | 20-30 min | Conteúdo novo criado para FASE 1
 | 2026-07-03 | Auto-populamento: vocabulário de “Engel”, treino `ie/ei`, `ng` compacto e quiz fonético | 20-30 min | Conteúdo novo criado para FASE 1
 | 2026-07-04 | Auto-populamento: vocabulário de “Mein Herz brennt”, treino `z=ts`, contraste `ch` e quiz fonético | 20-30 min | Conteúdo novo criado para FASE 1
+| 2026-07-05 | Auto-populamento: vocabulário de “Deutschland”, treino `eu/ei/ie`, final seco e quiz fonético | 20-30 min | Conteúdo novo criado para FASE 1
 ```
 
 ### Semana 2
@@ -92,4 +93,4 @@ DATA | ATIVIDADE | TEMPO | NOTA
 
 ---
 
-*Última atualização: 2026-07-04*
+*Última atualização: 2026-07-05*
