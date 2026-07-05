@@ -48,7 +48,7 @@ _TRANSLATIONS = {
         "Exponha preferências": ["Ich mag Kaffee.", "Ich mag keinen Fisch.", "Ich bevorzuge Tee.", "Ich mag brasilianisches Essen.", "Ich höre gern Musik.", "Ich sehe gern Filme.", "Ich mag Fußball.", "Ich mag diese Stadt.", "Ich mag warmes Wetter.", "Ich finde das gut."],
     },
     "fr": {
-        "Converse sobre viagem": ["Je voyage à Paris.", "J'ai besoin d'un billet.", "J'ai un hôtel.", "Où est la gare ?", "J'ai besoin d'une carte.", "Je prends le train.", "Le bus part quand ?", "C'est mon bagage.", "J'ai besoin d'aide.", "J'arrive aujourd'hui."],
+        "Converse sobre viagem": ["Je voyage à Paris.", "J'ai besoin d'un billet.", "J'ai une réservation d'hôtel.", "Où est la gare ?", "J'ai besoin d'une carte.", "Je prends le train.", "Le bus part quand ?", "C'est mon bagage.", "J'ai besoin d'aide.", "J'arrive aujourd'hui."],
         "Peça em um restaurante": ["J'ai une table.", "Le menu, s'il vous plaît.", "Je prends une soupe.", "Je prends le poulet.", "Je voudrais de l'eau.", "Je voudrais un dessert.", "Sans viande, s'il vous plaît.", "Vous recommandez quoi ?", "L'addition, s'il vous plaît.", "Merci beaucoup."],
         "Compartilhe contato": ["Mon numéro est un deux trois.", "Mon e-mail est ici.", "C'est mon adresse.", "Je m'appelle Victor.", "Mon nom de famille est Fernandes.", "Le numéro est quatre cinq six.", "Vous pouvez répéter ?", "J'épelle mon nom.", "J'écris un message.", "Voici mon contact."],
         "Fale de sua família": ["C'est ma mère.", "C'est mon père.", "J'ai un frère.", "J'ai une sœur.", "Mon fils est ici.", "Ma fille est petite.", "Mes grands-parents habitent ici.", "Ma mère a cinquante ans.", "C'est ma maison.", "Ma famille est grande."],
@@ -58,7 +58,7 @@ _TRANSLATIONS = {
         "Exponha preferências": ["J'aime le café.", "Je n'aime pas le poisson.", "Je préfère le thé.", "J'aime la cuisine brésilienne.", "J'aime écouter de la musique.", "J'aime regarder des films.", "J'aime le football.", "J'aime cette ville.", "J'aime le temps chaud.", "Je trouve ça bien."],
     },
     "ru": {
-        "Converse sobre viagem": ["Я еду в Москву.", "Мне нужен билет.", "У меня есть отель.", "Где вокзал?", "Мне нужна карта.", "Я еду на поезде.", "Когда автобус?", "Это мой багаж.", "Мне нужна помощь.", "Я приезжаю сегодня."],
+        "Converse sobre viagem": ["Я еду в Москву.", "Мне нужен билет.", "У меня есть бронь в отеле.", "Где вокзал?", "Мне нужна карта.", "Я еду на поезде.", "Когда автобус?", "Это мой багаж.", "Мне нужна помощь.", "Я приезжаю сегодня."],
         "Peça em um restaurante": ["У меня есть столик.", "Меню, пожалуйста.", "Я возьму суп.", "Я возьму курицу.", "Я хочу воду.", "Я хочу десерт.", "Без мяса, пожалуйста.", "Что вы рекомендуете?", "Счёт, пожалуйста.", "Большое спасибо."],
         "Compartilhe contato": ["Мой номер один два три.", "Мой имейл здесь.", "Это мой адрес.", "Меня зовут Виктор.", "Моя фамилия Фернандес.", "Номер четыре пять шесть.", "Повторите, пожалуйста.", "Я диктую своё имя.", "Я пишу сообщение.", "Вот мой контакт."],
         "Fale de sua família": ["Это моя мама.", "Это мой папа.", "У меня есть брат.", "У меня есть сестра.", "Мой сын здесь.", "Моя дочь маленькая.", "Мои бабушка и дедушка живут здесь.", "Моей маме пятьдесят лет.", "Это мой дом.", "Моя семья большая."],
@@ -68,7 +68,7 @@ _TRANSLATIONS = {
         "Exponha preferências": ["Я люблю кофе.", "Я не люблю рыбу.", "Я предпочитаю чай.", "Я люблю бразильскую еду.", "Я люблю слушать музыку.", "Я люблю смотреть фильмы.", "Я люблю футбол.", "Мне нравится этот город.", "Я люблю тёплую погоду.", "Я думаю, это хорошо."],
     },
     "jp": {
-        "Converse sobre viagem": ["東京へ旅行します。", "切符が必要です。", "ホテルがあります。", "駅はどこですか。", "地図が必要です。", "電車に乗ります。", "バスはいつ出ますか。", "これは私の荷物です。", "助けが必要です。", "今日着きます。"],
+        "Converse sobre viagem": ["東京へ旅行します。", "切符が必要です。", "ホテルの予約があります。", "駅はどこですか。", "地図が必要です。", "電車に乗ります。", "バスはいつ出ますか。", "これは私の荷物です。", "助けが必要です。", "今日着きます。"],
         "Peça em um restaurante": ["席があります。", "メニューをお願いします。", "スープをお願いします。", "チキンをお願いします。", "水をお願いします。", "デザートをお願いします。", "肉なしでお願いします。", "おすすめは何ですか。", "お会計をお願いします。", "ありがとうございます。"],
         "Compartilhe contato": ["私の電話番号は一二三です。", "私のメールはこれです。", "これは私の住所です。", "私の名前はビクトルです。", "私の名字はフェルナンデスです。", "番号は四五六です。", "もう一度お願いします。", "名前をつづります。", "メッセージを書きます。", "これが私の連絡先です。"],
         "Fale de sua família": ["これは私の母です。", "これは私の父です。", "兄弟がいます。", "姉妹がいます。", "息子はここにいます。", "娘は小さいです。", "祖父母はここに住んでいます。", "母は五十歳です。", "これは私の家です。", "私の家族は大きいです。"],
@@ -78,7 +78,7 @@ _TRANSLATIONS = {
         "Exponha preferências": ["コーヒーが好きです。", "魚が好きではありません。", "お茶のほうが好きです。", "ブラジル料理が好きです。", "音楽を聞くのが好きです。", "映画を見るのが好きです。", "サッカーが好きです。", "この町が好きです。", "暖かい天気が好きです。", "いいと思います。"],
     },
     "en": {
-        "Converse sobre viagem": ["I travel to London.", "I need a ticket.", "I have a hotel.", "Where is the station?", "I need a map.", "I take the train.", "When does the bus leave?", "This is my luggage.", "I need help.", "I arrive today."],
+        "Converse sobre viagem": ["I travel to London.", "I need a ticket.", "I have a hotel reservation.", "Where is the station?", "I need a map.", "I take the train.", "When does the bus leave?", "This is my luggage.", "I need help.", "I arrive today."],
         "Peça em um restaurante": ["I have a table.", "The menu, please.", "I will have soup.", "I will have the chicken.", "I would like water.", "I would like dessert.", "No meat, please.", "What do you recommend?", "The bill, please.", "Thank you very much."],
         "Compartilhe contato": ["My phone number is one two three.", "My email is here.", "This is my address.", "My name is Victor.", "My last name is Fernandes.", "The number is four five six.", "Can you repeat that?", "I spell my name.", "I write a message.", "Here is my contact."],
         "Fale de sua família": ["This is my mother.", "This is my father.", "I have a brother.", "I have a sister.", "My son is here.", "My daughter is young.", "My grandparents live here.", "My mother is fifty years old.", "This is my house.", "My family is big."],
