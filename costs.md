@@ -76,3 +76,4 @@
 - 2026-07-04T09:00:00-03:00 — Auto-populamento diário Polyglot: adicionados vocabulário, tarefas, dica e quiz da FASE 1 de alemão com âncora “Mein Herz brennt”; progress tracker atualizado para Dia 5 e vocabulário ativo ajustado para 41. Cost: execução local via cron/Hermes; sem gasto externo de API registrado.
 
 - 2026-07-05T09:00:00-03:00 — Auto-populamento diário Polyglot: adicionados vocabulário, tarefas, dica e quiz da FASE 1 de alemão com âncora “Deutschland”; progress tracker atualizado para Dia 6 e vocabulário ativo ajustado para 49. Cost: execução local via cron/Hermes; sem gasto externo de API registrado.
+- 2026-07-06T09:00:00-03:00 — Auto-populamento diário Polyglot: adicionados vocabulário, tarefas, dica e quiz da FASE 1 de alemão com âncora “Radio”; progress tracker atualizado para Dia 7 e vocabulário ativo ajustado para 57. Cost: execução local via cron/Hermes; sem gasto externo de API registrado.
