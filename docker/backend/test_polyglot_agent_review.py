@@ -8,7 +8,7 @@ import polyglot_agent_review  # noqa: E402
 from polyglot_agent_review import context_for_index, review_item, add_repetition_verdicts  # noqa: E402
 
 
-def test_model_review_calls_9router_endpoint_and_prefixed_model(monkeypatch):
+def test_model_review_calls_live_9router_proxy_default_endpoint_and_model(monkeypatch):
     captured = {}
 
     def fake_urlopen(request, timeout):
@@ -21,13 +21,36 @@ def test_model_review_calls_9router_endpoint_and_prefixed_model(monkeypatch):
 
         return Response()
 
+    monkeypatch.delenv("POLYGLOT_9ROUTER_BASE_URL", raising=False)
     monkeypatch.setattr(polyglot_agent_review.urllib.request, "urlopen", fake_urlopen)
 
-    result = polyglot_agent_review.call_9router_review("9router/cx/gpt-5.5", [], {}, {})
+    result = polyglot_agent_review.call_9router_review("cx/gpt-5.5", [], {}, {})
 
     assert result["status"] == "ok"
-    assert captured["url"] == "http://127.0.0.1:20128/v1/chat/completions"
-    assert '"model": "9router/cx/gpt-5.5"' in captured["body"]
+    assert captured["url"] == "http://127.0.0.1:11434/v1/chat/completions"
+    assert '"model": "cx/gpt-5.5"' in captured["body"]
+    assert '"max_tokens": 2500' in captured["body"]
+
+
+def test_model_review_allows_endpoint_override(monkeypatch):
+    captured = {}
+
+    def fake_urlopen(request, timeout):
+        captured["url"] = request.full_url
+
+        class Response:
+            def read(self):
+                return b'{"choices":[{"message":{"content":"PASS"}}]}'
+
+        return Response()
+
+    monkeypatch.setenv("POLYGLOT_9ROUTER_BASE_URL", "http://127.0.0.1:9999/v1")
+    monkeypatch.setattr(polyglot_agent_review.urllib.request, "urlopen", fake_urlopen)
+
+    result = polyglot_agent_review.call_9router_review("cx/gpt-5.5", [], {}, {})
+
+    assert result["status"] == "ok"
+    assert captured["url"] == "http://127.0.0.1:9999/v1/chat/completions"
 
 
 def test_polyglot_qa_blocks_sequence_dialogue_without_explicit_order():

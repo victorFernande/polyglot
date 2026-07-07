@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import sys
 import urllib.error
@@ -41,16 +42,27 @@ for unit_idx, unit in enumerate(A1_UNITS, start=1):
                     CURRICULUM_PHRASE_UNITS.setdefault(key, set()).add(unit_idx)
 
 INCREMENTAL_PROMPT_UNIT_MARKERS = {
+    # Hardcoded incremental review prefixes (some use short labels, others use full unit titles).
     "café em contexto": 1,
+    "fazendo um pedido no café em contexto": 1,
     "apresentação em contexto": 2,
+    "apresente-se em contexto": 2,
     "viagem em contexto": 3,
+    "converse sobre viagem em contexto": 3,
     "restaurante em contexto": 4,
+    "peça em um restaurante em contexto": 4,
     "contato em contexto": 5,
+    "compartilhe contato em contexto": 5,
     "família em contexto": 6,
+    "fale de sua família em contexto": 6,
     "trabalho em contexto": 7,
+    "converse sobre o trabalho em contexto": 7,
     "roupas em contexto": 8,
+    "descreva roupas em contexto": 8,
     "hábitos em contexto": 9,
+    "converse sobre hábitos em contexto": 9,
     "preferências em contexto": 10,
+    "exponha preferências em contexto": 10,
 }
 
 GENERIC_PROMPTS = [
@@ -375,53 +387,58 @@ def call_9router_review(model: str, rows: list[dict], counts: Counter, issues: C
         f"Verdicts: {dict(counts)}\nIssue codes: {dict(issues)}\n"
         f"Examples: {json.dumps(examples, ensure_ascii=False)[:18000]}"
     )
-    payload = {
-        "model": model,
-        "messages": [
-            {"role": "system", "content": "Você é auditor rigoroso de exercícios de idiomas. Seja conciso e bloqueie conteúdo ambíguo."},
-            {"role": "user", "content": prompt},
-        ],
-        "temperature": 0.1,
-        "max_tokens": 900,
-        "stream": False,
-    }
-    request = urllib.request.Request(
-        "http://127.0.0.1:20128/v1/chat/completions",
-        data=json.dumps(payload).encode("utf-8"),
-        headers={"Content-Type": "application/json"},
-        method="POST",
-    )
-    try:
-        raw = urllib.request.urlopen(request, timeout=300).read().decode("utf-8", errors="replace")
+    base_url = os.environ.get("POLYGLOT_9ROUTER_BASE_URL", "http://127.0.0.1:11434/v1").rstrip("/")
+    # Kimi can spend the first few thousand tokens internally and return an
+    # empty final answer with finish_reason=max_tokens. Retry once with a
+    # larger cap before treating the model review as blocked.
+    for max_tokens in (2500, 5000):
+        payload = {
+            "model": model,
+            "messages": [
+                {"role": "system", "content": "Você é auditor rigoroso de exercícios de idiomas. Seja conciso e bloqueie conteúdo ambíguo. Entregue apenas o relatório final."},
+                {"role": "user", "content": prompt},
+            ],
+            "temperature": 0.1,
+            "max_tokens": max_tokens,
+            "stream": False,
+        }
+        request = urllib.request.Request(
+            f"{base_url}/chat/completions",
+            data=json.dumps(payload).encode("utf-8"),
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
         try:
-            data = json.loads(raw)
-            content = data["choices"][0]["message"].get("content", "")
-        except json.JSONDecodeError:
-            chunks: list[str] = []
-            for chunk in raw.split("\n\n"):
-                if not chunk.startswith("data: "):
-                    continue
-                body = chunk[6:]
-                if body.strip() == "[DONE]":
-                    continue
-                try:
-                    obj = json.loads(body)
-                    chunks.append(obj.get("choices", [{}])[0].get("delta", {}).get("content", ""))
-                except Exception:
-                    continue
-            content = "".join(chunks)
-        content = content.strip()
-        if not content:
-            return {"model": model, "status": "blocked", "error": "empty model review response"}
-        return {"model": model, "status": "ok", "review": content}
-    except Exception as exc:
-        return {"model": model, "status": "blocked", "error": repr(exc)}
+            raw = urllib.request.urlopen(request, timeout=300).read().decode("utf-8", errors="replace")
+            try:
+                data = json.loads(raw)
+                content = data["choices"][0]["message"].get("content", "")
+            except json.JSONDecodeError:
+                chunks: list[str] = []
+                for chunk in raw.split("\n\n"):
+                    if not chunk.startswith("data: "):
+                        continue
+                    body = chunk[6:]
+                    if body.strip() == "[DONE]":
+                        continue
+                    try:
+                        obj = json.loads(body)
+                        chunks.append(obj.get("choices", [{}])[0].get("delta", {}).get("content", ""))
+                    except Exception:
+                        continue
+                content = "".join(chunks)
+            content = content.strip()
+            if content:
+                return {"model": model, "status": "ok", "review": content}
+        except Exception as exc:
+            return {"model": model, "status": "blocked", "error": repr(exc)}
+    return {"model": model, "status": "blocked", "error": "empty model review response"}
 
 
 def run_model_reviews(rows: list[dict], counts: Counter, issues: Counter) -> list[dict]:
     return [
-        call_9router_review("9router/cx/gpt-5.5", rows, counts, issues),
-        call_9router_review("9router/kimi/kimi-k2.6", rows, counts, issues),
+        call_9router_review("cx/gpt-5.5", rows, counts, issues),
+        call_9router_review("kimi/kimi-k2.6", rows, counts, issues),
     ]
 
 
