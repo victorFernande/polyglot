@@ -17,6 +17,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -75,6 +76,33 @@ def write_snapshot(snapshot: dict[str, int], after: dict[str, int], snapshot_dir
     return path
 
 
+def repo_root() -> Path:
+    return Path(__file__).resolve().parents[2]
+
+
+def git_has_changes(paths: list[str] | None = None) -> bool:
+    command = ["git", "status", "--porcelain"]
+    if paths:
+        command.extend(["--", *paths])
+    result = subprocess.run(command, cwd=repo_root(), capture_output=True, text=True)
+    result.check_returncode()
+    return bool(result.stdout.strip())
+
+
+def commit_cron_changes(snapshot_path: Path, message: str, include_db: bool = False) -> bool:
+    root = repo_root()
+    paths = [str(snapshot_path.relative_to(root))]
+    if include_db:
+        paths.append("polyglot.db")
+
+    if not git_has_changes(paths):
+        return False
+
+    subprocess.run(["git", "add", "--", *paths], cwd=root, check=True)
+    subprocess.run(["git", "commit", "-m", message], cwd=root, check=True)
+    return True
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Polyglot incremental exercise cron")
     parser.add_argument(
@@ -91,6 +119,21 @@ def main() -> int:
         "--bootstrap",
         action="store_true",
         help="Bootstrap active lessons if they do not exist",
+    )
+    parser.add_argument(
+        "--commit",
+        action="store_true",
+        help="Commit the generated snapshot after a successful cron run",
+    )
+    parser.add_argument(
+        "--commit-db",
+        action="store_true",
+        help="Also include polyglot.db in the cron commit when it is tracked/changed",
+    )
+    parser.add_argument(
+        "--commit-message",
+        default="Content QA(polyglot): add hourly incremental exercise items",
+        help="Git commit message used with --commit",
     )
     args = parser.parse_args()
 
@@ -112,9 +155,18 @@ def main() -> int:
             after = take_snapshot(db)
 
         snapshot_path = write_snapshot(before, after, snapshot_dir)
+        committed = False
+        if args.commit:
+            committed = commit_cron_changes(
+                snapshot_path,
+                args.commit_message,
+                include_db=args.commit_db,
+            )
 
         print(f"Polyglot cron incremental round complete.")
         print(f"Snapshot: {snapshot_path}")
+        if args.commit:
+            print(f"Commit: {'created' if committed else 'skipped (no tracked cron changes)'}")
         for code in LANGUAGES:
             print(f"  {code}: {before[code]} -> {after[code]} (+{added[code]})")
         return 0

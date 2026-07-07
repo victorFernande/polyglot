@@ -29,7 +29,12 @@ add_repetition_verdicts = _polyglot_agent_review.add_repetition_verdicts
 LANGUAGES = ["de", "fr", "ru", "jp", "en"]
 
 
-def run_cron(database_url: str, snapshot_dir: str, bootstrap: bool = False) -> subprocess.CompletedProcess:
+def run_cron(
+    database_url: str,
+    snapshot_dir: str,
+    bootstrap: bool = False,
+    commit: bool = False,
+) -> subprocess.CompletedProcess:
     env = {
         **os.environ,
         "DATABASE_URL": database_url,
@@ -37,6 +42,8 @@ def run_cron(database_url: str, snapshot_dir: str, bootstrap: bool = False) -> s
     args = [str(BACKEND / ".venv" / "bin" / "python"), str(CRON), "--database-url", database_url, "--snapshot-dir", snapshot_dir]
     if bootstrap:
         args.append("--bootstrap")
+    if commit:
+        args.append("--commit")
     return subprocess.run(args, capture_output=True, text=True, env=env, cwd=str(BACKEND))
 
 
@@ -132,6 +139,16 @@ def test_cron_incremental_creates_snapshot_and_adds_items():
             assert payload["after"][code] == after[code]
     finally:
         db_path.unlink(missing_ok=True)
+
+
+def test_cron_incremental_exposes_commit_flag_without_staging_unrelated_paths():
+    source = CRON.read_text(encoding="utf-8")
+
+    assert '"--commit"' in source
+    assert '"--commit-db"' in source
+    assert 'subprocess.run(["git", "add", "--", *paths]' in source
+    assert 'subprocess.run(["git", "commit", "-m", message]' in source
+    assert 'git_has_changes(paths)' in source
 
 
 def test_cron_incremental_grows_at_static_target():
