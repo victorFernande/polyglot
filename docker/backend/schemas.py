@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from datetime import datetime
 from typing import Optional, List
 from enum import Enum
@@ -34,9 +34,8 @@ class UserResponse(BaseModel):
     current_streak: int
     best_streak: int
     last_study_date: Optional[datetime]
-    
-    class Config:
-        from_attributes = True
+
+    model_config = ConfigDict(from_attributes=True)
 
 class UserStats(BaseModel):
     total_xp: int
@@ -71,9 +70,8 @@ class WaveResponse(BaseModel):
     phrases_count: int
     hours_input: float
     phases: List["PhaseResponse"] = []
-    
-    class Config:
-        from_attributes = True
+
+    model_config = ConfigDict(from_attributes=True)
 
 # ============== PHASE ==============
 class PhaseResponse(BaseModel):
@@ -88,9 +86,8 @@ class PhaseResponse(BaseModel):
     total_tasks: int
     progress_percent: float
     tasks: List["TaskResponse"] = []
-    
-    class Config:
-        from_attributes = True
+
+    model_config = ConfigDict(from_attributes=True)
 
 # ============== TASK ==============
 class TaskResponse(BaseModel):
@@ -100,9 +97,8 @@ class TaskResponse(BaseModel):
     xp_reward: int
     completed: bool
     completed_at: Optional[datetime]
-    
-    class Config:
-        from_attributes = True
+
+    model_config = ConfigDict(from_attributes=True)
 
 class TaskComplete(BaseModel):
     task_id: int
@@ -120,9 +116,8 @@ class StudyLogResponse(BaseModel):
     duration_minutes: int
     xp_earned: int
     notes: Optional[str]
-    
-    class Config:
-        from_attributes = True
+
+    model_config = ConfigDict(from_attributes=True)
 
 # ============== ACHIEVEMENT ==============
 class AchievementResponse(BaseModel):
@@ -136,9 +131,8 @@ class AchievementResponse(BaseModel):
     requirement_value: int
     earned: bool = False
     earned_at: Optional[datetime] = None
-    
-    class Config:
-        from_attributes = True
+
+    model_config = ConfigDict(from_attributes=True)
 
 # ============== XP / LEVEL ==============
 class XPEarned(BaseModel):
@@ -192,8 +186,7 @@ class ExerciseItemResponse(BaseModel):
     explanation: Optional[str] = None
     xp_reward: int
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class ExerciseLessonResponse(BaseModel):
     id: int
@@ -214,8 +207,7 @@ class ExerciseLessonResponse(BaseModel):
     active_session_id: Optional[int] = None
     items: List[ExerciseItemResponse] = []
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class ExerciseSessionResponse(BaseModel):
     id: int
@@ -233,8 +225,7 @@ class ExerciseSessionResponse(BaseModel):
     current_item: Optional[ExerciseItemResponse] = None
     items: List[ExerciseItemResponse] = []
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class ExerciseAnswerCreate(BaseModel):
     item_id: int

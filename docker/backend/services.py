@@ -230,7 +230,7 @@ class ExerciseService:
     }
     SESSION_SIZE = 20
     TARGET_ITEMS = 1000
-    INCREMENTAL_ITEM_TARGETS = {"de": 1230, "fr": 1140, "ru": 1140, "jp": 1140, "en": 1140}
+    INCREMENTAL_ITEM_TARGETS = {"de": 1250, "fr": 1250, "ru": 1250, "jp": 1250, "en": 1250}
     JP_BEGINNER_KANA = {
         "私の名前はビクトルです。": "わたしのなまえはビクトルです。",
         "ブラジル出身です。": "ブラジルしゅっしんです。",
@@ -361,6 +361,21 @@ class ExerciseService:
         return ExerciseService.INCREMENTAL_ITEM_TARGETS.get(code, ExerciseService.TARGET_ITEMS)
 
     @staticmethod
+    def dynamic_target_for_language(code: str, current_count: int) -> int:
+        """Return the incremental growth target for a language.
+
+        Until the canonical static target is reached, the static target is the
+        goal. Once it is reached (or exceeded), the cron grows in 20-item session
+        blocks toward the next full session boundary. This guarantees the cron
+        never stalls and never exceeds SESSION_SIZE per block.
+        """
+        static = ExerciseService.target_items_for_language(code)
+        if current_count < static:
+            return static
+        # Next multiple of SESSION_SIZE above current_count.
+        return ((current_count // ExerciseService.SESSION_SIZE) + 1) * ExerciseService.SESSION_SIZE
+
+    @staticmethod
     def _choice(prompt, answer, options, idx):
         opts = list(dict.fromkeys([answer] + options))[:4]
         return {"type":"choice","prompt":prompt,"answer":{"value":answer},"options":opts,"tiles":None,"pairs":None,"hint":"Escolha a opção correta e fale em voz alta antes de confirmar.","explanation":f"Resposta correta: {answer}.","xp_reward":8 + (idx % 3)}
@@ -381,6 +396,8 @@ class ExerciseService:
 
     @staticmethod
     def _build(prompt, words, extras, idx):
+        if len(words) < 2:
+            return ExerciseService._choice(prompt.replace("monte a frase", "escolha a opção"), words[0] if words else "", extras[:3], idx)
         tiles = list(dict.fromkeys(extras + words))
         return {"type":"build","prompt":prompt,"answer":{"value":words},"options":None,"tiles":tiles,"pairs":None,"hint":"Monte a frase na ordem natural do idioma.","explanation":"Frases curtas ajudam a fixar padrões sem decorar regras isoladas.","xp_reward":10 + (idx % 4)}
 
@@ -401,15 +418,33 @@ class ExerciseService:
 
     @staticmethod
     def _coherent_sequence_pairs(unit, code: str, topic_index: int):
-        # Use the real communicative phrases from the unit, not the expanded
-        # metalinguistic vocabulary bank. The four-card sequence should read
-        # like a short dialogue/introduction that a learner can order by logic.
+        # Sequence exercises must be small coherent scripts. Random windows create
+        # nonsense dialogues such as travel + hobbies + origin + greeting.
         unit_pairs = unit["phrases"][code]
-        if unit["title"] == "Apresente-se":
-            start = max(0, min(len(unit_pairs) - 4, topic_index - 4))
+        title = unit["title"]
+        if title == "Apresente-se":
+            indexes = [0, 1, 2, 3]
+        elif title == "Compartilhe contato":
+            indexes = [3, 4, 0, 9]
+        elif title == "Fazendo um pedido no café":
+            indexes = [0, 1, 2, 4]
+        elif title == "Desloque-se pela cidade":
+            indexes = [0, 1, 2, 3]
+        elif title == "No restaurante":
+            indexes = [0, 1, 2, 3]
+        elif title == "Fale da família":
+            indexes = [0, 1, 2, 3]
+        elif title == "Trabalho e rotina":
+            indexes = [0, 1, 2, 3]
+        elif title == "Compras e roupas":
+            indexes = [0, 1, 2, 3]
+        elif title == "Hábitos diários":
+            indexes = [0, 1, 2, 3]
+        elif title == "Exponha preferências":
+            indexes = [0, 1, 2, 3]
         else:
-            start = (topic_index - 1) % len(unit_pairs)
-        return [[unit_pairs[(start + offset) % len(unit_pairs)][0], unit_pairs[(start + offset) % len(unit_pairs)][1]] for offset in range(4)]
+            indexes = [0, 1, 2, 3]
+        return [[unit_pairs[i][0], unit_pairs[i][1]] for i in indexes if i < len(unit_pairs)]
 
     @staticmethod
     def _match(prompt, pairs, idx):
@@ -653,8 +688,8 @@ class ExerciseService:
     @staticmethod
     def _items_need_regeneration(lesson: ExerciseLesson, generated: list[dict]) -> bool:
         existing = sorted(list(lesson.items), key=lambda item: item.order_index)
-        if len(existing) > len(generated):
-            return True
+        # Cron items added beyond the original target must never be deleted.
+        # Only compare the items that fall within the current generated window.
         for item, expected in zip(existing, generated[:len(existing)]):
             if (
                 item.type != expected["type"]
@@ -672,11 +707,14 @@ class ExerciseService:
 
     @staticmethod
     def _generic_review_block(code: str, start_index: int):
-        """Generate one mini-batch of up to 5 incremental review items deterministically.
+        """Generate one full 20-item incremental review block deterministically.
 
-        Used when the cron asks for more items beyond the current hardcoded targets.
+        Used when the cron asks for items beyond the current hardcoded targets.
         The block is pedagogically tied to the unit implied by the block position so
-        that session/topic coherence is preserved.
+        that session/topic coherence is preserved. A full block contains 10 items from
+        the block's main topic and 10 review items from a rotated earlier topic, with
+        varied exercise types (choice, listen_choice, image_choice, build, context_choice,
+        listen_match, sequence_dialogue, listen_build).
         """
         name = ExerciseService.LANGUAGE_NAMES[code]
         # Rotate units every 20-item block to keep review varied and coherent.
@@ -687,53 +725,116 @@ class ExerciseService:
         portuguese_options = [pt for pt, _foreign in phrases]
         session_number = (start_index - 1) // ExerciseService.SESSION_SIZE + 1
         prefix = f"Sessão {session_number} — Revisão incremental · {unit['title']} em contexto"
-        # Deterministic phrase rotation within the unit.
+        # Keep all 20 items within the same unit to avoid topic drift while varying
+        # exercise type/window enough that the second half is not an exact duplicate.
         phrase_offset = (start_index - 1) % len(phrases)
-        p1 = phrases[phrase_offset % len(phrases)]
-        p2 = phrases[(phrase_offset + 1) % len(phrases)]
-        p3 = phrases[(phrase_offset + 2) % len(phrases)]
-        p4 = phrases[(phrase_offset + 3) % len(phrases)]
-        p5 = phrases[(phrase_offset + 4) % len(phrases)]
+        p = [phrases[(phrase_offset + i) % len(phrases)] for i in range(24)]
         items = []
         idx = start_index
 
-        items.append(ExerciseService._choice(
-            f"{prefix}: escolha como dizer “{p1[0]}” em {name}",
-            p1[1],
-            [options[(phrase_offset + 1) % len(phrases)], options[(phrase_offset + 2) % len(phrases)], options[(phrase_offset + 3) % len(phrases)]],
-            idx,
-        ))
-        items.append(ExerciseService._listen_choice(
-            f"{prefix}: ouça o áudio e identifique a fala que comunica “{p2[0]}”",
-            p2[1],
-            [options[(phrase_offset + 2) % len(phrases)], options[(phrase_offset + 3) % len(phrases)], options[(phrase_offset + 4) % len(phrases)]],
-            idx + 1,
-        ))
-        image_sample = [p3, p1, p2, p4]
-        items.append(ExerciseService._image_choice(
-            f"{prefix}: observe a imagem e escolha a frase que representa “{image_sample[0][0]}”",
-            (image_sample[0][0], image_sample[0][1], ExerciseService._icon_key_for_phrase(image_sample[0][0], image_sample[0][1], unit["topics"][2])),
-            [(pt, foreign, ExerciseService._icon_key_for_phrase(pt, foreign, unit["topics"][2])) for pt, foreign in image_sample[1:]],
-            idx + 2,
-        ))
-        words = ExerciseService._build_tokens(code, p4[1])
-        extras = [word for foreign in options[:10] for word in ExerciseService._build_tokens(code, foreign)]
-        if len(words) < 2:
-            words = ExerciseService._build_tokens(code, p3[1])
-        items.append(ExerciseService._build(
-            f"{prefix}: monte a frase em ordem natural para dizer “{p4[0]}”",
-            words,
-            extras,
-            idx + 3,
-        ))
-        items.append(ExerciseService._context_choice(
-            f"{prefix}: situação guiada — pratique uma fala do tema. Escolha a opção que comunica “{p5[0]}” em {name}.",
-            p5[1],
-            [options[(phrase_offset + 1) % len(phrases)], options[(phrase_offset + 2) % len(phrases)], options[(phrase_offset + 3) % len(phrases)]],
-            idx + 4,
-        ))
+        def _choice_idx(i):
+            return ExerciseService._choice(
+                f"{prefix}: escolha como dizer “{p[i][0]}” em {name}",
+                p[i][1],
+                [options[(phrase_offset + i + 1) % len(phrases)], options[(phrase_offset + i + 2) % len(phrases)], options[(phrase_offset + i + 3) % len(phrases)]],
+                idx + i,
+            )
 
-        hint = f"Mini-aula: {unit['goal']} Esta revisão acrescenta prática real sem ultrapassar 20 questões no bloco atual."
+        def _listen_choice_idx(i):
+            return ExerciseService._listen_choice(
+                f"{prefix}: ouça o áudio e identifique a fala que comunica “{p[i][0]}”",
+                p[i][1],
+                [options[(phrase_offset + i + 2) % len(phrases)], options[(phrase_offset + i + 3) % len(phrases)], options[(phrase_offset + i + 4) % len(phrases)]],
+                idx + i,
+            )
+
+        def _image_choice_idx(i):
+            sample = [p[i], p[i + 1], p[i + 2], p[i + 3]]
+            return ExerciseService._image_choice(
+                f"{prefix}: observe a imagem e escolha a frase que representa “{sample[0][0]}”",
+                (sample[0][0], sample[0][1], ExerciseService._icon_key_for_phrase(sample[0][0], sample[0][1], unit["topics"][2])),
+                [(pt, foreign, ExerciseService._icon_key_for_phrase(pt, foreign, unit["topics"][2])) for pt, foreign in sample[1:]],
+                idx + i,
+            )
+
+        def _build_idx(i):
+            words = ExerciseService._build_tokens(code, p[i][1])
+            extras = [word for foreign in options[:10] for word in ExerciseService._build_tokens(code, foreign)]
+            if len(words) < 2:
+                words = ExerciseService._build_tokens(code, p[(i + 1) % len(phrases)][1])
+            return ExerciseService._build(
+                f"{prefix}: monte a frase em ordem natural para dizer “{p[i][0]}”",
+                words,
+                extras,
+                idx + i,
+            )
+
+        def _context_choice_idx(i):
+            return ExerciseService._context_choice(
+                f"{prefix}: situação guiada — pratique uma fala do tema. Escolha a opção que comunica “{p[i][0]}” em {name}.",
+                p[i][1],
+                [options[(phrase_offset + i + 1) % len(phrases)], options[(phrase_offset + i + 2) % len(phrases)], options[(phrase_offset + i + 3) % len(phrases)]],
+                idx + i,
+            )
+
+        def _listen_match_idx(i, pair_count=4):
+            listen_pairs = [[foreign, portuguese] for portuguese, foreign in p[i:i + pair_count]]
+            return ExerciseService._listen_match(
+                f"{prefix}: ouça cada áudio em {name} e selecione a tradução em português",
+                listen_pairs[:pair_count],
+                idx + i,
+            )
+
+        def _sequence_dialogue_idx(i):
+            seq = [p[i], p[i + 1], p[i + 2], p[i + 3]]
+            phrases_only = [foreign for _pt, foreign in seq]
+            return ExerciseService._sequence_dialogue(
+                f"{prefix}: prática guiada de ordem — organize os cartões exatamente assim: primeiro “{seq[0][0]}”; depois “{seq[1][0]}”; em seguida “{seq[2][0]}”; por fim “{seq[3][0]}”",
+                phrases_only,
+                idx + i,
+            )
+
+        def _listen_build_idx(i):
+            words = ExerciseService._build_tokens(code, p[i][1])
+            extras = [word for foreign in options[:10] for word in ExerciseService._build_tokens(code, foreign)]
+            if len(words) < 2:
+                words = ExerciseService._build_tokens(code, p[(i + 1) % len(phrases)][1])
+            return ExerciseService._listen_build(
+                f"{prefix}: ouça e monte em ordem natural — “{p[i][0]}”",
+                words,
+                extras,
+                idx + i,
+            )
+
+        # Full 20-item block with varied exercise types and minimal repetition.
+        # Use separate indices for each factory so that image/sequence dialogue use
+        # non-overlapping phrase windows and never exceed the precomputed 20-phrase list.
+        block_plan = [
+            (_choice_idx, 0),
+            (_listen_choice_idx, 1),
+            (_image_choice_idx, 2),
+            (_build_idx, 3),
+            (_context_choice_idx, 4),
+            (_listen_match_idx, 5),
+            (_choice_idx, 6),
+            (_listen_build_idx, 7),
+            (_sequence_dialogue_idx, 8),
+            (_context_choice_idx, 9),
+            (_listen_choice_idx, 10),
+            (_image_choice_idx, 11),
+            (_build_idx, 12),
+            (_context_choice_idx, 13),
+            (_listen_match_idx, 14),
+            (_choice_idx, 15),
+            (_listen_build_idx, 16),
+            (_sequence_dialogue_idx, 17),
+            (_context_choice_idx, 18),
+            (_choice_idx, 19),
+        ]
+        for factory, i in block_plan:
+            items.append(factory(i))
+
+        hint = f"Mini-aula: Revisão incremental. Esta revisão acrescenta prática real sem ultrapassar 20 questões no bloco atual."
         for item in items:
             if item["type"] == "listen_build":
                 item["hint"] = f"{hint} Ouça a frase, repita em voz alta e monte as palavras na ordem correta."
@@ -785,13 +886,17 @@ class ExerciseService:
         if not lesson:
             return 0
         current_count = db.query(ExerciseItem).filter(ExerciseItem.lesson_id == lesson.id).count()
+        target = ExerciseService.dynamic_target_for_language(code, current_count)
+        remaining_to_target = target - current_count
+        if remaining_to_target <= 0:
+            return 0
         last_block_size = current_count % ExerciseService.SESSION_SIZE
         if last_block_size == 0:
-            to_add = min(max_new, ExerciseService.SESSION_SIZE)
+            to_add = min(max_new, ExerciseService.SESSION_SIZE, remaining_to_target)
         elif last_block_size <= 15:
-            to_add = min(max_new, ExerciseService.SESSION_SIZE - last_block_size)
+            to_add = min(max_new, ExerciseService.SESSION_SIZE - last_block_size, remaining_to_target)
         else:
-            to_add = ExerciseService.SESSION_SIZE - last_block_size
+            to_add = min(ExerciseService.SESSION_SIZE - last_block_size, remaining_to_target)
         if to_add <= 0:
             return 0
         batch = ExerciseService.generate_incremental_batch(code, current_count, to_add)
@@ -994,7 +1099,7 @@ class ExerciseService:
             start_index + len(items),
         ))
 
-        hint = f"Mini-aula: {unit['goal']} Esta revisão acrescenta prática real sem ultrapassar 20 questões no bloco atual."
+        hint = f"Mini-aula: Revisão incremental. Esta revisão acrescenta prática real sem ultrapassar 20 questões no bloco atual."
         for item in items:
             if item["type"] == "listen_build":
                 item["hint"] = f"{hint} Ouça a frase, repita em voz alta e monte as palavras na ordem correta."
@@ -1186,7 +1291,7 @@ class ExerciseService:
             start_index + len(items),
         ))
 
-        hint = f"Mini-aula: {unit['goal']} Esta revisão acrescenta prática real sem ultrapassar 20 questões no bloco atual."
+        hint = f"Mini-aula: Revisão incremental. Esta revisão acrescenta prática real sem ultrapassar 20 questões no bloco atual."
         for item in items[session_52_start:]:
             if item["type"] == "listen_build":
                 item["hint"] = f"{hint} Ouça a frase, repita em voz alta e monte as palavras na ordem correta."
@@ -1293,7 +1398,7 @@ class ExerciseService:
             start_index + len(items),
         ))
 
-        hint = f"Mini-aula: {unit['goal']} Esta revisão abre um novo bloco com 10 questões reais, sem ultrapassar 20 questões por sessão."
+        hint = f"Mini-aula: Revisão incremental. Esta revisão abre um novo bloco com 10 questões reais, sem ultrapassar 20 questões por sessão."
         for item in items[session_53_start:]:
             if item["type"] == "listen_build":
                 item["hint"] = f"{hint} Ouça a frase, repita em voz alta e monte as palavras na ordem correta."
@@ -1499,7 +1604,7 @@ class ExerciseService:
             start_index + len(items),
         ))
 
-        hint = f"Mini-aula: {unit['goal']} Esta revisão abre um novo bloco com 10 questões reais, sem ultrapassar 20 questões por sessão."
+        hint = f"Mini-aula: Revisão incremental. Esta revisão abre um novo bloco com 10 questões reais, sem ultrapassar 20 questões por sessão."
         for item in items[session_54_start:]:
             if item["type"] == "listen_build":
                 item["hint"] = f"{hint} Ouça a frase, repita em voz alta e monte as palavras na ordem correta."
@@ -1704,7 +1809,7 @@ class ExerciseService:
             start_index + len(items),
         ))
 
-        hint = f"Mini-aula: {unit['goal']} Esta revisão abre um novo bloco com 10 questões reais, sem ultrapassar 20 questões por sessão."
+        hint = f"Mini-aula: Revisão incremental. Esta revisão abre um novo bloco com 10 questões reais, sem ultrapassar 20 questões por sessão."
         for item in items[session_55_start:]:
             if item["type"] == "listen_build":
                 item["hint"] = f"{hint} Ouça a frase, repita em voz alta e monte as palavras na ordem correta."
@@ -1994,7 +2099,7 @@ class ExerciseService:
             start_index + len(items),
         ))
 
-        hint = f"Mini-aula: {unit['goal']} Esta revisão continua o bloco com questões reais, sem ultrapassar 20 questões por sessão."
+        hint = f"Mini-aula: Revisão incremental. Esta revisão continua o bloco com questões reais, sem ultrapassar 20 questões por sessão."
         for item in items[session_56_start:]:
             if item["type"] == "listen_build":
                 item["hint"] = f"{hint} Ouça a frase, repita em voz alta e monte as palavras na ordem correta."
@@ -2185,7 +2290,7 @@ class ExerciseService:
             start_index + len(items),
         ))
 
-        hint = f"Mini-aula: {unit['goal']} Esta revisão continua o bloco com questões reais, sem ultrapassar 20 questões por sessão."
+        hint = f"Mini-aula: Revisão incremental. Esta revisão continua o bloco com questões reais, sem ultrapassar 20 questões por sessão."
         for item in items[session_57_start:]:
             if item["type"] == "listen_build":
                 item["hint"] = f"{hint} Ouça a frase, repita em voz alta e monte as palavras na ordem correta."
@@ -2292,7 +2397,7 @@ class ExerciseService:
             start_index + len(items),
         ))
 
-        hint = f"Mini-aula: {unit['goal']} Esta revisão abre um novo bloco com questões reais, sem ultrapassar 20 questões por sessão."
+        hint = f"Mini-aula: Revisão incremental. Esta revisão abre um novo bloco com questões reais, sem ultrapassar 20 questões por sessão."
         for item in items[session_58_start:]:
             if item["type"] == "listen_build":
                 item["hint"] = f"{hint} Ouça a frase, repita em voz alta e monte as palavras na ordem correta."
@@ -2504,7 +2609,7 @@ class ExerciseService:
             start_index + len(items),
         ))
 
-        hint = f"Mini-aula: {unit['goal']} Esta revisão continua o bloco com 10 questões reais, sem ultrapassar 20 questões por sessão."
+        hint = f"Mini-aula: Revisão incremental. Esta revisão continua o bloco com 10 questões reais, sem ultrapassar 20 questões por sessão."
         for item in items[session_59_start:]:
             if item["type"] == "listen_build":
                 item["hint"] = f"{hint} Ouça a frase, repita em voz alta e monte as palavras na ordem correta."
@@ -2799,7 +2904,7 @@ class ExerciseService:
             start_index + len(items),
         ))
 
-        hint = f"Mini-aula: {unit['goal']} Esta revisão continua o bloco com questões reais, sem ultrapassar 20 questões por sessão."
+        hint = f"Mini-aula: Revisão incremental. Esta revisão continua o bloco com questões reais, sem ultrapassar 20 questões por sessão."
         for item in items[session_60_start:]:
             if item["type"] == "listen_build":
                 item["hint"] = f"{hint} Ouça a frase, repita em voz alta e monte as palavras na ordem correta."
@@ -2865,7 +2970,7 @@ class ExerciseService:
             start_index + len(items),
         ))
 
-        hint = f"Mini-aula: {unit['goal']} Esta revisão abre um novo bloco real de sessão sem ultrapassar 20 questões."
+        hint = f"Mini-aula: Revisão incremental. Esta revisão abre um novo bloco real de sessão sem ultrapassar 20 questões."
         for item in items[session_61_start:]:
             item["hint"] = hint
             if item["type"] in {"build", "listen_build"}:
@@ -2914,7 +3019,7 @@ class ExerciseService:
             start_index + len(items),
         ))
 
-        hint = f"Mini-aula: {unit['goal']} Esta revisão continua o bloco real de apresentação sem ultrapassar 20 questões."
+        hint = f"Mini-aula: Revisão incremental. Esta revisão continua o bloco real de apresentação sem ultrapassar 20 questões."
         for item in items[session_61_start + 5:]:
             if item["type"] == "listen_build":
                 item["hint"] = f"{hint} Ouça a frase, repita em voz alta e monte as palavras na ordem correta."
@@ -2973,7 +3078,7 @@ class ExerciseService:
             start_index + len(items),
         ))
 
-        hint = f"Mini-aula: {unit['goal']} Esta revisão acrescenta mais cinco questões reais ao bloco de apresentação sem ultrapassar 20 questões."
+        hint = f"Mini-aula: Revisão incremental. Esta revisão acrescenta mais cinco questões reais ao bloco de apresentação sem ultrapassar 20 questões."
         for item in items[session_61_start + 10:]:
             item["hint"] = hint
             if item["type"] in {"build", "listen_build"}:
@@ -3022,7 +3127,7 @@ class ExerciseService:
             start_index + len(items),
         ))
 
-        hint = f"Mini-aula: {unit['goal']} Esta revisão fecha o bloco real de apresentação com 20 questões, sem ultrapassar o limite da sessão."
+        hint = f"Mini-aula: Revisão incremental. Esta revisão fecha o bloco real de apresentação com 20 questões, sem ultrapassar o limite da sessão."
         for item in items[session_61_start + 15:]:
             if item["type"] == "listen_build":
                 item["hint"] = f"{hint} Ouça a frase, repita em voz alta e monte as palavras na ordem correta."
@@ -3038,111 +3143,10 @@ class ExerciseService:
             elif item["type"] not in {"image_choice", "listen_match", "sequence_dialogue"}:
                 item["explanation"] = f"{unit['title']}: “{item['answer']['value']}” comunica a ideia pedida em {name}."
 
-        unit = A1_UNITS[2]
-        session_62_start = len(items)
-        phrases = unit["phrases"][code]
-        prefix = "Sessão 62 — Revisão incremental · Viagem em contexto"
-        options = [foreign for _pt, foreign in phrases]
-
-        pt, target = phrases[0]
-        items.append(ExerciseService._choice(
-            f"{prefix}: escolha como dizer “{pt}” em {name}",
-            target,
-            [foreign for foreign in options[1:4]],
-            start_index + len(items),
-        ))
-
-        pt, target = phrases[1]
-        items.append(ExerciseService._listen_choice(
-            f"{prefix}: ouça o áudio e identifique a fala que comunica “{pt}”",
-            target,
-            [foreign for foreign in options[2:5]],
-            start_index + len(items),
-        ))
-
-        image_sample = [phrases[2], phrases[0], phrases[3], phrases[8]]
-        answer_pt, answer_foreign = image_sample[0]
-        items.append(ExerciseService._image_choice(
-            f"{prefix}: observe a imagem e escolha a frase que representa “{answer_pt}”",
-            (answer_pt, answer_foreign, ExerciseService._icon_key_for_phrase(answer_pt, answer_foreign, unit["topics"][2])),
-            [(pt, foreign, ExerciseService._icon_key_for_phrase(pt, foreign, unit["topics"][2])) for pt, foreign in image_sample[1:]],
-            start_index + len(items),
-        ))
-
-        pt, target = phrases[3]
-        words = ExerciseService._build_tokens(code, target)
-        extras = [word for foreign in options[0:10] for word in ExerciseService._build_tokens(code, foreign)]
-        items.append(ExerciseService._build(
-            f"{prefix}: monte a frase em ordem natural para dizer “{pt}”",
-            words,
-            extras,
-            start_index + len(items),
-        ))
-
-        pt, target = phrases[4]
-        items.append(ExerciseService._context_choice(
-            f"{prefix}: situação guiada — use um mapa para se orientar na viagem. Escolha a fala que comunica “{pt}” em {name}.",
-            target,
-            [foreign for foreign in options[5:8]],
-            start_index + len(items),
-        ))
-
-        listen_pairs = [[foreign, portuguese] for portuguese, foreign in phrases[1:5]]
-        items.append(ExerciseService._listen_match(
-            f"{prefix}: ouça cada áudio em {name} e selecione a tradução em português",
-            listen_pairs,
-            start_index + len(items),
-        ))
-
-        pt, target = phrases[7]
-        wrong_portuguese = [portuguese for portuguese, _foreign in phrases[0:4] if portuguese != pt][:3]
-        items.append(ExerciseService._choice(
-            f"{prefix}: entenda “{target}” — qual é o significado em português?",
-            pt,
-            wrong_portuguese,
-            start_index + len(items),
-        ))
-
-        pt, target = phrases[8]
-        words = ExerciseService._build_tokens(code, target)
-        extras = [word for foreign in options[0:10] for word in ExerciseService._build_tokens(code, foreign)]
-        items.append(ExerciseService._listen_build(
-            f"{prefix}: ouça e monte em ordem natural — “{pt}”",
-            words,
-            extras,
-            start_index + len(items),
-        ))
-
-        sequence_pairs = [phrases[1], phrases[3], phrases[8], phrases[9]]
-        items.append(ExerciseService._sequence_dialogue(
-            f"{prefix}: prática guiada de ordem — organize os cartões exatamente assim: primeiro passagem; depois estação; em seguida ajuda; por fim chegada",
-            [foreign for _portuguese, foreign in sequence_pairs],
-            start_index + len(items),
-        ))
-
-        pt, target = phrases[9]
-        items.append(ExerciseService._context_choice(
-            f"{prefix}: situação guiada — confirme a chegada de hoje. Escolha a fala que comunica “{pt}” em {name}.",
-            target,
-            [foreign for foreign in options[0:3]],
-            start_index + len(items),
-        ))
-
-        hint = f"Mini-aula: {unit['goal']} Esta revisão abre um novo bloco real de viagem sem ultrapassar 20 questões."
-        for item in items[session_62_start:]:
-            if item["type"] == "listen_build":
-                item["hint"] = f"{hint} Ouça a frase, repita em voz alta e monte as palavras na ordem correta."
-            elif item["type"] == "listen_match":
-                item["hint"] = f"{hint} Toque em cada áudio no idioma estudado e selecione a tradução correspondente em português."
-                item["explanation"] = f"Cada áudio em {name} deve ser ligado à tradução em português dentro da revisão de viagem."
-            elif item["type"] == "sequence_dialogue":
-                item["hint"] = f"{hint} Siga a ordem indicada no enunciado e organize apenas as frases no idioma estudado."
-            else:
-                item["hint"] = hint
-            if item["type"] in {"build", "listen_build"}:
-                item["explanation"] = f"A frase correta é: “{' '.join(item['answer']['value'])}”."
-            elif item["type"] not in {"image_choice", "listen_match", "sequence_dialogue"}:
-                item["explanation"] = f"{unit['title']}: “{item['answer']['value']}” comunica a ideia pedida em {name}."
+        next_start_index = start_index + len(items)
+        remaining = count - len(items)
+        if remaining > 0:
+            items.extend(ExerciseService._generic_review_block(code, next_start_index)[:remaining])
         return items[:count]
 
     @staticmethod
@@ -3255,21 +3259,48 @@ class ExerciseService:
     def _sequence_prompt(prefix: str, unit_title: str, sequence_pairs: list[list[str]], topic_name: str):
         portuguese_steps = [pair[0] for pair in sequence_pairs]
         if unit_title == "Apresente-se":
-            return f"{prefix}: monte uma apresentação curta seguindo a ordem: nome → origem → onde mora → idioma que fala"
-        if unit_title:
-            return f"{prefix}: prática guiada de ordem — organize os cartões exatamente assim: primeiro contexto; depois detalhe; em seguida resposta; por fim fechamento"
-        return f"{prefix}: prática guiada de ordem — organize os cartões exatamente assim: primeiro {portuguese_steps[0]}; depois {portuguese_steps[1]}; em seguida {portuguese_steps[2]}; por fim {portuguese_steps[3]}"
+            return f"{prefix}: monte uma apresentação curta seguindo a ordem: nome; origem; onde mora; idioma que fala"
+        return f"{prefix}: organize as cartas para formar uma sequência coerente: primeiro “{portuguese_steps[0]}”; depois “{portuguese_steps[1]}”; em seguida “{portuguese_steps[2]}”; por fim “{portuguese_steps[3]}”"
+
+    @staticmethod
+    def _didactic_stage(question_index: int):
+        stages = [
+            ("Etapa 1 — Vocabulário novo", "associar palavra com significado", "Muito fácil"),
+            ("Etapa 2 — Reconhecimento", "reconhecer o significado", "Muito fácil"),
+            ("Etapa 2 — Reconhecimento", "reconhecer áudio e significado", "Fácil"),
+            ("Etapa 3 — Aplicação em frases", "aplicar em frase curta", "Fácil"),
+            ("Etapa 3 — Aplicação em frases", "completar ou escolher frase curta", "Fácil"),
+            ("Etapa 4 — Variação controlada", "traduzir com pequena mudança", "Médio"),
+            ("Etapa 4 — Variação controlada", "identificar padrão em contexto", "Médio"),
+            ("Etapa 5 — Produção ativa", "montar frase", "Médio"),
+            ("Etapa 5 — Produção ativa", "ordenar fala curta", "Médio"),
+            ("Etapa 6 — Revisão", "revisar vocabulário anterior", "Médio"),
+        ]
+        return stages[(question_index - 1) % len(stages)]
+
+    @staticmethod
+    def _didactic_hint(unit, stage: str, skill: str, difficulty: str, item_type: str):
+        action = ""
+        if item_type in {"listen_choice", "listen_match", "listen_build"} or "áudio" in skill:
+            action = " Ouça o áudio e repita antes de responder."
+        elif item_type in {"build", "sequence_dialogue"} or "montar" in skill or "ordenar" in skill:
+            action = " Procure a ordem natural: quem fala, ação e complemento."
+        elif item_type == "match" or "revisar" in skill:
+            action = " Compare pelo significado geral, não pela aparência da palavra."
+        elif item_type == "image_choice":
+            action = " Use o ícone e o contexto para eliminar opções improváveis."
+        return f"Mini-aula: {stage}. Habilidade treinada: {skill}. Nível: {difficulty}.{action}"
 
     @staticmethod
     def generate_items(code: str):
         name = ExerciseService.LANGUAGE_NAMES[code]
         items = []
         type_patterns = [
-            ["choice", "listen_choice", "image_choice", "build", "context_choice", "listen_match", "choice", "listen_build", "sequence_dialogue", "context_choice"],
-            ["listen_choice", "choice", "build", "context_choice", "image_choice", "choice", "match", "sequence_dialogue", "listen_build", "context_choice"],
-            ["context_choice", "image_choice", "choice", "listen_choice", "build", "listen_match", "sequence_dialogue", "context_choice", "listen_choice", "listen_build"],
-            ["choice", "build", "listen_choice", "image_choice", "context_choice", "match", "listen_build", "choice", "sequence_dialogue", "listen_choice"],
-            ["image_choice", "choice", "context_choice", "build", "listen_choice", "listen_match", "choice", "listen_choice", "listen_build", "sequence_dialogue"],
+            ["match", "choice", "listen_choice", "choice", "image_choice", "choice", "context_choice", "build", "sequence_dialogue", "listen_match"],
+            ["match", "choice", "choice", "build", "image_choice", "listen_choice", "choice", "listen_build", "sequence_dialogue", "listen_match"],
+            ["match", "choice", "listen_choice", "context_choice", "image_choice", "choice", "context_choice", "listen_build", "sequence_dialogue", "listen_match"],
+            ["match", "choice", "choice", "listen_choice", "image_choice", "choice", "context_choice", "build", "listen_build", "listen_match"],
+            ["match", "choice", "listen_choice", "choice", "image_choice", "context_choice", "choice", "listen_build", "sequence_dialogue", "listen_match"],
         ]
         for unit_index, unit in enumerate(A1_UNITS, 1):
             bank = ExerciseService._expanded_practice_bank(code, unit, unit_index)
@@ -3281,14 +3312,15 @@ class ExerciseService:
                 for question_index, (pt, target) in enumerate(topic_pairs, 1):
                     idx = (unit_index - 1) * 100 + (topic_index - 1) * 10 + question_index
                     prefix = f"Unidade {unit_index}/10 — {unit['title']} · Tópico {topic_index}/10 — {topic_name}"
-                    hint = f"Mini-aula: {unit['goal']} Este item usa vocabulário variado do contexto, não só as frases fixas da unidade."
-                    explanation = f"{unit['title']}: “{target}” corresponde a “{pt}”. Use como bloco real de comunicação em {name}."
                     wrong = ExerciseService._wrong_options(bank, target, start + question_index, 3)
                     prompt = ExerciseService._prompt_for_question(prefix, question_index + topic_index - 1, pt, target, name, topic_name)
                     item_type = pattern[question_index - 1]
                     unit_phrase_count = len(unit["phrases"][code])
                     phrase_index = topic_index - 1 if (unit["title"] == "Apresente-se" and topic_name == "dizer profissão" and question_index == 2) else (topic_index + question_index - 2) % unit_phrase_count
                     pt, target = unit["phrases"][code][phrase_index]
+                    stage, skill, difficulty = ExerciseService._didactic_stage(question_index)
+                    hint = ExerciseService._didactic_hint(unit, stage, skill, difficulty, item_type)
+                    explanation = f"{stage}: “{target}” corresponde a “{pt}”. Habilidade treinada: {skill}. Nível: {difficulty}."
                     varied_wrong_foreign = [foreign for pair_idx, (_pt, foreign) in enumerate(unit["phrases"][code]) if pair_idx != phrase_index][:3]
                     varied_wrong_portuguese = [portuguese for pair_idx, (portuguese, _foreign) in enumerate(unit["phrases"][code]) if pair_idx != phrase_index][:3]
                     if item_type == "choice":
@@ -3338,7 +3370,7 @@ class ExerciseService:
                             prompt = f"{review_prefix}: tópico {topic_index} bloco {question_index} — relacione cada frase ao significado em português"
                             item = ExerciseService._match(prompt, pairs, idx)
                     elif item_type == "sequence_dialogue":
-                        sequence_pairs = ExerciseService._coherent_sequence_pairs(unit, code, topic_index) if unit["title"] == "Apresente-se" else ExerciseService._real_phrase_window(code, unit_index * 31 + topic_index * 13 + question_index * 4, 4)
+                        sequence_pairs = ExerciseService._coherent_sequence_pairs(unit, code, topic_index)
                         phrases = [foreign for _portuguese, foreign in sequence_pairs]
                         review_prefix = f"Unidade {unit_index}/10 — {unit['title']} · Revisão guiada"
                         prompt = ExerciseService._sequence_prompt(review_prefix, unit["title"], sequence_pairs, topic_name)
@@ -3348,26 +3380,19 @@ class ExerciseService:
                         context_wrong = varied_wrong_foreign
                         prompt = f"{prefix}: situação guiada — você precisa comunicar “{context_pt}” no tema “{topic_name}”. Escolha a fala correta em {name}."
                         item = ExerciseService._context_choice(prompt, context_target, context_wrong, idx)
-                    if item["type"] == "listen_build":
-                        item["hint"] = f"{hint} Ouça a frase, repita em voz alta e monte as palavras na ordem correta."
-                    elif item["type"] == "listen_match":
-                        item["hint"] = f"{hint} Toque em cada áudio no idioma estudado e selecione a tradução correspondente em português."
-                    elif item["type"] == "sequence_dialogue":
-                        item["hint"] = f"{hint} Siga a ordem indicada no enunciado e organize apenas as frases no idioma estudado."
-                    else:
-                        item["hint"] = hint
+                    item["hint"] = hint
                     if item["type"] == "image_choice":
                         pass
                     elif item["type"] == "listen_match":
-                        item["explanation"] = f"Cada áudio em {name} deve ser ligado à tradução em português dentro do tema “{topic_name}”."
+                        item["explanation"] = f"{explanation} Cada áudio em {name} deve ser ligado à tradução em português dentro do tema “{topic_name}”."
                     elif item["type"] == "match":
-                        item["explanation"] = f"Cada par conecta uma frase em {name} ao significado em português dentro do tema “{topic_name}”."
+                        item["explanation"] = f"{explanation} Cada par conecta uma palavra ou frase em {name} ao significado em português."
                     elif item["type"] == "sequence_dialogue":
-                        pass
+                        item["explanation"] = f"{explanation} Ordene as frases curtas para formar uma sequência natural."
                     elif item["type"] in {"build", "listen_build"}:
-                        item["explanation"] = f"A frase correta é: “{' '.join(item['answer']['value'])}”."
+                        item["explanation"] = f"{explanation} Frase correta: “{' '.join(item['answer']['value'])}”."
                     else:
-                        item["explanation"] = f"{unit['title']}: “{item['answer']['value']}” comunica a ideia pedida em {name}."
+                        item["explanation"] = f"{explanation} Resposta correta: “{item['answer']['value']}”."
                     if code == "jp" and idx <= 100:
                         item = ExerciseService._scaffold_japanese_beginner_item(item, "romaji")
                     elif code == "jp" and idx <= 200:
@@ -3377,7 +3402,14 @@ class ExerciseService:
                     items.append(item)
         target_count = ExerciseService.target_items_for_language(code)
         if target_count > ExerciseService.TARGET_ITEMS:
-            items.extend(ExerciseService._incremental_review_items(code, ExerciseService.TARGET_ITEMS + 1, target_count - ExerciseService.TARGET_ITEMS))
+            incremental = ExerciseService._incremental_review_items(code, ExerciseService.TARGET_ITEMS + 1, target_count - ExerciseService.TARGET_ITEMS)
+            items.extend(incremental)
+            index = len(items) + 1
+            while len(items) < target_count:
+                block = ExerciseService._generic_review_block(code, index)
+                still_need = target_count - len(items)
+                items.extend(block[:still_need])
+                index += len(block)
         return items[:target_count]
 
     @staticmethod

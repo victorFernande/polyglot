@@ -405,6 +405,8 @@ def _learned_word_values(item):
             return [" ".join(map(str, value))] if isinstance(value, list) else [str(value)]
         if "pairs" in answer and isinstance(answer["pairs"], list):
             return [str(left) for left, _right in answer["pairs"]]
+    if item.type == "sequence_dialogue" and isinstance(answer, list):
+        return [str(v) for v in answer]
     if isinstance(answer, list):
         return [" ".join(map(str, answer))]
     if answer is None:

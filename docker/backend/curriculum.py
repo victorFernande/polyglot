@@ -78,7 +78,7 @@ _TRANSLATIONS = {
         "Exponha preferências": ["コーヒーが好きです。", "魚が好きではありません。", "お茶のほうが好きです。", "ブラジル料理が好きです。", "音楽を聞くのが好きです。", "映画を見るのが好きです。", "サッカーが好きです。", "この町が好きです。", "暖かい天気が好きです。", "いいと思います。"],
     },
     "en": {
-        "Converse sobre viagem": ["I travel to London.", "I need a ticket.", "I have a hotel reservation.", "Where is the station?", "I need a map.", "I take the train.", "When does the bus leave?", "This is my luggage.", "I need help.", "I arrive today."],
+        "Converse sobre viagem": ["I travel to Berlin.", "I need a ticket.", "I have a hotel reservation.", "Where is the station?", "I need a map.", "I take the train.", "When does the bus leave?", "This is my luggage.", "I need help.", "I arrive today."],
         "Peça em um restaurante": ["I have a table.", "The menu, please.", "I will have soup.", "I will have the chicken.", "I would like water.", "I would like dessert.", "No meat, please.", "What do you recommend?", "The bill, please.", "Thank you very much."],
         "Compartilhe contato": ["My phone number is one two three.", "My email is here.", "This is my address.", "My name is Victor.", "My last name is Fernandes.", "The number is four five six.", "Can you repeat that?", "I spell my name.", "I write a message.", "Here is my contact."],
         "Fale de sua família": ["This is my mother.", "This is my father.", "I have a brother.", "I have a sister.", "My son is here.", "My daughter is young.", "My grandparents live here.", "My mother is fifty years old.", "This is my house.", "My family is big."],
