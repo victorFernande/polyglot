@@ -9,7 +9,6 @@ import { speakSegmentsWithBrowser, speechLangForLanguage, voiceSegmentsForAnswer
 import { createSpeechPlaybackController } from '../lib/speechPlayback.mjs'
 import { buildExerciseFeedback } from '../lib/exerciseFeedback.mjs'
 import { selectableImageChoiceOptions } from '../lib/imageChoice.mjs'
-import { lessonContextForExercise } from '../lib/exerciseLessonContext.mjs'
 import { hintForExerciseType } from '../lib/exerciseTypeHint.mjs'
 import { choiceShortcutLabels } from '../lib/exerciseChoiceShortcuts.mjs'
 import { exerciseSessionProgress } from '../lib/exerciseSessionProgress.mjs'
@@ -130,7 +129,7 @@ export default function Exercises() {
   const activePath = pathData.find((p) => (p.language_code || p.language) === langCode)
   const choiceLikeTypes = ['choice', 'listen_choice', 'context_choice', 'image_choice']
   const choiceOptions = useMemo(() => (choiceLikeTypes.includes(item?.type) ? stableShuffleOptions(item.options || [], item.id ?? item.prompt) : []), [item])
-  const lessonContext = useMemo(() => lessonContextForExercise(lesson), [lesson])
+
   const lessonLanguageProgress = useMemo(() => summarizeExerciseLessonProgressByLanguage(lessons), [lessons])
   const filteredLessons = useMemo(() => filterExerciseLessonsByLanguage(lessons, lessonLanguageFilter), [lessons, lessonLanguageFilter])
   const currentSessionNumber = sessionNumberForExerciseSession(session, activePath)
@@ -373,7 +372,7 @@ export default function Exercises() {
         })}
       </div>
 
-      {activePath && <SkillTrail path={activePath} lessonContext={lessonContext} page={trailPage} mobilePage={mobileTrailPage} onPageChange={setTrailPage} onMobilePageChange={setMobileTrailPage} currentSessionNumber={currentSessionNumber} onSessionClick={openSessionNumber} />}
+      {activePath && <SkillTrail path={activePath} page={trailPage} mobilePage={mobileTrailPage} onPageChange={setTrailPage} onMobilePageChange={setMobileTrailPage} currentSessionNumber={currentSessionNumber} onSessionClick={openSessionNumber} />}
 
       {item && session && lesson && (
         <ExerciseShell
@@ -554,7 +553,7 @@ function MicroDialoguePrompt({ dialogue }) {
   )
 }
 
-function SkillTrail({ path, lessonContext, page, mobilePage, onPageChange, onMobilePageChange, currentSessionNumber, onSessionClick }) {
+function SkillTrail({ path, page, mobilePage, onPageChange, onMobilePageChange, currentSessionNumber, onSessionClick }) {
   const desktopWindowState = sessionWindowForPage(path.nodes, page, 5)
   const mobileWindowState = sessionWindowForPage(path.nodes, mobilePage, 3)
   const layout = trailHeaderLayoutClasses()
@@ -603,13 +602,6 @@ function SkillTrail({ path, lessonContext, page, mobilePage, onPageChange, onMob
           </div>
           <span className="w-fit rounded-full bg-polyglot-accent/20 px-3 py-1 text-sm text-polyglot-accent">{path.completed_sessions}/{path.total_sessions}</span>
         </div>
-        {lessonContext && (
-          <div className={layout.contextCard}>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-polyglot-accent">{lessonContext.label}</p>
-            <h4 className="mt-1 text-lg font-bold text-white">{lessonContext.title}</h4>
-            {lessonContext.description && <p className="mt-1 text-sm text-gray-300">{lessonContext.description}</p>}
-          </div>
-        )}
         <div className={layout.mobileTrail}>
           <button type="button" className="btn-secondary shrink-0 rounded-full p-3 disabled:opacity-30" disabled={!mobileWindowState.canGoPrev} onClick={() => onMobilePageChange(mobileWindowState.page - 1)} aria-label="Ver sessões anteriores">
             <ChevronLeft size={20} />

@@ -19,6 +19,13 @@ const approvedPhrases = [
   'QA aprovado 01/07 18:02',
 ]
 
+const pendingPhrases = [
+  'QA aprovado 03/07 09:06',
+  'QA aprovado 03/07 08:03',
+  'QA aprovado 03/07 08:12',
+  'QA aprovado 03/07 13:02',
+]
+
 test('all reviewed QA changelog entries are approved and retained for audit', () => {
   for (const phrase of approvedPhrases) {
     const entry = exercisesQaChangeLog.find((change) => change.approvalPhrase === phrase)
@@ -98,7 +105,7 @@ test('approved QA changelog copy does not still say changes are pending', () => 
     .flatMap((entry) => [entry.title, entry.summary, ...entry.diffs])
     .join('\n')
 
-  assert.doesNotMatch(approvedText, /alterações pendentes|item pendente|pendente mais novo|menu de alterações pendentes|PENDING QA APPROVAL/i)
+  assert.doesNotMatch(approvedText, /alterações pendentes|item pendente|pendente mais novo|menu de alterações pendentes|aguardando aprovação QA|PENDING QA APPROVAL/i)
 })
 
 test('rendered-item source audit fix entry is approved and retained for audit', () => {
@@ -111,10 +118,14 @@ test('rendered-item source audit fix entry is approved and retained for audit', 
   assert.match(entry.summary, /snapshot de feedback/)
 })
 
-test('all open QA changes are approved and no pending changelog item remains', () => {
-  assert.deepEqual(pendingExercisesQaChanges().map((entry) => entry.approvalPhrase), [])
-  assert.equal(latestExercisesQaChange(), null)
+test('all open QA changes are tracked and the latest pending cron audit is present', () => {
+  const pending = pendingExercisesQaChanges()
+  const latest = latestExercisesQaChange()
+  assert.ok(pending.length >= 1, 'cron audit should remain pending until Victor approves')
+  assert.equal(latest?.id, 'cron-qa-2026-07-03')
+  assert.equal(latest?.approved, false)
 })
+
 
 test('lesson item fallback suppression QA entry is approved with scoped evidence', () => {
   const entry = exercisesQaChangeLog.find((change) => change.id === '2026-07-01-1402-qa-suppress-lesson-item-fallback')

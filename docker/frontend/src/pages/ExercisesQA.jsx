@@ -45,7 +45,7 @@ const LESSON_LANGUAGE_FILTERS = [
   { code: 'en', label: 'Inglês' },
 ]
 
-const BUILD_LIKE_TYPES = ['build', 'listen_build']
+const BUILD_LIKE_TYPES = ['build']
 const ANSWER_FEEDBACK_SPEECH_DELAY_MS = 420
 
 function answerValue(answer) {
@@ -126,6 +126,7 @@ export default function Exercises() {
   const currentLessonFallbackItem = lesson?.items?.[currentIndex]
   const item = feedback?.itemSnapshot || currentSessionItem
   const hasSuppressedLessonItemFallback = !!session && !currentSessionItem && !!currentLessonFallbackItem && currentIndex < (session?.total_count || 0)
+  const hasMissingActiveSessionItemBlocker = !!session && !currentSessionItem && currentIndex < (session?.total_count || 0)
   const displayIndex = feedback?.answeredIndex ?? currentIndex
   const sessionProgress = useMemo(() => exerciseSessionProgress(session), [session])
   const langCode = lesson?.language_code || lesson?.language || 'de'
@@ -137,7 +138,7 @@ export default function Exercises() {
   const filteredLessons = useMemo(() => filterExerciseLessonsByLanguage(lessons, lessonLanguageFilter), [lessons, lessonLanguageFilter])
   const currentSessionNumber = sessionNumberForExerciseSession(session, activePath)
   const microDialogue = useMemo(() => (item?.type === 'context_choice' ? parseMicroDialoguePrompt(item.prompt) : null), [item])
-  const isUsingListenBuildDictation = item?.type === 'listen_build' && typedAnswer.trim().length > 0
+  const hasListenBuildDedicatedBody = item?.type === 'listen_build'
 
   useEffect(() => {
     if (activePath) {
@@ -193,18 +194,18 @@ export default function Exercises() {
     if (!item) return null
     if (['choice', 'listen_choice', 'context_choice'].includes(item.type)) return selected
     if (item.type === 'image_choice') return selected
-    if (isUsingListenBuildDictation) return buildListenBuildDictationPayload(typedAnswer)
+    if (item.type === 'listen_build') return buildListenBuildDictationPayload(typedAnswer)
     if (item.type === 'sequence_dialogue') return sequenceDialoguePayload(built)
     if (BUILD_LIKE_TYPES.includes(item.type)) return isLetterScrambleEligible(item) ? buildLetterScramblePayload(built) : built
     if (['match', 'listen_match'].includes(item.type)) return matched
     return selected
-  }, [item, selected, built, matched, typedAnswer, isUsingListenBuildDictation])
+  }, [item, selected, built, matched, typedAnswer])
 
   const canCheck = useMemo(() => {
     if (!item) return false
     if (['choice', 'listen_choice', 'context_choice'].includes(item.type)) return !!selected
     if (item.type === 'image_choice') return !!selected
-    if (isUsingListenBuildDictation) return canSubmitListenBuildDictation(item, typedAnswer)
+    if (item.type === 'listen_build') return canSubmitListenBuildDictation(item, typedAnswer)
     if (item.type === 'sequence_dialogue') return sequenceDialogueCanSubmit(item, built)
     if (BUILD_LIKE_TYPES.includes(item.type)) {
       if (isLetterScrambleEligible(item)) return built.length === singleWordBuildAnswer(item).length
@@ -212,7 +213,7 @@ export default function Exercises() {
     }
     if (['match', 'listen_match'].includes(item.type)) return Object.keys(matched).length === matchPairs(item).length
     return false
-  }, [item, selected, built, matched, typedAnswer, isUsingListenBuildDictation])
+  }, [item, selected, built, matched, typedAnswer])
 
   async function check() {
     if (!item || !session) return
@@ -383,7 +384,7 @@ export default function Exercises() {
 
       {activePath && <SkillTrail path={activePath} lessonContext={lessonContext} page={trailPage} mobilePage={mobileTrailPage} onPageChange={setTrailPage} onMobilePageChange={setMobileTrailPage} currentSessionNumber={currentSessionNumber} onSessionClick={openSessionNumber} />}
 
-      {hasSuppressedLessonItemFallback && (
+      {hasMissingActiveSessionItemBlocker && (
         <QaSuppressedLessonFallbackPanel
           fallbackItem={currentLessonFallbackItem}
           session={session}
@@ -401,6 +402,7 @@ export default function Exercises() {
           item={item}
           langCode={langCode}
           lesson={lesson}
+          lessonContext={lessonContext}
           microDialogue={microDialogue}
           onCheck={check}
           onReplay={replayCurrentAudio}
@@ -423,7 +425,7 @@ export default function Exercises() {
           {item.type === 'image_choice' && <ImageChoiceExerciseBody options={choiceOptions} selected={selected} onInteract={() => setFeedback(null)} setSelected={setSelected} />}
           {item.type === 'listen_build' && <ListenBuildDictationExerciseBody typedAnswer={typedAnswer} setTypedAnswer={setTypedAnswer} onInteract={() => setFeedback(null)} onSubmit={check} canSubmit={canCheck} busy={busy} />}
           {item.type === 'sequence_dialogue' && <SequenceDialogueExerciseBody item={item} built={built} onInteract={() => setFeedback(null)} setBuilt={setBuilt} />}
-          {BUILD_LIKE_TYPES.includes(item.type) && <BuildExerciseBody item={item} built={built} onInteract={() => setFeedback(null)} setBuilt={setBuilt} />}
+          {item.type === 'build' && <BuildExerciseBody item={item} built={built} onInteract={() => setFeedback(null)} setBuilt={setBuilt} />}
           {['match', 'listen_match'].includes(item.type) && <MatchExerciseBody item={item} langCode={langCode} matched={matched} onInteract={() => setFeedback(null)} onSpeakAudio={(text) => speakCurrent([{ text, lang: speechLangForLanguage(langCode) }])} setMatched={setMatched} />}
         </ExerciseShell>
       )}
@@ -486,7 +488,21 @@ function ExercisesQaChangeMenu({ entries }) {
   )
 }
 
-function ExerciseShell({ activePath, busy, canCheck, children, currentSessionNumber, displayIndex, feedback, feedbackSheet, item, langCode, lesson, microDialogue, onCheck, onReplay, onToggleVoice, session, sessionProgress, voiceMode }) {
+function LessonContextBadge({ lessonContext }) {
+  if (!lessonContext) return null
+  return (
+    <div className="mb-4 rounded-2xl border border-amber-300/25 bg-amber-300/10 p-4 text-sm text-amber-50">
+      <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-300">{lessonContext.label}</p>
+      <p className="mt-1 font-bold text-white">{lessonContext.title}</p>
+      {lessonContext.description && <p className="mt-1 text-amber-50/80">{lessonContext.description}</p>}
+      {(lessonContext.units?.length > 0 || lessonContext.topics?.length > 0) && (
+        <p className="mt-2 text-xs text-amber-100/70">unidades: {JSON.stringify(lessonContext.units)} · tópicos: {JSON.stringify(lessonContext.topics)}</p>
+      )}
+    </div>
+  )
+}
+
+function ExerciseShell({ activePath, busy, canCheck, children, currentSessionNumber, displayIndex, feedback, feedbackSheet, item, langCode, lesson, lessonContext, microDialogue, onCheck, onReplay, onToggleVoice, session, sessionProgress, voiceMode }) {
   const progress = progressPercentForSession(session)
   const difficultyLabel = difficultyLabelForItem(item)
   const instruction = instructionForItemType(item)
@@ -511,6 +527,8 @@ function ExerciseShell({ activePath, busy, canCheck, children, currentSessionNum
           <ProgressStat label="Faltam" value={sessionProgress.remaining} />
           <ProgressStat label="Acerto parcial" value={`${sessionProgress.correct}/${sessionProgress.answered}`} detail={`${sessionProgress.accuracyPercent}%`} />
         </div>
+
+        <LessonContextBadge lessonContext={lessonContext} />
 
         <QaSessionIntegrityStrip session={session} item={item} feedback={feedback} />
 
@@ -574,18 +592,45 @@ function QaSessionIntegrityStrip({ session, item, feedback }) {
   }, {})
   const duplicateAnswerSummary = Object.entries(answerBuckets)
     .filter(([, bucket]) => bucket.count > 1)
-    .map(([answer, bucket]) => `${answer}: ${bucket.count}x (${bucket.itemIds.join(', ')})`)
+    .map(([answer, bucket]) => `${qaDuplicateLabel(answer)}: ${bucket.count}x (${bucket.itemIds.join(', ')})`)
     .join(' · ') || 'sem respostas repetidas na sessão'
   const hasDuplicateAnswerCluster = Object.values(answerBuckets).some((bucket) => bucket.count > 2)
+  const promptBuckets = (session.items || []).reduce((counts, sessionItem) => {
+    const promptKey = String(sessionItem.prompt || '—').trim().replace(/\s+/g, ' ').toLocaleLowerCase() || '—'
+    const bucket = counts[promptKey] || { count: 0, itemIds: [] }
+    bucket.count += 1
+    bucket.itemIds.push(sessionItem.id || 'sem-id')
+    counts[promptKey] = bucket
+    return counts
+  }, {})
+  const duplicatePromptSummary = Object.entries(promptBuckets)
+    .filter(([, bucket]) => bucket.count > 1)
+    .map(([prompt, bucket]) => `${qaDuplicateLabel(prompt)}: ${bucket.count}x (${bucket.itemIds.join(', ')})`)
+    .join(' · ') || 'sem prompts repetidos na sessão'
+  const hasDuplicatePromptCluster = Object.values(promptBuckets).some((bucket) => bucket.count > 2)
+  const itemIdBuckets = (session.items || []).reduce((counts, sessionItem) => {
+    const itemId = sessionItem.id || 'sem-id'
+    const bucket = counts[itemId] || { count: 0, types: [] }
+    bucket.count += 1
+    bucket.types.push(sessionItem.type || 'unknown')
+    counts[itemId] = bucket
+    return counts
+  }, {})
+  const duplicateItemIdSummary = Object.entries(itemIdBuckets)
+    .filter(([, bucket]) => bucket.count > 1)
+    .map(([itemId, bucket]) => `${itemId}: ${bucket.count}x (${bucket.types.join(', ')})`)
+    .join(' · ') || 'sem IDs de item repetidos na sessão'
+  const hasDuplicateItemIdCluster = Object.values(itemIdBuckets).some((bucket) => bucket.count > 1)
   const exceedsSessionLimit = session.total_count > 20
   const hasItemCountMismatch = sessionItemCount !== session.total_count
   const isAwaitingFinish = session.current_index >= session.total_count
   const hasMissingActiveItem = !isAwaitingFinish && session.current_index >= sessionItemCount
   const hasRenderedItemMismatch = !!expectedSessionItem?.id && !!item?.id && expectedSessionItem.id !== item.id
   const hasIntegrityBlocker = exceedsSessionLimit || hasItemCountMismatch || hasMissingActiveItem || hasRenderedItemMismatch
+  const hasIntegrityRevision = hasDuplicateItemIdCluster || hasDuplicateAnswerCluster || hasDuplicatePromptCluster
 
   return (
-    <div className={`mb-6 rounded-2xl border p-4 text-sm ${hasIntegrityBlocker ? 'border-red-400/50 bg-red-500/15 text-red-100' : 'border-cyan-300/25 bg-cyan-300/10 text-cyan-50'}`}>
+    <div className={`mb-6 rounded-2xl border p-4 text-sm ${hasIntegrityBlocker ? 'border-red-400/50 bg-red-500/15 text-red-100' : hasIntegrityRevision ? 'border-amber-300/40 bg-amber-400/10 text-amber-50' : 'border-cyan-300/25 bg-cyan-300/10 text-cyan-50'}`}>
       <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-300">Integridade QA da sessão</p>
@@ -594,7 +639,9 @@ function QaSessionIntegrityStrip({ session, item, feedback }) {
           {hasItemCountMismatch && <p className="mt-2 rounded-xl bg-red-500/20 px-3 py-2 font-bold text-red-100">QA BLOCKER: session.items não bate com total_count; validar payload backend antes de promover.</p>}
           {hasMissingActiveItem && <p className="mt-2 rounded-xl bg-red-500/20 px-3 py-2 font-bold text-red-100">QA BLOCKER: current_index sem item real em session.items; validar janela ativa antes de promover.</p>}
           {hasRenderedItemMismatch && <p className="mt-2 rounded-xl bg-red-500/20 px-3 py-2 font-bold text-red-100">QA BLOCKER: item renderizado não corresponde ao item real da sessão; remover fallback local antes de promover.</p>}
+          {hasDuplicateItemIdCluster && <p className="mt-2 rounded-xl bg-amber-400/15 px-3 py-2 font-bold text-amber-100">QA REVISE: mesmo item.id aparece mais de uma vez na sessão; revisar duplicidade real antes de promover.</p>}
           {hasDuplicateAnswerCluster && <p className="mt-2 rounded-xl bg-amber-400/15 px-3 py-2 font-bold text-amber-100">QA REVISE: mesma resposta aparece mais de 2 vezes na sessão; revisar variedade pedagógica antes de promover.</p>}
+          {hasDuplicatePromptCluster && <p className="mt-2 rounded-xl bg-amber-400/15 px-3 py-2 font-bold text-amber-100">QA REVISE: mesmo prompt aparece mais de 2 vezes na sessão; revisar repetição visual antes de promover.</p>}
         </div>
         <div className="grid gap-2 text-xs sm:grid-cols-2 lg:min-w-[28rem]">
           <span className="rounded-xl bg-black/25 px-3 py-2"><strong>session.id:</strong> {session.id}</span>
@@ -609,19 +656,29 @@ function QaSessionIntegrityStrip({ session, item, feedback }) {
           <span className="rounded-xl bg-black/25 px-3 py-2 sm:col-span-2"><strong>Origem renderizada:</strong> {renderedItemSource}</span>
           <span className="rounded-xl bg-black/25 px-3 py-2 sm:col-span-2"><strong>Variedade:</strong> {varietySummary}</span>
           <span className="rounded-xl bg-black/25 px-3 py-2 sm:col-span-2"><strong>Respostas repetidas:</strong> {duplicateAnswerSummary}</span>
+          <span className="rounded-xl bg-black/25 px-3 py-2 sm:col-span-2"><strong>Prompts repetidos:</strong> {duplicatePromptSummary}</span>
+          <span className="rounded-xl bg-black/25 px-3 py-2 sm:col-span-2"><strong>Item IDs repetidos:</strong> {duplicateItemIdSummary}</span>
+          <span className="rounded-xl bg-black/25 px-3 py-2 sm:col-span-2"><strong>Renderização listen_build:</strong> {hasListenBuildDedicatedBody ? 'corpo dedicado de ditado, sem cartões de montagem' : 'não aplicável'}</span>
+          <span className="rounded-xl bg-black/25 px-3 py-2 sm:col-span-2"><strong>QA OK:</strong> {hasListenBuildDedicatedBody ? 'listen_build usa apenas o corpo de ditado digitável' : 'não aplicável'}</span>
         </div>
       </div>
     </div>
   )
 }
 
+function qaDuplicateLabel(value, maxLength = 72) {
+  const normalized = String(value).replace(/\s+/g, ' ').trim()
+  if (normalized.length <= maxLength) return normalized
+  return normalized.slice(0, maxLength - 1) + '…'
+}
+
 function QaSuppressedLessonFallbackPanel({ fallbackItem, session }) {
   return (
     <div className="rounded-3xl border border-red-400/60 bg-red-500/15 p-5 text-red-50 shadow-2xl shadow-red-950/20">
-      <p className="text-xs font-black uppercase tracking-[0.22em] text-red-200">QA BLOCKER · fallback de lesson.items suprimido</p>
+      <p className="text-xs font-black uppercase tracking-[0.22em] text-red-200">QA BLOCKER · item ativo ausente em session.items</p>
       <h3 className="mt-2 text-xl font-black text-white">A sessão backend não trouxe um item real para renderizar.</h3>
       <p className="mt-2 text-sm text-red-50/85">
-        /exercises-qa encontrou um item correspondente em lesson.items, mas não renderizou esse fallback para evitar prática paralela fora da sessão pontuada. Corrigir o payload de session.items antes de qualquer promoção.
+        /exercises-qa encontrou um item correspondente em lesson.items, mas esse fallback foi suprimido para evitar prática paralela fora da sessão pontuada. Corrigir o payload de session.items antes de qualquer promoção.
       </p>
       <div className="mt-4 grid gap-2 text-xs sm:grid-cols-2 lg:grid-cols-4">
         <span className="rounded-xl bg-black/25 px-3 py-2"><strong>session.id:</strong> {session?.id || '—'}</span>
@@ -629,6 +686,7 @@ function QaSuppressedLessonFallbackPanel({ fallbackItem, session }) {
         <span className="rounded-xl bg-black/25 px-3 py-2"><strong>total_count:</strong> {session?.total_count ?? '—'}</span>
         <span className="rounded-xl bg-black/25 px-3 py-2"><strong>fallback lesson item:</strong> {fallbackItem?.id || '—'}</span>
       </div>
+      <p className="mt-3 text-xs text-red-200/80">Nenhum fallback de lesson.items foi usado como exercício ativo.</p>
     </div>
   )
 }
@@ -846,11 +904,11 @@ function ListenBuildDictationExerciseBody({ typedAnswer, setTypedAnswer, onInter
         </label>
         {typedAnswer && (
           <button type="button" className="btn-secondary" onClick={() => { onInteract(); setTypedAnswer('') }}>
-            Prefiro montar com peças
+            Limpar ditado
           </button>
         )}
       </div>
-      <p className="mt-2 text-xs text-gray-400">Pressione Enter para verificar quando a frase digitada tiver a mesma quantidade de palavras da resposta. Se preferir, deixe o campo vazio e use as peças abaixo.</p>
+      <p className="mt-2 text-xs text-gray-400">listen_build usa somente o campo de ditado; pressione Enter para verificar quando a frase digitada tiver a mesma quantidade de palavras da resposta.</p>
     </div>
   )
 }

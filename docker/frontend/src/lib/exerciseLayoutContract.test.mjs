@@ -3,6 +3,7 @@ import test from 'node:test'
 import { readFileSync } from 'node:fs'
 
 const exercisesSource = readFileSync(new URL('../pages/ExercisesQA.jsx', import.meta.url), 'utf8')
+const prodExercisesSource = readFileSync(new URL('../pages/Exercises.jsx', import.meta.url), 'utf8')
 
 test('Exercises uses one real-session shell instead of extra/local panels', () => {
   assert.match(exercisesSource, /function ExerciseShell\(/, 'real session layout shell should exist')
@@ -19,6 +20,12 @@ test('Exercises keeps varied exercise types as real session bodies', () => {
   assert.match(exercisesSource, /function BuildExerciseBody\(/)
   assert.match(exercisesSource, /function MatchExerciseBody\(/)
   assert.match(exercisesSource, /function SequenceDialogueExerciseBody\(/)
+})
+
+test('production Exercises trail does not render the current-unit description card', () => {
+  assert.doesNotMatch(prodExercisesSource, /lessonContext=\{lessonContext\}/, 'production /exercises should not pass the current-unit card into SkillTrail')
+  assert.doesNotMatch(prodExercisesSource, /lessonContext\.label|lessonContext\.title|lessonContext\.description/, 'production /exercises should not render the Unidade atual context card')
+  assert.match(exercisesSource, /lessonContext=\{lessonContext\}/, 'QA route may keep the context card for review visibility')
 })
 
 test('ExercisesQA exposes session integrity metadata without adding local practice', () => {
@@ -38,9 +45,18 @@ test('ExercisesQA exposes session integrity metadata without adding local practi
   assert.match(exercisesSource, /QA BLOCKER: item renderizado não corresponde ao item real da sessão/, 'QA strip should block rendered item/session item mismatches')
   assert.match(exercisesSource, /snapshot de feedback da sessão/, 'QA strip should avoid false positives while feedback renders the answered item snapshot')
   assert.match(exercisesSource, /const item = feedback\?\.itemSnapshot \|\| currentSessionItem/, 'QA route should not render lesson.items as the active exercise fallback')
-  assert.match(exercisesSource, /QaSuppressedLessonFallbackPanel/, 'QA route should show a blocker panel when a lesson item fallback is suppressed')
-  assert.match(exercisesSource, /QA BLOCKER · fallback de lesson\.items suprimido/)
+  assert.match(exercisesSource, /QaSuppressedLessonFallbackPanel/, 'QA route should show a blocker panel when the active session item is missing')
+  assert.match(exercisesSource, /QA BLOCKER · item ativo ausente em session\.items/)
   assert.match(exercisesSource, /session\.items[\s\S]*\.reduce/, 'variety summary should be computed from real session.items')
   assert.match(exercisesSource, /XP real/)
+  assert.match(exercisesSource, /Item IDs repetidos/, 'QA strip should expose duplicate item ids from real session.items')
+  assert.match(exercisesSource, /QA REVISE: mesmo item\.id aparece mais de uma vez na sessão/, 'QA strip should flag repeated real item ids before promotion')
+  assert.match(exercisesSource, /Prompts repetidos/, 'QA strip should expose repeated prompts from real session.items')
+  assert.match(exercisesSource, /QA REVISE: mesmo prompt aparece mais de 2 vezes na sessão/, 'QA strip should flag repeated prompt clusters for visual/pedagogical review')
+  assert.match(exercisesSource, /hasIntegrityRevision \? 'border-amber-300\/40 bg-amber-400\/10 text-amber-50'/, 'revision-only QA warnings should switch the integrity strip to amber chrome')
+  assert.match(exercisesSource, /Renderização listen_build/, 'QA strip should expose the listen_build rendering mode')
+  assert.match(exercisesSource, /QA OK:\u003c\/strong\u003e.*listen_build usa apenas o corpo de ditado digitável/, 'QA strip should confirm listen_build no longer renders dictation and build cards together')
+  assert.match(exercisesSource, /item\.type === 'build' && <BuildExerciseBody/, 'build cards should render only for build items in QA')
+  assert.doesNotMatch(exercisesSource, /\{BUILD_LIKE_TYPES\.includes\(item\.type\) && <BuildExerciseBody/, 'listen_build must not share the build card body in QA')
   assert.doesNotMatch(exercisesSource, /Treino local|Questão extra|frontend-only/i)
 })
