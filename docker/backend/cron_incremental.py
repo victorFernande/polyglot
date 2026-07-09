@@ -140,7 +140,9 @@ def main() -> int:
     database_url = args.database_url
     snapshot_dir = Path(args.snapshot_dir)
     if not snapshot_dir.is_absolute():
-        snapshot_dir = Path(__file__).resolve().parent / snapshot_dir
+        # cron_incremental.py lives in docker/backend, so relative paths should be
+        # interpreted from the repository root, not from docker/backend.
+        snapshot_dir = repo_root() / snapshot_dir
 
     db = get_db_session(database_url)
     try:
