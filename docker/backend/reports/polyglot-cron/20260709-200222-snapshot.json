@@ -1,0 +1,46 @@
+{
+  "timestamp": "20260709-200222",
+  "database": "polyglot.db",
+  "languages": [
+    "de",
+    "fr",
+    "ru",
+    "jp",
+    "en"
+  ],
+  "before": {
+    "de": 1394,
+    "fr": 1394,
+    "ru": 1394,
+    "jp": 1394,
+    "en": 1370
+  },
+  "after": {
+    "de": 1399,
+    "fr": 1399,
+    "ru": 1399,
+    "jp": 1399,
+    "en": 1375
+  },
+  "added": {
+    "de": 5,
+    "fr": 5,
+    "ru": 5,
+    "jp": 5,
+    "en": 5
+  },
+  "qa_recent": {
+    "reviewed": 100,
+    "verdicts": {
+      "PASS": 100
+    },
+    "model_reviews": [
+      "cx/gpt-5.5 ok",
+      "kimi/kimi-k2.6 ok"
+    ]
+  },
+  "tests": [
+    "pytest docker/backend/test_cron_incremental.py docker/backend/test_polyglot_agent_review.py: 19 passed"
+  ],
+  "frontend_extra_practice_boundary": "PASS"
+}
