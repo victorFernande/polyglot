@@ -1,0 +1,5 @@
+de: 1260 items, last_block=0, session=Trilha A1 Situacional 1000 — Alemão
+en: 1260 items, last_block=0, session=Trilha A1 Situacional 1000 — Inglês
+fr: 1260 items, last_block=0, session=Trilha A1 Situacional 1000 — Francês
+jp: 1260 items, last_block=0, session=Trilha A1 Situacional 1000 — Japonês
+ru: 1260 items, last_block=0, session=Trilha A1 Situacional 1000 — Russo
