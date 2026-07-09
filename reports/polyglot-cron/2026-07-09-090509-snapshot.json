@@ -1,0 +1,49 @@
+{
+  "timestamp": "2026-07-09-090509",
+  "languages": [
+    "de",
+    "fr",
+    "ru",
+    "jp",
+    "en"
+  ],
+  "before": {
+    "de": 1250,
+    "fr": 1250,
+    "ru": 1250,
+    "jp": 1250,
+    "en": 1250
+  },
+  "after": {
+    "de": 1255,
+    "fr": 1255,
+    "ru": 1255,
+    "jp": 1255,
+    "en": 1255
+  },
+  "added": {
+    "de": 5,
+    "fr": 5,
+    "ru": 5,
+    "jp": 5,
+    "en": 5
+  },
+  "review": {
+    "total": 100,
+    "verdicts": {
+      "PASS": 100
+    },
+    "issue_codes": {},
+    "model_reviews": [
+      {
+        "model": "cx/gpt-5.5",
+        "status": "ok"
+      },
+      {
+        "model": "kimi/kimi-k2.6",
+        "status": "ok"
+      }
+    ]
+  },
+  "verdict": "PASS"
+}

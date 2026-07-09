@@ -1,0 +1,17 @@
+{
+  "total": 100,
+  "verdicts": {
+    "PASS": 100
+  },
+  "issue_codes": {},
+  "model_reviews": [
+    {
+      "model": "cx/gpt-5.5",
+      "status": "ok"
+    },
+    {
+      "model": "kimi/kimi-k2.6",
+      "status": "ok"
+    }
+  ]
+}
