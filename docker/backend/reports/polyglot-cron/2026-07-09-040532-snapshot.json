@@ -1,0 +1,35 @@
+{
+  "timestamp": "2026-07-09-040532",
+  "languages": {
+    "de": {
+      "before": 1265,
+      "after": 1270,
+      "added": 5,
+      "delta": 5
+    },
+    "fr": {
+      "before": 1265,
+      "after": 1270,
+      "added": 5,
+      "delta": 5
+    },
+    "ru": {
+      "before": 1265,
+      "after": 1270,
+      "added": 5,
+      "delta": 5
+    },
+    "jp": {
+      "before": 1265,
+      "after": 1270,
+      "added": 5,
+      "delta": 5
+    },
+    "en": {
+      "before": 1265,
+      "after": 1270,
+      "added": 5,
+      "delta": 5
+    }
+  }
+}
