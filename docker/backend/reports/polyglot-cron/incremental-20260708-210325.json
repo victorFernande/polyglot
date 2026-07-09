@@ -1,0 +1,37 @@
+{
+  "timestamp": "20260708-210325",
+  "languages": [
+    "de",
+    "fr",
+    "ru",
+    "jp",
+    "en"
+  ],
+  "counts_before": {
+    "de": 1265,
+    "fr": 1265,
+    "ru": 1265,
+    "jp": 1265,
+    "en": 1265
+  },
+  "counts_after": {
+    "de": 1270,
+    "fr": 1270,
+    "ru": 1270,
+    "jp": 1270,
+    "en": 1270
+  },
+  "increments": {
+    "de": 5,
+    "fr": 5,
+    "ru": 5,
+    "jp": 5,
+    "en": 5
+  },
+  "review_before": "python3 shared/tools/polyglot_agent_review.py --recent 20 => 100/100 PASS; model reviews ok",
+  "generation": "docker/backend/.venv/bin/python scripts/cron_add_incremental_exercises.py => +5 por idioma, +25 total",
+  "notes": [
+    "O comando com python3 do sistema falhou por ausência de sqlalchemy; reexecutado com docker/backend/.venv/bin/python.",
+    "Os snapshots não rastreados já existentes em docker/backend/reports/polyglot-cron/ foram preservados e não incluídos neste snapshot."
+  ]
+}
