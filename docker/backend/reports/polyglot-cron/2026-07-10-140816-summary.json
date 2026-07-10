@@ -1,0 +1,36 @@
+{
+  "status": "PASS",
+  "snapshot": "docker/backend/reports/polyglot-cron/2026-07-10-140816-snapshot.json",
+  "counts": {
+    "de": {
+      "before": 1300,
+      "after": 1305,
+      "added": 5
+    },
+    "fr": {
+      "before": 1300,
+      "after": 1305,
+      "added": 5
+    },
+    "ru": {
+      "before": 1300,
+      "after": 1305,
+      "added": 5
+    },
+    "jp": {
+      "before": 1300,
+      "after": 1305,
+      "added": 5
+    },
+    "en": {
+      "before": 1300,
+      "after": 1305,
+      "added": 5
+    }
+  },
+  "review_verdicts": {
+    "PASS": 150
+  },
+  "frontend_boundary": "PASS",
+  "focused_tests": "2 passed"
+}
