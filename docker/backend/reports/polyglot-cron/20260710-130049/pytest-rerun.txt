@@ -1,0 +1,9 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.15, pytest-9.1.1, pluggy-1.6.0
+rootdir: /home/victor/workspace/polyglot
+plugins: anyio-3.7.1
+collected 15 items
+
+docker/backend/test_exercise_content.py ...............                  [100%]
+
+============================== 15 passed in 4.35s ==============================
