@@ -1,0 +1,421 @@
+{
+  "total": 20,
+  "verdicts": {
+    "PASS": 20
+  },
+  "issue_codes": {},
+  "model_reviews": [
+    {
+      "model": "cx/gpt-5.5",
+      "status": "ok",
+      "review": "REVISE\n\nGaps críticos encontrados:\n\n1. Erro semântico direto — Berlim traduzido como Moscou\n   - Index 1241\n   - Prompt: “Eu viajo para Berlim.”\n   - Answer: “Я еду в Москву.”\n   - Problema: “в Москву” = “para Moscou”, não “para Berlim”.\n   - Correção esperada: “Я еду в Берлин.”\n\n2. Erro repetido em diálogo sequencial\n   - Index 1249\n   - Prompt pede: “Eu viajo para Berlim.”\n   - Answer inclui: “Я еду в Москву.”\n   - Problema: mesma inconsistência Berlim/Moscou.\n   - Correção esperada no cartão: “Я еду в Берлин.”\n\n3. Tradução imprecisa para iniciante absoluto\n   - Index 1247 e também par em 1246\n   - Prompt: “A que horas sai o ônibus?”\n   - Answer: “Когда автобус?”\n   - Problema: literalmente mais próximo de “Quando é o ônibus?” / “Quando o ônibus?”, não expressa claramente “a que horas sai”.\n   - Sugestão mais clara: “Во сколько автобус?” ou “Во сколько отправляется автобус?”\n\n4. Inconsistência de escopo pedagógico\n   - Unit/topic: “Exponha preferências” / “opinião”\n   - Vários itens tratam de apresentação pessoal e viagem.\n   - Não bloqueia, pois o prompt indica “Revisão incremental”, mas há desalinhamento de metadados que pode prejudicar organização curricular.\n\nConclusão: há erros objetivos de correspondência prompt–resposta. Não pode receber PASS."
+    },
+    {
+      "model": "kimi/kimi-k2.6",
+      "status": "blocked",
+      "error": "<HTTPError 502: 'Bad Gateway'>"
+    }
+  ],
+  "items": [
+    {
+      "language": "ru",
+      "language_name": "Russo",
+      "index": 1231,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 62,
+      "question_in_session": 11,
+      "type": "listen_choice",
+      "prompt": "Sessão 62 — Revisão incremental · Apresente-se em contexto: ouça o áudio e identifique a fala que comunica “Meu nome é Victor.”",
+      "answer": "Меня зовут Виктор.",
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "ru",
+      "language_name": "Russo",
+      "index": 1232,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 62,
+      "question_in_session": 12,
+      "type": "image_choice",
+      "prompt": "Sessão 62 — Revisão incremental · Apresente-se em contexto: observe a imagem e escolha a frase que representa “Eu sou do Brasil.”",
+      "answer": "Я из Бразилии.",
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "ru",
+      "language_name": "Russo",
+      "index": 1233,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 62,
+      "question_in_session": 13,
+      "type": "build",
+      "prompt": "Sessão 62 — Revisão incremental · Apresente-se em contexto: monte a frase em ordem natural para dizer “Eu moro em São Paulo.”",
+      "answer": [
+        "Я",
+        "живу",
+        "в",
+        "Сан-Паулу."
+      ],
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "ru",
+      "language_name": "Russo",
+      "index": 1234,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 62,
+      "question_in_session": 14,
+      "type": "context_choice",
+      "prompt": "Sessão 62 — Revisão incremental · Apresente-se em contexto: situação guiada — pratique uma fala do tema. Escolha a opção que comunica “Eu falo português.” em Russo.",
+      "answer": "Я говорю по-португальски.",
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "ru",
+      "language_name": "Russo",
+      "index": 1235,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 62,
+      "question_in_session": 15,
+      "type": "listen_match",
+      "prompt": "Sessão 62 — Revisão incremental · Apresente-se em contexto: ouça cada áudio em Russo e selecione a tradução em português",
+      "answer": [
+        [
+          "Я преподаватель.",
+          "Eu sou professor."
+        ],
+        [
+          "Я учу русский.",
+          "Eu estudo russo."
+        ],
+        [
+          "Как тебя зовут?",
+          "Como você se chama?"
+        ],
+        [
+          "Откуда ты?",
+          "De onde você é?"
+        ]
+      ],
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "ru",
+      "language_name": "Russo",
+      "index": 1236,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 62,
+      "question_in_session": 16,
+      "type": "choice",
+      "prompt": "Sessão 62 — Revisão incremental · Apresente-se em contexto: escolha como dizer “Eu estudo russo.” em Russo",
+      "answer": "Я учу русский.",
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "ru",
+      "language_name": "Russo",
+      "index": 1237,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 62,
+      "question_in_session": 17,
+      "type": "listen_build",
+      "prompt": "Sessão 62 — Revisão incremental · Apresente-se em contexto: ouça e monte em ordem natural — “Como você se chama?”",
+      "answer": [
+        "Как",
+        "тебя",
+        "зовут?"
+      ],
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "ru",
+      "language_name": "Russo",
+      "index": 1238,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 62,
+      "question_in_session": 18,
+      "type": "sequence_dialogue",
+      "prompt": "Sessão 62 — Revisão incremental · Apresente-se em contexto: prática guiada de ordem — organize os cartões exatamente assim: primeiro “De onde você é?”; depois “Eu gosto de música.”; em seguida “Prazer em conhecer você.”; por fim “Meu nome é Victor.”",
+      "answer": [
+        "Откуда ты?",
+        "Я люблю музыку.",
+        "Очень приятно.",
+        "Меня зовут Виктор."
+      ],
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "ru",
+      "language_name": "Russo",
+      "index": 1239,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 62,
+      "question_in_session": 19,
+      "type": "context_choice",
+      "prompt": "Sessão 62 — Revisão incremental · Apresente-se em contexto: situação guiada — pratique uma fala do tema. Escolha a opção que comunica “Eu gosto de música.” em Russo.",
+      "answer": "Я люблю музыку.",
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "ru",
+      "language_name": "Russo",
+      "index": 1240,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 62,
+      "question_in_session": 20,
+      "type": "choice",
+      "prompt": "Sessão 62 — Revisão incremental · Apresente-se em contexto: escolha como dizer “Prazer em conhecer você.” em Russo",
+      "answer": "Очень приятно.",
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "ru",
+      "language_name": "Russo",
+      "index": 1241,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 63,
+      "question_in_session": 1,
+      "type": "choice",
+      "prompt": "Sessão 63 — Revisão incremental · Converse sobre viagem em contexto: escolha como dizer “Eu viajo para Berlim.” em Russo",
+      "answer": "Я еду в Москву.",
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "ru",
+      "language_name": "Russo",
+      "index": 1242,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 63,
+      "question_in_session": 2,
+      "type": "listen_choice",
+      "prompt": "Sessão 63 — Revisão incremental · Converse sobre viagem em contexto: ouça o áudio e identifique a fala que comunica “Eu preciso de uma passagem.”",
+      "answer": "Мне нужен билет.",
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "ru",
+      "language_name": "Russo",
+      "index": 1243,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 63,
+      "question_in_session": 3,
+      "type": "image_choice",
+      "prompt": "Sessão 63 — Revisão incremental · Converse sobre viagem em contexto: observe a imagem e escolha a frase que representa “Eu tenho uma reserva de hotel.”",
+      "answer": "У меня есть бронь в отеле.",
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "ru",
+      "language_name": "Russo",
+      "index": 1244,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 63,
+      "question_in_session": 4,
+      "type": "build",
+      "prompt": "Sessão 63 — Revisão incremental · Converse sobre viagem em contexto: monte a frase em ordem natural para dizer “Onde fica a estação?”",
+      "answer": [
+        "Где",
+        "вокзал?"
+      ],
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "ru",
+      "language_name": "Russo",
+      "index": 1245,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 63,
+      "question_in_session": 5,
+      "type": "context_choice",
+      "prompt": "Sessão 63 — Revisão incremental · Converse sobre viagem em contexto: situação guiada — pratique uma fala do tema. Escolha a opção que comunica “Eu preciso de um mapa.” em Russo.",
+      "answer": "Мне нужна карта.",
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "ru",
+      "language_name": "Russo",
+      "index": 1246,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 63,
+      "question_in_session": 6,
+      "type": "listen_match",
+      "prompt": "Sessão 63 — Revisão incremental · Converse sobre viagem em contexto: ouça cada áudio em Russo e selecione a tradução em português",
+      "answer": [
+        [
+          "Я еду на поезде.",
+          "Eu pego o trem."
+        ],
+        [
+          "Когда автобус?",
+          "A que horas sai o ônibus?"
+        ],
+        [
+          "Это мой багаж.",
+          "Esta é minha bagagem."
+        ],
+        [
+          "Мне нужна помощь.",
+          "Eu preciso de ajuda."
+        ]
+      ],
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "ru",
+      "language_name": "Russo",
+      "index": 1247,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 63,
+      "question_in_session": 7,
+      "type": "choice",
+      "prompt": "Sessão 63 — Revisão incremental · Converse sobre viagem em contexto: escolha como dizer “A que horas sai o ônibus?” em Russo",
+      "answer": "Когда автобус?",
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "ru",
+      "language_name": "Russo",
+      "index": 1248,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 63,
+      "question_in_session": 8,
+      "type": "listen_build",
+      "prompt": "Sessão 63 — Revisão incremental · Converse sobre viagem em contexto: ouça e monte em ordem natural — “Esta é minha bagagem.”",
+      "answer": [
+        "Это",
+        "мой",
+        "багаж."
+      ],
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "ru",
+      "language_name": "Russo",
+      "index": 1249,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 63,
+      "question_in_session": 9,
+      "type": "sequence_dialogue",
+      "prompt": "Sessão 63 — Revisão incremental · Converse sobre viagem em contexto: prática guiada de ordem — organize os cartões exatamente assim: primeiro “Eu preciso de ajuda.”; depois “Eu chego hoje.”; em seguida “Eu viajo para Berlim.”; por fim “Eu preciso de uma passagem.”",
+      "answer": [
+        "Мне нужна помощь.",
+        "Я приезжаю сегодня.",
+        "Я еду в Москву.",
+        "Мне нужен билет."
+      ],
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "ru",
+      "language_name": "Russo",
+      "index": 1250,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 63,
+      "question_in_session": 10,
+      "type": "context_choice",
+      "prompt": "Sessão 63 — Revisão incremental · Converse sobre viagem em contexto: situação guiada — pratique uma fala do tema. Escolha a opção que comunica “Eu chego hoje.” em Russo.",
+      "answer": "Я приезжаю сегодня.",
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    }
+  ]
+}
