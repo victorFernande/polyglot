@@ -1,0 +1,30 @@
+{
+  "timestamp": "2026-07-10T19:03:59.981124",
+  "languages": {
+    "de": {
+      "count": 1330,
+      "last_block": 10,
+      "lesson": "Trilha A1 Situacional 1000 — Alemão"
+    },
+    "fr": {
+      "count": 1330,
+      "last_block": 10,
+      "lesson": "Trilha A1 Situacional 1000 — Francês"
+    },
+    "ru": {
+      "count": 1330,
+      "last_block": 10,
+      "lesson": "Trilha A1 Situacional 1000 — Russo"
+    },
+    "jp": {
+      "count": 1330,
+      "last_block": 10,
+      "lesson": "Trilha A1 Situacional 1000 — Japonês"
+    },
+    "en": {
+      "count": 1330,
+      "last_block": 10,
+      "lesson": "Trilha A1 Situacional 1000 — Inglês"
+    }
+  }
+}
