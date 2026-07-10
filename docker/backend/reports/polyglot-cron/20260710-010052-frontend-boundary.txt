@@ -1,0 +1,2 @@
+Forbidden Exercises.jsx check:
+PASS
