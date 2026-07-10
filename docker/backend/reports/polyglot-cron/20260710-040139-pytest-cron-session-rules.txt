@@ -1,0 +1,9 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.15, pytest-9.1.1, pluggy-1.6.0
+rootdir: /tmp/polyglot-cron-20260710-040125
+plugins: anyio-3.7.1
+collected 7 items
+
+scripts/test_cron_session_rules.py .......                               [100%]
+
+============================== 7 passed in 0.18s ===============================
