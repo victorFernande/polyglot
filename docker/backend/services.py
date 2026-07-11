@@ -1123,9 +1123,8 @@ class ExerciseService:
         portuguese_options = [pt for pt, _foreign in phrases]
 
         pt, target = phrases[0]
-        display_pt = "Eu viajo para Berlim." if code == "de" else pt
         items.append(ExerciseService._choice(
-            f"{prefix}: escolha como dizer “{display_pt}” em {name}",
+            f"{prefix}: escolha como dizer “{pt}” em {name}",
             target,
             [foreign for foreign in options[1:4]],
             start_index + len(items),
