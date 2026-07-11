@@ -1,0 +1,425 @@
+{
+  "total": 20,
+  "verdicts": {
+    "PASS": 20
+  },
+  "issue_codes": {},
+  "model_reviews": [
+    {
+      "model": "cx/gpt-5.5",
+      "status": "ok",
+      "review": "PASS\n\nGaps: nenhum gap bloqueante identificado.\n\nObservações:\n- Issue codes vazio.\n- 20/20 verdicts como PASS.\n- Amostras coerentes para alemão iniciante absoluto.\n- Traduções e respostas estão adequadas ao nível e aos prompts.\n- Sem ambiguidade crítica detectada."
+    },
+    {
+      "model": "kimi/kimi-k2.6",
+      "status": "ok",
+      "review": "# Relatório de Auditoria — Polyglot (Alemão, Unidade 10, Sessões 62–63)\n\n## Veredito: **PASS**\n\n## Justificativa\n- **Verdicts:** 20/20 PASS\n- **Issue codes:** vazio `{}`\n- **Amostras:** 20 exercícios inspecionados, todos coerentes\n\n## Verificações realizadas\n\n| Critério | Resultado |\n|---|---|\n| Correção gramatical do alemão | ✅ Todas as frases corretas (\"Ich heiße Victor.\", \"Ich komme aus Brasilien.\", \"Ich reise nach Berlin.\", \"Ich komme heute an.\" — verbo separável correto) |\n| Traduções PT↔DE fiéis | ✅ Pares listen_match exatos (\"Ich nehme den Zug.\" = \"Eu pego o trem.\") |\n| Ordens de build/listen_build | ✅ Ordem natural correta (\"Wo ist der Bahnhof?\", \"Wie heißt du?\") |\n| Sequências de diálogo | ✅ Ordem das respostas bate com a ordem exigida no prompt |\n| Consistência de metadados | ✅ language, unit, session e question_in_session consistentes |\n| Adequação a iniciante absoluto | ✅ Vocabulário básico, frases curtas, registro \"du\" apropriado |\n\n## Gaps\nNenhum gap bloqueante identificado.\n\n**Observações não bloqueantes (registro apenas):**\n1. O título da unidade (\"Exponha preferências\" / tópico \"opinião\") não reflete o conteúdo das sessões 62–63 (apresentação pessoal e viagem). Como são \"Revisão incremental\", o desalinhamento é esperado — mas se a convenção exigir alinhamento título↔conteúdo, vale sinalizar ao time de conteúdo.\n2. Sem distractors visíveis nas amostras — não foi possível auditar a qualidade das alternativas incorretas (limitação dos dados fornecidos, não do conteúdo).\n\n**Decisão final: PASS — lote aprovado para publicação.**"
+    }
+  ],
+  "items": [
+    {
+      "language": "de",
+      "language_name": "Alemão",
+      "index": 1231,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 62,
+      "question_in_session": 11,
+      "type": "listen_choice",
+      "prompt": "Sessão 62 — Revisão incremental · Apresente-se em contexto: ouça o áudio e identifique a fala que comunica “Meu nome é Victor.”",
+      "answer": "Ich heiße Victor.",
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "de",
+      "language_name": "Alemão",
+      "index": 1232,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 62,
+      "question_in_session": 12,
+      "type": "image_choice",
+      "prompt": "Sessão 62 — Revisão incremental · Apresente-se em contexto: observe a imagem e escolha a frase que representa “Eu sou do Brasil.”",
+      "answer": "Ich komme aus Brasilien.",
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "de",
+      "language_name": "Alemão",
+      "index": 1233,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 62,
+      "question_in_session": 13,
+      "type": "build",
+      "prompt": "Sessão 62 — Revisão incremental · Apresente-se em contexto: monte a frase em ordem natural para dizer “Eu moro em São Paulo.”",
+      "answer": [
+        "Ich",
+        "wohne",
+        "in",
+        "São",
+        "Paulo."
+      ],
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "de",
+      "language_name": "Alemão",
+      "index": 1234,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 62,
+      "question_in_session": 14,
+      "type": "context_choice",
+      "prompt": "Sessão 62 — Revisão incremental · Apresente-se em contexto: situação guiada — pratique uma fala do tema. Escolha a opção que comunica “Eu falo português.” em Alemão.",
+      "answer": "Ich spreche Portugiesisch.",
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "de",
+      "language_name": "Alemão",
+      "index": 1235,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 62,
+      "question_in_session": 15,
+      "type": "listen_match",
+      "prompt": "Sessão 62 — Revisão incremental · Apresente-se em contexto: ouça cada áudio em Alemão e selecione a tradução em português",
+      "answer": [
+        [
+          "Ich bin Lehrer.",
+          "Eu sou professor."
+        ],
+        [
+          "Ich lerne Deutsch.",
+          "Eu estudo alemão."
+        ],
+        [
+          "Wie heißt du?",
+          "Como você se chama?"
+        ],
+        [
+          "Woher kommst du?",
+          "De onde você é?"
+        ]
+      ],
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "de",
+      "language_name": "Alemão",
+      "index": 1236,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 62,
+      "question_in_session": 16,
+      "type": "choice",
+      "prompt": "Sessão 62 — Revisão incremental · Apresente-se em contexto: escolha como dizer “Eu estudo alemão.” em Alemão",
+      "answer": "Ich lerne Deutsch.",
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "de",
+      "language_name": "Alemão",
+      "index": 1237,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 62,
+      "question_in_session": 17,
+      "type": "listen_build",
+      "prompt": "Sessão 62 — Revisão incremental · Apresente-se em contexto: ouça e monte em ordem natural — “Como você se chama?”",
+      "answer": [
+        "Wie",
+        "heißt",
+        "du?"
+      ],
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "de",
+      "language_name": "Alemão",
+      "index": 1238,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 62,
+      "question_in_session": 18,
+      "type": "sequence_dialogue",
+      "prompt": "Sessão 62 — Revisão incremental · Apresente-se em contexto: prática guiada de ordem — organize os cartões exatamente assim: primeiro “De onde você é?”; depois “Eu gosto de música.”; em seguida “Prazer em conhecer você.”; por fim “Meu nome é Victor.”",
+      "answer": [
+        "Woher kommst du?",
+        "Ich mag Musik.",
+        "Freut mich.",
+        "Ich heiße Victor."
+      ],
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "de",
+      "language_name": "Alemão",
+      "index": 1239,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 62,
+      "question_in_session": 19,
+      "type": "context_choice",
+      "prompt": "Sessão 62 — Revisão incremental · Apresente-se em contexto: situação guiada — pratique uma fala do tema. Escolha a opção que comunica “Eu gosto de música.” em Alemão.",
+      "answer": "Ich mag Musik.",
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "de",
+      "language_name": "Alemão",
+      "index": 1240,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 62,
+      "question_in_session": 20,
+      "type": "choice",
+      "prompt": "Sessão 62 — Revisão incremental · Apresente-se em contexto: escolha como dizer “Prazer em conhecer você.” em Alemão",
+      "answer": "Freut mich.",
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "de",
+      "language_name": "Alemão",
+      "index": 1241,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 63,
+      "question_in_session": 1,
+      "type": "choice",
+      "prompt": "Sessão 63 — Revisão incremental · Converse sobre viagem em contexto: escolha como dizer “Eu viajo para Berlim.” em Alemão",
+      "answer": "Ich reise nach Berlin.",
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "de",
+      "language_name": "Alemão",
+      "index": 1242,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 63,
+      "question_in_session": 2,
+      "type": "listen_choice",
+      "prompt": "Sessão 63 — Revisão incremental · Converse sobre viagem em contexto: ouça o áudio e identifique a fala que comunica “Eu preciso de uma passagem.”",
+      "answer": "Ich brauche ein Ticket.",
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "de",
+      "language_name": "Alemão",
+      "index": 1243,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 63,
+      "question_in_session": 3,
+      "type": "image_choice",
+      "prompt": "Sessão 63 — Revisão incremental · Converse sobre viagem em contexto: observe a imagem e escolha a frase que representa “Eu tenho uma reserva de hotel.”",
+      "answer": "Ich habe eine Hotelreservierung.",
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "de",
+      "language_name": "Alemão",
+      "index": 1244,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 63,
+      "question_in_session": 4,
+      "type": "build",
+      "prompt": "Sessão 63 — Revisão incremental · Converse sobre viagem em contexto: monte a frase em ordem natural para dizer “Onde fica a estação?”",
+      "answer": [
+        "Wo",
+        "ist",
+        "der",
+        "Bahnhof?"
+      ],
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "de",
+      "language_name": "Alemão",
+      "index": 1245,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 63,
+      "question_in_session": 5,
+      "type": "context_choice",
+      "prompt": "Sessão 63 — Revisão incremental · Converse sobre viagem em contexto: situação guiada — pratique uma fala do tema. Escolha a opção que comunica “Eu preciso de um mapa.” em Alemão.",
+      "answer": "Ich brauche eine Karte.",
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "de",
+      "language_name": "Alemão",
+      "index": 1246,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 63,
+      "question_in_session": 6,
+      "type": "listen_match",
+      "prompt": "Sessão 63 — Revisão incremental · Converse sobre viagem em contexto: ouça cada áudio em Alemão e selecione a tradução em português",
+      "answer": [
+        [
+          "Ich nehme den Zug.",
+          "Eu pego o trem."
+        ],
+        [
+          "Wann fährt der Bus?",
+          "A que horas sai o ônibus?"
+        ],
+        [
+          "Das ist mein Gepäck.",
+          "Esta é minha bagagem."
+        ],
+        [
+          "Ich brauche Hilfe.",
+          "Eu preciso de ajuda."
+        ]
+      ],
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "de",
+      "language_name": "Alemão",
+      "index": 1247,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 63,
+      "question_in_session": 7,
+      "type": "choice",
+      "prompt": "Sessão 63 — Revisão incremental · Converse sobre viagem em contexto: escolha como dizer “A que horas sai o ônibus?” em Alemão",
+      "answer": "Wann fährt der Bus?",
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "de",
+      "language_name": "Alemão",
+      "index": 1248,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 63,
+      "question_in_session": 8,
+      "type": "listen_build",
+      "prompt": "Sessão 63 — Revisão incremental · Converse sobre viagem em contexto: ouça e monte em ordem natural — “Esta é minha bagagem.”",
+      "answer": [
+        "Das",
+        "ist",
+        "mein",
+        "Gepäck."
+      ],
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "de",
+      "language_name": "Alemão",
+      "index": 1249,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 63,
+      "question_in_session": 9,
+      "type": "sequence_dialogue",
+      "prompt": "Sessão 63 — Revisão incremental · Converse sobre viagem em contexto: prática guiada de ordem — organize os cartões exatamente assim: primeiro “Eu preciso de ajuda.”; depois “Eu chego hoje.”; em seguida “Eu viajo para Berlim.”; por fim “Eu preciso de uma passagem.”",
+      "answer": [
+        "Ich brauche Hilfe.",
+        "Ich komme heute an.",
+        "Ich reise nach Berlin.",
+        "Ich brauche ein Ticket."
+      ],
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "de",
+      "language_name": "Alemão",
+      "index": 1250,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 63,
+      "question_in_session": 10,
+      "type": "context_choice",
+      "prompt": "Sessão 63 — Revisão incremental · Converse sobre viagem em contexto: situação guiada — pratique uma fala do tema. Escolha a opção que comunica “Eu chego hoje.” em Alemão.",
+      "answer": "Ich komme heute an.",
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    }
+  ]
+}
