@@ -1,0 +1,24 @@
+{
+  "snapshot": "docker/backend/reports/polyglot-cron/20260711-030107",
+  "before": {
+    "de": 1270,
+    "fr": 1270,
+    "ru": 1270,
+    "jp": 1270,
+    "en": 1270
+  },
+  "after": {
+    "de": 1275,
+    "fr": 1275,
+    "ru": 1275,
+    "jp": 1275,
+    "en": 1275
+  },
+  "delta": {
+    "de": 5,
+    "fr": 5,
+    "ru": 5,
+    "jp": 5,
+    "en": 5
+  }
+}
