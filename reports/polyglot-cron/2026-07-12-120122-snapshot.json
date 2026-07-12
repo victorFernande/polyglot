@@ -1,0 +1,579 @@
+{
+  "timestamp": "2026-07-12T12:01:33.953266",
+  "before": {
+    "de": 1260,
+    "fr": 1260,
+    "ru": 1260,
+    "jp": 1260,
+    "en": 1260
+  },
+  "added": {
+    "de": 5,
+    "fr": 5,
+    "ru": 5,
+    "jp": 5,
+    "en": 5
+  },
+  "after": {
+    "de": 1265,
+    "fr": 1265,
+    "ru": 1265,
+    "jp": 1265,
+    "en": 1265
+  },
+  "new_items": {
+    "de": [
+      {
+        "id": 6301,
+        "order_index": 1261,
+        "type": "choice",
+        "prompt": "Sessão 63 — Revisão incremental · Converse sobre viagem em contexto: escolha como dizer “Eu viajo para Berlim.” em Alemão",
+        "answer": {
+          "value": "Ich reise nach Berlin."
+        },
+        "options": [
+          "Ich reise nach Berlin.",
+          "Ich brauche ein Ticket.",
+          "Ich habe eine Hotelreservierung.",
+          "Wo ist der Bahnhof?"
+        ],
+        "hint": "Mini-aula: Revisão incremental. Esta revisão acrescenta prática real sem ultrapassar 20 questões no bloco atual."
+      },
+      {
+        "id": 6302,
+        "order_index": 1262,
+        "type": "listen_choice",
+        "prompt": "Sessão 63 — Revisão incremental · Converse sobre viagem em contexto: ouça o áudio e identifique a fala que comunica “Eu preciso de uma passagem.”",
+        "answer": {
+          "value": "Ich brauche ein Ticket."
+        },
+        "options": [
+          "Ich brauche ein Ticket.",
+          "Wo ist der Bahnhof?",
+          "Ich brauche eine Karte.",
+          "Ich nehme den Zug."
+        ],
+        "hint": "Mini-aula: Revisão incremental. Esta revisão acrescenta prática real sem ultrapassar 20 questões no bloco atual."
+      },
+      {
+        "id": 6303,
+        "order_index": 1263,
+        "type": "image_choice",
+        "prompt": "Sessão 63 — Revisão incremental · Converse sobre viagem em contexto: observe a imagem e escolha a frase que representa “Eu tenho uma reserva de hotel.”",
+        "answer": {
+          "value": "Ich habe eine Hotelreservierung."
+        },
+        "options": [
+          {
+            "label_pt": "Eu tenho uma reserva de hotel.",
+            "display_text": "Ich habe eine Hotelreservierung.",
+            "value": "Ich habe eine Hotelreservierung.",
+            "icon_key": "speech",
+            "svg": "<svg viewBox=\"0 0 96 96\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"96\" height=\"96\" rx=\"22\" fill=\"#dbeafe\"/><path d=\"M20 24h56v34H45L31 72V58H20V24z\" fill=\"#38bdf8\" stroke=\"#0f172a\" stroke-width=\"4\"/><path d=\"M32 38h32M32 48h22\" stroke=\"#fff\" stroke-width=\"5\" stroke-linecap=\"round\"/></svg>",
+            "image_src": "data:image/svg+xml;charset=UTF-8,%3Csvg%20viewBox%3D%220%200%2096%2096%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%2296%22%20height%3D%2296%22%20rx%3D%2222%22%20fill%3D%22%23dbeafe%22%2F%3E%3Cpath%20d%3D%22M20%2024h56v34H45L31%2072V58H20V24z%22%20fill%3D%22%2338bdf8%22%20stroke%3D%22%230f172a%22%20stroke-width%3D%224%22%2F%3E%3Cpath%20d%3D%22M32%2038h32M32%2048h22%22%20stroke%3D%22%23fff%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E"
+          },
+          {
+            "label_pt": "Onde fica a estação?",
+            "display_text": "Wo ist der Bahnhof?",
+            "value": "Wo ist der Bahnhof?",
+            "icon_key": "train",
+            "svg": "<svg viewBox=\"0 0 96 96\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"96\" height=\"96\" rx=\"22\" fill=\"#ffedd5\"/><rect x=\"24\" y=\"18\" width=\"48\" height=\"52\" rx=\"10\" fill=\"#2563eb\"/><rect x=\"32\" y=\"28\" width=\"32\" height=\"16\" rx=\"3\" fill=\"#bfdbfe\"/><circle cx=\"36\" cy=\"56\" r=\"5\" fill=\"#fff\"/><circle cx=\"60\" cy=\"56\" r=\"5\" fill=\"#fff\"/><path d=\"M34 78h28\" stroke=\"#111827\" stroke-width=\"5\"/></svg>",
+            "image_src": "data:image/svg+xml;charset=UTF-8,%3Csvg%20viewBox%3D%220%200%2096%2096%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%2296%22%20height%3D%2296%22%20rx%3D%2222%22%20fill%3D%22%23ffedd5%22%2F%3E%3Crect%20x%3D%2224%22%20y%3D%2218%22%20width%3D%2248%22%20height%3D%2252%22%20rx%3D%2210%22%20fill%3D%22%232563eb%22%2F%3E%3Crect%20x%3D%2232%22%20y%3D%2228%22%20width%3D%2232%22%20height%3D%2216%22%20rx%3D%223%22%20fill%3D%22%23bfdbfe%22%2F%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%2256%22%20r%3D%225%22%20fill%3D%22%23fff%22%2F%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%2256%22%20r%3D%225%22%20fill%3D%22%23fff%22%2F%3E%3Cpath%20d%3D%22M34%2078h28%22%20stroke%3D%22%23111827%22%20stroke-width%3D%225%22%2F%3E%3C%2Fsvg%3E"
+          },
+          {
+            "label_pt": "Eu preciso de um mapa.",
+            "display_text": "Ich brauche eine Karte.",
+            "value": "Ich brauche eine Karte.",
+            "icon_key": "speech",
+            "svg": "<svg viewBox=\"0 0 96 96\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"96\" height=\"96\" rx=\"22\" fill=\"#dcfce7\"/><path d=\"M20 24h56v34H45L31 72V58H20V24z\" fill=\"#38bdf8\" stroke=\"#0f172a\" stroke-width=\"4\"/><path d=\"M32 38h32M32 48h22\" stroke=\"#fff\" stroke-width=\"5\" stroke-linecap=\"round\"/></svg>",
+            "image_src": "data:image/svg+xml;charset=UTF-8,%3Csvg%20viewBox%3D%220%200%2096%2096%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%2296%22%20height%3D%2296%22%20rx%3D%2222%22%20fill%3D%22%23dcfce7%22%2F%3E%3Cpath%20d%3D%22M20%2024h56v34H45L31%2072V58H20V24z%22%20fill%3D%22%2338bdf8%22%20stroke%3D%22%230f172a%22%20stroke-width%3D%224%22%2F%3E%3Cpath%20d%3D%22M32%2038h32M32%2048h22%22%20stroke%3D%22%23fff%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E"
+          },
+          {
+            "label_pt": "Eu pego o trem.",
+            "display_text": "Ich nehme den Zug.",
+            "value": "Ich nehme den Zug.",
+            "icon_key": "train",
+            "svg": "<svg viewBox=\"0 0 96 96\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"96\" height=\"96\" rx=\"22\" fill=\"#fae8ff\"/><rect x=\"24\" y=\"18\" width=\"48\" height=\"52\" rx=\"10\" fill=\"#2563eb\"/><rect x=\"32\" y=\"28\" width=\"32\" height=\"16\" rx=\"3\" fill=\"#bfdbfe\"/><circle cx=\"36\" cy=\"56\" r=\"5\" fill=\"#fff\"/><circle cx=\"60\" cy=\"56\" r=\"5\" fill=\"#fff\"/><path d=\"M34 78h28\" stroke=\"#111827\" stroke-width=\"5\"/></svg>",
+            "image_src": "data:image/svg+xml;charset=UTF-8,%3Csvg%20viewBox%3D%220%200%2096%2096%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%2296%22%20height%3D%2296%22%20rx%3D%2222%22%20fill%3D%22%23fae8ff%22%2F%3E%3Crect%20x%3D%2224%22%20y%3D%2218%22%20width%3D%2248%22%20height%3D%2252%22%20rx%3D%2210%22%20fill%3D%22%232563eb%22%2F%3E%3Crect%20x%3D%2232%22%20y%3D%2228%22%20width%3D%2232%22%20height%3D%2216%22%20rx%3D%223%22%20fill%3D%22%23bfdbfe%22%2F%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%2256%22%20r%3D%225%22%20fill%3D%22%23fff%22%2F%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%2256%22%20r%3D%225%22%20fill%3D%22%23fff%22%2F%3E%3Cpath%20d%3D%22M34%2078h28%22%20stroke%3D%22%23111827%22%20stroke-width%3D%225%22%2F%3E%3C%2Fsvg%3E"
+          }
+        ],
+        "hint": "Mini-aula: Revisão incremental. Esta revisão acrescenta prática real sem ultrapassar 20 questões no bloco atual."
+      },
+      {
+        "id": 6304,
+        "order_index": 1264,
+        "type": "build",
+        "prompt": "Sessão 63 — Revisão incremental · Converse sobre viagem em contexto: monte a frase em ordem natural para dizer “Onde fica a estação?”",
+        "answer": {
+          "value": [
+            "Wo",
+            "ist",
+            "der",
+            "Bahnhof?"
+          ]
+        },
+        "options": null,
+        "hint": "Mini-aula: Revisão incremental. Esta revisão acrescenta prática real sem ultrapassar 20 questões no bloco atual."
+      },
+      {
+        "id": 6305,
+        "order_index": 1265,
+        "type": "context_choice",
+        "prompt": "Sessão 63 — Revisão incremental · Converse sobre viagem em contexto: situação guiada — pratique uma fala do tema. Escolha a opção que comunica “Eu preciso de um mapa.” em Alemão.",
+        "answer": {
+          "value": "Ich brauche eine Karte."
+        },
+        "options": [
+          "Ich brauche eine Karte.",
+          "Ich nehme den Zug.",
+          "Wann fährt der Bus?",
+          "Das ist mein Gepäck."
+        ],
+        "hint": "Mini-aula: Revisão incremental. Esta revisão acrescenta prática real sem ultrapassar 20 questões no bloco atual."
+      }
+    ],
+    "fr": [
+      {
+        "id": 6306,
+        "order_index": 1261,
+        "type": "choice",
+        "prompt": "Sessão 63 — Revisão incremental · Converse sobre viagem em contexto: escolha como dizer “Eu viajo para Berlim.” em Francês",
+        "answer": {
+          "value": "Je voyage à Paris."
+        },
+        "options": [
+          "Je voyage à Paris.",
+          "J'ai besoin d'un billet.",
+          "J'ai une réservation d'hôtel.",
+          "Où est la gare ?"
+        ],
+        "hint": "Mini-aula: Revisão incremental. Esta revisão acrescenta prática real sem ultrapassar 20 questões no bloco atual."
+      },
+      {
+        "id": 6307,
+        "order_index": 1262,
+        "type": "listen_choice",
+        "prompt": "Sessão 63 — Revisão incremental · Converse sobre viagem em contexto: ouça o áudio e identifique a fala que comunica “Eu preciso de uma passagem.”",
+        "answer": {
+          "value": "J'ai besoin d'un billet."
+        },
+        "options": [
+          "J'ai besoin d'un billet.",
+          "Où est la gare ?",
+          "J'ai besoin d'une carte.",
+          "Je prends le train."
+        ],
+        "hint": "Mini-aula: Revisão incremental. Esta revisão acrescenta prática real sem ultrapassar 20 questões no bloco atual."
+      },
+      {
+        "id": 6308,
+        "order_index": 1263,
+        "type": "image_choice",
+        "prompt": "Sessão 63 — Revisão incremental · Converse sobre viagem em contexto: observe a imagem e escolha a frase que representa “Eu tenho uma reserva de hotel.”",
+        "answer": {
+          "value": "J'ai une réservation d'hôtel."
+        },
+        "options": [
+          {
+            "label_pt": "Eu tenho uma reserva de hotel.",
+            "display_text": "J'ai une réservation d'hôtel.",
+            "value": "J'ai une réservation d'hôtel.",
+            "icon_key": "speech",
+            "svg": "<svg viewBox=\"0 0 96 96\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"96\" height=\"96\" rx=\"22\" fill=\"#dbeafe\"/><path d=\"M20 24h56v34H45L31 72V58H20V24z\" fill=\"#38bdf8\" stroke=\"#0f172a\" stroke-width=\"4\"/><path d=\"M32 38h32M32 48h22\" stroke=\"#fff\" stroke-width=\"5\" stroke-linecap=\"round\"/></svg>",
+            "image_src": "data:image/svg+xml;charset=UTF-8,%3Csvg%20viewBox%3D%220%200%2096%2096%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%2296%22%20height%3D%2296%22%20rx%3D%2222%22%20fill%3D%22%23dbeafe%22%2F%3E%3Cpath%20d%3D%22M20%2024h56v34H45L31%2072V58H20V24z%22%20fill%3D%22%2338bdf8%22%20stroke%3D%22%230f172a%22%20stroke-width%3D%224%22%2F%3E%3Cpath%20d%3D%22M32%2038h32M32%2048h22%22%20stroke%3D%22%23fff%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E"
+          },
+          {
+            "label_pt": "Onde fica a estação?",
+            "display_text": "Où est la gare ?",
+            "value": "Où est la gare ?",
+            "icon_key": "train",
+            "svg": "<svg viewBox=\"0 0 96 96\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"96\" height=\"96\" rx=\"22\" fill=\"#ffedd5\"/><rect x=\"24\" y=\"18\" width=\"48\" height=\"52\" rx=\"10\" fill=\"#2563eb\"/><rect x=\"32\" y=\"28\" width=\"32\" height=\"16\" rx=\"3\" fill=\"#bfdbfe\"/><circle cx=\"36\" cy=\"56\" r=\"5\" fill=\"#fff\"/><circle cx=\"60\" cy=\"56\" r=\"5\" fill=\"#fff\"/><path d=\"M34 78h28\" stroke=\"#111827\" stroke-width=\"5\"/></svg>",
+            "image_src": "data:image/svg+xml;charset=UTF-8,%3Csvg%20viewBox%3D%220%200%2096%2096%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%2296%22%20height%3D%2296%22%20rx%3D%2222%22%20fill%3D%22%23ffedd5%22%2F%3E%3Crect%20x%3D%2224%22%20y%3D%2218%22%20width%3D%2248%22%20height%3D%2252%22%20rx%3D%2210%22%20fill%3D%22%232563eb%22%2F%3E%3Crect%20x%3D%2232%22%20y%3D%2228%22%20width%3D%2232%22%20height%3D%2216%22%20rx%3D%223%22%20fill%3D%22%23bfdbfe%22%2F%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%2256%22%20r%3D%225%22%20fill%3D%22%23fff%22%2F%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%2256%22%20r%3D%225%22%20fill%3D%22%23fff%22%2F%3E%3Cpath%20d%3D%22M34%2078h28%22%20stroke%3D%22%23111827%22%20stroke-width%3D%225%22%2F%3E%3C%2Fsvg%3E"
+          },
+          {
+            "label_pt": "Eu preciso de um mapa.",
+            "display_text": "J'ai besoin d'une carte.",
+            "value": "J'ai besoin d'une carte.",
+            "icon_key": "speech",
+            "svg": "<svg viewBox=\"0 0 96 96\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"96\" height=\"96\" rx=\"22\" fill=\"#dcfce7\"/><path d=\"M20 24h56v34H45L31 72V58H20V24z\" fill=\"#38bdf8\" stroke=\"#0f172a\" stroke-width=\"4\"/><path d=\"M32 38h32M32 48h22\" stroke=\"#fff\" stroke-width=\"5\" stroke-linecap=\"round\"/></svg>",
+            "image_src": "data:image/svg+xml;charset=UTF-8,%3Csvg%20viewBox%3D%220%200%2096%2096%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%2296%22%20height%3D%2296%22%20rx%3D%2222%22%20fill%3D%22%23dcfce7%22%2F%3E%3Cpath%20d%3D%22M20%2024h56v34H45L31%2072V58H20V24z%22%20fill%3D%22%2338bdf8%22%20stroke%3D%22%230f172a%22%20stroke-width%3D%224%22%2F%3E%3Cpath%20d%3D%22M32%2038h32M32%2048h22%22%20stroke%3D%22%23fff%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E"
+          },
+          {
+            "label_pt": "Eu pego o trem.",
+            "display_text": "Je prends le train.",
+            "value": "Je prends le train.",
+            "icon_key": "train",
+            "svg": "<svg viewBox=\"0 0 96 96\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"96\" height=\"96\" rx=\"22\" fill=\"#fae8ff\"/><rect x=\"24\" y=\"18\" width=\"48\" height=\"52\" rx=\"10\" fill=\"#2563eb\"/><rect x=\"32\" y=\"28\" width=\"32\" height=\"16\" rx=\"3\" fill=\"#bfdbfe\"/><circle cx=\"36\" cy=\"56\" r=\"5\" fill=\"#fff\"/><circle cx=\"60\" cy=\"56\" r=\"5\" fill=\"#fff\"/><path d=\"M34 78h28\" stroke=\"#111827\" stroke-width=\"5\"/></svg>",
+            "image_src": "data:image/svg+xml;charset=UTF-8,%3Csvg%20viewBox%3D%220%200%2096%2096%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%2296%22%20height%3D%2296%22%20rx%3D%2222%22%20fill%3D%22%23fae8ff%22%2F%3E%3Crect%20x%3D%2224%22%20y%3D%2218%22%20width%3D%2248%22%20height%3D%2252%22%20rx%3D%2210%22%20fill%3D%22%232563eb%22%2F%3E%3Crect%20x%3D%2232%22%20y%3D%2228%22%20width%3D%2232%22%20height%3D%2216%22%20rx%3D%223%22%20fill%3D%22%23bfdbfe%22%2F%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%2256%22%20r%3D%225%22%20fill%3D%22%23fff%22%2F%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%2256%22%20r%3D%225%22%20fill%3D%22%23fff%22%2F%3E%3Cpath%20d%3D%22M34%2078h28%22%20stroke%3D%22%23111827%22%20stroke-width%3D%225%22%2F%3E%3C%2Fsvg%3E"
+          }
+        ],
+        "hint": "Mini-aula: Revisão incremental. Esta revisão acrescenta prática real sem ultrapassar 20 questões no bloco atual."
+      },
+      {
+        "id": 6309,
+        "order_index": 1264,
+        "type": "build",
+        "prompt": "Sessão 63 — Revisão incremental · Converse sobre viagem em contexto: monte a frase em ordem natural para dizer “Onde fica a estação?”",
+        "answer": {
+          "value": [
+            "Où",
+            "est",
+            "la",
+            "gare",
+            "?"
+          ]
+        },
+        "options": null,
+        "hint": "Mini-aula: Revisão incremental. Esta revisão acrescenta prática real sem ultrapassar 20 questões no bloco atual."
+      },
+      {
+        "id": 6310,
+        "order_index": 1265,
+        "type": "context_choice",
+        "prompt": "Sessão 63 — Revisão incremental · Converse sobre viagem em contexto: situação guiada — pratique uma fala do tema. Escolha a opção que comunica “Eu preciso de um mapa.” em Francês.",
+        "answer": {
+          "value": "J'ai besoin d'une carte."
+        },
+        "options": [
+          "J'ai besoin d'une carte.",
+          "Je prends le train.",
+          "Le bus part quand ?",
+          "C'est mon bagage."
+        ],
+        "hint": "Mini-aula: Revisão incremental. Esta revisão acrescenta prática real sem ultrapassar 20 questões no bloco atual."
+      }
+    ],
+    "ru": [
+      {
+        "id": 6311,
+        "order_index": 1261,
+        "type": "choice",
+        "prompt": "Sessão 63 — Revisão incremental · Converse sobre viagem em contexto: escolha como dizer “Eu viajo para Berlim.” em Russo",
+        "answer": {
+          "value": "Я еду в Москву."
+        },
+        "options": [
+          "Я еду в Москву.",
+          "Мне нужен билет.",
+          "У меня есть бронь в отеле.",
+          "Где вокзал?"
+        ],
+        "hint": "Mini-aula: Revisão incremental. Esta revisão acrescenta prática real sem ultrapassar 20 questões no bloco atual."
+      },
+      {
+        "id": 6312,
+        "order_index": 1262,
+        "type": "listen_choice",
+        "prompt": "Sessão 63 — Revisão incremental · Converse sobre viagem em contexto: ouça o áudio e identifique a fala que comunica “Eu preciso de uma passagem.”",
+        "answer": {
+          "value": "Мне нужен билет."
+        },
+        "options": [
+          "Мне нужен билет.",
+          "Где вокзал?",
+          "Мне нужна карта.",
+          "Я еду на поезде."
+        ],
+        "hint": "Mini-aula: Revisão incremental. Esta revisão acrescenta prática real sem ultrapassar 20 questões no bloco atual."
+      },
+      {
+        "id": 6313,
+        "order_index": 1263,
+        "type": "image_choice",
+        "prompt": "Sessão 63 — Revisão incremental · Converse sobre viagem em contexto: observe a imagem e escolha a frase que representa “Eu tenho uma reserva de hotel.”",
+        "answer": {
+          "value": "У меня есть бронь в отеле."
+        },
+        "options": [
+          {
+            "label_pt": "Eu tenho uma reserva de hotel.",
+            "display_text": "У меня есть бронь в отеле.",
+            "value": "У меня есть бронь в отеле.",
+            "icon_key": "speech",
+            "svg": "<svg viewBox=\"0 0 96 96\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"96\" height=\"96\" rx=\"22\" fill=\"#dbeafe\"/><path d=\"M20 24h56v34H45L31 72V58H20V24z\" fill=\"#38bdf8\" stroke=\"#0f172a\" stroke-width=\"4\"/><path d=\"M32 38h32M32 48h22\" stroke=\"#fff\" stroke-width=\"5\" stroke-linecap=\"round\"/></svg>",
+            "image_src": "data:image/svg+xml;charset=UTF-8,%3Csvg%20viewBox%3D%220%200%2096%2096%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%2296%22%20height%3D%2296%22%20rx%3D%2222%22%20fill%3D%22%23dbeafe%22%2F%3E%3Cpath%20d%3D%22M20%2024h56v34H45L31%2072V58H20V24z%22%20fill%3D%22%2338bdf8%22%20stroke%3D%22%230f172a%22%20stroke-width%3D%224%22%2F%3E%3Cpath%20d%3D%22M32%2038h32M32%2048h22%22%20stroke%3D%22%23fff%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E"
+          },
+          {
+            "label_pt": "Onde fica a estação?",
+            "display_text": "Где вокзал?",
+            "value": "Где вокзал?",
+            "icon_key": "train",
+            "svg": "<svg viewBox=\"0 0 96 96\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"96\" height=\"96\" rx=\"22\" fill=\"#ffedd5\"/><rect x=\"24\" y=\"18\" width=\"48\" height=\"52\" rx=\"10\" fill=\"#2563eb\"/><rect x=\"32\" y=\"28\" width=\"32\" height=\"16\" rx=\"3\" fill=\"#bfdbfe\"/><circle cx=\"36\" cy=\"56\" r=\"5\" fill=\"#fff\"/><circle cx=\"60\" cy=\"56\" r=\"5\" fill=\"#fff\"/><path d=\"M34 78h28\" stroke=\"#111827\" stroke-width=\"5\"/></svg>",
+            "image_src": "data:image/svg+xml;charset=UTF-8,%3Csvg%20viewBox%3D%220%200%2096%2096%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%2296%22%20height%3D%2296%22%20rx%3D%2222%22%20fill%3D%22%23ffedd5%22%2F%3E%3Crect%20x%3D%2224%22%20y%3D%2218%22%20width%3D%2248%22%20height%3D%2252%22%20rx%3D%2210%22%20fill%3D%22%232563eb%22%2F%3E%3Crect%20x%3D%2232%22%20y%3D%2228%22%20width%3D%2232%22%20height%3D%2216%22%20rx%3D%223%22%20fill%3D%22%23bfdbfe%22%2F%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%2256%22%20r%3D%225%22%20fill%3D%22%23fff%22%2F%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%2256%22%20r%3D%225%22%20fill%3D%22%23fff%22%2F%3E%3Cpath%20d%3D%22M34%2078h28%22%20stroke%3D%22%23111827%22%20stroke-width%3D%225%22%2F%3E%3C%2Fsvg%3E"
+          },
+          {
+            "label_pt": "Eu preciso de um mapa.",
+            "display_text": "Мне нужна карта.",
+            "value": "Мне нужна карта.",
+            "icon_key": "speech",
+            "svg": "<svg viewBox=\"0 0 96 96\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"96\" height=\"96\" rx=\"22\" fill=\"#dcfce7\"/><path d=\"M20 24h56v34H45L31 72V58H20V24z\" fill=\"#38bdf8\" stroke=\"#0f172a\" stroke-width=\"4\"/><path d=\"M32 38h32M32 48h22\" stroke=\"#fff\" stroke-width=\"5\" stroke-linecap=\"round\"/></svg>",
+            "image_src": "data:image/svg+xml;charset=UTF-8,%3Csvg%20viewBox%3D%220%200%2096%2096%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%2296%22%20height%3D%2296%22%20rx%3D%2222%22%20fill%3D%22%23dcfce7%22%2F%3E%3Cpath%20d%3D%22M20%2024h56v34H45L31%2072V58H20V24z%22%20fill%3D%22%2338bdf8%22%20stroke%3D%22%230f172a%22%20stroke-width%3D%224%22%2F%3E%3Cpath%20d%3D%22M32%2038h32M32%2048h22%22%20stroke%3D%22%23fff%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E"
+          },
+          {
+            "label_pt": "Eu pego o trem.",
+            "display_text": "Я еду на поезде.",
+            "value": "Я еду на поезде.",
+            "icon_key": "train",
+            "svg": "<svg viewBox=\"0 0 96 96\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"96\" height=\"96\" rx=\"22\" fill=\"#fae8ff\"/><rect x=\"24\" y=\"18\" width=\"48\" height=\"52\" rx=\"10\" fill=\"#2563eb\"/><rect x=\"32\" y=\"28\" width=\"32\" height=\"16\" rx=\"3\" fill=\"#bfdbfe\"/><circle cx=\"36\" cy=\"56\" r=\"5\" fill=\"#fff\"/><circle cx=\"60\" cy=\"56\" r=\"5\" fill=\"#fff\"/><path d=\"M34 78h28\" stroke=\"#111827\" stroke-width=\"5\"/></svg>",
+            "image_src": "data:image/svg+xml;charset=UTF-8,%3Csvg%20viewBox%3D%220%200%2096%2096%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%2296%22%20height%3D%2296%22%20rx%3D%2222%22%20fill%3D%22%23fae8ff%22%2F%3E%3Crect%20x%3D%2224%22%20y%3D%2218%22%20width%3D%2248%22%20height%3D%2252%22%20rx%3D%2210%22%20fill%3D%22%232563eb%22%2F%3E%3Crect%20x%3D%2232%22%20y%3D%2228%22%20width%3D%2232%22%20height%3D%2216%22%20rx%3D%223%22%20fill%3D%22%23bfdbfe%22%2F%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%2256%22%20r%3D%225%22%20fill%3D%22%23fff%22%2F%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%2256%22%20r%3D%225%22%20fill%3D%22%23fff%22%2F%3E%3Cpath%20d%3D%22M34%2078h28%22%20stroke%3D%22%23111827%22%20stroke-width%3D%225%22%2F%3E%3C%2Fsvg%3E"
+          }
+        ],
+        "hint": "Mini-aula: Revisão incremental. Esta revisão acrescenta prática real sem ultrapassar 20 questões no bloco atual."
+      },
+      {
+        "id": 6314,
+        "order_index": 1264,
+        "type": "build",
+        "prompt": "Sessão 63 — Revisão incremental · Converse sobre viagem em contexto: monte a frase em ordem natural para dizer “Onde fica a estação?”",
+        "answer": {
+          "value": [
+            "Где",
+            "вокзал?"
+          ]
+        },
+        "options": null,
+        "hint": "Mini-aula: Revisão incremental. Esta revisão acrescenta prática real sem ultrapassar 20 questões no bloco atual."
+      },
+      {
+        "id": 6315,
+        "order_index": 1265,
+        "type": "context_choice",
+        "prompt": "Sessão 63 — Revisão incremental · Converse sobre viagem em contexto: situação guiada — pratique uma fala do tema. Escolha a opção que comunica “Eu preciso de um mapa.” em Russo.",
+        "answer": {
+          "value": "Мне нужна карта."
+        },
+        "options": [
+          "Мне нужна карта.",
+          "Я еду на поезде.",
+          "Когда автобус?",
+          "Это мой багаж."
+        ],
+        "hint": "Mini-aula: Revisão incremental. Esta revisão acrescenta prática real sem ultrapassar 20 questões no bloco atual."
+      }
+    ],
+    "jp": [
+      {
+        "id": 6316,
+        "order_index": 1261,
+        "type": "choice",
+        "prompt": "Sessão 63 — Revisão incremental · Converse sobre viagem em contexto: escolha como dizer “Eu viajo para Berlim.” em Japonês",
+        "answer": {
+          "value": "東京へ旅行します。"
+        },
+        "options": [
+          "東京へ旅行します。",
+          "切符が必要です。",
+          "ホテルの予約があります。",
+          "駅はどこですか。"
+        ],
+        "hint": "Mini-aula: Revisão incremental. Esta revisão acrescenta prática real sem ultrapassar 20 questões no bloco atual."
+      },
+      {
+        "id": 6317,
+        "order_index": 1262,
+        "type": "listen_choice",
+        "prompt": "Sessão 63 — Revisão incremental · Converse sobre viagem em contexto: ouça o áudio e identifique a fala que comunica “Eu preciso de uma passagem.”",
+        "answer": {
+          "value": "切符が必要です。"
+        },
+        "options": [
+          "切符が必要です。",
+          "駅はどこですか。",
+          "地図が必要です。",
+          "電車に乗ります。"
+        ],
+        "hint": "Mini-aula: Revisão incremental. Esta revisão acrescenta prática real sem ultrapassar 20 questões no bloco atual."
+      },
+      {
+        "id": 6318,
+        "order_index": 1263,
+        "type": "image_choice",
+        "prompt": "Sessão 63 — Revisão incremental · Converse sobre viagem em contexto: observe a imagem e escolha a frase que representa “Eu tenho uma reserva de hotel.”",
+        "answer": {
+          "value": "ホテルの予約があります。"
+        },
+        "options": [
+          {
+            "label_pt": "Eu tenho uma reserva de hotel.",
+            "display_text": "ホテルの予約があります。",
+            "value": "ホテルの予約があります。",
+            "icon_key": "speech",
+            "svg": "<svg viewBox=\"0 0 96 96\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"96\" height=\"96\" rx=\"22\" fill=\"#dbeafe\"/><path d=\"M20 24h56v34H45L31 72V58H20V24z\" fill=\"#38bdf8\" stroke=\"#0f172a\" stroke-width=\"4\"/><path d=\"M32 38h32M32 48h22\" stroke=\"#fff\" stroke-width=\"5\" stroke-linecap=\"round\"/></svg>",
+            "image_src": "data:image/svg+xml;charset=UTF-8,%3Csvg%20viewBox%3D%220%200%2096%2096%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%2296%22%20height%3D%2296%22%20rx%3D%2222%22%20fill%3D%22%23dbeafe%22%2F%3E%3Cpath%20d%3D%22M20%2024h56v34H45L31%2072V58H20V24z%22%20fill%3D%22%2338bdf8%22%20stroke%3D%22%230f172a%22%20stroke-width%3D%224%22%2F%3E%3Cpath%20d%3D%22M32%2038h32M32%2048h22%22%20stroke%3D%22%23fff%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E"
+          },
+          {
+            "label_pt": "Onde fica a estação?",
+            "display_text": "駅はどこですか。",
+            "value": "駅はどこですか。",
+            "icon_key": "train",
+            "svg": "<svg viewBox=\"0 0 96 96\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"96\" height=\"96\" rx=\"22\" fill=\"#ffedd5\"/><rect x=\"24\" y=\"18\" width=\"48\" height=\"52\" rx=\"10\" fill=\"#2563eb\"/><rect x=\"32\" y=\"28\" width=\"32\" height=\"16\" rx=\"3\" fill=\"#bfdbfe\"/><circle cx=\"36\" cy=\"56\" r=\"5\" fill=\"#fff\"/><circle cx=\"60\" cy=\"56\" r=\"5\" fill=\"#fff\"/><path d=\"M34 78h28\" stroke=\"#111827\" stroke-width=\"5\"/></svg>",
+            "image_src": "data:image/svg+xml;charset=UTF-8,%3Csvg%20viewBox%3D%220%200%2096%2096%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%2296%22%20height%3D%2296%22%20rx%3D%2222%22%20fill%3D%22%23ffedd5%22%2F%3E%3Crect%20x%3D%2224%22%20y%3D%2218%22%20width%3D%2248%22%20height%3D%2252%22%20rx%3D%2210%22%20fill%3D%22%232563eb%22%2F%3E%3Crect%20x%3D%2232%22%20y%3D%2228%22%20width%3D%2232%22%20height%3D%2216%22%20rx%3D%223%22%20fill%3D%22%23bfdbfe%22%2F%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%2256%22%20r%3D%225%22%20fill%3D%22%23fff%22%2F%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%2256%22%20r%3D%225%22%20fill%3D%22%23fff%22%2F%3E%3Cpath%20d%3D%22M34%2078h28%22%20stroke%3D%22%23111827%22%20stroke-width%3D%225%22%2F%3E%3C%2Fsvg%3E"
+          },
+          {
+            "label_pt": "Eu preciso de um mapa.",
+            "display_text": "地図が必要です。",
+            "value": "地図が必要です。",
+            "icon_key": "speech",
+            "svg": "<svg viewBox=\"0 0 96 96\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"96\" height=\"96\" rx=\"22\" fill=\"#dcfce7\"/><path d=\"M20 24h56v34H45L31 72V58H20V24z\" fill=\"#38bdf8\" stroke=\"#0f172a\" stroke-width=\"4\"/><path d=\"M32 38h32M32 48h22\" stroke=\"#fff\" stroke-width=\"5\" stroke-linecap=\"round\"/></svg>",
+            "image_src": "data:image/svg+xml;charset=UTF-8,%3Csvg%20viewBox%3D%220%200%2096%2096%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%2296%22%20height%3D%2296%22%20rx%3D%2222%22%20fill%3D%22%23dcfce7%22%2F%3E%3Cpath%20d%3D%22M20%2024h56v34H45L31%2072V58H20V24z%22%20fill%3D%22%2338bdf8%22%20stroke%3D%22%230f172a%22%20stroke-width%3D%224%22%2F%3E%3Cpath%20d%3D%22M32%2038h32M32%2048h22%22%20stroke%3D%22%23fff%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E"
+          },
+          {
+            "label_pt": "Eu pego o trem.",
+            "display_text": "電車に乗ります。",
+            "value": "電車に乗ります。",
+            "icon_key": "train",
+            "svg": "<svg viewBox=\"0 0 96 96\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"96\" height=\"96\" rx=\"22\" fill=\"#fae8ff\"/><rect x=\"24\" y=\"18\" width=\"48\" height=\"52\" rx=\"10\" fill=\"#2563eb\"/><rect x=\"32\" y=\"28\" width=\"32\" height=\"16\" rx=\"3\" fill=\"#bfdbfe\"/><circle cx=\"36\" cy=\"56\" r=\"5\" fill=\"#fff\"/><circle cx=\"60\" cy=\"56\" r=\"5\" fill=\"#fff\"/><path d=\"M34 78h28\" stroke=\"#111827\" stroke-width=\"5\"/></svg>",
+            "image_src": "data:image/svg+xml;charset=UTF-8,%3Csvg%20viewBox%3D%220%200%2096%2096%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%2296%22%20height%3D%2296%22%20rx%3D%2222%22%20fill%3D%22%23fae8ff%22%2F%3E%3Crect%20x%3D%2224%22%20y%3D%2218%22%20width%3D%2248%22%20height%3D%2252%22%20rx%3D%2210%22%20fill%3D%22%232563eb%22%2F%3E%3Crect%20x%3D%2232%22%20y%3D%2228%22%20width%3D%2232%22%20height%3D%2216%22%20rx%3D%223%22%20fill%3D%22%23bfdbfe%22%2F%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%2256%22%20r%3D%225%22%20fill%3D%22%23fff%22%2F%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%2256%22%20r%3D%225%22%20fill%3D%22%23fff%22%2F%3E%3Cpath%20d%3D%22M34%2078h28%22%20stroke%3D%22%23111827%22%20stroke-width%3D%225%22%2F%3E%3C%2Fsvg%3E"
+          }
+        ],
+        "hint": "Mini-aula: Revisão incremental. Esta revisão acrescenta prática real sem ultrapassar 20 questões no bloco atual."
+      },
+      {
+        "id": 6319,
+        "order_index": 1264,
+        "type": "build",
+        "prompt": "Sessão 63 — Revisão incremental · Converse sobre viagem em contexto: monte a frase em ordem natural para dizer “Onde fica a estação?”",
+        "answer": {
+          "value": [
+            "駅",
+            "は",
+            "ど",
+            "こ",
+            "で",
+            "す",
+            "か",
+            "。"
+          ]
+        },
+        "options": null,
+        "hint": "Mini-aula: Revisão incremental. Esta revisão acrescenta prática real sem ultrapassar 20 questões no bloco atual."
+      },
+      {
+        "id": 6320,
+        "order_index": 1265,
+        "type": "context_choice",
+        "prompt": "Sessão 63 — Revisão incremental · Converse sobre viagem em contexto: situação guiada — pratique uma fala do tema. Escolha a opção que comunica “Eu preciso de um mapa.” em Japonês.",
+        "answer": {
+          "value": "地図が必要です。"
+        },
+        "options": [
+          "地図が必要です。",
+          "電車に乗ります。",
+          "バスはいつ出ますか。",
+          "これは私の荷物です。"
+        ],
+        "hint": "Mini-aula: Revisão incremental. Esta revisão acrescenta prática real sem ultrapassar 20 questões no bloco atual."
+      }
+    ],
+    "en": [
+      {
+        "id": 6321,
+        "order_index": 1261,
+        "type": "choice",
+        "prompt": "Sessão 63 — Revisão incremental · Converse sobre viagem em contexto: escolha como dizer “Eu viajo para Berlim.” em Inglês",
+        "answer": {
+          "value": "I travel to Berlin."
+        },
+        "options": [
+          "I travel to Berlin.",
+          "I need a ticket.",
+          "I have a hotel reservation.",
+          "Where is the station?"
+        ],
+        "hint": "Mini-aula: Revisão incremental. Esta revisão acrescenta prática real sem ultrapassar 20 questões no bloco atual."
+      },
+      {
+        "id": 6322,
+        "order_index": 1262,
+        "type": "listen_choice",
+        "prompt": "Sessão 63 — Revisão incremental · Converse sobre viagem em contexto: ouça o áudio e identifique a fala que comunica “Eu preciso de uma passagem.”",
+        "answer": {
+          "value": "I need a ticket."
+        },
+        "options": [
+          "I need a ticket.",
+          "Where is the station?",
+          "I need a map.",
+          "I take the train."
+        ],
+        "hint": "Mini-aula: Revisão incremental. Esta revisão acrescenta prática real sem ultrapassar 20 questões no bloco atual."
+      },
+      {
+        "id": 6323,
+        "order_index": 1263,
+        "type": "image_choice",
+        "prompt": "Sessão 63 — Revisão incremental · Converse sobre viagem em contexto: observe a imagem e escolha a frase que representa “Eu tenho uma reserva de hotel.”",
+        "answer": {
+          "value": "I have a hotel reservation."
+        },
+        "options": [
+          {
+            "label_pt": "Eu tenho uma reserva de hotel.",
+            "display_text": "I have a hotel reservation.",
+            "value": "I have a hotel reservation.",
+            "icon_key": "speech",
+            "svg": "<svg viewBox=\"0 0 96 96\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"96\" height=\"96\" rx=\"22\" fill=\"#dbeafe\"/><path d=\"M20 24h56v34H45L31 72V58H20V24z\" fill=\"#38bdf8\" stroke=\"#0f172a\" stroke-width=\"4\"/><path d=\"M32 38h32M32 48h22\" stroke=\"#fff\" stroke-width=\"5\" stroke-linecap=\"round\"/></svg>",
+            "image_src": "data:image/svg+xml;charset=UTF-8,%3Csvg%20viewBox%3D%220%200%2096%2096%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%2296%22%20height%3D%2296%22%20rx%3D%2222%22%20fill%3D%22%23dbeafe%22%2F%3E%3Cpath%20d%3D%22M20%2024h56v34H45L31%2072V58H20V24z%22%20fill%3D%22%2338bdf8%22%20stroke%3D%22%230f172a%22%20stroke-width%3D%224%22%2F%3E%3Cpath%20d%3D%22M32%2038h32M32%2048h22%22%20stroke%3D%22%23fff%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E"
+          },
+          {
+            "label_pt": "Onde fica a estação?",
+            "display_text": "Where is the station?",
+            "value": "Where is the station?",
+            "icon_key": "train",
+            "svg": "<svg viewBox=\"0 0 96 96\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"96\" height=\"96\" rx=\"22\" fill=\"#ffedd5\"/><rect x=\"24\" y=\"18\" width=\"48\" height=\"52\" rx=\"10\" fill=\"#2563eb\"/><rect x=\"32\" y=\"28\" width=\"32\" height=\"16\" rx=\"3\" fill=\"#bfdbfe\"/><circle cx=\"36\" cy=\"56\" r=\"5\" fill=\"#fff\"/><circle cx=\"60\" cy=\"56\" r=\"5\" fill=\"#fff\"/><path d=\"M34 78h28\" stroke=\"#111827\" stroke-width=\"5\"/></svg>",
+            "image_src": "data:image/svg+xml;charset=UTF-8,%3Csvg%20viewBox%3D%220%200%2096%2096%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%2296%22%20height%3D%2296%22%20rx%3D%2222%22%20fill%3D%22%23ffedd5%22%2F%3E%3Crect%20x%3D%2224%22%20y%3D%2218%22%20width%3D%2248%22%20height%3D%2252%22%20rx%3D%2210%22%20fill%3D%22%232563eb%22%2F%3E%3Crect%20x%3D%2232%22%20y%3D%2228%22%20width%3D%2232%22%20height%3D%2216%22%20rx%3D%223%22%20fill%3D%22%23bfdbfe%22%2F%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%2256%22%20r%3D%225%22%20fill%3D%22%23fff%22%2F%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%2256%22%20r%3D%225%22%20fill%3D%22%23fff%22%2F%3E%3Cpath%20d%3D%22M34%2078h28%22%20stroke%3D%22%23111827%22%20stroke-width%3D%225%22%2F%3E%3C%2Fsvg%3E"
+          },
+          {
+            "label_pt": "Eu preciso de um mapa.",
+            "display_text": "I need a map.",
+            "value": "I need a map.",
+            "icon_key": "speech",
+            "svg": "<svg viewBox=\"0 0 96 96\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"96\" height=\"96\" rx=\"22\" fill=\"#dcfce7\"/><path d=\"M20 24h56v34H45L31 72V58H20V24z\" fill=\"#38bdf8\" stroke=\"#0f172a\" stroke-width=\"4\"/><path d=\"M32 38h32M32 48h22\" stroke=\"#fff\" stroke-width=\"5\" stroke-linecap=\"round\"/></svg>",
+            "image_src": "data:image/svg+xml;charset=UTF-8,%3Csvg%20viewBox%3D%220%200%2096%2096%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%2296%22%20height%3D%2296%22%20rx%3D%2222%22%20fill%3D%22%23dcfce7%22%2F%3E%3Cpath%20d%3D%22M20%2024h56v34H45L31%2072V58H20V24z%22%20fill%3D%22%2338bdf8%22%20stroke%3D%22%230f172a%22%20stroke-width%3D%224%22%2F%3E%3Cpath%20d%3D%22M32%2038h32M32%2048h22%22%20stroke%3D%22%23fff%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E"
+          },
+          {
+            "label_pt": "Eu pego o trem.",
+            "display_text": "I take the train.",
+            "value": "I take the train.",
+            "icon_key": "train",
+            "svg": "<svg viewBox=\"0 0 96 96\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"96\" height=\"96\" rx=\"22\" fill=\"#fae8ff\"/><rect x=\"24\" y=\"18\" width=\"48\" height=\"52\" rx=\"10\" fill=\"#2563eb\"/><rect x=\"32\" y=\"28\" width=\"32\" height=\"16\" rx=\"3\" fill=\"#bfdbfe\"/><circle cx=\"36\" cy=\"56\" r=\"5\" fill=\"#fff\"/><circle cx=\"60\" cy=\"56\" r=\"5\" fill=\"#fff\"/><path d=\"M34 78h28\" stroke=\"#111827\" stroke-width=\"5\"/></svg>",
+            "image_src": "data:image/svg+xml;charset=UTF-8,%3Csvg%20viewBox%3D%220%200%2096%2096%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%2296%22%20height%3D%2296%22%20rx%3D%2222%22%20fill%3D%22%23fae8ff%22%2F%3E%3Crect%20x%3D%2224%22%20y%3D%2218%22%20width%3D%2248%22%20height%3D%2252%22%20rx%3D%2210%22%20fill%3D%22%232563eb%22%2F%3E%3Crect%20x%3D%2232%22%20y%3D%2228%22%20width%3D%2232%22%20height%3D%2216%22%20rx%3D%223%22%20fill%3D%22%23bfdbfe%22%2F%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%2256%22%20r%3D%225%22%20fill%3D%22%23fff%22%2F%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%2256%22%20r%3D%225%22%20fill%3D%22%23fff%22%2F%3E%3Cpath%20d%3D%22M34%2078h28%22%20stroke%3D%22%23111827%22%20stroke-width%3D%225%22%2F%3E%3C%2Fsvg%3E"
+          }
+        ],
+        "hint": "Mini-aula: Revisão incremental. Esta revisão acrescenta prática real sem ultrapassar 20 questões no bloco atual."
+      },
+      {
+        "id": 6324,
+        "order_index": 1264,
+        "type": "build",
+        "prompt": "Sessão 63 — Revisão incremental · Converse sobre viagem em contexto: monte a frase em ordem natural para dizer “Onde fica a estação?”",
+        "answer": {
+          "value": [
+            "Where",
+            "is",
+            "the",
+            "station?"
+          ]
+        },
+        "options": null,
+        "hint": "Mini-aula: Revisão incremental. Esta revisão acrescenta prática real sem ultrapassar 20 questões no bloco atual."
+      },
+      {
+        "id": 6325,
+        "order_index": 1265,
+        "type": "context_choice",
+        "prompt": "Sessão 63 — Revisão incremental · Converse sobre viagem em contexto: situação guiada — pratique uma fala do tema. Escolha a opção que comunica “Eu preciso de um mapa.” em Inglês.",
+        "answer": {
+          "value": "I need a map."
+        },
+        "options": [
+          "I need a map.",
+          "I take the train.",
+          "When does the bus leave?",
+          "This is my luggage."
+        ],
+        "hint": "Mini-aula: Revisão incremental. Esta revisão acrescenta prática real sem ultrapassar 20 questões no bloco atual."
+      }
+    ]
+  }
+}
