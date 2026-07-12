@@ -10,7 +10,7 @@
 ### Status Atual
 - **Onda:** 1 de 4
 - **Fase:** FASE 1 — Alfabeto & Fonética
-- **Dia da Onda:** 12 / 56
+- **Dia da Onda:** 13 / 56
 - **Início:** 2026-06-29
 - **Previsão de Término:** 2026-08-23
 
@@ -25,7 +25,7 @@
 ### Métricas Acumuladas
 | Métrica | Valor | Meta da Onda |
 |---------|-------|--------------|
-| Vocabulário ativo | 97 | 200 |
+| Vocabulário ativo | 105 | 200 |
 | Frases construídas | 0 | 70 |
 | Horas de input | 0h | 18h |
 | Músicas analisadas | 0 | 10 |
@@ -82,6 +82,7 @@ DATA | ATIVIDADE | TEMPO | NOTA
 2026-07-09 | Auto-populamento: vocabulário de “Moskau”, treino `st` inicial, `z=ts`, finais secos e quiz fonético | 20-30 min | Conteúdo novo criado para FASE 1
 2026-07-10 | Auto-populamento: vocabulário de “Links 2 3 4”, treino contagem, `v=f`, cortes finais e quiz fonético | 20-30 min | Conteúdo novo criado para FASE 1
 2026-07-11 | Auto-populamento: vocabulário de “Sehnsucht”, treino `ch` gutural/fino, vogais longas e quiz fonético | 20-30 min | Conteúdo novo criado para FASE 1
+2026-07-12 | Auto-populamento: vocabulário de “Amerika”, treino `w=v`, finais secos, `z=ts` e quiz fonético | 20-30 min | Conteúdo novo criado para FASE 1
 ```
 
 *(continue para semanas 3-8)*
@@ -99,4 +100,4 @@ DATA | ATIVIDADE | TEMPO | NOTA
 
 ---
 
-*Última atualização: 2026-07-11*
+*Última atualização: 2026-07-12*
