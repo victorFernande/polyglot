@@ -1,0 +1,1 @@
+PASS: nenhum padrão frontend-only proibido em Exercises.jsx
