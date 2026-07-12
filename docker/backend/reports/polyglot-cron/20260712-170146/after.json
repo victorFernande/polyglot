@@ -1,0 +1,11 @@
+{
+  "timestamp": "2026-07-12T17:01:46.610101",
+  "db": "docker/backend/polyglot.db",
+  "counts": {
+    "de": 1260,
+    "fr": 1260,
+    "ru": 1260,
+    "jp": 1260,
+    "en": 1260
+  }
+}
