@@ -1,0 +1,8 @@
+{
+  "de": {"items": 1255},
+  "fr": {"items": 1255},
+  "ru": {"items": 1255},
+  "jp": {"items": 1255},
+  "en": {"items": 1255},
+  "note": "Derived from cron_add_incremental_exercises delta output (+5 each) and post-run snapshot of 1260 each; initial direct snapshot with system python failed due missing sqlalchemy."
+}
