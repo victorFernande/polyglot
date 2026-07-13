@@ -1,0 +1,426 @@
+{
+  "total": 20,
+  "verdicts": {
+    "PASS": 20
+  },
+  "issue_codes": {},
+  "model_reviews": [
+    {
+      "model": "cx/gpt-5.5",
+      "status": "ok",
+      "review": "REVISE\n\nGaps encontrados:\n- Metadados incoerentes: `unit_title` = “Exponha preferências” e `topic` = “opinião”, mas os exercícios tratam de apresentação pessoal e viagem.\n- Sessão 63: tema “Converse sobre viagem” não se alinha ao tópico declarado “opinião”.\n- Sessão 62: “Apresente-se em contexto” também não se alinha claramente a “Exponha preferências”, embora algumas frases como “I like music” sejam compatíveis.\n- Para iniciante absoluto, alguns itens da sessão 63 podem estar levemente acima do esperado: “hotel reservation”, “When does the bus leave?”, “luggage”.\n- “I travel to Berlin.” traduz “Eu viajo para Berlim.”, mas pode soar habitual/genérico; para contexto de viagem imediata, “I’m traveling to Berlin” seria mais natural. Não é erro fatal, mas é ponto de revisão.\n\nSem evidência para BLOCK. Conteúdo linguístico majoritariamente correto, mas requer ajuste de alinhamento curricular/metadados."
+    },
+    {
+      "model": "kimi/kimi-k2.6",
+      "status": "ok",
+      "review": "# Relatório de Auditoria — Polyglot Iniciante Absoluto\n\n## Veredito Geral: **REVISE**\n\n---\n\n## Resumo\n- **Verdicts do sistema:** 20 PASS, 0 issues reportadas.\n- **Amostras analisadas:** 20 (índices 1231–1250), sessões 62–63, unidade 10 \"Exponha preferências\", tópico \"opinião\".\n\n---\n\n## Gaps Críticos Identificados\n\n### 🔴 GAP 1 — Desalinhamento de Unidade/Tópico (BLOQUEANTE)\n- **Unidade 10 = \"Exponha preferências\"** e **tópico = \"opinião\"**, mas **nenhum** dos 20 exercícios trabalha preferências ou opiniões.\n- Sessão 62: apresentação pessoal (\"My name is Victor\", \"I am from Brazil\", \"I speak Portuguese\").\n- Sessão 63: viagem (\"I travel to Berlin\", \"I need a ticket\", \"Where is the station?\").\n- **Impacto:** metadados enganosos; o aluno busca \"preferências/opinião\" e recebe \"apresentação/viagem\". Viola coerência curricular.\n\n### 🟠 GAP 2 — Desalinhamento de Dificuldade\n- Dificuldade declarada **62–63/100** (intermediária), mas o conteúdo é **A1 básico** (frases de apresentação e viagem elementares).\n- **Impacto:** curva de dificuldade inflada; inadequado para progressão real do iniciante.\n\n### 🟡 GAP 3 — `sequence_dialogue` não é diálogo\n- Índices 1238 e 1249: tipo `sequence_dialogue`, mas as sequências são frases soltas sem estrutura dialógica (sem alternância de interlocutores/pergunta-resposta lógica).\n- Ex.: 1238 ordena \"Where are you from?\" → \"I like music.\" → \"Nice to meet you.\" → \"My name is Victor.\" — não forma conversa coerente.\n\n### 🟡 GAP 4 — Prompts genéricos/repetitivos\n- `context_choice` (1234, 1239, 1245, 1250) usa texto placeholder \"situação guiada — pratique uma fala do tema\" sem contexto real.\n\n---\n\n## Pontos Positivos\n- Traduções EN↔PT corretas e naturais em todas as amostras.\n- Ordens de `build`/`listen_build` gramaticalmente corretas.\n- Pares `listen_match` coerentes.\n\n---\n\n## Recomendação\n**REVISE** — corrigir metadados de unidade/tópico (GAP 1) e recalibrar dificuldade (GAP 2) antes de publicar. GAPs 3–4 recomendados, não bloqueantes."
+    }
+  ],
+  "items": [
+    {
+      "language": "en",
+      "language_name": "Inglês",
+      "index": 1231,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 62,
+      "question_in_session": 11,
+      "type": "listen_choice",
+      "prompt": "Sessão 62 · dificuldade 62/100 — Apresente-se em contexto: ouça o áudio e identifique a fala que comunica “Meu nome é Victor.”",
+      "answer": "My name is Victor.",
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "en",
+      "language_name": "Inglês",
+      "index": 1232,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 62,
+      "question_in_session": 12,
+      "type": "image_choice",
+      "prompt": "Sessão 62 · dificuldade 62/100 — Apresente-se em contexto: observe a imagem e escolha a frase que representa “Eu sou do Brasil.”",
+      "answer": "I am from Brazil.",
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "en",
+      "language_name": "Inglês",
+      "index": 1233,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 62,
+      "question_in_session": 13,
+      "type": "build",
+      "prompt": "Sessão 62 · dificuldade 62/100 — Apresente-se em contexto: monte a frase em ordem natural para dizer “Eu moro em São Paulo.”",
+      "answer": [
+        "I",
+        "live",
+        "in",
+        "São",
+        "Paulo."
+      ],
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "en",
+      "language_name": "Inglês",
+      "index": 1234,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 62,
+      "question_in_session": 14,
+      "type": "context_choice",
+      "prompt": "Sessão 62 · dificuldade 62/100 — Apresente-se em contexto: situação guiada — pratique uma fala do tema. Escolha a opção que comunica “Eu falo português.” em Inglês.",
+      "answer": "I speak Portuguese.",
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "en",
+      "language_name": "Inglês",
+      "index": 1235,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 62,
+      "question_in_session": 15,
+      "type": "listen_match",
+      "prompt": "Sessão 62 · dificuldade 62/100 — Apresente-se em contexto: ouça cada áudio em Inglês e selecione a tradução em português",
+      "answer": [
+        [
+          "I am a teacher.",
+          "Eu sou professor."
+        ],
+        [
+          "I study English.",
+          "Eu estudo inglês."
+        ],
+        [
+          "What is your name?",
+          "Como você se chama?"
+        ],
+        [
+          "Where are you from?",
+          "De onde você é?"
+        ]
+      ],
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "en",
+      "language_name": "Inglês",
+      "index": 1236,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 62,
+      "question_in_session": 16,
+      "type": "choice",
+      "prompt": "Sessão 62 · dificuldade 62/100 — Apresente-se em contexto: escolha como dizer “Eu estudo inglês.” em Inglês",
+      "answer": "I study English.",
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "en",
+      "language_name": "Inglês",
+      "index": 1237,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 62,
+      "question_in_session": 17,
+      "type": "listen_build",
+      "prompt": "Sessão 62 · dificuldade 62/100 — Apresente-se em contexto: ouça e monte em ordem natural — “Como você se chama?”",
+      "answer": [
+        "What",
+        "is",
+        "your",
+        "name?"
+      ],
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "en",
+      "language_name": "Inglês",
+      "index": 1238,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 62,
+      "question_in_session": 18,
+      "type": "sequence_dialogue",
+      "prompt": "Sessão 62 · dificuldade 62/100 — Apresente-se em contexto: prática guiada de ordem — organize os cartões exatamente assim: primeiro “De onde você é?”; depois “Eu gosto de música.”; em seguida “Prazer em conhecer você.”; por fim “Meu nome é Victor.”",
+      "answer": [
+        "Where are you from?",
+        "I like music.",
+        "Nice to meet you.",
+        "My name is Victor."
+      ],
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "en",
+      "language_name": "Inglês",
+      "index": 1239,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 62,
+      "question_in_session": 19,
+      "type": "context_choice",
+      "prompt": "Sessão 62 · dificuldade 62/100 — Apresente-se em contexto: situação guiada — pratique uma fala do tema. Escolha a opção que comunica “Eu gosto de música.” em Inglês.",
+      "answer": "I like music.",
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "en",
+      "language_name": "Inglês",
+      "index": 1240,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 62,
+      "question_in_session": 20,
+      "type": "choice",
+      "prompt": "Sessão 62 · dificuldade 62/100 — Apresente-se em contexto: escolha como dizer “Prazer em conhecer você.” em Inglês",
+      "answer": "Nice to meet you.",
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "en",
+      "language_name": "Inglês",
+      "index": 1241,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 63,
+      "question_in_session": 1,
+      "type": "choice",
+      "prompt": "Sessão 63 · dificuldade 63/100 — Converse sobre viagem em contexto: escolha como dizer “Eu viajo para Berlim.” em Inglês",
+      "answer": "I travel to Berlin.",
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "en",
+      "language_name": "Inglês",
+      "index": 1242,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 63,
+      "question_in_session": 2,
+      "type": "listen_choice",
+      "prompt": "Sessão 63 · dificuldade 63/100 — Converse sobre viagem em contexto: ouça o áudio e identifique a fala que comunica “Eu preciso de uma passagem.”",
+      "answer": "I need a ticket.",
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "en",
+      "language_name": "Inglês",
+      "index": 1243,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 63,
+      "question_in_session": 3,
+      "type": "image_choice",
+      "prompt": "Sessão 63 · dificuldade 63/100 — Converse sobre viagem em contexto: observe a imagem e escolha a frase que representa “Eu tenho uma reserva de hotel.”",
+      "answer": "I have a hotel reservation.",
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "en",
+      "language_name": "Inglês",
+      "index": 1244,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 63,
+      "question_in_session": 4,
+      "type": "build",
+      "prompt": "Sessão 63 · dificuldade 63/100 — Converse sobre viagem em contexto: monte a frase em ordem natural para dizer “Onde fica a estação?”",
+      "answer": [
+        "Where",
+        "is",
+        "the",
+        "station?"
+      ],
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "en",
+      "language_name": "Inglês",
+      "index": 1245,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 63,
+      "question_in_session": 5,
+      "type": "context_choice",
+      "prompt": "Sessão 63 · dificuldade 63/100 — Converse sobre viagem em contexto: situação guiada — pratique uma fala do tema. Escolha a opção que comunica “Eu preciso de um mapa.” em Inglês.",
+      "answer": "I need a map.",
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "en",
+      "language_name": "Inglês",
+      "index": 1246,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 63,
+      "question_in_session": 6,
+      "type": "listen_match",
+      "prompt": "Sessão 63 · dificuldade 63/100 — Converse sobre viagem em contexto: ouça cada áudio em Inglês e selecione a tradução em português",
+      "answer": [
+        [
+          "I take the train.",
+          "Eu pego o trem."
+        ],
+        [
+          "When does the bus leave?",
+          "A que horas sai o ônibus?"
+        ],
+        [
+          "This is my luggage.",
+          "Esta é minha bagagem."
+        ],
+        [
+          "I need help.",
+          "Eu preciso de ajuda."
+        ]
+      ],
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "en",
+      "language_name": "Inglês",
+      "index": 1247,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 63,
+      "question_in_session": 7,
+      "type": "choice",
+      "prompt": "Sessão 63 · dificuldade 63/100 — Converse sobre viagem em contexto: escolha como dizer “A que horas sai o ônibus?” em Inglês",
+      "answer": "When does the bus leave?",
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "en",
+      "language_name": "Inglês",
+      "index": 1248,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 63,
+      "question_in_session": 8,
+      "type": "listen_build",
+      "prompt": "Sessão 63 · dificuldade 63/100 — Converse sobre viagem em contexto: ouça e monte em ordem natural — “Esta é minha bagagem.”",
+      "answer": [
+        "This",
+        "is",
+        "my",
+        "luggage."
+      ],
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "en",
+      "language_name": "Inglês",
+      "index": 1249,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 63,
+      "question_in_session": 9,
+      "type": "sequence_dialogue",
+      "prompt": "Sessão 63 · dificuldade 63/100 — Converse sobre viagem em contexto: prática guiada de ordem — organize os cartões exatamente assim: primeiro “Eu preciso de ajuda.”; depois “Eu chego hoje.”; em seguida “Eu viajo para Berlim.”; por fim “Eu preciso de uma passagem.”",
+      "answer": [
+        "I need help.",
+        "I arrive today.",
+        "I travel to Berlin.",
+        "I need a ticket."
+      ],
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "en",
+      "language_name": "Inglês",
+      "index": 1250,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 63,
+      "question_in_session": 10,
+      "type": "context_choice",
+      "prompt": "Sessão 63 · dificuldade 63/100 — Converse sobre viagem em contexto: situação guiada — pratique uma fala do tema. Escolha a opção que comunica “Eu chego hoje.” em Inglês.",
+      "answer": "I arrive today.",
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    }
+  ]
+}
