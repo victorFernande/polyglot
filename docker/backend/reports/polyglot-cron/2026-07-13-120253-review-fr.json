@@ -1,0 +1,425 @@
+{
+  "total": 20,
+  "verdicts": {
+    "PASS": 20
+  },
+  "issue_codes": {},
+  "model_reviews": [
+    {
+      "model": "cx/gpt-5.5",
+      "status": "ok",
+      "review": "REVISE\n\nGaps identificados:\n- Alinhamento pedagógico inconsistente: unidade “Exponha preferências” e tópico “opinião”, mas várias atividades tratam de apresentação pessoal e viagem.\n- Nível declarado não combina com “iniciante absoluto”: dificuldade 62/100–63/100 sugere progressão intermediária, não início absoluto.\n- Algumas respostas são aceitáveis, mas com nuances não explicitadas para iniciantes:\n  - “Enchanté.” pode variar por gênero/contexto.\n  - “Je suis professeur.” traduzido como “Eu sou professor.” não cobre forma feminina.\n  - “Le bus part quand ?” é natural/coloquial, mas “Quand part le bus ?” seria forma mais padrão.\n- Sequências de diálogo são mecanicamente corretas, mas pouco naturais como diálogo real.\n\nNão há motivo para BLOCK: as amostras estão majoritariamente corretas e compreensíveis."
+    },
+    {
+      "model": "kimi/kimi-k2.6",
+      "status": "ok",
+      "review": "# Relatório de Auditoria — Conteúdo Polyglot (Francês, iniciante absoluto)\n\n## Veredito: **REVISE**\n\nIssue codes vazios e amostras gramaticalmente corretas, mas há **incoerência estrutural de metadados** que impede PASS limpo.\n\n---\n\n## Gaps identificados\n\n### 1. Desalinhamento Unidade/Tópico vs. Conteúdo (CRÍTICO)\n- `unit_title`: \"Exponha preferências\" / `topic`: \"opinião\"\n- Conteúdo real da **Sessão 62**: apresentação pessoal (nome, origem, profissão, idioma)\n- Conteúdo real da **Sessão 63**: viagem (passagem, hotel, estação, bagagem)\n- **Nenhum item aborda preferências ou opinião.** O único item tangencial é \"J'aime la musique.\" (gosto ≠ opinião/preferência exposta como tema central).\n- Metadados enganosos prejudicam rastreabilidade curricular e progressão do aluno.\n\n### 2. Dificuldade declarada vs. nível real (MODERADO)\n- Sessões marcadas como dificuldade **62/100 e 63/100** (intermediário).\n- Frases são de **iniciante absoluto** (A1): \"Je m'appelle Victor.\", \"Enchanté.\", \"Où est la gare ?\"\n- Para um produto \"iniciante absoluto\", a calibragem de dificuldade está inflada e inconsistente com o material.\n\n### 3. Coerência linguística (OK)\n- Gramática, ortografia e traduções corretas em todos os 20 itens.\n- \"Je viens du Brésil.\", \"J'habite à São Paulo.\", \"J'arrive aujourd'hui.\" — corretos.\n- \"Le bus part quand ?\" — registro informal aceitável para A1, mas \"À quelle heure part le bus ?\" seria mais alinhado ao prompt (\"A que horas...\"). Não bloqueante.\n\n---\n\n## Recomendação\n**REVISE** — corrigir `unit_title`/`topic` para refletir o conteúdo real (ex.: Sessão 62 → \"Apresente-se\"; Sessão 63 → \"Viagem\") e recalibrar a dificuldade para a faixa de iniciante. Conteúdo linguístico em si não requer alteração."
+    }
+  ],
+  "items": [
+    {
+      "language": "fr",
+      "language_name": "Francês",
+      "index": 1231,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 62,
+      "question_in_session": 11,
+      "type": "listen_choice",
+      "prompt": "Sessão 62 · dificuldade 62/100 — Apresente-se em contexto: ouça o áudio e identifique a fala que comunica “Meu nome é Victor.”",
+      "answer": "Je m'appelle Victor.",
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "fr",
+      "language_name": "Francês",
+      "index": 1232,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 62,
+      "question_in_session": 12,
+      "type": "image_choice",
+      "prompt": "Sessão 62 · dificuldade 62/100 — Apresente-se em contexto: observe a imagem e escolha a frase que representa “Eu sou do Brasil.”",
+      "answer": "Je viens du Brésil.",
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "fr",
+      "language_name": "Francês",
+      "index": 1233,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 62,
+      "question_in_session": 13,
+      "type": "build",
+      "prompt": "Sessão 62 · dificuldade 62/100 — Apresente-se em contexto: monte a frase em ordem natural para dizer “Eu moro em São Paulo.”",
+      "answer": [
+        "J'habite",
+        "à",
+        "São",
+        "Paulo."
+      ],
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "fr",
+      "language_name": "Francês",
+      "index": 1234,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 62,
+      "question_in_session": 14,
+      "type": "context_choice",
+      "prompt": "Sessão 62 · dificuldade 62/100 — Apresente-se em contexto: situação guiada — pratique uma fala do tema. Escolha a opção que comunica “Eu falo português.” em Francês.",
+      "answer": "Je parle portugais.",
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "fr",
+      "language_name": "Francês",
+      "index": 1235,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 62,
+      "question_in_session": 15,
+      "type": "listen_match",
+      "prompt": "Sessão 62 · dificuldade 62/100 — Apresente-se em contexto: ouça cada áudio em Francês e selecione a tradução em português",
+      "answer": [
+        [
+          "Je suis professeur.",
+          "Eu sou professor."
+        ],
+        [
+          "J'apprends le français.",
+          "Eu estudo francês."
+        ],
+        [
+          "Comment tu t'appelles ?",
+          "Como você se chama?"
+        ],
+        [
+          "Tu viens d'où ?",
+          "De onde você é?"
+        ]
+      ],
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "fr",
+      "language_name": "Francês",
+      "index": 1236,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 62,
+      "question_in_session": 16,
+      "type": "choice",
+      "prompt": "Sessão 62 · dificuldade 62/100 — Apresente-se em contexto: escolha como dizer “Eu estudo francês.” em Francês",
+      "answer": "J'apprends le français.",
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "fr",
+      "language_name": "Francês",
+      "index": 1237,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 62,
+      "question_in_session": 17,
+      "type": "listen_build",
+      "prompt": "Sessão 62 · dificuldade 62/100 — Apresente-se em contexto: ouça e monte em ordem natural — “Como você se chama?”",
+      "answer": [
+        "Comment",
+        "tu",
+        "t'appelles",
+        "?"
+      ],
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "fr",
+      "language_name": "Francês",
+      "index": 1238,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 62,
+      "question_in_session": 18,
+      "type": "sequence_dialogue",
+      "prompt": "Sessão 62 · dificuldade 62/100 — Apresente-se em contexto: prática guiada de ordem — organize os cartões exatamente assim: primeiro “De onde você é?”; depois “Eu gosto de música.”; em seguida “Prazer em conhecer você.”; por fim “Meu nome é Victor.”",
+      "answer": [
+        "Tu viens d'où ?",
+        "J'aime la musique.",
+        "Enchanté.",
+        "Je m'appelle Victor."
+      ],
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "fr",
+      "language_name": "Francês",
+      "index": 1239,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 62,
+      "question_in_session": 19,
+      "type": "context_choice",
+      "prompt": "Sessão 62 · dificuldade 62/100 — Apresente-se em contexto: situação guiada — pratique uma fala do tema. Escolha a opção que comunica “Eu gosto de música.” em Francês.",
+      "answer": "J'aime la musique.",
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "fr",
+      "language_name": "Francês",
+      "index": 1240,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 62,
+      "question_in_session": 20,
+      "type": "choice",
+      "prompt": "Sessão 62 · dificuldade 62/100 — Apresente-se em contexto: escolha como dizer “Prazer em conhecer você.” em Francês",
+      "answer": "Enchanté.",
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "fr",
+      "language_name": "Francês",
+      "index": 1241,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 63,
+      "question_in_session": 1,
+      "type": "choice",
+      "prompt": "Sessão 63 · dificuldade 63/100 — Converse sobre viagem em contexto: escolha como dizer “Eu viajo para Berlim.” em Francês",
+      "answer": "Je voyage à Berlin.",
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "fr",
+      "language_name": "Francês",
+      "index": 1242,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 63,
+      "question_in_session": 2,
+      "type": "listen_choice",
+      "prompt": "Sessão 63 · dificuldade 63/100 — Converse sobre viagem em contexto: ouça o áudio e identifique a fala que comunica “Eu preciso de uma passagem.”",
+      "answer": "J'ai besoin d'un billet.",
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "fr",
+      "language_name": "Francês",
+      "index": 1243,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 63,
+      "question_in_session": 3,
+      "type": "image_choice",
+      "prompt": "Sessão 63 · dificuldade 63/100 — Converse sobre viagem em contexto: observe a imagem e escolha a frase que representa “Eu tenho uma reserva de hotel.”",
+      "answer": "J'ai une réservation d'hôtel.",
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "fr",
+      "language_name": "Francês",
+      "index": 1244,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 63,
+      "question_in_session": 4,
+      "type": "build",
+      "prompt": "Sessão 63 · dificuldade 63/100 — Converse sobre viagem em contexto: monte a frase em ordem natural para dizer “Onde fica a estação?”",
+      "answer": [
+        "Où",
+        "est",
+        "la",
+        "gare",
+        "?"
+      ],
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "fr",
+      "language_name": "Francês",
+      "index": 1245,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 63,
+      "question_in_session": 5,
+      "type": "context_choice",
+      "prompt": "Sessão 63 · dificuldade 63/100 — Converse sobre viagem em contexto: situação guiada — pratique uma fala do tema. Escolha a opção que comunica “Eu preciso de um mapa.” em Francês.",
+      "answer": "J'ai besoin d'une carte.",
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "fr",
+      "language_name": "Francês",
+      "index": 1246,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 63,
+      "question_in_session": 6,
+      "type": "listen_match",
+      "prompt": "Sessão 63 · dificuldade 63/100 — Converse sobre viagem em contexto: ouça cada áudio em Francês e selecione a tradução em português",
+      "answer": [
+        [
+          "Je prends le train.",
+          "Eu pego o trem."
+        ],
+        [
+          "Le bus part quand ?",
+          "A que horas sai o ônibus?"
+        ],
+        [
+          "C'est mon bagage.",
+          "Esta é minha bagagem."
+        ],
+        [
+          "J'ai besoin d'aide.",
+          "Eu preciso de ajuda."
+        ]
+      ],
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "fr",
+      "language_name": "Francês",
+      "index": 1247,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 63,
+      "question_in_session": 7,
+      "type": "choice",
+      "prompt": "Sessão 63 · dificuldade 63/100 — Converse sobre viagem em contexto: escolha como dizer “A que horas sai o ônibus?” em Francês",
+      "answer": "Le bus part quand ?",
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "fr",
+      "language_name": "Francês",
+      "index": 1248,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 63,
+      "question_in_session": 8,
+      "type": "listen_build",
+      "prompt": "Sessão 63 · dificuldade 63/100 — Converse sobre viagem em contexto: ouça e monte em ordem natural — “Esta é minha bagagem.”",
+      "answer": [
+        "C'est",
+        "mon",
+        "bagage."
+      ],
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "fr",
+      "language_name": "Francês",
+      "index": 1249,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 63,
+      "question_in_session": 9,
+      "type": "sequence_dialogue",
+      "prompt": "Sessão 63 · dificuldade 63/100 — Converse sobre viagem em contexto: prática guiada de ordem — organize os cartões exatamente assim: primeiro “Eu preciso de ajuda.”; depois “Eu chego hoje.”; em seguida “Eu viajo para Berlim.”; por fim “Eu preciso de uma passagem.”",
+      "answer": [
+        "J'ai besoin d'aide.",
+        "J'arrive aujourd'hui.",
+        "Je voyage à Berlin.",
+        "J'ai besoin d'un billet."
+      ],
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    },
+    {
+      "language": "fr",
+      "language_name": "Francês",
+      "index": 1250,
+      "unit_number": 10,
+      "unit_title": "Exponha preferências",
+      "topic_number": 10,
+      "topic": "opinião",
+      "session_number": 63,
+      "question_in_session": 10,
+      "type": "context_choice",
+      "prompt": "Sessão 63 · dificuldade 63/100 — Converse sobre viagem em contexto: situação guiada — pratique uma fala do tema. Escolha a opção que comunica “Eu chego hoje.” em Francês.",
+      "answer": "J'arrive aujourd'hui.",
+      "verdict": "PASS",
+      "severity": "none",
+      "issues": []
+    }
+  ]
+}
