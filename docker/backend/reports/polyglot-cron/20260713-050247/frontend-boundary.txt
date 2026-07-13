@@ -1,0 +1,1 @@
+PASS forbidden frontend-only extra/local practice check
