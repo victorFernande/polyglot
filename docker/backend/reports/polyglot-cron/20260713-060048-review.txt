@@ -1,0 +1,5 @@
+## POLYGLOT-QA Review
+- Total reviewed: 100
+- Verdicts: {'PASS': 100}
+- Top issue codes: []
+- Model reviews: [{'model': 'cx/gpt-5.5', 'status': 'ok'}, {'model': 'kimi/kimi-k2.6', 'status': 'ok'}]
