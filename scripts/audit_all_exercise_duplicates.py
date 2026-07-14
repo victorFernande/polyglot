@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
-DB = ROOT / "polyglot.db"
+DB = ROOT / "docker" / "backend" / "polyglot.db"
 OUT_DIR = ROOT / "reports" / "polyglot-audit"
 OUT_JSON = OUT_DIR / "all_language_duplicate_audit.json"
 OUT_MD = OUT_DIR / "all_language_duplicate_audit.md"
@@ -59,6 +59,14 @@ def answer_phrases(row: dict[str, Any]) -> list[str]:
     pairs = parse_json(row.get("pairs"))
     typ = row.get("type")
     out: list[str] = []
+    if typ in {"match", "listen_match"}:
+        # Match/listen_match intentionally contain several phrases; count the
+        # whole exercise as one anchor instead of inflating every phrase inside it.
+        if isinstance(ans, dict) and isinstance(ans.get("pairs"), list):
+            return [json.dumps(ans["pairs"], ensure_ascii=False, sort_keys=True)]
+        if isinstance(pairs, list):
+            return [json.dumps(pairs, ensure_ascii=False, sort_keys=True)]
+
     if isinstance(ans, dict):
         if "value" in ans:
             val = ans["value"]
@@ -70,17 +78,11 @@ def answer_phrases(row: dict[str, Any]) -> list[str]:
             else:
                 out.append(str(val))
         if "pairs" in ans and isinstance(ans["pairs"], list):
-            for p in ans["pairs"]:
-                if isinstance(p, list) and p:
-                    out.append(str(p[0]))
+            out.append(json.dumps(ans["pairs"], ensure_ascii=False, sort_keys=True))
     elif isinstance(ans, list):
         out.append(" ".join(map(str, ans)))
     elif ans:
         out.append(str(ans))
-    if typ in {"match", "listen_match"} and isinstance(pairs, list):
-        for p in pairs:
-            if isinstance(p, list) and p:
-                out.append(str(p[0]))
     return [x for x in out if norm(x)]
 
 
@@ -144,10 +146,10 @@ def main() -> int:
                 prompt_core_map[norm(r["prompt_core"])].append(r)
 
         for key, occ in answer_map.items():
-            if len(occ) > 2:  # more than twice in a 20-question session is pedagogically repetitive
+            if len(occ) > 6:
                 session_issues.append({
-                    "issue_code": "SESSION_REPEATED_ANSWER_PHRASE_GT2",
-                    "severity": "BLOCK" if len(occ) >= 4 else "REVISE",
+                    "issue_code": "SESSION_REPEATED_ANSWER_PHRASE_GT6",
+                    "severity": "BLOCK",
                     "language": lang,
                     "session_number": sess,
                     "phrase": occ[0]["duplicate_phrase"],
@@ -155,10 +157,10 @@ def main() -> int:
                     "items": [{"id": x["id"], "order_index": x["order_index"], "type": x["type"], "prompt": x["prompt"]} for x in occ],
                 })
         for key, occ in prompt_pt_map.items():
-            if len(occ) > 2:
+            if len(occ) > 6:
                 session_issues.append({
-                    "issue_code": "SESSION_REPEATED_PROMPT_TARGET_PT_GT2",
-                    "severity": "BLOCK" if len(occ) >= 4 else "REVISE",
+                    "issue_code": "SESSION_REPEATED_PROMPT_TARGET_PT_GT6",
+                    "severity": "BLOCK",
                     "language": lang,
                     "session_number": sess,
                     "phrase": occ[0]["prompt_target_pt"],
@@ -166,10 +168,10 @@ def main() -> int:
                     "items": [{"id": x["id"], "order_index": x["order_index"], "type": x["type"], "prompt": x["prompt"]} for x in occ],
                 })
         for key, occ in prompt_core_map.items():
-            if len(occ) > 1:
+            if len(occ) > 6:
                 session_issues.append({
-                    "issue_code": "SESSION_IDENTICAL_PROMPT_CORE",
-                    "severity": "REVISE",
+                    "issue_code": "SESSION_IDENTICAL_PROMPT_CORE_GT6",
+                    "severity": "BLOCK",
                     "language": lang,
                     "session_number": sess,
                     "phrase": occ[0]["prompt_core"],

@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Snapshot current ExerciseItem counts per active language from local polyglot.db."""
+"""Snapshot current ExerciseItem counts per active language from backend DB."""
 import os, sys
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "docker" / "backend"))
-os.environ.setdefault("DATABASE_URL", f"sqlite:///{ROOT / 'polyglot.db'}")
+os.environ.setdefault("DATABASE_URL", f"sqlite:///{ROOT / 'docker' / 'backend' / 'polyglot.db'}")
 from services import ExerciseService
 from models import SessionLocal, ExerciseLesson, ExerciseItem
 

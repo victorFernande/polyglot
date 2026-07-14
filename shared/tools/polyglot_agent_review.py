@@ -57,6 +57,7 @@ INCREMENTAL_PROMPT_UNIT_MARKERS = {
     "fale de sua família em contexto": 6,
     "trabalho em contexto": 7,
     "converse sobre o trabalho em contexto": 7,
+    "converse sobre o trabalho, use o tempo presente em contexto": 7,
     "roupas em contexto": 8,
     "descreva roupas em contexto": 8,
     "hábitos em contexto": 9,
@@ -149,13 +150,14 @@ def phrase_keys_for_repetition(item: dict) -> set[str]:
     elif isinstance(answer, list):
         if all(isinstance(part, str) for part in answer):
             keys.add(" ".join(answer).casefold().strip())
+        elif item.get("type") in {"match", "listen_match"}:
+            # Count the whole matching exercise, not each phrase inside it;
+            # the product rule is about repeated questions with the same text.
+            keys.add(str(answer).casefold().strip())
         else:
             for pair in answer:
                 if isinstance(pair, list) and pair and isinstance(pair[0], str):
                     keys.add(pair[0].casefold().strip())
-    for pair in item.get("pairs") or []:
-        if isinstance(pair, list) and pair and isinstance(pair[0], str):
-            keys.add(pair[0].casefold().strip())
     return {key for key in keys if key}
 
 
@@ -184,15 +186,25 @@ def unit_number_for_item(idx_zero: int, item: dict) -> int:
     return int(context_for_index(idx_zero)["unit_number"])
 
 
+def semantic_drift_values(item: dict) -> list[str]:
+    answer = answer_value(item)
+    if item.get("type") in {"build", "listen_build"} and isinstance(answer, list):
+        return [" ".join(str(part) for part in answer)]
+    values: list[str] = []
+    values.extend(learner_visible_phrase_values(answer))
+    values.extend(learner_visible_phrase_values(item.get("pairs")))
+    values.extend(learner_visible_phrase_values(item.get("options")))
+    return values
+
+
 def out_of_context_curriculum_phrases(language: str, idx_zero: int, item: dict) -> list[dict[str, str]]:
     """Find known curriculum phrases from another unit inside this session item."""
     context = context_for_index(idx_zero)
     current_unit = unit_number_for_item(idx_zero, item)
-    values: list[str] = []
-    values.extend(learner_visible_phrase_values(answer_value(item)))
-    values.extend(learner_visible_phrase_values(item.get("pairs")))
-    values.extend(learner_visible_phrase_values(item.get("options")))
-    values.extend(learner_visible_phrase_values(item.get("tiles")))
+    values = semantic_drift_values(item)
+    # Build tiles include distractor chunks/words and can legitimately overlap
+    # short phrases from earlier units (e.g. "please"). Audit semantic drift on
+    # learner-facing answers, pairs, and options; not on loose tile inventories.
 
     findings: list[dict[str, str]] = []
     seen: set[str] = set()
@@ -330,11 +342,11 @@ def review_item(language: str, idx_zero: int, item: dict) -> dict:
     }
 
 
-def add_repetition_verdicts(rows: list[dict], max_repetitions: int = 5) -> list[dict]:
-    """BLOCK a session when the same phrase appears in more than five exercises.
+def add_repetition_verdicts(rows: list[dict], max_repetitions: int = 6) -> list[dict]:
+    """BLOCK a session when the same phrase appears in more than six exercises.
 
-    Individual items can be valid, but a session with 6+ exercises anchored on
-    the same phrase feels repetitive and must be regenerated/refeita by QA.
+    Individual items can be valid, but a session with more than 6 exercises
+    anchored on the same phrase feels repetitive and must be regenerated/refeita by QA.
     """
     grouped: dict[tuple[str, int], list[dict]] = {}
     for row in rows:

@@ -10,7 +10,7 @@ services:
       - ./backend:/app
       - polyglot-data:/app/data
     environment:
-      - DATABASE_URL=sqlite:///./data/polyglot.db
+      - DATABASE_URL=sqlite:///./polyglot.db
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]

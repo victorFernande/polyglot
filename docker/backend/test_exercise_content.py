@@ -2,6 +2,7 @@ import json
 import os
 import re
 import tempfile
+from pathlib import Path
 
 os.environ["DATABASE_URL"] = f"sqlite:///{tempfile.NamedTemporaryFile(delete=False).name}"
 
@@ -11,6 +12,7 @@ from curriculum import A1_UNITS  # noqa: E402
 
 
 LANGUAGES = {"de", "fr", "ru", "jp", "en"}
+ROOT = Path(__file__).resolve().parents[2]
 
 
 METALINGUISTIC_MARKERS = {
@@ -395,7 +397,7 @@ def test_real_database_cron_round_uses_latest_snapshot():
     # New snapshots include both before/after; older snapshots were flat.
     before_counts = raw_counts.get("before", raw_counts)
 
-    os.environ["DATABASE_URL"] = "sqlite:///./polyglot.db"
+    os.environ["DATABASE_URL"] = f"sqlite:///{ROOT / 'docker' / 'backend' / 'polyglot.db'}"
     import models
     importlib.reload(models)
     Base = models.Base

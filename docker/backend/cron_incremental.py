@@ -22,11 +22,13 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
+BACKEND_DB_URL = f"sqlite:///{Path(__file__).resolve().with_name('polyglot.db')}"
+
 # Set DATABASE_URL before importing models so the module-level engine uses it.
 if "DATABASE_URL" not in os.environ:
-    os.environ["DATABASE_URL"] = "sqlite:///./polyglot.db"
+    os.environ["DATABASE_URL"] = BACKEND_DB_URL
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, func
 from sqlalchemy.orm import sessionmaker
 
 from models import Base, ExerciseItem, ExerciseLesson
@@ -50,9 +52,9 @@ def take_snapshot(db) -> dict[str, int]:
         if lesson is None:
             snapshot[code] = 0
         else:
-            snapshot[code] = db.query(ExerciseItem).filter(
+            snapshot[code] = db.query(func.max(ExerciseItem.order_index)).filter(
                 ExerciseItem.lesson_id == lesson.id
-            ).count()
+            ).scalar() or 0
     return snapshot
 
 
@@ -93,7 +95,7 @@ def commit_cron_changes(snapshot_path: Path, message: str, include_db: bool = Fa
     root = repo_root()
     paths = [str(snapshot_path.relative_to(root))]
     if include_db:
-        paths.append("polyglot.db")
+        paths.append("docker/backend/polyglot.db")
 
     if not git_has_changes(paths):
         return False
@@ -107,7 +109,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Polyglot incremental exercise cron")
     parser.add_argument(
         "--database-url",
-        default=os.environ.get("DATABASE_URL", "sqlite:///./polyglot.db"),
+        default=os.environ.get("DATABASE_URL", BACKEND_DB_URL),
         help="SQLAlchemy database URL",
     )
     parser.add_argument(
@@ -128,7 +130,7 @@ def main() -> int:
     parser.add_argument(
         "--commit-db",
         action="store_true",
-        help="Also include polyglot.db in the cron commit when it is tracked/changed",
+        help="Also include docker/backend/polyglot.db in the cron commit when it is tracked/changed",
     )
     parser.add_argument(
         "--commit-message",

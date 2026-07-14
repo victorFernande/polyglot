@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 from sqlalchemy import create_engine, Column, Integer, String, Float, Boolean, DateTime, ForeignKey, Text, Enum, JSON, UniqueConstraint
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
@@ -218,7 +219,8 @@ class ExerciseAnswer(Base):
     item = relationship("ExerciseItem", back_populates="answers")
 
 # Database setup
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./polyglot.db")
+DEFAULT_DATABASE_URL = f"sqlite:///{Path(__file__).resolve().with_name('polyglot.db')}"
+DATABASE_URL = os.getenv("DATABASE_URL", DEFAULT_DATABASE_URL)
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

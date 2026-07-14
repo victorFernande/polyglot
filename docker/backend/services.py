@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from urllib.parse import quote
 
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from models import Achievement, ExerciseAnswer, ExerciseItem, ExerciseLesson, ExerciseSession, Phase, SessionLocal, StudyLog, Task, User, UserAchievement, Wave
 from schemas import *
@@ -230,7 +231,7 @@ class ExerciseService:
     }
     SESSION_SIZE = 20
     TARGET_ITEMS = 1000
-    INCREMENTAL_ITEM_TARGETS = {"de": 1250, "fr": 1250, "ru": 1250, "jp": 1250, "en": 1250}
+    INCREMENTAL_ITEM_TARGETS = {"de": 1500, "fr": 1500, "ru": 1500, "jp": 1500, "en": 1500}
     JP_BEGINNER_KANA = {
         "私の名前はビクトルです。": "わたしのなまえはビクトルです。",
         "ブラジル出身です。": "ブラジルしゅっしんです。",
@@ -379,6 +380,13 @@ class ExerciseService:
     def _choice(prompt, answer, options, idx):
         opts = list(dict.fromkeys([answer] + options))[:4]
         return {"type":"choice","prompt":prompt,"answer":{"value":answer},"options":opts,"tiles":None,"pairs":None,"hint":"Escolha a opção correta e fale em voz alta antes de confirmar.","explanation":f"Resposta correta: {answer}.","xp_reward":8 + (idx % 3)}
+
+    @staticmethod
+    def _choice_distractors(code: str, answer: str, preferred: list[str]):
+        pool = list(preferred)
+        for unit in A1_UNITS:
+            pool.extend(foreign for _pt, foreign in unit["phrases"][code])
+        return [value for value in dict.fromkeys(pool) if value != answer][:3]
 
     @staticmethod
     def _listen_choice(prompt, answer, options, idx):
@@ -724,7 +732,8 @@ class ExerciseService:
         options = [foreign for _pt, foreign in phrases]
         portuguese_options = [pt for pt, _foreign in phrases]
         session_number = (start_index - 1) // ExerciseService.SESSION_SIZE + 1
-        prefix = f"Sessão {session_number} — Revisão incremental · {unit['title']} em contexto"
+        lesson_difficulty = min(100, max(1, session_number))
+        prefix = f"Sessão {session_number} · dificuldade {lesson_difficulty}/100 — {unit['title']} em contexto"
         # Keep all 20 items within the same unit to avoid topic drift while varying
         # exercise type/window enough that the second half is not an exact duplicate.
         phrase_offset = (start_index - 1) % len(phrases)
@@ -736,7 +745,7 @@ class ExerciseService:
             return ExerciseService._choice(
                 f"{prefix}: escolha como dizer “{p[i][0]}” em {name}",
                 p[i][1],
-                [options[(phrase_offset + i + 1) % len(phrases)], options[(phrase_offset + i + 2) % len(phrases)], options[(phrase_offset + i + 3) % len(phrases)]],
+                ExerciseService._choice_distractors(code, p[i][1], [options[(phrase_offset + i + 1) % len(phrases)], options[(phrase_offset + i + 2) % len(phrases)], options[(phrase_offset + i + 3) % len(phrases)]]),
                 idx + i,
             )
 
@@ -744,7 +753,7 @@ class ExerciseService:
             return ExerciseService._listen_choice(
                 f"{prefix}: ouça o áudio e identifique a fala que comunica “{p[i][0]}”",
                 p[i][1],
-                [options[(phrase_offset + i + 2) % len(phrases)], options[(phrase_offset + i + 3) % len(phrases)], options[(phrase_offset + i + 4) % len(phrases)]],
+                ExerciseService._choice_distractors(code, p[i][1], [options[(phrase_offset + i + 2) % len(phrases)], options[(phrase_offset + i + 3) % len(phrases)], options[(phrase_offset + i + 4) % len(phrases)]]),
                 idx + i,
             )
 
@@ -773,7 +782,7 @@ class ExerciseService:
             return ExerciseService._context_choice(
                 f"{prefix}: situação guiada — pratique uma fala do tema. Escolha a opção que comunica “{p[i][0]}” em {name}.",
                 p[i][1],
-                [options[(phrase_offset + i + 1) % len(phrases)], options[(phrase_offset + i + 2) % len(phrases)], options[(phrase_offset + i + 3) % len(phrases)]],
+                ExerciseService._choice_distractors(code, p[i][1], [options[(phrase_offset + i + 1) % len(phrases)], options[(phrase_offset + i + 2) % len(phrases)], options[(phrase_offset + i + 3) % len(phrases)]]),
                 idx + i,
             )
 
@@ -834,21 +843,41 @@ class ExerciseService:
         for factory, i in block_plan:
             items.append(factory(i))
 
-        hint = f"Mini-aula: Revisão incremental. Esta revisão acrescenta prática real sem ultrapassar 20 questões no bloco atual."
-        for item in items:
+        primer_pairs = p[:4]
+        primer = "; ".join(f"{foreign} = {pt}" for pt, foreign in primer_pairs)
+        hint = (
+            f"Mini-aula: Etapa guiada de revisão e expansão. Primeiro reconheça poucas frases novas, "
+            f"depois reutilize em áudio, imagem, ordem das palavras e contexto. Vocabulário foco: {primer}. "
+            f"XP: +10 a +15. Tempo estimado: 20-35s. Dificuldade: {lesson_difficulty}/100."
+        )
+        for pos, item in enumerate(items, 1):
+            pt_focus, foreign_focus = p[(pos - 1) % len(p)]
+            stage = [
+                "vocabulário",
+                "associação",
+                "reconhecimento",
+                "construção",
+                "ordem das palavras",
+                "lacuna/tradução guiada",
+                "escuta",
+                "contexto",
+                "microdiálogo",
+                "revisão espaçada",
+            ][(pos - 1) % 10]
+            item["xp_reward"] = 15 if item["type"] in {"build", "listen_build", "sequence_dialogue"} else 10
             if item["type"] == "listen_build":
-                item["hint"] = f"{hint} Ouça a frase, repita em voz alta e monte as palavras na ordem correta."
+                item["hint"] = f"{hint} Etapa: {stage}. Ouça, repita em voz alta e monte na ordem natural."
             elif item["type"] == "listen_match":
-                item["hint"] = f"{hint} Toque em cada áudio no idioma estudado e selecione a tradução correspondente em português."
-                item["explanation"] = f"Cada áudio em {name} deve ser ligado à tradução em português dentro da revisão de {unit['title'].lower()}."
+                item["hint"] = f"{hint} Etapa: {stage}. Toque em cada áudio e ligue à tradução em português."
+                item["explanation"] = f"Escuta + associação: cada áudio em {name} deve ser ligado ao significado em português. Repare no som antes de olhar as opções."
             elif item["type"] == "sequence_dialogue":
-                item["hint"] = f"{hint} Siga a ordem indicada no enunciado e organize apenas as frases no idioma estudado."
+                item["hint"] = f"{hint} Etapa: {stage}. Organize as falas como uma conversa curta e natural."
             else:
-                item["hint"] = hint
+                item["hint"] = f"{hint} Etapa: {stage}. Frase foco: “{foreign_focus}” = “{pt_focus}”."
             if item["type"] in {"build", "listen_build"}:
-                item["explanation"] = f"A frase correta é: “{' '.join(item['answer']['value'])}”."
+                item["explanation"] = f"Construção: a frase correta é “{' '.join(item['answer']['value'])}”. A ordem das palavras treina produção ativa, não só reconhecimento."
             elif item["type"] not in {"image_choice", "listen_match", "sequence_dialogue"}:
-                item["explanation"] = f"{unit['title']}: “{item['answer']['value']}” comunica a ideia pedida em {name}."
+                item["explanation"] = f"{unit['title']}: “{item['answer']['value']}” comunica “{pt_focus}” em {name}. A revisão mistura conteúdo novo com frases já vistas para fixar aos poucos."
 
         return items
 
@@ -885,7 +914,9 @@ class ExerciseService:
         lesson = db.query(ExerciseLesson).filter(ExerciseLesson.language_code == code, ExerciseLesson.active == True).first()
         if not lesson:
             return 0
-        current_count = db.query(ExerciseItem).filter(ExerciseItem.lesson_id == lesson.id).count()
+        current_count = db.query(func.max(ExerciseItem.order_index)).filter(
+            ExerciseItem.lesson_id == lesson.id
+        ).scalar() or 0
         target = ExerciseService.dynamic_target_for_language(code, current_count)
         remaining_to_target = target - current_count
         if remaining_to_target <= 0:
@@ -3359,7 +3390,13 @@ class ExerciseService:
                             prompt = f"{prefix}: monte a frase em ordem natural para dizer “{build_pt}”"
                             item = ExerciseService._build(prompt, words, extras, idx)
                     elif item_type in {"match", "listen_match"}:
-                        sample = ExerciseService._real_phrase_window(code, unit_index * 23 + topic_index * 11 + question_index * 4, 4)
+                        # Keep recognition pairs inside the current unit. Cross-unit
+                        # review belongs to explicit incremental review blocks only.
+                        sample = ExerciseService._windowed_pairs(
+                            unit["phrases"][code],
+                            topic_index + question_index - 2,
+                            4,
+                        )
                         pairs = [[foreign, portuguese] for portuguese, foreign in sample]
                         review_prefix = f"Unidade {unit_index}/10 — {unit['title']} · Revisão guiada"
                         if item_type == "listen_match":

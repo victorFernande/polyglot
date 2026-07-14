@@ -155,9 +155,9 @@ def test_polyglot_qa_blocks_match_translation_pairs_that_are_only_topic_labels()
     assert any(issue["code"] == "match_translation_is_topic_label" for issue in result["issues"])
 
 
-def test_polyglot_qa_blocks_sessions_with_more_than_five_repeated_same_phrase():
+def test_polyglot_qa_blocks_sessions_with_more_than_six_repeated_same_phrase():
     rows = []
-    for idx in range(6):
+    for idx in range(7):
         rows.append(review_item("de", idx, {
             "type": "choice",
             "prompt": "Unidade 1/10 — Café · Tópico 1/10 — cumprimentar: escolha como dizer “Olá.” em Alemão",

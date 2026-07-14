@@ -206,9 +206,9 @@ def test_cron_incremental_respects_session_boundary_after_static_target():
                     ExerciseLesson.language_code == code, ExerciseLesson.active == True
                 ).first()
                 target = ExerciseService.target_items_for_language(code)
-                # 1250 + 6 items -> count 1256, last block size 16, dynamic target 1280,
-                # so only 4 items should be added to close the block at 20.
-                for extra in range(1, 7):
+                # target + 16 items -> last block size 16, dynamic target moves to
+                # the next full session boundary, so only 4 items should be added.
+                for extra in range(1, 17):
                     db.add(ExerciseItem(
                         lesson_id=lesson.id,
                         order_index=target + extra,
