@@ -1,5 +1,5 @@
 {
-  "total_items": 7950,
+  "total_items": 7975,
   "languages": [
     "de",
     "en",
@@ -15,7 +15,7 @@
     {
       "language": "de",
       "phrase": "Das ist mein Vater.",
-      "count": 39,
+      "count": 40,
       "examples": [
         {
           "id": 163733,
@@ -78,7 +78,7 @@
     {
       "language": "de",
       "phrase": "Das ist meine Mutter.",
-      "count": 37,
+      "count": 38,
       "examples": [
         {
           "id": 163740,
@@ -141,7 +141,7 @@
     {
       "language": "de",
       "phrase": "Ich habe eine Schwester.",
-      "count": 36,
+      "count": 37,
       "examples": [
         {
           "id": 163735,
@@ -204,7 +204,7 @@
     {
       "language": "de",
       "phrase": "Ich habe einen Bruder.",
-      "count": 35,
+      "count": 36,
       "examples": [
         {
           "id": 163734,
@@ -330,7 +330,7 @@
     {
       "language": "de",
       "phrase": "Mein Sohn ist hier.",
-      "count": 28,
+      "count": 29,
       "examples": [
         {
           "id": 163736,
@@ -1338,7 +1338,7 @@
     {
       "language": "en",
       "phrase": "This is my father.",
-      "count": 39,
+      "count": 40,
       "examples": [
         {
           "id": 169733,
@@ -1401,7 +1401,7 @@
     {
       "language": "en",
       "phrase": "This is my mother.",
-      "count": 37,
+      "count": 38,
       "examples": [
         {
           "id": 169740,
@@ -1464,7 +1464,7 @@
     {
       "language": "en",
       "phrase": "I have a sister.",
-      "count": 36,
+      "count": 37,
       "examples": [
         {
           "id": 169735,
@@ -1527,7 +1527,7 @@
     {
       "language": "en",
       "phrase": "I have a brother.",
-      "count": 35,
+      "count": 36,
       "examples": [
         {
           "id": 169734,
@@ -1653,7 +1653,7 @@
     {
       "language": "en",
       "phrase": "My son is here.",
-      "count": 28,
+      "count": 29,
       "examples": [
         {
           "id": 169736,
@@ -2598,7 +2598,7 @@
     {
       "language": "fr",
       "phrase": "C'est mon père.",
-      "count": 39,
+      "count": 40,
       "examples": [
         {
           "id": 165233,
@@ -2661,7 +2661,7 @@
     {
       "language": "fr",
       "phrase": "C'est ma mère.",
-      "count": 37,
+      "count": 38,
       "examples": [
         {
           "id": 165240,
@@ -2724,7 +2724,7 @@
     {
       "language": "fr",
       "phrase": "J'ai une sœur.",
-      "count": 36,
+      "count": 37,
       "examples": [
         {
           "id": 165235,
@@ -2787,7 +2787,7 @@
     {
       "language": "fr",
       "phrase": "J'ai un frère.",
-      "count": 35,
+      "count": 36,
       "examples": [
         {
           "id": 165234,
@@ -2913,7 +2913,7 @@
     {
       "language": "fr",
       "phrase": "Mon fils est ici.",
-      "count": 28,
+      "count": 29,
       "examples": [
         {
           "id": 165236,
@@ -3795,7 +3795,7 @@
     {
       "language": "jp",
       "phrase": "これは私の父です。",
-      "count": 37,
+      "count": 38,
       "examples": [
         {
           "id": 168233,
@@ -3858,7 +3858,7 @@
     {
       "language": "jp",
       "phrase": "これは私の母です。",
-      "count": 36,
+      "count": 37,
       "examples": [
         {
           "id": 168240,
@@ -3921,7 +3921,7 @@
     {
       "language": "jp",
       "phrase": "兄弟がいます。",
-      "count": 33,
+      "count": 34,
       "examples": [
         {
           "id": 168234,
@@ -4047,7 +4047,7 @@
     {
       "language": "jp",
       "phrase": "息子はここにいます。",
-      "count": 26,
+      "count": 27,
       "examples": [
         {
           "id": 168236,
@@ -4424,6 +4424,69 @@
     },
     {
       "language": "jp",
+      "phrase": "姉 妹 が い ま す 。",
+      "count": 22,
+      "examples": [
+        {
+          "id": 168299,
+          "order_index": 568,
+          "session_number": 29,
+          "type": "listen_build",
+          "phrase": "姉 妹 が い ま す 。"
+        },
+        {
+          "id": 168815,
+          "order_index": 1084,
+          "session_number": 55,
+          "type": "build",
+          "phrase": "姉 妹 が い ま す 。"
+        },
+        {
+          "id": 169035,
+          "order_index": 1304,
+          "session_number": 66,
+          "type": "build",
+          "phrase": "姉 妹 が い ま す 。"
+        },
+        {
+          "id": 170750,
+          "order_index": 1504,
+          "session_number": 76,
+          "type": "build",
+          "phrase": "姉 妹 が い ま す 。"
+        },
+        {
+          "id": 170775,
+          "order_index": 1509,
+          "session_number": 76,
+          "type": "build",
+          "phrase": "姉 妹 が い ま す 。"
+        },
+        {
+          "id": 170800,
+          "order_index": 1514,
+          "session_number": 76,
+          "type": "build",
+          "phrase": "姉 妹 が い ま す 。"
+        },
+        {
+          "id": 170825,
+          "order_index": 1519,
+          "session_number": 76,
+          "type": "build",
+          "phrase": "姉 妹 が い ま す 。"
+        },
+        {
+          "id": 170850,
+          "order_index": 1524,
+          "session_number": 77,
+          "type": "build",
+          "phrase": "姉 妹 が い ま す 。"
+        }
+      ]
+    },
+    {
+      "language": "jp",
       "phrase": "ベルリンへ旅行します。",
       "count": 21,
       "examples": [
@@ -4482,69 +4545,6 @@
           "session_number": 14,
           "type": "context_choice",
           "phrase": "ベルリンへ旅行します。"
-        }
-      ]
-    },
-    {
-      "language": "jp",
-      "phrase": "姉 妹 が い ま す 。",
-      "count": 21,
-      "examples": [
-        {
-          "id": 168299,
-          "order_index": 568,
-          "session_number": 29,
-          "type": "listen_build",
-          "phrase": "姉 妹 が い ま す 。"
-        },
-        {
-          "id": 168815,
-          "order_index": 1084,
-          "session_number": 55,
-          "type": "build",
-          "phrase": "姉 妹 が い ま す 。"
-        },
-        {
-          "id": 169035,
-          "order_index": 1304,
-          "session_number": 66,
-          "type": "build",
-          "phrase": "姉 妹 が い ま す 。"
-        },
-        {
-          "id": 170750,
-          "order_index": 1504,
-          "session_number": 76,
-          "type": "build",
-          "phrase": "姉 妹 が い ま す 。"
-        },
-        {
-          "id": 170775,
-          "order_index": 1509,
-          "session_number": 76,
-          "type": "build",
-          "phrase": "姉 妹 が い ま す 。"
-        },
-        {
-          "id": 170800,
-          "order_index": 1514,
-          "session_number": 76,
-          "type": "build",
-          "phrase": "姉 妹 が い ま す 。"
-        },
-        {
-          "id": 170825,
-          "order_index": 1519,
-          "session_number": 76,
-          "type": "build",
-          "phrase": "姉 妹 が い ま す 。"
-        },
-        {
-          "id": 170850,
-          "order_index": 1524,
-          "session_number": 77,
-          "type": "build",
-          "phrase": "姉 妹 が い ま す 。"
         }
       ]
     },
@@ -5118,7 +5118,7 @@
     {
       "language": "ru",
       "phrase": "Это мой папа.",
-      "count": 39,
+      "count": 40,
       "examples": [
         {
           "id": 166733,
@@ -5181,7 +5181,7 @@
     {
       "language": "ru",
       "phrase": "Это моя мама.",
-      "count": 37,
+      "count": 38,
       "examples": [
         {
           "id": 166740,
@@ -5244,7 +5244,7 @@
     {
       "language": "ru",
       "phrase": "У меня есть сестра.",
-      "count": 36,
+      "count": 37,
       "examples": [
         {
           "id": 166735,
@@ -5307,7 +5307,7 @@
     {
       "language": "ru",
       "phrase": "У меня есть брат.",
-      "count": 35,
+      "count": 36,
       "examples": [
         {
           "id": 166734,
@@ -5433,7 +5433,7 @@
     {
       "language": "ru",
       "phrase": "Мой сын здесь.",
-      "count": 28,
+      "count": 29,
       "examples": [
         {
           "id": 166736,
