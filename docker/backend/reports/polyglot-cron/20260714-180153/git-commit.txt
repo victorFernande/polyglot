@@ -1,0 +1,14 @@
+[main 48af5a6] Content QA(polyglot): add hourly wave 1 exercises
+ 17 files changed, 513 insertions(+), 305 deletions(-)
+ create mode 100644 docker/backend/reports/polyglot-cron/20260714-180153/2026-07-14-180153-snapshot.json
+ create mode 100644 docker/backend/reports/polyglot-cron/20260714-180153/audit-duplicates.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260714-180153/counts-after.json
+ create mode 100644 docker/backend/reports/polyglot-cron/20260714-180153/counts-before.json
+ create mode 100644 docker/backend/reports/polyglot-cron/20260714-180153/cron-incremental.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260714-180153/frontend-boundary.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260714-180153/git-status-before-commit.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260714-180153/pytest-venv.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260714-180153/pytest.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260714-180153/review-all.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260714-180153/review-recent30.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260714-180153/staged-files.txt
