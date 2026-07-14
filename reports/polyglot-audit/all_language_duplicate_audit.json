@@ -1,5 +1,5 @@
 {
-  "total_items": 7875,
+  "total_items": 7900,
   "languages": [
     "de",
     "en",
@@ -15,7 +15,7 @@
     {
       "language": "de",
       "phrase": "Das ist mein Vater.",
-      "count": 36,
+      "count": 37,
       "examples": [
         {
           "id": 163733,
@@ -78,7 +78,7 @@
     {
       "language": "de",
       "phrase": "Das ist meine Mutter.",
-      "count": 34,
+      "count": 35,
       "examples": [
         {
           "id": 163740,
@@ -141,7 +141,7 @@
     {
       "language": "de",
       "phrase": "Ich habe eine Schwester.",
-      "count": 33,
+      "count": 34,
       "examples": [
         {
           "id": 163735,
@@ -204,7 +204,7 @@
     {
       "language": "de",
       "phrase": "Ich habe einen Bruder.",
-      "count": 32,
+      "count": 33,
       "examples": [
         {
           "id": 163734,
@@ -455,6 +455,69 @@
     },
     {
       "language": "de",
+      "phrase": "Mein Sohn ist hier.",
+      "count": 26,
+      "examples": [
+        {
+          "id": 163736,
+          "order_index": 505,
+          "session_number": 26,
+          "type": "image_choice",
+          "phrase": "Mein Sohn ist hier."
+        },
+        {
+          "id": 163745,
+          "order_index": 514,
+          "session_number": 26,
+          "type": "build",
+          "phrase": "Mein Sohn ist hier."
+        },
+        {
+          "id": 163754,
+          "order_index": 523,
+          "session_number": 27,
+          "type": "listen_choice",
+          "phrase": "Mein Sohn ist hier."
+        },
+        {
+          "id": 163763,
+          "order_index": 532,
+          "session_number": 27,
+          "type": "choice",
+          "phrase": "Mein Sohn ist hier."
+        },
+        {
+          "id": 163809,
+          "order_index": 578,
+          "session_number": 29,
+          "type": "listen_build",
+          "phrase": "Mein Sohn ist hier."
+        },
+        {
+          "id": 163818,
+          "order_index": 587,
+          "session_number": 30,
+          "type": "context_choice",
+          "phrase": "Mein Sohn ist hier."
+        },
+        {
+          "id": 163827,
+          "order_index": 596,
+          "session_number": 30,
+          "type": "context_choice",
+          "phrase": "Mein Sohn ist hier."
+        },
+        {
+          "id": 164316,
+          "order_index": 1085,
+          "session_number": 55,
+          "type": "context_choice",
+          "phrase": "Mein Sohn ist hier."
+        }
+      ]
+    },
+    {
+      "language": "de",
       "phrase": "Ich komme aus Brasilien.",
       "count": 25,
       "examples": [
@@ -513,69 +576,6 @@
           "session_number": 8,
           "type": "context_choice",
           "phrase": "Ich komme aus Brasilien."
-        }
-      ]
-    },
-    {
-      "language": "de",
-      "phrase": "Mein Sohn ist hier.",
-      "count": 25,
-      "examples": [
-        {
-          "id": 163736,
-          "order_index": 505,
-          "session_number": 26,
-          "type": "image_choice",
-          "phrase": "Mein Sohn ist hier."
-        },
-        {
-          "id": 163745,
-          "order_index": 514,
-          "session_number": 26,
-          "type": "build",
-          "phrase": "Mein Sohn ist hier."
-        },
-        {
-          "id": 163754,
-          "order_index": 523,
-          "session_number": 27,
-          "type": "listen_choice",
-          "phrase": "Mein Sohn ist hier."
-        },
-        {
-          "id": 163763,
-          "order_index": 532,
-          "session_number": 27,
-          "type": "choice",
-          "phrase": "Mein Sohn ist hier."
-        },
-        {
-          "id": 163809,
-          "order_index": 578,
-          "session_number": 29,
-          "type": "listen_build",
-          "phrase": "Mein Sohn ist hier."
-        },
-        {
-          "id": 163818,
-          "order_index": 587,
-          "session_number": 30,
-          "type": "context_choice",
-          "phrase": "Mein Sohn ist hier."
-        },
-        {
-          "id": 163827,
-          "order_index": 596,
-          "session_number": 30,
-          "type": "context_choice",
-          "phrase": "Mein Sohn ist hier."
-        },
-        {
-          "id": 164316,
-          "order_index": 1085,
-          "session_number": 55,
-          "type": "context_choice",
-          "phrase": "Mein Sohn ist hier."
         }
       ]
     },
@@ -1338,7 +1338,7 @@
     {
       "language": "en",
       "phrase": "This is my father.",
-      "count": 36,
+      "count": 37,
       "examples": [
         {
           "id": 169733,
@@ -1401,7 +1401,7 @@
     {
       "language": "en",
       "phrase": "This is my mother.",
-      "count": 34,
+      "count": 35,
       "examples": [
         {
           "id": 169740,
@@ -1464,7 +1464,7 @@
     {
       "language": "en",
       "phrase": "I have a sister.",
-      "count": 33,
+      "count": 34,
       "examples": [
         {
           "id": 169735,
@@ -1527,7 +1527,7 @@
     {
       "language": "en",
       "phrase": "I have a brother.",
-      "count": 32,
+      "count": 33,
       "examples": [
         {
           "id": 169734,
@@ -1778,6 +1778,69 @@
     },
     {
       "language": "en",
+      "phrase": "My son is here.",
+      "count": 26,
+      "examples": [
+        {
+          "id": 169736,
+          "order_index": 505,
+          "session_number": 26,
+          "type": "image_choice",
+          "phrase": "My son is here."
+        },
+        {
+          "id": 169745,
+          "order_index": 514,
+          "session_number": 26,
+          "type": "build",
+          "phrase": "My son is here."
+        },
+        {
+          "id": 169754,
+          "order_index": 523,
+          "session_number": 27,
+          "type": "listen_choice",
+          "phrase": "My son is here."
+        },
+        {
+          "id": 169763,
+          "order_index": 532,
+          "session_number": 27,
+          "type": "choice",
+          "phrase": "My son is here."
+        },
+        {
+          "id": 169809,
+          "order_index": 578,
+          "session_number": 29,
+          "type": "listen_build",
+          "phrase": "My son is here."
+        },
+        {
+          "id": 169818,
+          "order_index": 587,
+          "session_number": 30,
+          "type": "context_choice",
+          "phrase": "My son is here."
+        },
+        {
+          "id": 169827,
+          "order_index": 596,
+          "session_number": 30,
+          "type": "context_choice",
+          "phrase": "My son is here."
+        },
+        {
+          "id": 170316,
+          "order_index": 1085,
+          "session_number": 55,
+          "type": "context_choice",
+          "phrase": "My son is here."
+        }
+      ]
+    },
+    {
+      "language": "en",
       "phrase": "I would like a coffee.",
       "count": 25,
       "examples": [
@@ -1899,69 +1962,6 @@
           "session_number": 8,
           "type": "context_choice",
           "phrase": "I am from Brazil."
-        }
-      ]
-    },
-    {
-      "language": "en",
-      "phrase": "My son is here.",
-      "count": 25,
-      "examples": [
-        {
-          "id": 169736,
-          "order_index": 505,
-          "session_number": 26,
-          "type": "image_choice",
-          "phrase": "My son is here."
-        },
-        {
-          "id": 169745,
-          "order_index": 514,
-          "session_number": 26,
-          "type": "build",
-          "phrase": "My son is here."
-        },
-        {
-          "id": 169754,
-          "order_index": 523,
-          "session_number": 27,
-          "type": "listen_choice",
-          "phrase": "My son is here."
-        },
-        {
-          "id": 169763,
-          "order_index": 532,
-          "session_number": 27,
-          "type": "choice",
-          "phrase": "My son is here."
-        },
-        {
-          "id": 169809,
-          "order_index": 578,
-          "session_number": 29,
-          "type": "listen_build",
-          "phrase": "My son is here."
-        },
-        {
-          "id": 169818,
-          "order_index": 587,
-          "session_number": 30,
-          "type": "context_choice",
-          "phrase": "My son is here."
-        },
-        {
-          "id": 169827,
-          "order_index": 596,
-          "session_number": 30,
-          "type": "context_choice",
-          "phrase": "My son is here."
-        },
-        {
-          "id": 170316,
-          "order_index": 1085,
-          "session_number": 55,
-          "type": "context_choice",
-          "phrase": "My son is here."
         }
       ]
     },
@@ -2598,7 +2598,7 @@
     {
       "language": "fr",
       "phrase": "C'est mon père.",
-      "count": 36,
+      "count": 37,
       "examples": [
         {
           "id": 165233,
@@ -2661,7 +2661,7 @@
     {
       "language": "fr",
       "phrase": "C'est ma mère.",
-      "count": 34,
+      "count": 35,
       "examples": [
         {
           "id": 165240,
@@ -2724,7 +2724,7 @@
     {
       "language": "fr",
       "phrase": "J'ai une sœur.",
-      "count": 33,
+      "count": 34,
       "examples": [
         {
           "id": 165235,
@@ -2787,7 +2787,7 @@
     {
       "language": "fr",
       "phrase": "J'ai un frère.",
-      "count": 32,
+      "count": 33,
       "examples": [
         {
           "id": 165234,
@@ -3038,6 +3038,69 @@
     },
     {
       "language": "fr",
+      "phrase": "Mon fils est ici.",
+      "count": 26,
+      "examples": [
+        {
+          "id": 165236,
+          "order_index": 505,
+          "session_number": 26,
+          "type": "image_choice",
+          "phrase": "Mon fils est ici."
+        },
+        {
+          "id": 165245,
+          "order_index": 514,
+          "session_number": 26,
+          "type": "build",
+          "phrase": "Mon fils est ici."
+        },
+        {
+          "id": 165254,
+          "order_index": 523,
+          "session_number": 27,
+          "type": "listen_choice",
+          "phrase": "Mon fils est ici."
+        },
+        {
+          "id": 165263,
+          "order_index": 532,
+          "session_number": 27,
+          "type": "choice",
+          "phrase": "Mon fils est ici."
+        },
+        {
+          "id": 165309,
+          "order_index": 578,
+          "session_number": 29,
+          "type": "listen_build",
+          "phrase": "Mon fils est ici."
+        },
+        {
+          "id": 165318,
+          "order_index": 587,
+          "session_number": 30,
+          "type": "context_choice",
+          "phrase": "Mon fils est ici."
+        },
+        {
+          "id": 165327,
+          "order_index": 596,
+          "session_number": 30,
+          "type": "context_choice",
+          "phrase": "Mon fils est ici."
+        },
+        {
+          "id": 165816,
+          "order_index": 1085,
+          "session_number": 55,
+          "type": "context_choice",
+          "phrase": "Mon fils est ici."
+        }
+      ]
+    },
+    {
+      "language": "fr",
       "phrase": "Je viens du Brésil.",
       "count": 25,
       "examples": [
@@ -3096,69 +3159,6 @@
           "session_number": 8,
           "type": "context_choice",
           "phrase": "Je viens du Brésil."
-        }
-      ]
-    },
-    {
-      "language": "fr",
-      "phrase": "Mon fils est ici.",
-      "count": 25,
-      "examples": [
-        {
-          "id": 165236,
-          "order_index": 505,
-          "session_number": 26,
-          "type": "image_choice",
-          "phrase": "Mon fils est ici."
-        },
-        {
-          "id": 165245,
-          "order_index": 514,
-          "session_number": 26,
-          "type": "build",
-          "phrase": "Mon fils est ici."
-        },
-        {
-          "id": 165254,
-          "order_index": 523,
-          "session_number": 27,
-          "type": "listen_choice",
-          "phrase": "Mon fils est ici."
-        },
-        {
-          "id": 165263,
-          "order_index": 532,
-          "session_number": 27,
-          "type": "choice",
-          "phrase": "Mon fils est ici."
-        },
-        {
-          "id": 165309,
-          "order_index": 578,
-          "session_number": 29,
-          "type": "listen_build",
-          "phrase": "Mon fils est ici."
-        },
-        {
-          "id": 165318,
-          "order_index": 587,
-          "session_number": 30,
-          "type": "context_choice",
-          "phrase": "Mon fils est ici."
-        },
-        {
-          "id": 165327,
-          "order_index": 596,
-          "session_number": 30,
-          "type": "context_choice",
-          "phrase": "Mon fils est ici."
-        },
-        {
-          "id": 165816,
-          "order_index": 1085,
-          "session_number": 55,
-          "type": "context_choice",
-          "phrase": "Mon fils est ici."
         }
       ]
     },
@@ -3795,7 +3795,7 @@
     {
       "language": "jp",
       "phrase": "これは私の父です。",
-      "count": 34,
+      "count": 35,
       "examples": [
         {
           "id": 168233,
@@ -3858,7 +3858,7 @@
     {
       "language": "jp",
       "phrase": "これは私の母です。",
-      "count": 33,
+      "count": 34,
       "examples": [
         {
           "id": 168240,
@@ -3921,7 +3921,7 @@
     {
       "language": "jp",
       "phrase": "兄弟がいます。",
-      "count": 30,
+      "count": 31,
       "examples": [
         {
           "id": 168234,
@@ -4110,7 +4110,7 @@
     {
       "language": "jp",
       "phrase": "息子はここにいます。",
-      "count": 23,
+      "count": 24,
       "examples": [
         {
           "id": 168236,
@@ -4676,6 +4676,69 @@
     },
     {
       "language": "jp",
+      "phrase": "姉 妹 が い ま す 。",
+      "count": 19,
+      "examples": [
+        {
+          "id": 168299,
+          "order_index": 568,
+          "session_number": 29,
+          "type": "listen_build",
+          "phrase": "姉 妹 が い ま す 。"
+        },
+        {
+          "id": 168815,
+          "order_index": 1084,
+          "session_number": 55,
+          "type": "build",
+          "phrase": "姉 妹 が い ま す 。"
+        },
+        {
+          "id": 169035,
+          "order_index": 1304,
+          "session_number": 66,
+          "type": "build",
+          "phrase": "姉 妹 が い ま す 。"
+        },
+        {
+          "id": 170750,
+          "order_index": 1504,
+          "session_number": 76,
+          "type": "build",
+          "phrase": "姉 妹 が い ま す 。"
+        },
+        {
+          "id": 170775,
+          "order_index": 1509,
+          "session_number": 76,
+          "type": "build",
+          "phrase": "姉 妹 が い ま す 。"
+        },
+        {
+          "id": 170800,
+          "order_index": 1514,
+          "session_number": 76,
+          "type": "build",
+          "phrase": "姉 妹 が い ま す 。"
+        },
+        {
+          "id": 170825,
+          "order_index": 1519,
+          "session_number": 76,
+          "type": "build",
+          "phrase": "姉 妹 が い ま す 。"
+        },
+        {
+          "id": 170850,
+          "order_index": 1524,
+          "session_number": 77,
+          "type": "build",
+          "phrase": "姉 妹 が い ま す 。"
+        }
+      ]
+    },
+    {
+      "language": "jp",
       "phrase": "学校で働いています。",
       "count": 19,
       "examples": [
@@ -4928,69 +4991,6 @@
     },
     {
       "language": "jp",
-      "phrase": "姉 妹 が い ま す 。",
-      "count": 18,
-      "examples": [
-        {
-          "id": 168299,
-          "order_index": 568,
-          "session_number": 29,
-          "type": "listen_build",
-          "phrase": "姉 妹 が い ま す 。"
-        },
-        {
-          "id": 168815,
-          "order_index": 1084,
-          "session_number": 55,
-          "type": "build",
-          "phrase": "姉 妹 が い ま す 。"
-        },
-        {
-          "id": 169035,
-          "order_index": 1304,
-          "session_number": 66,
-          "type": "build",
-          "phrase": "姉 妹 が い ま す 。"
-        },
-        {
-          "id": 170750,
-          "order_index": 1504,
-          "session_number": 76,
-          "type": "build",
-          "phrase": "姉 妹 が い ま す 。"
-        },
-        {
-          "id": 170775,
-          "order_index": 1509,
-          "session_number": 76,
-          "type": "build",
-          "phrase": "姉 妹 が い ま す 。"
-        },
-        {
-          "id": 170800,
-          "order_index": 1514,
-          "session_number": 76,
-          "type": "build",
-          "phrase": "姉 妹 が い ま す 。"
-        },
-        {
-          "id": 170825,
-          "order_index": 1519,
-          "session_number": 76,
-          "type": "build",
-          "phrase": "姉 妹 が い ま す 。"
-        },
-        {
-          "id": 170850,
-          "order_index": 1524,
-          "session_number": 77,
-          "type": "build",
-          "phrase": "姉 妹 が い ま す 。"
-        }
-      ]
-    },
-    {
-      "language": "jp",
       "phrase": "ズボンは黒いです。",
       "count": 18,
       "examples": [
@@ -5118,7 +5118,7 @@
     {
       "language": "ru",
       "phrase": "Это мой папа.",
-      "count": 36,
+      "count": 37,
       "examples": [
         {
           "id": 166733,
@@ -5181,7 +5181,7 @@
     {
       "language": "ru",
       "phrase": "Это моя мама.",
-      "count": 34,
+      "count": 35,
       "examples": [
         {
           "id": 166740,
@@ -5244,7 +5244,7 @@
     {
       "language": "ru",
       "phrase": "У меня есть сестра.",
-      "count": 33,
+      "count": 34,
       "examples": [
         {
           "id": 166735,
@@ -5307,7 +5307,7 @@
     {
       "language": "ru",
       "phrase": "У меня есть брат.",
-      "count": 32,
+      "count": 33,
       "examples": [
         {
           "id": 166734,
@@ -5495,6 +5495,69 @@
     },
     {
       "language": "ru",
+      "phrase": "Мой сын здесь.",
+      "count": 26,
+      "examples": [
+        {
+          "id": 166736,
+          "order_index": 505,
+          "session_number": 26,
+          "type": "image_choice",
+          "phrase": "Мой сын здесь."
+        },
+        {
+          "id": 166745,
+          "order_index": 514,
+          "session_number": 26,
+          "type": "build",
+          "phrase": "Мой сын здесь."
+        },
+        {
+          "id": 166754,
+          "order_index": 523,
+          "session_number": 27,
+          "type": "listen_choice",
+          "phrase": "Мой сын здесь."
+        },
+        {
+          "id": 166763,
+          "order_index": 532,
+          "session_number": 27,
+          "type": "choice",
+          "phrase": "Мой сын здесь."
+        },
+        {
+          "id": 166809,
+          "order_index": 578,
+          "session_number": 29,
+          "type": "listen_build",
+          "phrase": "Мой сын здесь."
+        },
+        {
+          "id": 166818,
+          "order_index": 587,
+          "session_number": 30,
+          "type": "context_choice",
+          "phrase": "Мой сын здесь."
+        },
+        {
+          "id": 166827,
+          "order_index": 596,
+          "session_number": 30,
+          "type": "context_choice",
+          "phrase": "Мой сын здесь."
+        },
+        {
+          "id": 167316,
+          "order_index": 1085,
+          "session_number": 55,
+          "type": "context_choice",
+          "phrase": "Мой сын здесь."
+        }
+      ]
+    },
+    {
+      "language": "ru",
       "phrase": "Я из Бразилии.",
       "count": 25,
       "examples": [
@@ -5553,69 +5616,6 @@
           "session_number": 8,
           "type": "context_choice",
           "phrase": "Я из Бразилии."
-        }
-      ]
-    },
-    {
-      "language": "ru",
-      "phrase": "Мой сын здесь.",
-      "count": 25,
-      "examples": [
-        {
-          "id": 166736,
-          "order_index": 505,
-          "session_number": 26,
-          "type": "image_choice",
-          "phrase": "Мой сын здесь."
-        },
-        {
-          "id": 166745,
-          "order_index": 514,
-          "session_number": 26,
-          "type": "build",
-          "phrase": "Мой сын здесь."
-        },
-        {
-          "id": 166754,
-          "order_index": 523,
-          "session_number": 27,
-          "type": "listen_choice",
-          "phrase": "Мой сын здесь."
-        },
-        {
-          "id": 166763,
-          "order_index": 532,
-          "session_number": 27,
-          "type": "choice",
-          "phrase": "Мой сын здесь."
-        },
-        {
-          "id": 166809,
-          "order_index": 578,
-          "session_number": 29,
-          "type": "listen_build",
-          "phrase": "Мой сын здесь."
-        },
-        {
-          "id": 166818,
-          "order_index": 587,
-          "session_number": 30,
-          "type": "context_choice",
-          "phrase": "Мой сын здесь."
-        },
-        {
-          "id": 166827,
-          "order_index": 596,
-          "session_number": 30,
-          "type": "context_choice",
-          "phrase": "Мой сын здесь."
-        },
-        {
-          "id": 167316,
-          "order_index": 1085,
-          "session_number": 55,
-          "type": "context_choice",
-          "phrase": "Мой сын здесь."
         }
       ]
     },
