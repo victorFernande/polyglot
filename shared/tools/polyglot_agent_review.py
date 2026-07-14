@@ -410,7 +410,7 @@ def call_9router_review(model: str, rows: list[dict], counts: Counter, issues: C
                 {"role": "system", "content": "Você é auditor rigoroso de exercícios de idiomas. Seja conciso e bloqueie conteúdo ambíguo. Entregue apenas o relatório final."},
                 {"role": "user", "content": prompt},
             ],
-            "temperature": 0.1,
+            "temperature": 1 if model.startswith("kimi/") else 0.1,
             "max_tokens": max_tokens,
             "stream": False,
         }
