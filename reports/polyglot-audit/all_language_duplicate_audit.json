@@ -1,5 +1,5 @@
 {
-  "total_items": 7675,
+  "total_items": 7700,
   "languages": [
     "de",
     "en",
@@ -78,7 +78,7 @@
     {
       "language": "de",
       "phrase": "Das ist mein Vater.",
-      "count": 28,
+      "count": 29,
       "examples": [
         {
           "id": 163733,
@@ -203,6 +203,69 @@
     },
     {
       "language": "de",
+      "phrase": "Das ist meine Mutter.",
+      "count": 27,
+      "examples": [
+        {
+          "id": 163740,
+          "order_index": 509,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "Das ist meine Mutter."
+        },
+        {
+          "id": 163750,
+          "order_index": 519,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "Das ist meine Mutter."
+        },
+        {
+          "id": 163760,
+          "order_index": 529,
+          "session_number": 27,
+          "type": "sequence_dialogue",
+          "phrase": "Das ist meine Mutter."
+        },
+        {
+          "id": 163769,
+          "order_index": 538,
+          "session_number": 27,
+          "type": "build",
+          "phrase": "Das ist meine Mutter."
+        },
+        {
+          "id": 163780,
+          "order_index": 549,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "Das ist meine Mutter."
+        },
+        {
+          "id": 163790,
+          "order_index": 559,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "Das ist meine Mutter."
+        },
+        {
+          "id": 163796,
+          "order_index": 565,
+          "session_number": 29,
+          "type": "image_choice",
+          "phrase": "Das ist meine Mutter."
+        },
+        {
+          "id": 163800,
+          "order_index": 569,
+          "session_number": 29,
+          "type": "sequence_dialogue",
+          "phrase": "Das ist meine Mutter."
+        }
+      ]
+    },
+    {
+      "language": "de",
       "phrase": "Die Rechnung, bitte.",
       "count": 26,
       "examples": [
@@ -266,64 +329,64 @@
     },
     {
       "language": "de",
-      "phrase": "Das ist meine Mutter.",
+      "phrase": "Ich habe eine Schwester.",
       "count": 26,
       "examples": [
+        {
+          "id": 163735,
+          "order_index": 504,
+          "session_number": 26,
+          "type": "choice",
+          "phrase": "Ich habe eine Schwester."
+        },
         {
           "id": 163740,
           "order_index": 509,
           "session_number": 26,
           "type": "sequence_dialogue",
-          "phrase": "Das ist meine Mutter."
+          "phrase": "Ich habe eine Schwester."
+        },
+        {
+          "id": 163744,
+          "order_index": 513,
+          "session_number": 26,
+          "type": "choice",
+          "phrase": "Ich habe eine Schwester."
         },
         {
           "id": 163750,
           "order_index": 519,
           "session_number": 26,
           "type": "sequence_dialogue",
-          "phrase": "Das ist meine Mutter."
+          "phrase": "Ich habe eine Schwester."
+        },
+        {
+          "id": 163753,
+          "order_index": 522,
+          "session_number": 27,
+          "type": "choice",
+          "phrase": "Ich habe eine Schwester."
         },
         {
           "id": 163760,
           "order_index": 529,
           "session_number": 27,
           "type": "sequence_dialogue",
-          "phrase": "Das ist meine Mutter."
-        },
-        {
-          "id": 163769,
-          "order_index": 538,
-          "session_number": 27,
-          "type": "build",
-          "phrase": "Das ist meine Mutter."
+          "phrase": "Ich habe eine Schwester."
         },
         {
           "id": 163780,
           "order_index": 549,
           "session_number": 28,
           "type": "sequence_dialogue",
-          "phrase": "Das ist meine Mutter."
+          "phrase": "Ich habe eine Schwester."
         },
         {
           "id": 163790,
           "order_index": 559,
           "session_number": 28,
           "type": "sequence_dialogue",
-          "phrase": "Das ist meine Mutter."
-        },
-        {
-          "id": 163796,
-          "order_index": 565,
-          "session_number": 29,
-          "type": "image_choice",
-          "phrase": "Das ist meine Mutter."
-        },
-        {
-          "id": 163800,
-          "order_index": 569,
-          "session_number": 29,
-          "type": "sequence_dialogue",
-          "phrase": "Das ist meine Mutter."
+          "phrase": "Ich habe eine Schwester."
         }
       ]
     },
@@ -392,64 +455,64 @@
     },
     {
       "language": "de",
-      "phrase": "Ich habe eine Schwester.",
+      "phrase": "Ich habe einen Bruder.",
       "count": 25,
       "examples": [
         {
-          "id": 163735,
-          "order_index": 504,
+          "id": 163734,
+          "order_index": 503,
           "session_number": 26,
-          "type": "choice",
-          "phrase": "Ich habe eine Schwester."
+          "type": "listen_choice",
+          "phrase": "Ich habe einen Bruder."
         },
         {
           "id": 163740,
           "order_index": 509,
           "session_number": 26,
           "type": "sequence_dialogue",
-          "phrase": "Ich habe eine Schwester."
+          "phrase": "Ich habe einen Bruder."
         },
         {
-          "id": 163744,
-          "order_index": 513,
+          "id": 163743,
+          "order_index": 512,
           "session_number": 26,
           "type": "choice",
-          "phrase": "Ich habe eine Schwester."
+          "phrase": "Ich habe einen Bruder."
         },
         {
           "id": 163750,
           "order_index": 519,
           "session_number": 26,
           "type": "sequence_dialogue",
-          "phrase": "Ich habe eine Schwester."
-        },
-        {
-          "id": 163753,
-          "order_index": 522,
-          "session_number": 27,
-          "type": "choice",
-          "phrase": "Ich habe eine Schwester."
+          "phrase": "Ich habe einen Bruder."
         },
         {
           "id": 163760,
           "order_index": 529,
           "session_number": 27,
           "type": "sequence_dialogue",
-          "phrase": "Ich habe eine Schwester."
+          "phrase": "Ich habe einen Bruder."
         },
         {
           "id": 163780,
           "order_index": 549,
           "session_number": 28,
           "type": "sequence_dialogue",
-          "phrase": "Ich habe eine Schwester."
+          "phrase": "Ich habe einen Bruder."
+        },
+        {
+          "id": 163789,
+          "order_index": 558,
+          "session_number": 28,
+          "type": "build",
+          "phrase": "Ich habe einen Bruder."
         },
         {
           "id": 163790,
           "order_index": 559,
           "session_number": 28,
           "type": "sequence_dialogue",
-          "phrase": "Ich habe eine Schwester."
+          "phrase": "Ich habe einen Bruder."
         }
       ]
     },
@@ -639,69 +702,6 @@
           "session_number": 18,
           "type": "context_choice",
           "phrase": "Die Speisekarte, bitte."
-        }
-      ]
-    },
-    {
-      "language": "de",
-      "phrase": "Ich habe einen Bruder.",
-      "count": 24,
-      "examples": [
-        {
-          "id": 163734,
-          "order_index": 503,
-          "session_number": 26,
-          "type": "listen_choice",
-          "phrase": "Ich habe einen Bruder."
-        },
-        {
-          "id": 163740,
-          "order_index": 509,
-          "session_number": 26,
-          "type": "sequence_dialogue",
-          "phrase": "Ich habe einen Bruder."
-        },
-        {
-          "id": 163743,
-          "order_index": 512,
-          "session_number": 26,
-          "type": "choice",
-          "phrase": "Ich habe einen Bruder."
-        },
-        {
-          "id": 163750,
-          "order_index": 519,
-          "session_number": 26,
-          "type": "sequence_dialogue",
-          "phrase": "Ich habe einen Bruder."
-        },
-        {
-          "id": 163760,
-          "order_index": 529,
-          "session_number": 27,
-          "type": "sequence_dialogue",
-          "phrase": "Ich habe einen Bruder."
-        },
-        {
-          "id": 163780,
-          "order_index": 549,
-          "session_number": 28,
-          "type": "sequence_dialogue",
-          "phrase": "Ich habe einen Bruder."
-        },
-        {
-          "id": 163789,
-          "order_index": 558,
-          "session_number": 28,
-          "type": "build",
-          "phrase": "Ich habe einen Bruder."
-        },
-        {
-          "id": 163790,
-          "order_index": 559,
-          "session_number": 28,
-          "type": "sequence_dialogue",
-          "phrase": "Ich habe einen Bruder."
         }
       ]
     },
@@ -1401,7 +1401,7 @@
     {
       "language": "en",
       "phrase": "This is my father.",
-      "count": 28,
+      "count": 29,
       "examples": [
         {
           "id": 169733,
@@ -1526,6 +1526,69 @@
     },
     {
       "language": "en",
+      "phrase": "This is my mother.",
+      "count": 27,
+      "examples": [
+        {
+          "id": 169740,
+          "order_index": 509,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "This is my mother."
+        },
+        {
+          "id": 169750,
+          "order_index": 519,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "This is my mother."
+        },
+        {
+          "id": 169760,
+          "order_index": 529,
+          "session_number": 27,
+          "type": "sequence_dialogue",
+          "phrase": "This is my mother."
+        },
+        {
+          "id": 169769,
+          "order_index": 538,
+          "session_number": 27,
+          "type": "build",
+          "phrase": "This is my mother."
+        },
+        {
+          "id": 169780,
+          "order_index": 549,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "This is my mother."
+        },
+        {
+          "id": 169790,
+          "order_index": 559,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "This is my mother."
+        },
+        {
+          "id": 169796,
+          "order_index": 565,
+          "session_number": 29,
+          "type": "image_choice",
+          "phrase": "This is my mother."
+        },
+        {
+          "id": 169800,
+          "order_index": 569,
+          "session_number": 29,
+          "type": "sequence_dialogue",
+          "phrase": "This is my mother."
+        }
+      ]
+    },
+    {
+      "language": "en",
       "phrase": "The bill, please.",
       "count": 26,
       "examples": [
@@ -1589,64 +1652,64 @@
     },
     {
       "language": "en",
-      "phrase": "This is my mother.",
+      "phrase": "I have a sister.",
       "count": 26,
       "examples": [
+        {
+          "id": 169735,
+          "order_index": 504,
+          "session_number": 26,
+          "type": "choice",
+          "phrase": "I have a sister."
+        },
         {
           "id": 169740,
           "order_index": 509,
           "session_number": 26,
           "type": "sequence_dialogue",
-          "phrase": "This is my mother."
+          "phrase": "I have a sister."
+        },
+        {
+          "id": 169744,
+          "order_index": 513,
+          "session_number": 26,
+          "type": "choice",
+          "phrase": "I have a sister."
         },
         {
           "id": 169750,
           "order_index": 519,
           "session_number": 26,
           "type": "sequence_dialogue",
-          "phrase": "This is my mother."
+          "phrase": "I have a sister."
+        },
+        {
+          "id": 169753,
+          "order_index": 522,
+          "session_number": 27,
+          "type": "choice",
+          "phrase": "I have a sister."
         },
         {
           "id": 169760,
           "order_index": 529,
           "session_number": 27,
           "type": "sequence_dialogue",
-          "phrase": "This is my mother."
-        },
-        {
-          "id": 169769,
-          "order_index": 538,
-          "session_number": 27,
-          "type": "build",
-          "phrase": "This is my mother."
+          "phrase": "I have a sister."
         },
         {
           "id": 169780,
           "order_index": 549,
           "session_number": 28,
           "type": "sequence_dialogue",
-          "phrase": "This is my mother."
+          "phrase": "I have a sister."
         },
         {
           "id": 169790,
           "order_index": 559,
           "session_number": 28,
           "type": "sequence_dialogue",
-          "phrase": "This is my mother."
-        },
-        {
-          "id": 169796,
-          "order_index": 565,
-          "session_number": 29,
-          "type": "image_choice",
-          "phrase": "This is my mother."
-        },
-        {
-          "id": 169800,
-          "order_index": 569,
-          "session_number": 29,
-          "type": "sequence_dialogue",
-          "phrase": "This is my mother."
+          "phrase": "I have a sister."
         }
       ]
     },
@@ -1778,64 +1841,64 @@
     },
     {
       "language": "en",
-      "phrase": "I have a sister.",
+      "phrase": "I have a brother.",
       "count": 25,
       "examples": [
         {
-          "id": 169735,
-          "order_index": 504,
+          "id": 169734,
+          "order_index": 503,
           "session_number": 26,
-          "type": "choice",
-          "phrase": "I have a sister."
+          "type": "listen_choice",
+          "phrase": "I have a brother."
         },
         {
           "id": 169740,
           "order_index": 509,
           "session_number": 26,
           "type": "sequence_dialogue",
-          "phrase": "I have a sister."
+          "phrase": "I have a brother."
         },
         {
-          "id": 169744,
-          "order_index": 513,
+          "id": 169743,
+          "order_index": 512,
           "session_number": 26,
           "type": "choice",
-          "phrase": "I have a sister."
+          "phrase": "I have a brother."
         },
         {
           "id": 169750,
           "order_index": 519,
           "session_number": 26,
           "type": "sequence_dialogue",
-          "phrase": "I have a sister."
-        },
-        {
-          "id": 169753,
-          "order_index": 522,
-          "session_number": 27,
-          "type": "choice",
-          "phrase": "I have a sister."
+          "phrase": "I have a brother."
         },
         {
           "id": 169760,
           "order_index": 529,
           "session_number": 27,
           "type": "sequence_dialogue",
-          "phrase": "I have a sister."
+          "phrase": "I have a brother."
         },
         {
           "id": 169780,
           "order_index": 549,
           "session_number": 28,
           "type": "sequence_dialogue",
-          "phrase": "I have a sister."
+          "phrase": "I have a brother."
+        },
+        {
+          "id": 169789,
+          "order_index": 558,
+          "session_number": 28,
+          "type": "build",
+          "phrase": "I have a brother."
         },
         {
           "id": 169790,
           "order_index": 559,
           "session_number": 28,
           "type": "sequence_dialogue",
-          "phrase": "I have a sister."
+          "phrase": "I have a brother."
         }
       ]
     },
@@ -1962,69 +2025,6 @@
           "session_number": 18,
           "type": "context_choice",
           "phrase": "The menu, please."
-        }
-      ]
-    },
-    {
-      "language": "en",
-      "phrase": "I have a brother.",
-      "count": 24,
-      "examples": [
-        {
-          "id": 169734,
-          "order_index": 503,
-          "session_number": 26,
-          "type": "listen_choice",
-          "phrase": "I have a brother."
-        },
-        {
-          "id": 169740,
-          "order_index": 509,
-          "session_number": 26,
-          "type": "sequence_dialogue",
-          "phrase": "I have a brother."
-        },
-        {
-          "id": 169743,
-          "order_index": 512,
-          "session_number": 26,
-          "type": "choice",
-          "phrase": "I have a brother."
-        },
-        {
-          "id": 169750,
-          "order_index": 519,
-          "session_number": 26,
-          "type": "sequence_dialogue",
-          "phrase": "I have a brother."
-        },
-        {
-          "id": 169760,
-          "order_index": 529,
-          "session_number": 27,
-          "type": "sequence_dialogue",
-          "phrase": "I have a brother."
-        },
-        {
-          "id": 169780,
-          "order_index": 549,
-          "session_number": 28,
-          "type": "sequence_dialogue",
-          "phrase": "I have a brother."
-        },
-        {
-          "id": 169789,
-          "order_index": 558,
-          "session_number": 28,
-          "type": "build",
-          "phrase": "I have a brother."
-        },
-        {
-          "id": 169790,
-          "order_index": 559,
-          "session_number": 28,
-          "type": "sequence_dialogue",
-          "phrase": "I have a brother."
         }
       ]
     },
@@ -2661,7 +2661,7 @@
     {
       "language": "fr",
       "phrase": "C'est mon père.",
-      "count": 28,
+      "count": 29,
       "examples": [
         {
           "id": 165233,
@@ -2786,6 +2786,69 @@
     },
     {
       "language": "fr",
+      "phrase": "C'est ma mère.",
+      "count": 27,
+      "examples": [
+        {
+          "id": 165240,
+          "order_index": 509,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "C'est ma mère."
+        },
+        {
+          "id": 165250,
+          "order_index": 519,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "C'est ma mère."
+        },
+        {
+          "id": 165260,
+          "order_index": 529,
+          "session_number": 27,
+          "type": "sequence_dialogue",
+          "phrase": "C'est ma mère."
+        },
+        {
+          "id": 165269,
+          "order_index": 538,
+          "session_number": 27,
+          "type": "build",
+          "phrase": "C'est ma mère."
+        },
+        {
+          "id": 165280,
+          "order_index": 549,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "C'est ma mère."
+        },
+        {
+          "id": 165290,
+          "order_index": 559,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "C'est ma mère."
+        },
+        {
+          "id": 165296,
+          "order_index": 565,
+          "session_number": 29,
+          "type": "image_choice",
+          "phrase": "C'est ma mère."
+        },
+        {
+          "id": 165300,
+          "order_index": 569,
+          "session_number": 29,
+          "type": "sequence_dialogue",
+          "phrase": "C'est ma mère."
+        }
+      ]
+    },
+    {
+      "language": "fr",
       "phrase": "L'addition, s'il vous plaît.",
       "count": 26,
       "examples": [
@@ -2849,64 +2912,64 @@
     },
     {
       "language": "fr",
-      "phrase": "C'est ma mère.",
+      "phrase": "J'ai une sœur.",
       "count": 26,
       "examples": [
+        {
+          "id": 165235,
+          "order_index": 504,
+          "session_number": 26,
+          "type": "choice",
+          "phrase": "J'ai une sœur."
+        },
         {
           "id": 165240,
           "order_index": 509,
           "session_number": 26,
           "type": "sequence_dialogue",
-          "phrase": "C'est ma mère."
+          "phrase": "J'ai une sœur."
+        },
+        {
+          "id": 165244,
+          "order_index": 513,
+          "session_number": 26,
+          "type": "choice",
+          "phrase": "J'ai une sœur."
         },
         {
           "id": 165250,
           "order_index": 519,
           "session_number": 26,
           "type": "sequence_dialogue",
-          "phrase": "C'est ma mère."
+          "phrase": "J'ai une sœur."
+        },
+        {
+          "id": 165253,
+          "order_index": 522,
+          "session_number": 27,
+          "type": "choice",
+          "phrase": "J'ai une sœur."
         },
         {
           "id": 165260,
           "order_index": 529,
           "session_number": 27,
           "type": "sequence_dialogue",
-          "phrase": "C'est ma mère."
-        },
-        {
-          "id": 165269,
-          "order_index": 538,
-          "session_number": 27,
-          "type": "build",
-          "phrase": "C'est ma mère."
+          "phrase": "J'ai une sœur."
         },
         {
           "id": 165280,
           "order_index": 549,
           "session_number": 28,
           "type": "sequence_dialogue",
-          "phrase": "C'est ma mère."
+          "phrase": "J'ai une sœur."
         },
         {
           "id": 165290,
           "order_index": 559,
           "session_number": 28,
           "type": "sequence_dialogue",
-          "phrase": "C'est ma mère."
-        },
-        {
-          "id": 165296,
-          "order_index": 565,
-          "session_number": 29,
-          "type": "image_choice",
-          "phrase": "C'est ma mère."
-        },
-        {
-          "id": 165300,
-          "order_index": 569,
-          "session_number": 29,
-          "type": "sequence_dialogue",
-          "phrase": "C'est ma mère."
+          "phrase": "J'ai une sœur."
         }
       ]
     },
@@ -2975,64 +3038,64 @@
     },
     {
       "language": "fr",
-      "phrase": "J'ai une sœur.",
+      "phrase": "J'ai un frère.",
       "count": 25,
       "examples": [
         {
-          "id": 165235,
-          "order_index": 504,
+          "id": 165234,
+          "order_index": 503,
           "session_number": 26,
-          "type": "choice",
-          "phrase": "J'ai une sœur."
+          "type": "listen_choice",
+          "phrase": "J'ai un frère."
         },
         {
           "id": 165240,
           "order_index": 509,
           "session_number": 26,
           "type": "sequence_dialogue",
-          "phrase": "J'ai une sœur."
+          "phrase": "J'ai un frère."
         },
         {
-          "id": 165244,
-          "order_index": 513,
+          "id": 165243,
+          "order_index": 512,
           "session_number": 26,
           "type": "choice",
-          "phrase": "J'ai une sœur."
+          "phrase": "J'ai un frère."
         },
         {
           "id": 165250,
           "order_index": 519,
           "session_number": 26,
           "type": "sequence_dialogue",
-          "phrase": "J'ai une sœur."
-        },
-        {
-          "id": 165253,
-          "order_index": 522,
-          "session_number": 27,
-          "type": "choice",
-          "phrase": "J'ai une sœur."
+          "phrase": "J'ai un frère."
         },
         {
           "id": 165260,
           "order_index": 529,
           "session_number": 27,
           "type": "sequence_dialogue",
-          "phrase": "J'ai une sœur."
+          "phrase": "J'ai un frère."
         },
         {
           "id": 165280,
           "order_index": 549,
           "session_number": 28,
           "type": "sequence_dialogue",
-          "phrase": "J'ai une sœur."
+          "phrase": "J'ai un frère."
+        },
+        {
+          "id": 165289,
+          "order_index": 558,
+          "session_number": 28,
+          "type": "build",
+          "phrase": "J'ai un frère."
         },
         {
           "id": 165290,
           "order_index": 559,
           "session_number": 28,
           "type": "sequence_dialogue",
-          "phrase": "J'ai une sœur."
+          "phrase": "J'ai un frère."
         }
       ]
     },
@@ -3159,69 +3222,6 @@
           "session_number": 18,
           "type": "context_choice",
           "phrase": "Le menu, s'il vous plaît."
-        }
-      ]
-    },
-    {
-      "language": "fr",
-      "phrase": "J'ai un frère.",
-      "count": 24,
-      "examples": [
-        {
-          "id": 165234,
-          "order_index": 503,
-          "session_number": 26,
-          "type": "listen_choice",
-          "phrase": "J'ai un frère."
-        },
-        {
-          "id": 165240,
-          "order_index": 509,
-          "session_number": 26,
-          "type": "sequence_dialogue",
-          "phrase": "J'ai un frère."
-        },
-        {
-          "id": 165243,
-          "order_index": 512,
-          "session_number": 26,
-          "type": "choice",
-          "phrase": "J'ai un frère."
-        },
-        {
-          "id": 165250,
-          "order_index": 519,
-          "session_number": 26,
-          "type": "sequence_dialogue",
-          "phrase": "J'ai un frère."
-        },
-        {
-          "id": 165260,
-          "order_index": 529,
-          "session_number": 27,
-          "type": "sequence_dialogue",
-          "phrase": "J'ai un frère."
-        },
-        {
-          "id": 165280,
-          "order_index": 549,
-          "session_number": 28,
-          "type": "sequence_dialogue",
-          "phrase": "J'ai un frère."
-        },
-        {
-          "id": 165289,
-          "order_index": 558,
-          "session_number": 28,
-          "type": "build",
-          "phrase": "J'ai un frère."
-        },
-        {
-          "id": 165290,
-          "order_index": 559,
-          "session_number": 28,
-          "type": "sequence_dialogue",
-          "phrase": "J'ai un frère."
         }
       ]
     },
@@ -3858,7 +3858,7 @@
     {
       "language": "jp",
       "phrase": "これは私の父です。",
-      "count": 26,
+      "count": 27,
       "examples": [
         {
           "id": 168233,
@@ -3915,6 +3915,69 @@
           "session_number": 29,
           "type": "listen_choice",
           "phrase": "これは私の父です。"
+        }
+      ]
+    },
+    {
+      "language": "jp",
+      "phrase": "これは私の母です。",
+      "count": 26,
+      "examples": [
+        {
+          "id": 168240,
+          "order_index": 509,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "これは私の母です。"
+        },
+        {
+          "id": 168250,
+          "order_index": 519,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "これは私の母です。"
+        },
+        {
+          "id": 168260,
+          "order_index": 529,
+          "session_number": 27,
+          "type": "sequence_dialogue",
+          "phrase": "これは私の母です。"
+        },
+        {
+          "id": 168280,
+          "order_index": 549,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "これは私の母です。"
+        },
+        {
+          "id": 168290,
+          "order_index": 559,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "これは私の母です。"
+        },
+        {
+          "id": 168296,
+          "order_index": 565,
+          "session_number": 29,
+          "type": "image_choice",
+          "phrase": "これは私の母です。"
+        },
+        {
+          "id": 168300,
+          "order_index": 569,
+          "session_number": 29,
+          "type": "sequence_dialogue",
+          "phrase": "これは私の母です。"
+        },
+        {
+          "id": 168305,
+          "order_index": 574,
+          "session_number": 29,
+          "type": "context_choice",
+          "phrase": "これは私の母です。"
         }
       ]
     },
@@ -3983,64 +4046,64 @@
     },
     {
       "language": "jp",
-      "phrase": "これは私の母です。",
-      "count": 25,
+      "phrase": "兄弟がいます。",
+      "count": 23,
       "examples": [
+        {
+          "id": 168234,
+          "order_index": 503,
+          "session_number": 26,
+          "type": "listen_choice",
+          "phrase": "兄弟がいます。"
+        },
         {
           "id": 168240,
           "order_index": 509,
           "session_number": 26,
           "type": "sequence_dialogue",
-          "phrase": "これは私の母です。"
+          "phrase": "兄弟がいます。"
+        },
+        {
+          "id": 168243,
+          "order_index": 512,
+          "session_number": 26,
+          "type": "choice",
+          "phrase": "兄弟がいます。"
         },
         {
           "id": 168250,
           "order_index": 519,
           "session_number": 26,
           "type": "sequence_dialogue",
-          "phrase": "これは私の母です。"
+          "phrase": "兄弟がいます。"
         },
         {
           "id": 168260,
           "order_index": 529,
           "session_number": 27,
           "type": "sequence_dialogue",
-          "phrase": "これは私の母です。"
+          "phrase": "兄弟がいます。"
         },
         {
           "id": 168280,
           "order_index": 549,
           "session_number": 28,
           "type": "sequence_dialogue",
-          "phrase": "これは私の母です。"
+          "phrase": "兄弟がいます。"
         },
         {
           "id": 168290,
           "order_index": 559,
           "session_number": 28,
           "type": "sequence_dialogue",
-          "phrase": "これは私の母です。"
-        },
-        {
-          "id": 168296,
-          "order_index": 565,
-          "session_number": 29,
-          "type": "image_choice",
-          "phrase": "これは私の母です。"
+          "phrase": "兄弟がいます。"
         },
         {
           "id": 168300,
           "order_index": 569,
           "session_number": 29,
           "type": "sequence_dialogue",
-          "phrase": "これは私の母です。"
-        },
-        {
-          "id": 168305,
-          "order_index": 574,
-          "session_number": 29,
-          "type": "context_choice",
-          "phrase": "これは私の母です。"
+          "phrase": "兄弟がいます。"
         }
       ]
     },
@@ -4293,69 +4356,6 @@
           "session_number": 24,
           "type": "context_choice",
           "phrase": "私の電話番号は一二三です。"
-        }
-      ]
-    },
-    {
-      "language": "jp",
-      "phrase": "兄弟がいます。",
-      "count": 22,
-      "examples": [
-        {
-          "id": 168234,
-          "order_index": 503,
-          "session_number": 26,
-          "type": "listen_choice",
-          "phrase": "兄弟がいます。"
-        },
-        {
-          "id": 168240,
-          "order_index": 509,
-          "session_number": 26,
-          "type": "sequence_dialogue",
-          "phrase": "兄弟がいます。"
-        },
-        {
-          "id": 168243,
-          "order_index": 512,
-          "session_number": 26,
-          "type": "choice",
-          "phrase": "兄弟がいます。"
-        },
-        {
-          "id": 168250,
-          "order_index": 519,
-          "session_number": 26,
-          "type": "sequence_dialogue",
-          "phrase": "兄弟がいます。"
-        },
-        {
-          "id": 168260,
-          "order_index": 529,
-          "session_number": 27,
-          "type": "sequence_dialogue",
-          "phrase": "兄弟がいます。"
-        },
-        {
-          "id": 168280,
-          "order_index": 549,
-          "session_number": 28,
-          "type": "sequence_dialogue",
-          "phrase": "兄弟がいます。"
-        },
-        {
-          "id": 168290,
-          "order_index": 559,
-          "session_number": 28,
-          "type": "sequence_dialogue",
-          "phrase": "兄弟がいます。"
-        },
-        {
-          "id": 168300,
-          "order_index": 569,
-          "session_number": 29,
-          "type": "sequence_dialogue",
-          "phrase": "兄弟がいます。"
         }
       ]
     },
@@ -5181,7 +5181,7 @@
     {
       "language": "ru",
       "phrase": "Это мой папа.",
-      "count": 28,
+      "count": 29,
       "examples": [
         {
           "id": 166733,
@@ -5307,7 +5307,7 @@
     {
       "language": "ru",
       "phrase": "Это моя мама.",
-      "count": 26,
+      "count": 27,
       "examples": [
         {
           "id": 166740,
@@ -5364,6 +5364,69 @@
           "session_number": 29,
           "type": "sequence_dialogue",
           "phrase": "Это моя мама."
+        }
+      ]
+    },
+    {
+      "language": "ru",
+      "phrase": "У меня есть сестра.",
+      "count": 26,
+      "examples": [
+        {
+          "id": 166735,
+          "order_index": 504,
+          "session_number": 26,
+          "type": "choice",
+          "phrase": "У меня есть сестра."
+        },
+        {
+          "id": 166740,
+          "order_index": 509,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "У меня есть сестра."
+        },
+        {
+          "id": 166744,
+          "order_index": 513,
+          "session_number": 26,
+          "type": "choice",
+          "phrase": "У меня есть сестра."
+        },
+        {
+          "id": 166750,
+          "order_index": 519,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "У меня есть сестра."
+        },
+        {
+          "id": 166753,
+          "order_index": 522,
+          "session_number": 27,
+          "type": "choice",
+          "phrase": "У меня есть сестра."
+        },
+        {
+          "id": 166760,
+          "order_index": 529,
+          "session_number": 27,
+          "type": "sequence_dialogue",
+          "phrase": "У меня есть сестра."
+        },
+        {
+          "id": 166780,
+          "order_index": 549,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "У меня есть сестра."
+        },
+        {
+          "id": 166790,
+          "order_index": 559,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "У меня есть сестра."
         }
       ]
     },
@@ -5432,64 +5495,64 @@
     },
     {
       "language": "ru",
-      "phrase": "У меня есть сестра.",
+      "phrase": "У меня есть брат.",
       "count": 25,
       "examples": [
         {
-          "id": 166735,
-          "order_index": 504,
+          "id": 166734,
+          "order_index": 503,
           "session_number": 26,
-          "type": "choice",
-          "phrase": "У меня есть сестра."
+          "type": "listen_choice",
+          "phrase": "У меня есть брат."
         },
         {
           "id": 166740,
           "order_index": 509,
           "session_number": 26,
           "type": "sequence_dialogue",
-          "phrase": "У меня есть сестра."
+          "phrase": "У меня есть брат."
         },
         {
-          "id": 166744,
-          "order_index": 513,
+          "id": 166743,
+          "order_index": 512,
           "session_number": 26,
           "type": "choice",
-          "phrase": "У меня есть сестра."
+          "phrase": "У меня есть брат."
         },
         {
           "id": 166750,
           "order_index": 519,
           "session_number": 26,
           "type": "sequence_dialogue",
-          "phrase": "У меня есть сестра."
-        },
-        {
-          "id": 166753,
-          "order_index": 522,
-          "session_number": 27,
-          "type": "choice",
-          "phrase": "У меня есть сестра."
+          "phrase": "У меня есть брат."
         },
         {
           "id": 166760,
           "order_index": 529,
           "session_number": 27,
           "type": "sequence_dialogue",
-          "phrase": "У меня есть сестра."
+          "phrase": "У меня есть брат."
         },
         {
           "id": 166780,
           "order_index": 549,
           "session_number": 28,
           "type": "sequence_dialogue",
-          "phrase": "У меня есть сестра."
+          "phrase": "У меня есть брат."
+        },
+        {
+          "id": 166789,
+          "order_index": 558,
+          "session_number": 28,
+          "type": "build",
+          "phrase": "У меня есть брат."
         },
         {
           "id": 166790,
           "order_index": 559,
           "session_number": 28,
           "type": "sequence_dialogue",
-          "phrase": "У меня есть сестра."
+          "phrase": "У меня есть брат."
         }
       ]
     },
@@ -5616,69 +5679,6 @@
           "session_number": 18,
           "type": "context_choice",
           "phrase": "Меню, пожалуйста."
-        }
-      ]
-    },
-    {
-      "language": "ru",
-      "phrase": "У меня есть брат.",
-      "count": 24,
-      "examples": [
-        {
-          "id": 166734,
-          "order_index": 503,
-          "session_number": 26,
-          "type": "listen_choice",
-          "phrase": "У меня есть брат."
-        },
-        {
-          "id": 166740,
-          "order_index": 509,
-          "session_number": 26,
-          "type": "sequence_dialogue",
-          "phrase": "У меня есть брат."
-        },
-        {
-          "id": 166743,
-          "order_index": 512,
-          "session_number": 26,
-          "type": "choice",
-          "phrase": "У меня есть брат."
-        },
-        {
-          "id": 166750,
-          "order_index": 519,
-          "session_number": 26,
-          "type": "sequence_dialogue",
-          "phrase": "У меня есть брат."
-        },
-        {
-          "id": 166760,
-          "order_index": 529,
-          "session_number": 27,
-          "type": "sequence_dialogue",
-          "phrase": "У меня есть брат."
-        },
-        {
-          "id": 166780,
-          "order_index": 549,
-          "session_number": 28,
-          "type": "sequence_dialogue",
-          "phrase": "У меня есть брат."
-        },
-        {
-          "id": 166789,
-          "order_index": 558,
-          "session_number": 28,
-          "type": "build",
-          "phrase": "У меня есть брат."
-        },
-        {
-          "id": 166790,
-          "order_index": 559,
-          "session_number": 28,
-          "type": "sequence_dialogue",
-          "phrase": "У меня есть брат."
         }
       ]
     },
