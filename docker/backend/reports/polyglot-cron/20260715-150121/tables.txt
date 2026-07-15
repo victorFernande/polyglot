@@ -1,0 +1,11 @@
+achievements
+exercise_answers
+exercise_items
+exercise_lessons
+exercise_sessions
+phases
+study_logs
+tasks
+user_achievements
+users
+waves
