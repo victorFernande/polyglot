@@ -1,7 +1,7 @@
 # Revisão full DB — Polyglot
 
-- Total: 8575
-- Veredictos: {'PASS': 8575}
+- Total: 8600
+- Veredictos: {'PASS': 8600}
 - Issue codes: {}
 
 PASS: nenhuma falha encontrada no DB completo.
