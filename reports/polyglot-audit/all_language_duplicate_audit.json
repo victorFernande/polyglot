@@ -1,5 +1,5 @@
 {
-  "total_items": 8200,
+  "total_items": 8225,
   "languages": [
     "de",
     "en",
@@ -15,7 +15,7 @@
     {
       "language": "de",
       "phrase": "Das ist mein Vater.",
-      "count": 49,
+      "count": 50,
       "examples": [
         {
           "id": 163733,
@@ -78,7 +78,7 @@
     {
       "language": "de",
       "phrase": "Das ist meine Mutter.",
-      "count": 47,
+      "count": 48,
       "examples": [
         {
           "id": 163740,
@@ -141,7 +141,7 @@
     {
       "language": "de",
       "phrase": "Ich habe eine Schwester.",
-      "count": 46,
+      "count": 47,
       "examples": [
         {
           "id": 163735,
@@ -204,7 +204,7 @@
     {
       "language": "de",
       "phrase": "Ich habe einen Bruder.",
-      "count": 45,
+      "count": 46,
       "examples": [
         {
           "id": 163734,
@@ -267,7 +267,7 @@
     {
       "language": "de",
       "phrase": "Mein Sohn ist hier.",
-      "count": 38,
+      "count": 39,
       "examples": [
         {
           "id": 163736,
@@ -1275,7 +1275,7 @@
     {
       "language": "en",
       "phrase": "This is my father.",
-      "count": 49,
+      "count": 50,
       "examples": [
         {
           "id": 169733,
@@ -1338,7 +1338,7 @@
     {
       "language": "en",
       "phrase": "This is my mother.",
-      "count": 47,
+      "count": 48,
       "examples": [
         {
           "id": 169740,
@@ -1401,7 +1401,7 @@
     {
       "language": "en",
       "phrase": "I have a sister.",
-      "count": 46,
+      "count": 47,
       "examples": [
         {
           "id": 169735,
@@ -1464,7 +1464,7 @@
     {
       "language": "en",
       "phrase": "I have a brother.",
-      "count": 45,
+      "count": 46,
       "examples": [
         {
           "id": 169734,
@@ -1590,7 +1590,7 @@
     {
       "language": "en",
       "phrase": "My son is here.",
-      "count": 38,
+      "count": 39,
       "examples": [
         {
           "id": 169736,
@@ -2535,7 +2535,7 @@
     {
       "language": "fr",
       "phrase": "C'est mon père.",
-      "count": 49,
+      "count": 50,
       "examples": [
         {
           "id": 165233,
@@ -2598,7 +2598,7 @@
     {
       "language": "fr",
       "phrase": "C'est ma mère.",
-      "count": 47,
+      "count": 48,
       "examples": [
         {
           "id": 165240,
@@ -2655,6 +2655,69 @@
           "session_number": 29,
           "type": "sequence_dialogue",
           "phrase": "C'est ma mère."
+        }
+      ]
+    },
+    {
+      "language": "fr",
+      "phrase": "J'ai une sœur.",
+      "count": 47,
+      "examples": [
+        {
+          "id": 165235,
+          "order_index": 504,
+          "session_number": 26,
+          "type": "choice",
+          "phrase": "J'ai une sœur."
+        },
+        {
+          "id": 165240,
+          "order_index": 509,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "J'ai une sœur."
+        },
+        {
+          "id": 165244,
+          "order_index": 513,
+          "session_number": 26,
+          "type": "choice",
+          "phrase": "J'ai une sœur."
+        },
+        {
+          "id": 165250,
+          "order_index": 519,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "J'ai une sœur."
+        },
+        {
+          "id": 165253,
+          "order_index": 522,
+          "session_number": 27,
+          "type": "choice",
+          "phrase": "J'ai une sœur."
+        },
+        {
+          "id": 165260,
+          "order_index": 529,
+          "session_number": 27,
+          "type": "sequence_dialogue",
+          "phrase": "J'ai une sœur."
+        },
+        {
+          "id": 165280,
+          "order_index": 549,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "J'ai une sœur."
+        },
+        {
+          "id": 165290,
+          "order_index": 559,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "J'ai une sœur."
         }
       ]
     },
@@ -2723,71 +2786,8 @@
     },
     {
       "language": "fr",
-      "phrase": "J'ai une sœur.",
-      "count": 46,
-      "examples": [
-        {
-          "id": 165235,
-          "order_index": 504,
-          "session_number": 26,
-          "type": "choice",
-          "phrase": "J'ai une sœur."
-        },
-        {
-          "id": 165240,
-          "order_index": 509,
-          "session_number": 26,
-          "type": "sequence_dialogue",
-          "phrase": "J'ai une sœur."
-        },
-        {
-          "id": 165244,
-          "order_index": 513,
-          "session_number": 26,
-          "type": "choice",
-          "phrase": "J'ai une sœur."
-        },
-        {
-          "id": 165250,
-          "order_index": 519,
-          "session_number": 26,
-          "type": "sequence_dialogue",
-          "phrase": "J'ai une sœur."
-        },
-        {
-          "id": 165253,
-          "order_index": 522,
-          "session_number": 27,
-          "type": "choice",
-          "phrase": "J'ai une sœur."
-        },
-        {
-          "id": 165260,
-          "order_index": 529,
-          "session_number": 27,
-          "type": "sequence_dialogue",
-          "phrase": "J'ai une sœur."
-        },
-        {
-          "id": 165280,
-          "order_index": 549,
-          "session_number": 28,
-          "type": "sequence_dialogue",
-          "phrase": "J'ai une sœur."
-        },
-        {
-          "id": 165290,
-          "order_index": 559,
-          "session_number": 28,
-          "type": "sequence_dialogue",
-          "phrase": "J'ai une sœur."
-        }
-      ]
-    },
-    {
-      "language": "fr",
       "phrase": "J'ai un frère.",
-      "count": 45,
+      "count": 46,
       "examples": [
         {
           "id": 165234,
@@ -2850,7 +2850,7 @@
     {
       "language": "fr",
       "phrase": "Mon fils est ici.",
-      "count": 38,
+      "count": 39,
       "examples": [
         {
           "id": 165236,
@@ -3795,7 +3795,7 @@
     {
       "language": "jp",
       "phrase": "これは私の父です。",
-      "count": 47,
+      "count": 48,
       "examples": [
         {
           "id": 168233,
@@ -3858,7 +3858,7 @@
     {
       "language": "jp",
       "phrase": "これは私の母です。",
-      "count": 46,
+      "count": 47,
       "examples": [
         {
           "id": 168240,
@@ -3921,7 +3921,7 @@
     {
       "language": "jp",
       "phrase": "兄弟がいます。",
-      "count": 43,
+      "count": 44,
       "examples": [
         {
           "id": 168234,
@@ -3984,7 +3984,7 @@
     {
       "language": "jp",
       "phrase": "息子はここにいます。",
-      "count": 36,
+      "count": 37,
       "examples": [
         {
           "id": 168236,
@@ -4047,7 +4047,7 @@
     {
       "language": "jp",
       "phrase": "姉 妹 が い ま す 。",
-      "count": 31,
+      "count": 32,
       "examples": [
         {
           "id": 168299,
@@ -5055,7 +5055,7 @@
     {
       "language": "ru",
       "phrase": "Это мой папа.",
-      "count": 49,
+      "count": 50,
       "examples": [
         {
           "id": 166733,
@@ -5118,7 +5118,7 @@
     {
       "language": "ru",
       "phrase": "Это моя мама.",
-      "count": 47,
+      "count": 48,
       "examples": [
         {
           "id": 166740,
@@ -5181,7 +5181,7 @@
     {
       "language": "ru",
       "phrase": "У меня есть сестра.",
-      "count": 46,
+      "count": 47,
       "examples": [
         {
           "id": 166735,
@@ -5244,7 +5244,7 @@
     {
       "language": "ru",
       "phrase": "У меня есть брат.",
-      "count": 45,
+      "count": 46,
       "examples": [
         {
           "id": 166734,
@@ -5370,7 +5370,7 @@
     {
       "language": "ru",
       "phrase": "Мой сын здесь.",
-      "count": 38,
+      "count": 39,
       "examples": [
         {
           "id": 166736,
