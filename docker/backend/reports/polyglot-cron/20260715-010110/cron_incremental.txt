@@ -1,5 +1,0 @@
-usage: cron_incremental.py [-h] [--database-url DATABASE_URL]
-                           [--snapshot-dir SNAPSHOT_DIR] [--bootstrap]
-                           [--commit] [--commit-db]
-                           [--commit-message COMMIT_MESSAGE]
-cron_incremental.py: error: unrecognized arguments: --languages de,fr,ru,jp,en --count 5
