@@ -1,0 +1,13 @@
+[main e3e2800] chore(polyglot): hourly incremental wave 1 questions 20260715-060139
+ 16 files changed, 118 insertions(+), 31 deletions(-)
+ create mode 100644 docker/backend/reports/polyglot-cron/20260715-060139/audit_all_exercise_duplicates.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260715-060139/counts_after_increment.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260715-060139/cron_incremental.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260715-060139/frontend_boundary_check.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260715-060139/pytest_backend.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260715-060139/pytest_backend_venv.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260715-060139/review_all_exercise_items.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260715-060139/review_recent30.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260715-060139/staged-files.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260715-060139/summary.md
+ create mode 100644 reports/polyglot-cron/2026-07-15-060139-snapshot.json

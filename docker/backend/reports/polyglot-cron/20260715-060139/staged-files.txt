@@ -1,0 +1,15 @@
+docker/backend/polyglot.db
+docker/backend/reports/polyglot-cron/20260715-060139/audit_all_exercise_duplicates.txt
+docker/backend/reports/polyglot-cron/20260715-060139/counts_after_increment.txt
+docker/backend/reports/polyglot-cron/20260715-060139/cron_incremental.txt
+docker/backend/reports/polyglot-cron/20260715-060139/frontend_boundary_check.txt
+docker/backend/reports/polyglot-cron/20260715-060139/pytest_backend.txt
+docker/backend/reports/polyglot-cron/20260715-060139/pytest_backend_venv.txt
+docker/backend/reports/polyglot-cron/20260715-060139/review_all_exercise_items.txt
+docker/backend/reports/polyglot-cron/20260715-060139/review_recent30.txt
+docker/backend/reports/polyglot-cron/20260715-060139/summary.md
+reports/polyglot-audit/all_language_duplicate_audit.json
+reports/polyglot-audit/all_language_duplicate_audit.md
+reports/polyglot-audit/all_language_full_review.json
+reports/polyglot-audit/all_language_full_review.md
+reports/polyglot-cron/2026-07-15-060139-snapshot.json
