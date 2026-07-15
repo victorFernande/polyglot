@@ -1,0 +1,1 @@
+OK: no forbidden frontend-only extra/local practice patterns in Exercises.jsx
