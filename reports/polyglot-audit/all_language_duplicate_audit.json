@@ -1,5 +1,5 @@
 {
-  "total_items": 8125,
+  "total_items": 8150,
   "languages": [
     "de",
     "en",
@@ -15,7 +15,7 @@
     {
       "language": "de",
       "phrase": "Das ist mein Vater.",
-      "count": 46,
+      "count": 47,
       "examples": [
         {
           "id": 163733,
@@ -78,7 +78,7 @@
     {
       "language": "de",
       "phrase": "Das ist meine Mutter.",
-      "count": 44,
+      "count": 45,
       "examples": [
         {
           "id": 163740,
@@ -141,7 +141,7 @@
     {
       "language": "de",
       "phrase": "Ich habe eine Schwester.",
-      "count": 43,
+      "count": 44,
       "examples": [
         {
           "id": 163735,
@@ -204,7 +204,7 @@
     {
       "language": "de",
       "phrase": "Ich habe einen Bruder.",
-      "count": 42,
+      "count": 43,
       "examples": [
         {
           "id": 163734,
@@ -267,7 +267,7 @@
     {
       "language": "de",
       "phrase": "Mein Sohn ist hier.",
-      "count": 35,
+      "count": 36,
       "examples": [
         {
           "id": 163736,
@@ -1275,7 +1275,7 @@
     {
       "language": "en",
       "phrase": "This is my father.",
-      "count": 46,
+      "count": 47,
       "examples": [
         {
           "id": 169733,
@@ -1332,6 +1332,69 @@
           "session_number": 28,
           "type": "context_choice",
           "phrase": "This is my father."
+        }
+      ]
+    },
+    {
+      "language": "en",
+      "phrase": "This is my mother.",
+      "count": 45,
+      "examples": [
+        {
+          "id": 169740,
+          "order_index": 509,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "This is my mother."
+        },
+        {
+          "id": 169750,
+          "order_index": 519,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "This is my mother."
+        },
+        {
+          "id": 169760,
+          "order_index": 529,
+          "session_number": 27,
+          "type": "sequence_dialogue",
+          "phrase": "This is my mother."
+        },
+        {
+          "id": 169769,
+          "order_index": 538,
+          "session_number": 27,
+          "type": "build",
+          "phrase": "This is my mother."
+        },
+        {
+          "id": 169780,
+          "order_index": 549,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "This is my mother."
+        },
+        {
+          "id": 169790,
+          "order_index": 559,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "This is my mother."
+        },
+        {
+          "id": 169796,
+          "order_index": 565,
+          "session_number": 29,
+          "type": "image_choice",
+          "phrase": "This is my mother."
+        },
+        {
+          "id": 169800,
+          "order_index": 569,
+          "session_number": 29,
+          "type": "sequence_dialogue",
+          "phrase": "This is my mother."
         }
       ]
     },
@@ -1400,71 +1463,8 @@
     },
     {
       "language": "en",
-      "phrase": "This is my mother.",
-      "count": 44,
-      "examples": [
-        {
-          "id": 169740,
-          "order_index": 509,
-          "session_number": 26,
-          "type": "sequence_dialogue",
-          "phrase": "This is my mother."
-        },
-        {
-          "id": 169750,
-          "order_index": 519,
-          "session_number": 26,
-          "type": "sequence_dialogue",
-          "phrase": "This is my mother."
-        },
-        {
-          "id": 169760,
-          "order_index": 529,
-          "session_number": 27,
-          "type": "sequence_dialogue",
-          "phrase": "This is my mother."
-        },
-        {
-          "id": 169769,
-          "order_index": 538,
-          "session_number": 27,
-          "type": "build",
-          "phrase": "This is my mother."
-        },
-        {
-          "id": 169780,
-          "order_index": 549,
-          "session_number": 28,
-          "type": "sequence_dialogue",
-          "phrase": "This is my mother."
-        },
-        {
-          "id": 169790,
-          "order_index": 559,
-          "session_number": 28,
-          "type": "sequence_dialogue",
-          "phrase": "This is my mother."
-        },
-        {
-          "id": 169796,
-          "order_index": 565,
-          "session_number": 29,
-          "type": "image_choice",
-          "phrase": "This is my mother."
-        },
-        {
-          "id": 169800,
-          "order_index": 569,
-          "session_number": 29,
-          "type": "sequence_dialogue",
-          "phrase": "This is my mother."
-        }
-      ]
-    },
-    {
-      "language": "en",
       "phrase": "I have a sister.",
-      "count": 43,
+      "count": 44,
       "examples": [
         {
           "id": 169735,
@@ -1527,7 +1527,7 @@
     {
       "language": "en",
       "phrase": "I have a brother.",
-      "count": 42,
+      "count": 43,
       "examples": [
         {
           "id": 169734,
@@ -1590,7 +1590,7 @@
     {
       "language": "en",
       "phrase": "My son is here.",
-      "count": 35,
+      "count": 36,
       "examples": [
         {
           "id": 169736,
@@ -2534,6 +2534,69 @@
     },
     {
       "language": "fr",
+      "phrase": "C'est mon père.",
+      "count": 47,
+      "examples": [
+        {
+          "id": 165233,
+          "order_index": 502,
+          "session_number": 26,
+          "type": "choice",
+          "phrase": "C'est mon père."
+        },
+        {
+          "id": 165240,
+          "order_index": 509,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "C'est mon père."
+        },
+        {
+          "id": 165250,
+          "order_index": 519,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "C'est mon père."
+        },
+        {
+          "id": 165260,
+          "order_index": 529,
+          "session_number": 27,
+          "type": "sequence_dialogue",
+          "phrase": "C'est mon père."
+        },
+        {
+          "id": 165270,
+          "order_index": 539,
+          "session_number": 27,
+          "type": "listen_build",
+          "phrase": "C'est mon père."
+        },
+        {
+          "id": 165279,
+          "order_index": 548,
+          "session_number": 28,
+          "type": "listen_build",
+          "phrase": "C'est mon père."
+        },
+        {
+          "id": 165280,
+          "order_index": 549,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "C'est mon père."
+        },
+        {
+          "id": 165288,
+          "order_index": 557,
+          "session_number": 28,
+          "type": "context_choice",
+          "phrase": "C'est mon père."
+        }
+      ]
+    },
+    {
+      "language": "fr",
       "phrase": "Je m'appelle Victor.",
       "count": 46,
       "examples": [
@@ -2597,71 +2660,8 @@
     },
     {
       "language": "fr",
-      "phrase": "C'est mon père.",
-      "count": 46,
-      "examples": [
-        {
-          "id": 165233,
-          "order_index": 502,
-          "session_number": 26,
-          "type": "choice",
-          "phrase": "C'est mon père."
-        },
-        {
-          "id": 165240,
-          "order_index": 509,
-          "session_number": 26,
-          "type": "sequence_dialogue",
-          "phrase": "C'est mon père."
-        },
-        {
-          "id": 165250,
-          "order_index": 519,
-          "session_number": 26,
-          "type": "sequence_dialogue",
-          "phrase": "C'est mon père."
-        },
-        {
-          "id": 165260,
-          "order_index": 529,
-          "session_number": 27,
-          "type": "sequence_dialogue",
-          "phrase": "C'est mon père."
-        },
-        {
-          "id": 165270,
-          "order_index": 539,
-          "session_number": 27,
-          "type": "listen_build",
-          "phrase": "C'est mon père."
-        },
-        {
-          "id": 165279,
-          "order_index": 548,
-          "session_number": 28,
-          "type": "listen_build",
-          "phrase": "C'est mon père."
-        },
-        {
-          "id": 165280,
-          "order_index": 549,
-          "session_number": 28,
-          "type": "sequence_dialogue",
-          "phrase": "C'est mon père."
-        },
-        {
-          "id": 165288,
-          "order_index": 557,
-          "session_number": 28,
-          "type": "context_choice",
-          "phrase": "C'est mon père."
-        }
-      ]
-    },
-    {
-      "language": "fr",
       "phrase": "C'est ma mère.",
-      "count": 44,
+      "count": 45,
       "examples": [
         {
           "id": 165240,
@@ -2724,7 +2724,7 @@
     {
       "language": "fr",
       "phrase": "J'ai une sœur.",
-      "count": 43,
+      "count": 44,
       "examples": [
         {
           "id": 165235,
@@ -2787,7 +2787,7 @@
     {
       "language": "fr",
       "phrase": "J'ai un frère.",
-      "count": 42,
+      "count": 43,
       "examples": [
         {
           "id": 165234,
@@ -2850,7 +2850,7 @@
     {
       "language": "fr",
       "phrase": "Mon fils est ici.",
-      "count": 35,
+      "count": 36,
       "examples": [
         {
           "id": 165236,
@@ -3795,7 +3795,7 @@
     {
       "language": "jp",
       "phrase": "これは私の父です。",
-      "count": 44,
+      "count": 45,
       "examples": [
         {
           "id": 168233,
@@ -3858,7 +3858,7 @@
     {
       "language": "jp",
       "phrase": "これは私の母です。",
-      "count": 43,
+      "count": 44,
       "examples": [
         {
           "id": 168240,
@@ -3921,7 +3921,7 @@
     {
       "language": "jp",
       "phrase": "兄弟がいます。",
-      "count": 40,
+      "count": 41,
       "examples": [
         {
           "id": 168234,
@@ -3984,7 +3984,7 @@
     {
       "language": "jp",
       "phrase": "息子はここにいます。",
-      "count": 33,
+      "count": 34,
       "examples": [
         {
           "id": 168236,
@@ -4047,7 +4047,7 @@
     {
       "language": "jp",
       "phrase": "姉 妹 が い ま す 。",
-      "count": 28,
+      "count": 29,
       "examples": [
         {
           "id": 168299,
@@ -5055,7 +5055,7 @@
     {
       "language": "ru",
       "phrase": "Это мой папа.",
-      "count": 46,
+      "count": 47,
       "examples": [
         {
           "id": 166733,
@@ -5112,6 +5112,69 @@
           "session_number": 28,
           "type": "context_choice",
           "phrase": "Это мой папа."
+        }
+      ]
+    },
+    {
+      "language": "ru",
+      "phrase": "Это моя мама.",
+      "count": 45,
+      "examples": [
+        {
+          "id": 166740,
+          "order_index": 509,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "Это моя мама."
+        },
+        {
+          "id": 166750,
+          "order_index": 519,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "Это моя мама."
+        },
+        {
+          "id": 166760,
+          "order_index": 529,
+          "session_number": 27,
+          "type": "sequence_dialogue",
+          "phrase": "Это моя мама."
+        },
+        {
+          "id": 166769,
+          "order_index": 538,
+          "session_number": 27,
+          "type": "build",
+          "phrase": "Это моя мама."
+        },
+        {
+          "id": 166780,
+          "order_index": 549,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "Это моя мама."
+        },
+        {
+          "id": 166790,
+          "order_index": 559,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "Это моя мама."
+        },
+        {
+          "id": 166796,
+          "order_index": 565,
+          "session_number": 29,
+          "type": "image_choice",
+          "phrase": "Это моя мама."
+        },
+        {
+          "id": 166800,
+          "order_index": 569,
+          "session_number": 29,
+          "type": "sequence_dialogue",
+          "phrase": "Это моя мама."
         }
       ]
     },
@@ -5180,71 +5243,8 @@
     },
     {
       "language": "ru",
-      "phrase": "Это моя мама.",
-      "count": 44,
-      "examples": [
-        {
-          "id": 166740,
-          "order_index": 509,
-          "session_number": 26,
-          "type": "sequence_dialogue",
-          "phrase": "Это моя мама."
-        },
-        {
-          "id": 166750,
-          "order_index": 519,
-          "session_number": 26,
-          "type": "sequence_dialogue",
-          "phrase": "Это моя мама."
-        },
-        {
-          "id": 166760,
-          "order_index": 529,
-          "session_number": 27,
-          "type": "sequence_dialogue",
-          "phrase": "Это моя мама."
-        },
-        {
-          "id": 166769,
-          "order_index": 538,
-          "session_number": 27,
-          "type": "build",
-          "phrase": "Это моя мама."
-        },
-        {
-          "id": 166780,
-          "order_index": 549,
-          "session_number": 28,
-          "type": "sequence_dialogue",
-          "phrase": "Это моя мама."
-        },
-        {
-          "id": 166790,
-          "order_index": 559,
-          "session_number": 28,
-          "type": "sequence_dialogue",
-          "phrase": "Это моя мама."
-        },
-        {
-          "id": 166796,
-          "order_index": 565,
-          "session_number": 29,
-          "type": "image_choice",
-          "phrase": "Это моя мама."
-        },
-        {
-          "id": 166800,
-          "order_index": 569,
-          "session_number": 29,
-          "type": "sequence_dialogue",
-          "phrase": "Это моя мама."
-        }
-      ]
-    },
-    {
-      "language": "ru",
       "phrase": "У меня есть сестра.",
-      "count": 43,
+      "count": 44,
       "examples": [
         {
           "id": 166735,
@@ -5307,7 +5307,7 @@
     {
       "language": "ru",
       "phrase": "У меня есть брат.",
-      "count": 42,
+      "count": 43,
       "examples": [
         {
           "id": 166734,
@@ -5370,7 +5370,7 @@
     {
       "language": "ru",
       "phrase": "Мой сын здесь.",
-      "count": 35,
+      "count": 36,
       "examples": [
         {
           "id": 166736,
