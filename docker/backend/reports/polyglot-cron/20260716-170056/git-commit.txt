@@ -1,0 +1,14 @@
+[main 72c19b1] chore(polyglot): add incremental exercises 20260716-170056
+ 17 files changed, 344 insertions(+), 31 deletions(-)
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-170056/2026-07-16-170057-snapshot.json
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-170056/audit_all_exercise_duplicates.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-170056/counts-after.json
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-170056/counts-before.json
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-170056/cron_incremental.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-170056/frontend-boundary.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-170056/git-fetch.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-170056/git-remote-ahead.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-170056/git-status-before-stage.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-170056/pytest.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-170056/review_all_exercise_items.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-170056/review_recent30.txt
