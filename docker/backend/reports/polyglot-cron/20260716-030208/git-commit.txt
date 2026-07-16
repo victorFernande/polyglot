@@ -1,0 +1,12 @@
+[main 7899e38] Content QA(polyglot): add hourly wave 1 exercise batch
+ 15 files changed, 3193 insertions(+), 31 deletions(-)
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-030208/2026-07-16-030208-snapshot.json
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-030208/after-counts.json
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-030208/audit_all_exercise_duplicates.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-030208/before-counts.json
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-030208/cron_incremental.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-030208/pytest.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-030208/review_all_exercise_items.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-030208/review_recent30.json
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-030208/review_recent30.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-030208/staged-files.txt
