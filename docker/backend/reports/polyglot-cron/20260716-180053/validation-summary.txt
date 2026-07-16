@@ -1,0 +1,4 @@
+review_all_exercise_items: PASS total=9200
+audit_all_exercise_duplicates: PASS issues=0 total=9200
+polyglot_agent_review --recent 30: PASS total=150 model_reviews=cx/gpt-5.5 ok,kimi/kimi-k2.6 ok
+pytest docker/backend/test_polyglot_agent_review.py docker/backend/test_cron_incremental.py -q: PASS exit_code=0
