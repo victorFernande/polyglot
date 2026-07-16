@@ -1,0 +1,1 @@
+OK: no forbidden frontend-only practice patterns
