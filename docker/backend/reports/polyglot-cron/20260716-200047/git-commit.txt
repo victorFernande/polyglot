@@ -1,0 +1,18 @@
+[main 99953d1] chore(polyglot): add hourly wave 1 exercise items
+ 22 files changed, 6570 insertions(+), 31 deletions(-)
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-200047/2026-07-16-200048-snapshot.json
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-200047/counts-after.json
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-200047/counts-before-after.json
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-200047/counts-before.json
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-200047/cron_incremental.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-200047/duplicates-after.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-200047/duplicates.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-200047/git-status-before-commit.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-200047/pytest-after.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-200047/pytest.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-200047/review-all-after.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-200047/review-all.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-200047/review-recent30-json-after.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-200047/review-recent30-json.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-200047/review-recent30.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-200047/staged-files.txt

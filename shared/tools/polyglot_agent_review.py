@@ -395,6 +395,9 @@ def call_9router_review(model: str, rows: list[dict], counts: Counter, issues: C
     prompt = (
         "Revise como auditor crítico máximo de conteúdo Polyglot para iniciante absoluto. "
         "Confirme se deve PASS/REVISE/BLOCK e liste gaps. Use só estes dados. "
+        "Julgue principalmente os campos visíveis ao learner (prompt, answer, options, tiles, pairs, hint, explanation). "
+        "unit_title/topic são metadados derivados para triagem e podem ficar defasados em sessões infinitas pós-base; "
+        "não marque REVISE/BLOCK só por divergência entre esses metadados e o tema explícito do prompt quando o conteúdo visível estiver coerente. "
         "Se issue codes estiver vazio e as amostras estiverem coerentes, pode dar PASS.\n\n"
         f"Verdicts: {dict(counts)}\nIssue codes: {dict(issues)}\n"
         f"Examples: {json.dumps(examples, ensure_ascii=False)[:18000]}"
