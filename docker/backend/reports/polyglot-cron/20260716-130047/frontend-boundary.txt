@@ -1,0 +1,1 @@
+{'file': 'docker/frontend/src/pages/Exercises.jsx', 'forbidden_found': [], 'status': 'PASS'}
