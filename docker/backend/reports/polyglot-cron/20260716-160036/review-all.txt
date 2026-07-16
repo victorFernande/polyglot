@@ -1,0 +1,10 @@
+## review_all_exercise_items
+{
+  "total": 9150,
+  "verdicts": {
+    "PASS": 9150
+  },
+  "issue_codes": {}
+}
+/home/victor/workspace/polyglot/reports/polyglot-audit/all_language_full_review.json
+/home/victor/workspace/polyglot/reports/polyglot-audit/all_language_full_review.md

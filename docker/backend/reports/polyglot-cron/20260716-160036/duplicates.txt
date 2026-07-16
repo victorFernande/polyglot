@@ -1,0 +1,16 @@
+## audit_all_exercise_duplicates
+{
+  "total_items": 9150,
+  "languages": [
+    "de",
+    "en",
+    "fr",
+    "jp",
+    "ru"
+  ],
+  "total_session_issues": 0,
+  "issue_counts": {},
+  "issues_by_language": {}
+}
+/home/victor/workspace/polyglot/reports/polyglot-audit/all_language_duplicate_audit.json
+/home/victor/workspace/polyglot/reports/polyglot-audit/all_language_duplicate_audit.md
