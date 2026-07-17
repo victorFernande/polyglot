@@ -1,0 +1,16 @@
+[main 02d3198] chore(polyglot): add wave 1 exercise batch 20260716-220500
+ 19 files changed, 626 insertions(+), 31 deletions(-)
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-220500/counts-after.json
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-220500/counts-before.json
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-220500/cron_incremental.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-220500/duplicates.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-220500/git-fetch.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-220500/git-status-after-validation.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-220500/git-status-before.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-220500/pytest-rerun.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-220500/pytest.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-220500/remote-ahead.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-220500/review-all.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-220500/review-recent30.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-220500/run-id.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260716-220500/staged-files.txt
