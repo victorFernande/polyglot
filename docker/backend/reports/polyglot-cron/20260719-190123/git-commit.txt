@@ -1,0 +1,21 @@
+[main 085428e] Content QA(polyglot): add hourly wave 1 exercises
+ 24 files changed, 109 insertions(+), 31 deletions(-)
+ create mode 100644 docker/backend/reports/polyglot-cron/20260719-190123/2026-07-19-190132-snapshot.json
+ create mode 100644 docker/backend/reports/polyglot-cron/20260719-190123/after-counts-final.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260719-190123/after-counts.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260719-190123/audit_all_exercise_duplicates.exit
+ create mode 100644 docker/backend/reports/polyglot-cron/20260719-190123/audit_all_exercise_duplicates.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260719-190123/before-counts.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260719-190123/cron_incremental.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260719-190123/cron_incremental_run2.exit
+ create mode 100644 docker/backend/reports/polyglot-cron/20260719-190123/cron_incremental_run2.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260719-190123/frontend-boundary.matches
+ create mode 100644 docker/backend/reports/polyglot-cron/20260719-190123/frontend-boundary.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260719-190123/git-fetch.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260719-190123/pytest.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260719-190123/pytest2.exit
+ create mode 100644 docker/backend/reports/polyglot-cron/20260719-190123/pytest2.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260719-190123/remote-ahead-before-commit.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260719-190123/review_all_exercise_items.exit
+ create mode 100644 docker/backend/reports/polyglot-cron/20260719-190123/review_all_exercise_items.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260719-190123/review_recent30.txt
