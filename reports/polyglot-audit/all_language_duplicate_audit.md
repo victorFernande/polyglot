@@ -1,6 +1,6 @@
 # Auditoria global de duplicação — Polyglot
 
-- Total de itens: 10925
+- Total de itens: 10950
 - Idiomas: de, en, fr, jp, ru
 - Issues por sessão: 0
 
