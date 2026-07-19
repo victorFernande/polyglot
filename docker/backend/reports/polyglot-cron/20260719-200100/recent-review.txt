@@ -1,0 +1,1 @@
+bash: shared/tools/polyglot_agent_review.py: Permission denied
