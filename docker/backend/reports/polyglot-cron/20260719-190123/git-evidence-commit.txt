@@ -1,0 +1,12 @@
+[main 781e3ed] Content QA(polyglot): add hourly cron evidence
+ 10 files changed, 648 insertions(+)
+ create mode 100644 docker/backend/reports/polyglot-cron/20260719-190123/commit-sha.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260719-190123/git-commit.exit
+ create mode 100644 docker/backend/reports/polyglot-cron/20260719-190123/git-commit.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260719-190123/git-fetch-before-push.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260719-190123/git-push.exit
+ create mode 100644 docker/backend/reports/polyglot-cron/20260719-190123/git-push.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260719-190123/git-status-after-push.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260719-190123/git-status-before-push.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260719-190123/remote-ahead-before-push.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260719-190123/staged-files.txt
