@@ -1,0 +1,5 @@
+de 2190 max_order=2190
+fr 2190 max_order=2190
+ru 2190 max_order=2190
+jp 2190 max_order=2190
+en 2190 max_order=2190

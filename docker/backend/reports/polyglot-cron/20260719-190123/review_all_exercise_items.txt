@@ -1,0 +1,9 @@
+{
+  "total": 10975,
+  "verdicts": {
+    "PASS": 10975
+  },
+  "issue_codes": {}
+}
+/home/victor/workspace/polyglot/reports/polyglot-audit/all_language_full_review.json
+/home/victor/workspace/polyglot/reports/polyglot-audit/all_language_full_review.md
