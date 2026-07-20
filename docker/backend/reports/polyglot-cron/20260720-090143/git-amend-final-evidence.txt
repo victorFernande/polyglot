@@ -1,0 +1,21 @@
+[main ead363e] Content QA(polyglot): add hourly incremental exercise items
+ Date: Mon Jul 20 09:03:09 2026 -0300
+ 23 files changed, 522 insertions(+), 31 deletions(-)
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-090143/2026-07-20-090143-snapshot.json
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-090143/audit_all_exercise_duplicates.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-090143/commit-sha-final.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-090143/commit-sha-pushed.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-090143/commit-sha.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-090143/counts-after.json
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-090143/counts-before.json
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-090143/cron_incremental.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-090143/git-amend-evidence.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-090143/git-commit.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-090143/git-push.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-090143/git-status-after-push.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-090143/pytest.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-090143/remote-ahead-before-push.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-090143/remote-ahead-final.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-090143/review_all_exercise_items.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-090143/review_recent30.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-090143/staged-files.txt
