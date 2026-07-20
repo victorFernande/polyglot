@@ -1,0 +1,12 @@
+usage: cron_incremental.py [-h] [--database-url DATABASE_URL]
+                           [--snapshot-dir SNAPSHOT_DIR] [--bootstrap]
+                           [--commit] [--commit-db]
+                           [--commit-message COMMIT_MESSAGE]
+cron_incremental.py: error: unrecognized arguments: --languages de,fr,ru,jp,en --count 5
+Polyglot cron incremental round complete.
+Snapshot: /home/victor/workspace/polyglot/reports/polyglot-cron/2026-07-20-110135-snapshot.json
+  de: 2270 -> 2275 (+5)
+  fr: 2270 -> 2275 (+5)
+  ru: 2270 -> 2275 (+5)
+  jp: 2270 -> 2275 (+5)
+  en: 2270 -> 2275 (+5)
