@@ -1,0 +1,23 @@
+[main b5324cc] chore(polyglot): hourly exercise expansion 20260720-150109
+ Date: Mon Jul 20 15:02:42 2026 -0300
+ 25 files changed, 533 insertions(+), 31 deletions(-)
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-150109/2026-07-20-150110-snapshot.json
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-150109/audit_all_exercise_duplicates.exit
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-150109/audit_all_exercise_duplicates.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-150109/counts-after.json
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-150109/counts-before.json
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-150109/cron_incremental.exit
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-150109/cron_incremental.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-150109/git-commit.exit
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-150109/git-commit.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-150109/git-fetch-before-commit.exit
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-150109/git-fetch-before-commit.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-150109/git-status-before.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-150109/pytest.exit
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-150109/pytest.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-150109/remote-ahead-before-commit.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-150109/review_all_exercise_items.exit
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-150109/review_all_exercise_items.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-150109/review_recent30.exit
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-150109/review_recent30.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-150109/staged-files.txt
