@@ -1,7 +1,7 @@
 {
-  "total": 12000,
+  "total": 12025,
   "verdicts": {
-    "PASS": 12000
+    "PASS": 12025
   },
   "issue_codes": {},
   "failures": []
