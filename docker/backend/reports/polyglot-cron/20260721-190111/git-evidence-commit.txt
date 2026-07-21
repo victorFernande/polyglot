@@ -1,0 +1,6 @@
+[main d45e89c] Content QA(polyglot): add hourly run evidence
+ 4 files changed, 554 insertions(+)
+ create mode 100644 docker/backend/reports/polyglot-cron/20260721-190111/commit-sha.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260721-190111/git-push.exit
+ create mode 100644 docker/backend/reports/polyglot-cron/20260721-190111/git-push.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260721-190111/git-status-after-push.txt
