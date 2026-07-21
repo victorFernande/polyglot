@@ -1,0 +1,9 @@
+exercise_lessons ['id', 'language_code', 'language_name', 'slug', 'title', 'description', 'order_index', 'xp_base', 'active', 'created_at']
+waves ['id', 'user_id', 'wave_number', 'language', 'language_name', 'anchor', 'status', 'started_at', 'completed_at', 'total_xp', 'vocabulary_count', 'phrases_count', 'hours_input']
+{
+  "de": 2355,
+  "fr": 2355,
+  "ru": 2355,
+  "jp": 2355,
+  "en": 2355
+}
