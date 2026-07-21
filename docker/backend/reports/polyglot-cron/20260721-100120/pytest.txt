@@ -1,0 +1,2 @@
+pytest docker/backend/test_polyglot_agent_review.py docker/backend/test_cron_incremental.py -q
+exit=0
