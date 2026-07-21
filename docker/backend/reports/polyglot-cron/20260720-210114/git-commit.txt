@@ -1,0 +1,17 @@
+[main e3d8b99] chore(polyglot): hourly exercise increment 20260720-210114
+ 20 files changed, 149 insertions(+), 31 deletions(-)
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-210114/counts-after.json
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-210114/counts-before.json
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-210114/counts-current.json
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-210114/counts-final.json
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-210114/cron_incremental.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-210114/duplicates.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-210114/git-status-before-stage.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-210114/pytest-venv.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-210114/pytest.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-210114/recent30.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-210114/review_all.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-210114/schema.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-210114/staged-files.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260720-210114/tables.txt
+ create mode 100644 reports/polyglot-cron/2026-07-20-210115-snapshot.json

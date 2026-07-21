@@ -1,0 +1,7 @@
+[('achievements',), ('exercise_answers',), ('exercise_items',), ('exercise_lessons',), ('exercise_sessions',), ('phases',), ('study_logs',), ('tasks',), ('user_achievements',), ('users',), ('waves',)]
+TABLE lesson
+[]
+TABLE lessons
+[]
+TABLE exercise_items
+[(0, 'id', 'INTEGER', 1, None, 1), (1, 'lesson_id', 'INTEGER', 0, None, 0), (2, 'order_index', 'INTEGER', 0, None, 0), (3, 'type', 'VARCHAR', 0, None, 0), (4, 'prompt', 'TEXT', 0, None, 0), (5, 'answer', 'JSON', 0, None, 0), (6, 'options', 'JSON', 0, None, 0), (7, 'tiles', 'JSON', 0, None, 0), (8, 'pairs', 'JSON', 0, None, 0), (9, 'hint', 'TEXT', 0, None, 0), (10, 'explanation', 'TEXT', 0, None, 0), (11, 'xp_reward', 'INTEGER', 0, None, 0)]
