@@ -1,0 +1,24 @@
+[main 2729560] Add Polyglot cron questions 20260721-180112
+ Date: Tue Jul 21 18:02:45 2026 -0300
+ 26 files changed, 1215 insertions(+), 31 deletions(-)
+ create mode 100644 docker/backend/reports/polyglot-cron/20260721-180112/counts-after.json
+ create mode 100644 docker/backend/reports/polyglot-cron/20260721-180112/counts-before.json
+ create mode 100644 docker/backend/reports/polyglot-cron/20260721-180112/cron_incremental.exit
+ create mode 100644 docker/backend/reports/polyglot-cron/20260721-180112/cron_incremental.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260721-180112/duplicates.exit
+ create mode 100644 docker/backend/reports/polyglot-cron/20260721-180112/duplicates.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260721-180112/git-commit.exit
+ create mode 100644 docker/backend/reports/polyglot-cron/20260721-180112/git-commit.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260721-180112/git-fetch-before-commit.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260721-180112/git-status-before-stage.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260721-180112/git-status-initial.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260721-180112/pytest.exit
+ create mode 100644 docker/backend/reports/polyglot-cron/20260721-180112/pytest.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260721-180112/recent_review.exit
+ create mode 100644 docker/backend/reports/polyglot-cron/20260721-180112/recent_review.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260721-180112/remote-ahead-before-commit.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260721-180112/review_all.exit
+ create mode 100644 docker/backend/reports/polyglot-cron/20260721-180112/review_all.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260721-180112/schema-tables.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260721-180112/staged-files.txt
+ create mode 100644 reports/polyglot-cron/2026-07-21-180120-snapshot.json
