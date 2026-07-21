@@ -1,0 +1,1 @@
+PASS frontend boundary: no forbidden extra/local practice patterns
