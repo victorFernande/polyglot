@@ -1,0 +1,13 @@
+usage: polyglot_agent_review.py [-h] [--language {de,fr,ru,jp,en}]
+                                [--recent RECENT] [--limit LIMIT] [--json]
+                                [--skip-model-review]
+
+options:
+  -h, --help            show this help message and exit
+  --language {de,fr,ru,jp,en}
+                        Language code; repeatable. Default: all.
+  --recent RECENT       Review the last N generated items per language.
+  --limit LIMIT         Review the first N selected items per language.
+  --json                Emit JSON instead of Markdown summary.
+  --skip-model-review   Do not call GPT/Kimi through 9Router. Use only for
+                        offline/unit tests.
