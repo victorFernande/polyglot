@@ -1,0 +1,20 @@
+exercise_lessons CREATE TABLE exercise_lessons (
+	id INTEGER NOT NULL, 
+	language_code VARCHAR, 
+	language_name VARCHAR, 
+	slug VARCHAR, 
+	title VARCHAR, 
+	description TEXT, 
+	order_index INTEGER, 
+	xp_base INTEGER, 
+	active BOOLEAN, 
+	created_at DATETIME, 
+	PRIMARY KEY (id), 
+	CONSTRAINT uq_exercise_lesson_language
+lessons None
+counts
+de 2400
+en 2400
+fr 2400
+jp 2400
+ru 2400
