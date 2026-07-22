@@ -1,0 +1,6316 @@
+{
+  "total_items": 12550,
+  "languages": [
+    "de",
+    "en",
+    "fr",
+    "jp",
+    "ru"
+  ],
+  "total_session_issues": 0,
+  "issue_counts": {},
+  "issues_by_language": {},
+  "session_issues": [],
+  "corpus_top_reuse": [
+    {
+      "language": "de",
+      "phrase": "Das ist mein Vater.",
+      "count": 223,
+      "examples": [
+        {
+          "id": 163733,
+          "order_index": 502,
+          "session_number": 26,
+          "type": "choice",
+          "phrase": "Das ist mein Vater."
+        },
+        {
+          "id": 163740,
+          "order_index": 509,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "Das ist mein Vater."
+        },
+        {
+          "id": 163750,
+          "order_index": 519,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "Das ist mein Vater."
+        },
+        {
+          "id": 163760,
+          "order_index": 529,
+          "session_number": 27,
+          "type": "sequence_dialogue",
+          "phrase": "Das ist mein Vater."
+        },
+        {
+          "id": 163770,
+          "order_index": 539,
+          "session_number": 27,
+          "type": "listen_build",
+          "phrase": "Das ist mein Vater."
+        },
+        {
+          "id": 163779,
+          "order_index": 548,
+          "session_number": 28,
+          "type": "listen_build",
+          "phrase": "Das ist mein Vater."
+        },
+        {
+          "id": 163780,
+          "order_index": 549,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "Das ist mein Vater."
+        },
+        {
+          "id": 163788,
+          "order_index": 557,
+          "session_number": 28,
+          "type": "context_choice",
+          "phrase": "Das ist mein Vater."
+        }
+      ]
+    },
+    {
+      "language": "de",
+      "phrase": "Das ist meine Mutter.",
+      "count": 221,
+      "examples": [
+        {
+          "id": 163740,
+          "order_index": 509,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "Das ist meine Mutter."
+        },
+        {
+          "id": 163750,
+          "order_index": 519,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "Das ist meine Mutter."
+        },
+        {
+          "id": 163760,
+          "order_index": 529,
+          "session_number": 27,
+          "type": "sequence_dialogue",
+          "phrase": "Das ist meine Mutter."
+        },
+        {
+          "id": 163769,
+          "order_index": 538,
+          "session_number": 27,
+          "type": "build",
+          "phrase": "Das ist meine Mutter."
+        },
+        {
+          "id": 163780,
+          "order_index": 549,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "Das ist meine Mutter."
+        },
+        {
+          "id": 163790,
+          "order_index": 559,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "Das ist meine Mutter."
+        },
+        {
+          "id": 163796,
+          "order_index": 565,
+          "session_number": 29,
+          "type": "image_choice",
+          "phrase": "Das ist meine Mutter."
+        },
+        {
+          "id": 163800,
+          "order_index": 569,
+          "session_number": 29,
+          "type": "sequence_dialogue",
+          "phrase": "Das ist meine Mutter."
+        }
+      ]
+    },
+    {
+      "language": "de",
+      "phrase": "Ich habe eine Schwester.",
+      "count": 220,
+      "examples": [
+        {
+          "id": 163735,
+          "order_index": 504,
+          "session_number": 26,
+          "type": "choice",
+          "phrase": "Ich habe eine Schwester."
+        },
+        {
+          "id": 163740,
+          "order_index": 509,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "Ich habe eine Schwester."
+        },
+        {
+          "id": 163744,
+          "order_index": 513,
+          "session_number": 26,
+          "type": "choice",
+          "phrase": "Ich habe eine Schwester."
+        },
+        {
+          "id": 163750,
+          "order_index": 519,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "Ich habe eine Schwester."
+        },
+        {
+          "id": 163753,
+          "order_index": 522,
+          "session_number": 27,
+          "type": "choice",
+          "phrase": "Ich habe eine Schwester."
+        },
+        {
+          "id": 163760,
+          "order_index": 529,
+          "session_number": 27,
+          "type": "sequence_dialogue",
+          "phrase": "Ich habe eine Schwester."
+        },
+        {
+          "id": 163780,
+          "order_index": 549,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "Ich habe eine Schwester."
+        },
+        {
+          "id": 163790,
+          "order_index": 559,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "Ich habe eine Schwester."
+        }
+      ]
+    },
+    {
+      "language": "de",
+      "phrase": "Ich habe einen Bruder.",
+      "count": 219,
+      "examples": [
+        {
+          "id": 163734,
+          "order_index": 503,
+          "session_number": 26,
+          "type": "listen_choice",
+          "phrase": "Ich habe einen Bruder."
+        },
+        {
+          "id": 163740,
+          "order_index": 509,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "Ich habe einen Bruder."
+        },
+        {
+          "id": 163743,
+          "order_index": 512,
+          "session_number": 26,
+          "type": "choice",
+          "phrase": "Ich habe einen Bruder."
+        },
+        {
+          "id": 163750,
+          "order_index": 519,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "Ich habe einen Bruder."
+        },
+        {
+          "id": 163760,
+          "order_index": 529,
+          "session_number": 27,
+          "type": "sequence_dialogue",
+          "phrase": "Ich habe einen Bruder."
+        },
+        {
+          "id": 163780,
+          "order_index": 549,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "Ich habe einen Bruder."
+        },
+        {
+          "id": 163789,
+          "order_index": 558,
+          "session_number": 28,
+          "type": "build",
+          "phrase": "Ich habe einen Bruder."
+        },
+        {
+          "id": 163790,
+          "order_index": 559,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "Ich habe einen Bruder."
+        }
+      ]
+    },
+    {
+      "language": "de",
+      "phrase": "Mein Sohn ist hier.",
+      "count": 212,
+      "examples": [
+        {
+          "id": 163736,
+          "order_index": 505,
+          "session_number": 26,
+          "type": "image_choice",
+          "phrase": "Mein Sohn ist hier."
+        },
+        {
+          "id": 163745,
+          "order_index": 514,
+          "session_number": 26,
+          "type": "build",
+          "phrase": "Mein Sohn ist hier."
+        },
+        {
+          "id": 163754,
+          "order_index": 523,
+          "session_number": 27,
+          "type": "listen_choice",
+          "phrase": "Mein Sohn ist hier."
+        },
+        {
+          "id": 163763,
+          "order_index": 532,
+          "session_number": 27,
+          "type": "choice",
+          "phrase": "Mein Sohn ist hier."
+        },
+        {
+          "id": 163809,
+          "order_index": 578,
+          "session_number": 29,
+          "type": "listen_build",
+          "phrase": "Mein Sohn ist hier."
+        },
+        {
+          "id": 163818,
+          "order_index": 587,
+          "session_number": 30,
+          "type": "context_choice",
+          "phrase": "Mein Sohn ist hier."
+        },
+        {
+          "id": 163827,
+          "order_index": 596,
+          "session_number": 30,
+          "type": "context_choice",
+          "phrase": "Mein Sohn ist hier."
+        },
+        {
+          "id": 164316,
+          "order_index": 1085,
+          "session_number": 55,
+          "type": "context_choice",
+          "phrase": "Mein Sohn ist hier."
+        }
+      ]
+    },
+    {
+      "language": "de",
+      "phrase": "Ich bin Lehrer.",
+      "count": 30,
+      "examples": [
+        {
+          "id": 163336,
+          "order_index": 105,
+          "session_number": 6,
+          "type": "image_choice",
+          "phrase": "Ich bin Lehrer."
+        },
+        {
+          "id": 163345,
+          "order_index": 114,
+          "session_number": 6,
+          "type": "build",
+          "phrase": "Ich bin Lehrer."
+        },
+        {
+          "id": 163354,
+          "order_index": 123,
+          "session_number": 7,
+          "type": "listen_choice",
+          "phrase": "Ich bin Lehrer."
+        },
+        {
+          "id": 163363,
+          "order_index": 132,
+          "session_number": 7,
+          "type": "choice",
+          "phrase": "Ich bin Lehrer."
+        },
+        {
+          "id": 163373,
+          "order_index": 142,
+          "session_number": 8,
+          "type": "choice",
+          "phrase": "Ich bin Lehrer."
+        },
+        {
+          "id": 163409,
+          "order_index": 178,
+          "session_number": 9,
+          "type": "listen_build",
+          "phrase": "Ich bin Lehrer."
+        },
+        {
+          "id": 163418,
+          "order_index": 187,
+          "session_number": 10,
+          "type": "context_choice",
+          "phrase": "Ich bin Lehrer."
+        },
+        {
+          "id": 163427,
+          "order_index": 196,
+          "session_number": 10,
+          "type": "context_choice",
+          "phrase": "Ich bin Lehrer."
+        }
+      ]
+    },
+    {
+      "language": "de",
+      "phrase": "Hier ist mein Kontakt.",
+      "count": 27,
+      "examples": [
+        {
+          "id": 163640,
+          "order_index": 409,
+          "session_number": 21,
+          "type": "sequence_dialogue",
+          "phrase": "Hier ist mein Kontakt."
+        },
+        {
+          "id": 163650,
+          "order_index": 419,
+          "session_number": 21,
+          "type": "sequence_dialogue",
+          "phrase": "Hier ist mein Kontakt."
+        },
+        {
+          "id": 163659,
+          "order_index": 428,
+          "session_number": 22,
+          "type": "listen_build",
+          "phrase": "Hier ist mein Kontakt."
+        },
+        {
+          "id": 163660,
+          "order_index": 429,
+          "session_number": 22,
+          "type": "sequence_dialogue",
+          "phrase": "Hier ist mein Kontakt."
+        },
+        {
+          "id": 163668,
+          "order_index": 437,
+          "session_number": 22,
+          "type": "context_choice",
+          "phrase": "Hier ist mein Kontakt."
+        },
+        {
+          "id": 163677,
+          "order_index": 446,
+          "session_number": 23,
+          "type": "context_choice",
+          "phrase": "Hier ist mein Kontakt."
+        },
+        {
+          "id": 163680,
+          "order_index": 449,
+          "session_number": 23,
+          "type": "sequence_dialogue",
+          "phrase": "Hier ist mein Kontakt."
+        },
+        {
+          "id": 163686,
+          "order_index": 455,
+          "session_number": 23,
+          "type": "image_choice",
+          "phrase": "Hier ist mein Kontakt."
+        }
+      ]
+    },
+    {
+      "language": "de",
+      "phrase": "Die Rechnung, bitte.",
+      "count": 26,
+      "examples": [
+        {
+          "id": 163239,
+          "order_index": 8,
+          "session_number": 1,
+          "type": "build",
+          "phrase": "Die Rechnung, bitte."
+        },
+        {
+          "id": 163266,
+          "order_index": 35,
+          "session_number": 2,
+          "type": "image_choice",
+          "phrase": "Die Rechnung, bitte."
+        },
+        {
+          "id": 163275,
+          "order_index": 44,
+          "session_number": 3,
+          "type": "choice",
+          "phrase": "Die Rechnung, bitte."
+        },
+        {
+          "id": 163284,
+          "order_index": 53,
+          "session_number": 3,
+          "type": "listen_choice",
+          "phrase": "Die Rechnung, bitte."
+        },
+        {
+          "id": 163293,
+          "order_index": 62,
+          "session_number": 4,
+          "type": "choice",
+          "phrase": "Die Rechnung, bitte."
+        },
+        {
+          "id": 163549,
+          "order_index": 318,
+          "session_number": 16,
+          "type": "listen_build",
+          "phrase": "Die Rechnung, bitte."
+        },
+        {
+          "id": 163558,
+          "order_index": 327,
+          "session_number": 17,
+          "type": "context_choice",
+          "phrase": "Die Rechnung, bitte."
+        },
+        {
+          "id": 163576,
+          "order_index": 345,
+          "session_number": 18,
+          "type": "image_choice",
+          "phrase": "Die Rechnung, bitte."
+        }
+      ]
+    },
+    {
+      "language": "de",
+      "phrase": "Ich komme aus Brasilien.",
+      "count": 25,
+      "examples": [
+        {
+          "id": 163333,
+          "order_index": 102,
+          "session_number": 6,
+          "type": "choice",
+          "phrase": "Ich komme aus Brasilien."
+        },
+        {
+          "id": 163340,
+          "order_index": 109,
+          "session_number": 6,
+          "type": "sequence_dialogue",
+          "phrase": "Ich komme aus Brasilien."
+        },
+        {
+          "id": 163350,
+          "order_index": 119,
+          "session_number": 6,
+          "type": "sequence_dialogue",
+          "phrase": "Ich komme aus Brasilien."
+        },
+        {
+          "id": 163360,
+          "order_index": 129,
+          "session_number": 7,
+          "type": "sequence_dialogue",
+          "phrase": "Ich komme aus Brasilien."
+        },
+        {
+          "id": 163370,
+          "order_index": 139,
+          "session_number": 7,
+          "type": "listen_build",
+          "phrase": "Ich komme aus Brasilien."
+        },
+        {
+          "id": 163379,
+          "order_index": 148,
+          "session_number": 8,
+          "type": "listen_build",
+          "phrase": "Ich komme aus Brasilien."
+        },
+        {
+          "id": 163380,
+          "order_index": 149,
+          "session_number": 8,
+          "type": "sequence_dialogue",
+          "phrase": "Ich komme aus Brasilien."
+        },
+        {
+          "id": 163388,
+          "order_index": 157,
+          "session_number": 8,
+          "type": "context_choice",
+          "phrase": "Ich komme aus Brasilien."
+        }
+      ]
+    },
+    {
+      "language": "de",
+      "phrase": "Ich heiße Victor.",
+      "count": 24,
+      "examples": [
+        {
+          "id": 163340,
+          "order_index": 109,
+          "session_number": 6,
+          "type": "sequence_dialogue",
+          "phrase": "Ich heiße Victor."
+        },
+        {
+          "id": 163350,
+          "order_index": 119,
+          "session_number": 6,
+          "type": "sequence_dialogue",
+          "phrase": "Ich heiße Victor."
+        },
+        {
+          "id": 163360,
+          "order_index": 129,
+          "session_number": 7,
+          "type": "sequence_dialogue",
+          "phrase": "Ich heiße Victor."
+        },
+        {
+          "id": 163369,
+          "order_index": 138,
+          "session_number": 7,
+          "type": "build",
+          "phrase": "Ich heiße Victor."
+        },
+        {
+          "id": 163380,
+          "order_index": 149,
+          "session_number": 8,
+          "type": "sequence_dialogue",
+          "phrase": "Ich heiße Victor."
+        },
+        {
+          "id": 163390,
+          "order_index": 159,
+          "session_number": 8,
+          "type": "sequence_dialogue",
+          "phrase": "Ich heiße Victor."
+        },
+        {
+          "id": 163396,
+          "order_index": 165,
+          "session_number": 9,
+          "type": "image_choice",
+          "phrase": "Ich heiße Victor."
+        },
+        {
+          "id": 163400,
+          "order_index": 169,
+          "session_number": 9,
+          "type": "sequence_dialogue",
+          "phrase": "Ich heiße Victor."
+        }
+      ]
+    },
+    {
+      "language": "de",
+      "phrase": "Ich brauche ein Ticket.",
+      "count": 24,
+      "examples": [
+        {
+          "id": 163433,
+          "order_index": 202,
+          "session_number": 11,
+          "type": "choice",
+          "phrase": "Ich brauche ein Ticket."
+        },
+        {
+          "id": 163440,
+          "order_index": 209,
+          "session_number": 11,
+          "type": "sequence_dialogue",
+          "phrase": "Ich brauche ein Ticket."
+        },
+        {
+          "id": 163450,
+          "order_index": 219,
+          "session_number": 11,
+          "type": "sequence_dialogue",
+          "phrase": "Ich brauche ein Ticket."
+        },
+        {
+          "id": 163460,
+          "order_index": 229,
+          "session_number": 12,
+          "type": "sequence_dialogue",
+          "phrase": "Ich brauche ein Ticket."
+        },
+        {
+          "id": 163470,
+          "order_index": 239,
+          "session_number": 12,
+          "type": "listen_build",
+          "phrase": "Ich brauche ein Ticket."
+        },
+        {
+          "id": 163479,
+          "order_index": 248,
+          "session_number": 13,
+          "type": "listen_build",
+          "phrase": "Ich brauche ein Ticket."
+        },
+        {
+          "id": 163480,
+          "order_index": 249,
+          "session_number": 13,
+          "type": "sequence_dialogue",
+          "phrase": "Ich brauche ein Ticket."
+        },
+        {
+          "id": 163488,
+          "order_index": 257,
+          "session_number": 13,
+          "type": "context_choice",
+          "phrase": "Ich brauche ein Ticket."
+        }
+      ]
+    },
+    {
+      "language": "de",
+      "phrase": "Die Speisekarte, bitte.",
+      "count": 24,
+      "examples": [
+        {
+          "id": 163533,
+          "order_index": 302,
+          "session_number": 16,
+          "type": "choice",
+          "phrase": "Die Speisekarte, bitte."
+        },
+        {
+          "id": 163540,
+          "order_index": 309,
+          "session_number": 16,
+          "type": "sequence_dialogue",
+          "phrase": "Die Speisekarte, bitte."
+        },
+        {
+          "id": 163550,
+          "order_index": 319,
+          "session_number": 16,
+          "type": "sequence_dialogue",
+          "phrase": "Die Speisekarte, bitte."
+        },
+        {
+          "id": 163560,
+          "order_index": 329,
+          "session_number": 17,
+          "type": "sequence_dialogue",
+          "phrase": "Die Speisekarte, bitte."
+        },
+        {
+          "id": 163570,
+          "order_index": 339,
+          "session_number": 17,
+          "type": "listen_build",
+          "phrase": "Die Speisekarte, bitte."
+        },
+        {
+          "id": 163579,
+          "order_index": 348,
+          "session_number": 18,
+          "type": "listen_build",
+          "phrase": "Die Speisekarte, bitte."
+        },
+        {
+          "id": 163580,
+          "order_index": 349,
+          "session_number": 18,
+          "type": "sequence_dialogue",
+          "phrase": "Die Speisekarte, bitte."
+        },
+        {
+          "id": 163588,
+          "order_index": 357,
+          "session_number": 18,
+          "type": "context_choice",
+          "phrase": "Die Speisekarte, bitte."
+        }
+      ]
+    },
+    {
+      "language": "de",
+      "phrase": "Ich möchte einen Kaffee.",
+      "count": 23,
+      "examples": [
+        {
+          "id": 163233,
+          "order_index": 2,
+          "session_number": 1,
+          "type": "choice",
+          "phrase": "Ich möchte einen Kaffee."
+        },
+        {
+          "id": 163240,
+          "order_index": 9,
+          "session_number": 1,
+          "type": "sequence_dialogue",
+          "phrase": "Ich möchte einen Kaffee."
+        },
+        {
+          "id": 163250,
+          "order_index": 19,
+          "session_number": 1,
+          "type": "sequence_dialogue",
+          "phrase": "Ich möchte einen Kaffee."
+        },
+        {
+          "id": 163260,
+          "order_index": 29,
+          "session_number": 2,
+          "type": "sequence_dialogue",
+          "phrase": "Ich möchte einen Kaffee."
+        },
+        {
+          "id": 163269,
+          "order_index": 38,
+          "session_number": 2,
+          "type": "build",
+          "phrase": "Ich möchte einen Kaffee."
+        },
+        {
+          "id": 163270,
+          "order_index": 39,
+          "session_number": 2,
+          "type": "listen_build",
+          "phrase": "Ich möchte einen Kaffee."
+        },
+        {
+          "id": 163279,
+          "order_index": 48,
+          "session_number": 3,
+          "type": "listen_build",
+          "phrase": "Ich möchte einen Kaffee."
+        },
+        {
+          "id": 163280,
+          "order_index": 49,
+          "session_number": 3,
+          "type": "sequence_dialogue",
+          "phrase": "Ich möchte einen Kaffee."
+        }
+      ]
+    },
+    {
+      "language": "de",
+      "phrase": "Ich habe einen Tisch.",
+      "count": 23,
+      "examples": [
+        {
+          "id": 163540,
+          "order_index": 309,
+          "session_number": 16,
+          "type": "sequence_dialogue",
+          "phrase": "Ich habe einen Tisch."
+        },
+        {
+          "id": 163550,
+          "order_index": 319,
+          "session_number": 16,
+          "type": "sequence_dialogue",
+          "phrase": "Ich habe einen Tisch."
+        },
+        {
+          "id": 163560,
+          "order_index": 329,
+          "session_number": 17,
+          "type": "sequence_dialogue",
+          "phrase": "Ich habe einen Tisch."
+        },
+        {
+          "id": 163569,
+          "order_index": 338,
+          "session_number": 17,
+          "type": "build",
+          "phrase": "Ich habe einen Tisch."
+        },
+        {
+          "id": 163580,
+          "order_index": 349,
+          "session_number": 18,
+          "type": "sequence_dialogue",
+          "phrase": "Ich habe einen Tisch."
+        },
+        {
+          "id": 163590,
+          "order_index": 359,
+          "session_number": 18,
+          "type": "sequence_dialogue",
+          "phrase": "Ich habe einen Tisch."
+        },
+        {
+          "id": 163596,
+          "order_index": 365,
+          "session_number": 19,
+          "type": "image_choice",
+          "phrase": "Ich habe einen Tisch."
+        },
+        {
+          "id": 163600,
+          "order_index": 369,
+          "session_number": 19,
+          "type": "sequence_dialogue",
+          "phrase": "Ich habe einen Tisch."
+        }
+      ]
+    },
+    {
+      "language": "de",
+      "phrase": "Meine Telefonnummer ist eins zwei drei.",
+      "count": 23,
+      "examples": [
+        {
+          "id": 163640,
+          "order_index": 409,
+          "session_number": 21,
+          "type": "sequence_dialogue",
+          "phrase": "Meine Telefonnummer ist eins zwei drei."
+        },
+        {
+          "id": 163650,
+          "order_index": 419,
+          "session_number": 21,
+          "type": "sequence_dialogue",
+          "phrase": "Meine Telefonnummer ist eins zwei drei."
+        },
+        {
+          "id": 163660,
+          "order_index": 429,
+          "session_number": 22,
+          "type": "sequence_dialogue",
+          "phrase": "Meine Telefonnummer ist eins zwei drei."
+        },
+        {
+          "id": 163669,
+          "order_index": 438,
+          "session_number": 22,
+          "type": "build",
+          "phrase": "Meine Telefonnummer ist eins zwei drei."
+        },
+        {
+          "id": 163680,
+          "order_index": 449,
+          "session_number": 23,
+          "type": "sequence_dialogue",
+          "phrase": "Meine Telefonnummer ist eins zwei drei."
+        },
+        {
+          "id": 163690,
+          "order_index": 459,
+          "session_number": 23,
+          "type": "sequence_dialogue",
+          "phrase": "Meine Telefonnummer ist eins zwei drei."
+        },
+        {
+          "id": 163696,
+          "order_index": 465,
+          "session_number": 24,
+          "type": "image_choice",
+          "phrase": "Meine Telefonnummer ist eins zwei drei."
+        },
+        {
+          "id": 163700,
+          "order_index": 469,
+          "session_number": 24,
+          "type": "sequence_dialogue",
+          "phrase": "Meine Telefonnummer ist eins zwei drei."
+        }
+      ]
+    },
+    {
+      "language": "de",
+      "phrase": "Ich reise nach Berlin.",
+      "count": 22,
+      "examples": [
+        {
+          "id": 163440,
+          "order_index": 209,
+          "session_number": 11,
+          "type": "sequence_dialogue",
+          "phrase": "Ich reise nach Berlin."
+        },
+        {
+          "id": 163450,
+          "order_index": 219,
+          "session_number": 11,
+          "type": "sequence_dialogue",
+          "phrase": "Ich reise nach Berlin."
+        },
+        {
+          "id": 163460,
+          "order_index": 229,
+          "session_number": 12,
+          "type": "sequence_dialogue",
+          "phrase": "Ich reise nach Berlin."
+        },
+        {
+          "id": 163469,
+          "order_index": 238,
+          "session_number": 12,
+          "type": "build",
+          "phrase": "Ich reise nach Berlin."
+        },
+        {
+          "id": 163480,
+          "order_index": 249,
+          "session_number": 13,
+          "type": "sequence_dialogue",
+          "phrase": "Ich reise nach Berlin."
+        },
+        {
+          "id": 163490,
+          "order_index": 259,
+          "session_number": 13,
+          "type": "sequence_dialogue",
+          "phrase": "Ich reise nach Berlin."
+        },
+        {
+          "id": 163496,
+          "order_index": 265,
+          "session_number": 14,
+          "type": "image_choice",
+          "phrase": "Ich reise nach Berlin."
+        },
+        {
+          "id": 163500,
+          "order_index": 269,
+          "session_number": 14,
+          "type": "sequence_dialogue",
+          "phrase": "Ich reise nach Berlin."
+        }
+      ]
+    },
+    {
+      "language": "de",
+      "phrase": "Ich mag keinen Fisch.",
+      "count": 22,
+      "examples": [
+        {
+          "id": 164133,
+          "order_index": 902,
+          "session_number": 46,
+          "type": "choice",
+          "phrase": "Ich mag keinen Fisch."
+        },
+        {
+          "id": 164140,
+          "order_index": 909,
+          "session_number": 46,
+          "type": "sequence_dialogue",
+          "phrase": "Ich mag keinen Fisch."
+        },
+        {
+          "id": 164150,
+          "order_index": 919,
+          "session_number": 46,
+          "type": "sequence_dialogue",
+          "phrase": "Ich mag keinen Fisch."
+        },
+        {
+          "id": 164160,
+          "order_index": 929,
+          "session_number": 47,
+          "type": "sequence_dialogue",
+          "phrase": "Ich mag keinen Fisch."
+        },
+        {
+          "id": 164170,
+          "order_index": 939,
+          "session_number": 47,
+          "type": "listen_build",
+          "phrase": "Ich mag keinen Fisch."
+        },
+        {
+          "id": 164179,
+          "order_index": 948,
+          "session_number": 48,
+          "type": "listen_build",
+          "phrase": "Ich mag keinen Fisch."
+        },
+        {
+          "id": 164180,
+          "order_index": 949,
+          "session_number": 48,
+          "type": "sequence_dialogue",
+          "phrase": "Ich mag keinen Fisch."
+        },
+        {
+          "id": 164188,
+          "order_index": 957,
+          "session_number": 48,
+          "type": "context_choice",
+          "phrase": "Ich mag keinen Fisch."
+        }
+      ]
+    },
+    {
+      "language": "de",
+      "phrase": "Ich spreche Portugiesisch.",
+      "count": 21,
+      "examples": [
+        {
+          "id": 163335,
+          "order_index": 104,
+          "session_number": 6,
+          "type": "choice",
+          "phrase": "Ich spreche Portugiesisch."
+        },
+        {
+          "id": 163340,
+          "order_index": 109,
+          "session_number": 6,
+          "type": "sequence_dialogue",
+          "phrase": "Ich spreche Portugiesisch."
+        },
+        {
+          "id": 163344,
+          "order_index": 113,
+          "session_number": 6,
+          "type": "choice",
+          "phrase": "Ich spreche Portugiesisch."
+        },
+        {
+          "id": 163350,
+          "order_index": 119,
+          "session_number": 6,
+          "type": "sequence_dialogue",
+          "phrase": "Ich spreche Portugiesisch."
+        },
+        {
+          "id": 163353,
+          "order_index": 122,
+          "session_number": 7,
+          "type": "choice",
+          "phrase": "Ich spreche Portugiesisch."
+        },
+        {
+          "id": 163360,
+          "order_index": 129,
+          "session_number": 7,
+          "type": "sequence_dialogue",
+          "phrase": "Ich spreche Portugiesisch."
+        },
+        {
+          "id": 163380,
+          "order_index": 149,
+          "session_number": 8,
+          "type": "sequence_dialogue",
+          "phrase": "Ich spreche Portugiesisch."
+        },
+        {
+          "id": 163390,
+          "order_index": 159,
+          "session_number": 8,
+          "type": "sequence_dialogue",
+          "phrase": "Ich spreche Portugiesisch."
+        }
+      ]
+    },
+    {
+      "language": "de",
+      "phrase": "Wo ist der Bahnhof?",
+      "count": 21,
+      "examples": [
+        {
+          "id": 163435,
+          "order_index": 204,
+          "session_number": 11,
+          "type": "choice",
+          "phrase": "Wo ist der Bahnhof?"
+        },
+        {
+          "id": 163440,
+          "order_index": 209,
+          "session_number": 11,
+          "type": "sequence_dialogue",
+          "phrase": "Wo ist der Bahnhof?"
+        },
+        {
+          "id": 163444,
+          "order_index": 213,
+          "session_number": 11,
+          "type": "choice",
+          "phrase": "Wo ist der Bahnhof?"
+        },
+        {
+          "id": 163450,
+          "order_index": 219,
+          "session_number": 11,
+          "type": "sequence_dialogue",
+          "phrase": "Wo ist der Bahnhof?"
+        },
+        {
+          "id": 163453,
+          "order_index": 222,
+          "session_number": 12,
+          "type": "choice",
+          "phrase": "Wo ist der Bahnhof?"
+        },
+        {
+          "id": 163460,
+          "order_index": 229,
+          "session_number": 12,
+          "type": "sequence_dialogue",
+          "phrase": "Wo ist der Bahnhof?"
+        },
+        {
+          "id": 163480,
+          "order_index": 249,
+          "session_number": 13,
+          "type": "sequence_dialogue",
+          "phrase": "Wo ist der Bahnhof?"
+        },
+        {
+          "id": 163490,
+          "order_index": 259,
+          "session_number": 13,
+          "type": "sequence_dialogue",
+          "phrase": "Wo ist der Bahnhof?"
+        }
+      ]
+    },
+    {
+      "language": "de",
+      "phrase": "Ich arbeite in einer Schule.",
+      "count": 21,
+      "examples": [
+        {
+          "id": 163833,
+          "order_index": 602,
+          "session_number": 31,
+          "type": "choice",
+          "phrase": "Ich arbeite in einer Schule."
+        },
+        {
+          "id": 163840,
+          "order_index": 609,
+          "session_number": 31,
+          "type": "sequence_dialogue",
+          "phrase": "Ich arbeite in einer Schule."
+        },
+        {
+          "id": 163850,
+          "order_index": 619,
+          "session_number": 31,
+          "type": "sequence_dialogue",
+          "phrase": "Ich arbeite in einer Schule."
+        },
+        {
+          "id": 163860,
+          "order_index": 629,
+          "session_number": 32,
+          "type": "sequence_dialogue",
+          "phrase": "Ich arbeite in einer Schule."
+        },
+        {
+          "id": 163870,
+          "order_index": 639,
+          "session_number": 32,
+          "type": "listen_build",
+          "phrase": "Ich arbeite in einer Schule."
+        },
+        {
+          "id": 163879,
+          "order_index": 648,
+          "session_number": 33,
+          "type": "listen_build",
+          "phrase": "Ich arbeite in einer Schule."
+        },
+        {
+          "id": 163880,
+          "order_index": 649,
+          "session_number": 33,
+          "type": "sequence_dialogue",
+          "phrase": "Ich arbeite in einer Schule."
+        },
+        {
+          "id": 163888,
+          "order_index": 657,
+          "session_number": 33,
+          "type": "context_choice",
+          "phrase": "Ich arbeite in einer Schule."
+        }
+      ]
+    },
+    {
+      "language": "en",
+      "phrase": "This is my father.",
+      "count": 223,
+      "examples": [
+        {
+          "id": 169733,
+          "order_index": 502,
+          "session_number": 26,
+          "type": "choice",
+          "phrase": "This is my father."
+        },
+        {
+          "id": 169740,
+          "order_index": 509,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "This is my father."
+        },
+        {
+          "id": 169750,
+          "order_index": 519,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "This is my father."
+        },
+        {
+          "id": 169760,
+          "order_index": 529,
+          "session_number": 27,
+          "type": "sequence_dialogue",
+          "phrase": "This is my father."
+        },
+        {
+          "id": 169770,
+          "order_index": 539,
+          "session_number": 27,
+          "type": "listen_build",
+          "phrase": "This is my father."
+        },
+        {
+          "id": 169779,
+          "order_index": 548,
+          "session_number": 28,
+          "type": "listen_build",
+          "phrase": "This is my father."
+        },
+        {
+          "id": 169780,
+          "order_index": 549,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "This is my father."
+        },
+        {
+          "id": 169788,
+          "order_index": 557,
+          "session_number": 28,
+          "type": "context_choice",
+          "phrase": "This is my father."
+        }
+      ]
+    },
+    {
+      "language": "en",
+      "phrase": "This is my mother.",
+      "count": 221,
+      "examples": [
+        {
+          "id": 169740,
+          "order_index": 509,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "This is my mother."
+        },
+        {
+          "id": 169750,
+          "order_index": 519,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "This is my mother."
+        },
+        {
+          "id": 169760,
+          "order_index": 529,
+          "session_number": 27,
+          "type": "sequence_dialogue",
+          "phrase": "This is my mother."
+        },
+        {
+          "id": 169769,
+          "order_index": 538,
+          "session_number": 27,
+          "type": "build",
+          "phrase": "This is my mother."
+        },
+        {
+          "id": 169780,
+          "order_index": 549,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "This is my mother."
+        },
+        {
+          "id": 169790,
+          "order_index": 559,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "This is my mother."
+        },
+        {
+          "id": 169796,
+          "order_index": 565,
+          "session_number": 29,
+          "type": "image_choice",
+          "phrase": "This is my mother."
+        },
+        {
+          "id": 169800,
+          "order_index": 569,
+          "session_number": 29,
+          "type": "sequence_dialogue",
+          "phrase": "This is my mother."
+        }
+      ]
+    },
+    {
+      "language": "en",
+      "phrase": "I have a sister.",
+      "count": 220,
+      "examples": [
+        {
+          "id": 169735,
+          "order_index": 504,
+          "session_number": 26,
+          "type": "choice",
+          "phrase": "I have a sister."
+        },
+        {
+          "id": 169740,
+          "order_index": 509,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "I have a sister."
+        },
+        {
+          "id": 169744,
+          "order_index": 513,
+          "session_number": 26,
+          "type": "choice",
+          "phrase": "I have a sister."
+        },
+        {
+          "id": 169750,
+          "order_index": 519,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "I have a sister."
+        },
+        {
+          "id": 169753,
+          "order_index": 522,
+          "session_number": 27,
+          "type": "choice",
+          "phrase": "I have a sister."
+        },
+        {
+          "id": 169760,
+          "order_index": 529,
+          "session_number": 27,
+          "type": "sequence_dialogue",
+          "phrase": "I have a sister."
+        },
+        {
+          "id": 169780,
+          "order_index": 549,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "I have a sister."
+        },
+        {
+          "id": 169790,
+          "order_index": 559,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "I have a sister."
+        }
+      ]
+    },
+    {
+      "language": "en",
+      "phrase": "I have a brother.",
+      "count": 219,
+      "examples": [
+        {
+          "id": 169734,
+          "order_index": 503,
+          "session_number": 26,
+          "type": "listen_choice",
+          "phrase": "I have a brother."
+        },
+        {
+          "id": 169740,
+          "order_index": 509,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "I have a brother."
+        },
+        {
+          "id": 169743,
+          "order_index": 512,
+          "session_number": 26,
+          "type": "choice",
+          "phrase": "I have a brother."
+        },
+        {
+          "id": 169750,
+          "order_index": 519,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "I have a brother."
+        },
+        {
+          "id": 169760,
+          "order_index": 529,
+          "session_number": 27,
+          "type": "sequence_dialogue",
+          "phrase": "I have a brother."
+        },
+        {
+          "id": 169780,
+          "order_index": 549,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "I have a brother."
+        },
+        {
+          "id": 169789,
+          "order_index": 558,
+          "session_number": 28,
+          "type": "build",
+          "phrase": "I have a brother."
+        },
+        {
+          "id": 169790,
+          "order_index": 559,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "I have a brother."
+        }
+      ]
+    },
+    {
+      "language": "en",
+      "phrase": "My son is here.",
+      "count": 212,
+      "examples": [
+        {
+          "id": 169736,
+          "order_index": 505,
+          "session_number": 26,
+          "type": "image_choice",
+          "phrase": "My son is here."
+        },
+        {
+          "id": 169745,
+          "order_index": 514,
+          "session_number": 26,
+          "type": "build",
+          "phrase": "My son is here."
+        },
+        {
+          "id": 169754,
+          "order_index": 523,
+          "session_number": 27,
+          "type": "listen_choice",
+          "phrase": "My son is here."
+        },
+        {
+          "id": 169763,
+          "order_index": 532,
+          "session_number": 27,
+          "type": "choice",
+          "phrase": "My son is here."
+        },
+        {
+          "id": 169809,
+          "order_index": 578,
+          "session_number": 29,
+          "type": "listen_build",
+          "phrase": "My son is here."
+        },
+        {
+          "id": 169818,
+          "order_index": 587,
+          "session_number": 30,
+          "type": "context_choice",
+          "phrase": "My son is here."
+        },
+        {
+          "id": 169827,
+          "order_index": 596,
+          "session_number": 30,
+          "type": "context_choice",
+          "phrase": "My son is here."
+        },
+        {
+          "id": 170316,
+          "order_index": 1085,
+          "session_number": 55,
+          "type": "context_choice",
+          "phrase": "My son is here."
+        }
+      ]
+    },
+    {
+      "language": "en",
+      "phrase": "My name is Victor.",
+      "count": 44,
+      "examples": [
+        {
+          "id": 169340,
+          "order_index": 109,
+          "session_number": 6,
+          "type": "sequence_dialogue",
+          "phrase": "My name is Victor."
+        },
+        {
+          "id": 169350,
+          "order_index": 119,
+          "session_number": 6,
+          "type": "sequence_dialogue",
+          "phrase": "My name is Victor."
+        },
+        {
+          "id": 169360,
+          "order_index": 129,
+          "session_number": 7,
+          "type": "sequence_dialogue",
+          "phrase": "My name is Victor."
+        },
+        {
+          "id": 169369,
+          "order_index": 138,
+          "session_number": 7,
+          "type": "build",
+          "phrase": "My name is Victor."
+        },
+        {
+          "id": 169380,
+          "order_index": 149,
+          "session_number": 8,
+          "type": "sequence_dialogue",
+          "phrase": "My name is Victor."
+        },
+        {
+          "id": 169390,
+          "order_index": 159,
+          "session_number": 8,
+          "type": "sequence_dialogue",
+          "phrase": "My name is Victor."
+        },
+        {
+          "id": 169396,
+          "order_index": 165,
+          "session_number": 9,
+          "type": "image_choice",
+          "phrase": "My name is Victor."
+        },
+        {
+          "id": 169400,
+          "order_index": 169,
+          "session_number": 9,
+          "type": "sequence_dialogue",
+          "phrase": "My name is Victor."
+        }
+      ]
+    },
+    {
+      "language": "en",
+      "phrase": "I am a teacher.",
+      "count": 30,
+      "examples": [
+        {
+          "id": 169336,
+          "order_index": 105,
+          "session_number": 6,
+          "type": "image_choice",
+          "phrase": "I am a teacher."
+        },
+        {
+          "id": 169345,
+          "order_index": 114,
+          "session_number": 6,
+          "type": "build",
+          "phrase": "I am a teacher."
+        },
+        {
+          "id": 169354,
+          "order_index": 123,
+          "session_number": 7,
+          "type": "listen_choice",
+          "phrase": "I am a teacher."
+        },
+        {
+          "id": 169363,
+          "order_index": 132,
+          "session_number": 7,
+          "type": "choice",
+          "phrase": "I am a teacher."
+        },
+        {
+          "id": 169373,
+          "order_index": 142,
+          "session_number": 8,
+          "type": "choice",
+          "phrase": "I am a teacher."
+        },
+        {
+          "id": 169409,
+          "order_index": 178,
+          "session_number": 9,
+          "type": "listen_build",
+          "phrase": "I am a teacher."
+        },
+        {
+          "id": 169418,
+          "order_index": 187,
+          "session_number": 10,
+          "type": "context_choice",
+          "phrase": "I am a teacher."
+        },
+        {
+          "id": 169427,
+          "order_index": 196,
+          "session_number": 10,
+          "type": "context_choice",
+          "phrase": "I am a teacher."
+        }
+      ]
+    },
+    {
+      "language": "en",
+      "phrase": "Here is my contact.",
+      "count": 27,
+      "examples": [
+        {
+          "id": 169640,
+          "order_index": 409,
+          "session_number": 21,
+          "type": "sequence_dialogue",
+          "phrase": "Here is my contact."
+        },
+        {
+          "id": 169650,
+          "order_index": 419,
+          "session_number": 21,
+          "type": "sequence_dialogue",
+          "phrase": "Here is my contact."
+        },
+        {
+          "id": 169659,
+          "order_index": 428,
+          "session_number": 22,
+          "type": "listen_build",
+          "phrase": "Here is my contact."
+        },
+        {
+          "id": 169660,
+          "order_index": 429,
+          "session_number": 22,
+          "type": "sequence_dialogue",
+          "phrase": "Here is my contact."
+        },
+        {
+          "id": 169668,
+          "order_index": 437,
+          "session_number": 22,
+          "type": "context_choice",
+          "phrase": "Here is my contact."
+        },
+        {
+          "id": 169677,
+          "order_index": 446,
+          "session_number": 23,
+          "type": "context_choice",
+          "phrase": "Here is my contact."
+        },
+        {
+          "id": 169680,
+          "order_index": 449,
+          "session_number": 23,
+          "type": "sequence_dialogue",
+          "phrase": "Here is my contact."
+        },
+        {
+          "id": 169686,
+          "order_index": 455,
+          "session_number": 23,
+          "type": "image_choice",
+          "phrase": "Here is my contact."
+        }
+      ]
+    },
+    {
+      "language": "en",
+      "phrase": "The bill, please.",
+      "count": 26,
+      "examples": [
+        {
+          "id": 169239,
+          "order_index": 8,
+          "session_number": 1,
+          "type": "build",
+          "phrase": "The bill, please."
+        },
+        {
+          "id": 169266,
+          "order_index": 35,
+          "session_number": 2,
+          "type": "image_choice",
+          "phrase": "The bill, please."
+        },
+        {
+          "id": 169275,
+          "order_index": 44,
+          "session_number": 3,
+          "type": "choice",
+          "phrase": "The bill, please."
+        },
+        {
+          "id": 169284,
+          "order_index": 53,
+          "session_number": 3,
+          "type": "listen_choice",
+          "phrase": "The bill, please."
+        },
+        {
+          "id": 169293,
+          "order_index": 62,
+          "session_number": 4,
+          "type": "choice",
+          "phrase": "The bill, please."
+        },
+        {
+          "id": 169549,
+          "order_index": 318,
+          "session_number": 16,
+          "type": "listen_build",
+          "phrase": "The bill, please."
+        },
+        {
+          "id": 169558,
+          "order_index": 327,
+          "session_number": 17,
+          "type": "context_choice",
+          "phrase": "The bill, please."
+        },
+        {
+          "id": 169576,
+          "order_index": 345,
+          "session_number": 18,
+          "type": "image_choice",
+          "phrase": "The bill, please."
+        }
+      ]
+    },
+    {
+      "language": "en",
+      "phrase": "I would like a coffee.",
+      "count": 25,
+      "examples": [
+        {
+          "id": 169233,
+          "order_index": 2,
+          "session_number": 1,
+          "type": "choice",
+          "phrase": "I would like a coffee."
+        },
+        {
+          "id": 169240,
+          "order_index": 9,
+          "session_number": 1,
+          "type": "sequence_dialogue",
+          "phrase": "I would like a coffee."
+        },
+        {
+          "id": 169250,
+          "order_index": 19,
+          "session_number": 1,
+          "type": "sequence_dialogue",
+          "phrase": "I would like a coffee."
+        },
+        {
+          "id": 169259,
+          "order_index": 28,
+          "session_number": 2,
+          "type": "listen_build",
+          "phrase": "I would like a coffee."
+        },
+        {
+          "id": 169260,
+          "order_index": 29,
+          "session_number": 2,
+          "type": "sequence_dialogue",
+          "phrase": "I would like a coffee."
+        },
+        {
+          "id": 169269,
+          "order_index": 38,
+          "session_number": 2,
+          "type": "build",
+          "phrase": "I would like a coffee."
+        },
+        {
+          "id": 169270,
+          "order_index": 39,
+          "session_number": 2,
+          "type": "listen_build",
+          "phrase": "I would like a coffee."
+        },
+        {
+          "id": 169279,
+          "order_index": 48,
+          "session_number": 3,
+          "type": "listen_build",
+          "phrase": "I would like a coffee."
+        }
+      ]
+    },
+    {
+      "language": "en",
+      "phrase": "I am from Brazil.",
+      "count": 25,
+      "examples": [
+        {
+          "id": 169333,
+          "order_index": 102,
+          "session_number": 6,
+          "type": "choice",
+          "phrase": "I am from Brazil."
+        },
+        {
+          "id": 169340,
+          "order_index": 109,
+          "session_number": 6,
+          "type": "sequence_dialogue",
+          "phrase": "I am from Brazil."
+        },
+        {
+          "id": 169350,
+          "order_index": 119,
+          "session_number": 6,
+          "type": "sequence_dialogue",
+          "phrase": "I am from Brazil."
+        },
+        {
+          "id": 169360,
+          "order_index": 129,
+          "session_number": 7,
+          "type": "sequence_dialogue",
+          "phrase": "I am from Brazil."
+        },
+        {
+          "id": 169370,
+          "order_index": 139,
+          "session_number": 7,
+          "type": "listen_build",
+          "phrase": "I am from Brazil."
+        },
+        {
+          "id": 169379,
+          "order_index": 148,
+          "session_number": 8,
+          "type": "listen_build",
+          "phrase": "I am from Brazil."
+        },
+        {
+          "id": 169380,
+          "order_index": 149,
+          "session_number": 8,
+          "type": "sequence_dialogue",
+          "phrase": "I am from Brazil."
+        },
+        {
+          "id": 169388,
+          "order_index": 157,
+          "session_number": 8,
+          "type": "context_choice",
+          "phrase": "I am from Brazil."
+        }
+      ]
+    },
+    {
+      "language": "en",
+      "phrase": "I need a ticket.",
+      "count": 24,
+      "examples": [
+        {
+          "id": 169433,
+          "order_index": 202,
+          "session_number": 11,
+          "type": "choice",
+          "phrase": "I need a ticket."
+        },
+        {
+          "id": 169440,
+          "order_index": 209,
+          "session_number": 11,
+          "type": "sequence_dialogue",
+          "phrase": "I need a ticket."
+        },
+        {
+          "id": 169450,
+          "order_index": 219,
+          "session_number": 11,
+          "type": "sequence_dialogue",
+          "phrase": "I need a ticket."
+        },
+        {
+          "id": 169460,
+          "order_index": 229,
+          "session_number": 12,
+          "type": "sequence_dialogue",
+          "phrase": "I need a ticket."
+        },
+        {
+          "id": 169470,
+          "order_index": 239,
+          "session_number": 12,
+          "type": "listen_build",
+          "phrase": "I need a ticket."
+        },
+        {
+          "id": 169479,
+          "order_index": 248,
+          "session_number": 13,
+          "type": "listen_build",
+          "phrase": "I need a ticket."
+        },
+        {
+          "id": 169480,
+          "order_index": 249,
+          "session_number": 13,
+          "type": "sequence_dialogue",
+          "phrase": "I need a ticket."
+        },
+        {
+          "id": 169488,
+          "order_index": 257,
+          "session_number": 13,
+          "type": "context_choice",
+          "phrase": "I need a ticket."
+        }
+      ]
+    },
+    {
+      "language": "en",
+      "phrase": "The menu, please.",
+      "count": 24,
+      "examples": [
+        {
+          "id": 169533,
+          "order_index": 302,
+          "session_number": 16,
+          "type": "choice",
+          "phrase": "The menu, please."
+        },
+        {
+          "id": 169540,
+          "order_index": 309,
+          "session_number": 16,
+          "type": "sequence_dialogue",
+          "phrase": "The menu, please."
+        },
+        {
+          "id": 169550,
+          "order_index": 319,
+          "session_number": 16,
+          "type": "sequence_dialogue",
+          "phrase": "The menu, please."
+        },
+        {
+          "id": 169560,
+          "order_index": 329,
+          "session_number": 17,
+          "type": "sequence_dialogue",
+          "phrase": "The menu, please."
+        },
+        {
+          "id": 169570,
+          "order_index": 339,
+          "session_number": 17,
+          "type": "listen_build",
+          "phrase": "The menu, please."
+        },
+        {
+          "id": 169579,
+          "order_index": 348,
+          "session_number": 18,
+          "type": "listen_build",
+          "phrase": "The menu, please."
+        },
+        {
+          "id": 169580,
+          "order_index": 349,
+          "session_number": 18,
+          "type": "sequence_dialogue",
+          "phrase": "The menu, please."
+        },
+        {
+          "id": 169588,
+          "order_index": 357,
+          "session_number": 18,
+          "type": "context_choice",
+          "phrase": "The menu, please."
+        }
+      ]
+    },
+    {
+      "language": "en",
+      "phrase": "I have a table.",
+      "count": 23,
+      "examples": [
+        {
+          "id": 169540,
+          "order_index": 309,
+          "session_number": 16,
+          "type": "sequence_dialogue",
+          "phrase": "I have a table."
+        },
+        {
+          "id": 169550,
+          "order_index": 319,
+          "session_number": 16,
+          "type": "sequence_dialogue",
+          "phrase": "I have a table."
+        },
+        {
+          "id": 169560,
+          "order_index": 329,
+          "session_number": 17,
+          "type": "sequence_dialogue",
+          "phrase": "I have a table."
+        },
+        {
+          "id": 169569,
+          "order_index": 338,
+          "session_number": 17,
+          "type": "build",
+          "phrase": "I have a table."
+        },
+        {
+          "id": 169580,
+          "order_index": 349,
+          "session_number": 18,
+          "type": "sequence_dialogue",
+          "phrase": "I have a table."
+        },
+        {
+          "id": 169590,
+          "order_index": 359,
+          "session_number": 18,
+          "type": "sequence_dialogue",
+          "phrase": "I have a table."
+        },
+        {
+          "id": 169596,
+          "order_index": 365,
+          "session_number": 19,
+          "type": "image_choice",
+          "phrase": "I have a table."
+        },
+        {
+          "id": 169600,
+          "order_index": 369,
+          "session_number": 19,
+          "type": "sequence_dialogue",
+          "phrase": "I have a table."
+        }
+      ]
+    },
+    {
+      "language": "en",
+      "phrase": "My phone number is one two three.",
+      "count": 23,
+      "examples": [
+        {
+          "id": 169640,
+          "order_index": 409,
+          "session_number": 21,
+          "type": "sequence_dialogue",
+          "phrase": "My phone number is one two three."
+        },
+        {
+          "id": 169650,
+          "order_index": 419,
+          "session_number": 21,
+          "type": "sequence_dialogue",
+          "phrase": "My phone number is one two three."
+        },
+        {
+          "id": 169660,
+          "order_index": 429,
+          "session_number": 22,
+          "type": "sequence_dialogue",
+          "phrase": "My phone number is one two three."
+        },
+        {
+          "id": 169669,
+          "order_index": 438,
+          "session_number": 22,
+          "type": "build",
+          "phrase": "My phone number is one two three."
+        },
+        {
+          "id": 169680,
+          "order_index": 449,
+          "session_number": 23,
+          "type": "sequence_dialogue",
+          "phrase": "My phone number is one two three."
+        },
+        {
+          "id": 169690,
+          "order_index": 459,
+          "session_number": 23,
+          "type": "sequence_dialogue",
+          "phrase": "My phone number is one two three."
+        },
+        {
+          "id": 169696,
+          "order_index": 465,
+          "session_number": 24,
+          "type": "image_choice",
+          "phrase": "My phone number is one two three."
+        },
+        {
+          "id": 169700,
+          "order_index": 469,
+          "session_number": 24,
+          "type": "sequence_dialogue",
+          "phrase": "My phone number is one two three."
+        }
+      ]
+    },
+    {
+      "language": "en",
+      "phrase": "I travel to Berlin.",
+      "count": 22,
+      "examples": [
+        {
+          "id": 169440,
+          "order_index": 209,
+          "session_number": 11,
+          "type": "sequence_dialogue",
+          "phrase": "I travel to Berlin."
+        },
+        {
+          "id": 169450,
+          "order_index": 219,
+          "session_number": 11,
+          "type": "sequence_dialogue",
+          "phrase": "I travel to Berlin."
+        },
+        {
+          "id": 169460,
+          "order_index": 229,
+          "session_number": 12,
+          "type": "sequence_dialogue",
+          "phrase": "I travel to Berlin."
+        },
+        {
+          "id": 169469,
+          "order_index": 238,
+          "session_number": 12,
+          "type": "build",
+          "phrase": "I travel to Berlin."
+        },
+        {
+          "id": 169480,
+          "order_index": 249,
+          "session_number": 13,
+          "type": "sequence_dialogue",
+          "phrase": "I travel to Berlin."
+        },
+        {
+          "id": 169490,
+          "order_index": 259,
+          "session_number": 13,
+          "type": "sequence_dialogue",
+          "phrase": "I travel to Berlin."
+        },
+        {
+          "id": 169496,
+          "order_index": 265,
+          "session_number": 14,
+          "type": "image_choice",
+          "phrase": "I travel to Berlin."
+        },
+        {
+          "id": 169500,
+          "order_index": 269,
+          "session_number": 14,
+          "type": "sequence_dialogue",
+          "phrase": "I travel to Berlin."
+        }
+      ]
+    },
+    {
+      "language": "en",
+      "phrase": "I do not like fish.",
+      "count": 22,
+      "examples": [
+        {
+          "id": 170133,
+          "order_index": 902,
+          "session_number": 46,
+          "type": "choice",
+          "phrase": "I do not like fish."
+        },
+        {
+          "id": 170140,
+          "order_index": 909,
+          "session_number": 46,
+          "type": "sequence_dialogue",
+          "phrase": "I do not like fish."
+        },
+        {
+          "id": 170150,
+          "order_index": 919,
+          "session_number": 46,
+          "type": "sequence_dialogue",
+          "phrase": "I do not like fish."
+        },
+        {
+          "id": 170160,
+          "order_index": 929,
+          "session_number": 47,
+          "type": "sequence_dialogue",
+          "phrase": "I do not like fish."
+        },
+        {
+          "id": 170170,
+          "order_index": 939,
+          "session_number": 47,
+          "type": "listen_build",
+          "phrase": "I do not like fish."
+        },
+        {
+          "id": 170179,
+          "order_index": 948,
+          "session_number": 48,
+          "type": "listen_build",
+          "phrase": "I do not like fish."
+        },
+        {
+          "id": 170180,
+          "order_index": 949,
+          "session_number": 48,
+          "type": "sequence_dialogue",
+          "phrase": "I do not like fish."
+        },
+        {
+          "id": 170188,
+          "order_index": 957,
+          "session_number": 48,
+          "type": "context_choice",
+          "phrase": "I do not like fish."
+        }
+      ]
+    },
+    {
+      "language": "en",
+      "phrase": "I speak Portuguese.",
+      "count": 21,
+      "examples": [
+        {
+          "id": 169335,
+          "order_index": 104,
+          "session_number": 6,
+          "type": "choice",
+          "phrase": "I speak Portuguese."
+        },
+        {
+          "id": 169340,
+          "order_index": 109,
+          "session_number": 6,
+          "type": "sequence_dialogue",
+          "phrase": "I speak Portuguese."
+        },
+        {
+          "id": 169344,
+          "order_index": 113,
+          "session_number": 6,
+          "type": "choice",
+          "phrase": "I speak Portuguese."
+        },
+        {
+          "id": 169350,
+          "order_index": 119,
+          "session_number": 6,
+          "type": "sequence_dialogue",
+          "phrase": "I speak Portuguese."
+        },
+        {
+          "id": 169353,
+          "order_index": 122,
+          "session_number": 7,
+          "type": "choice",
+          "phrase": "I speak Portuguese."
+        },
+        {
+          "id": 169360,
+          "order_index": 129,
+          "session_number": 7,
+          "type": "sequence_dialogue",
+          "phrase": "I speak Portuguese."
+        },
+        {
+          "id": 169380,
+          "order_index": 149,
+          "session_number": 8,
+          "type": "sequence_dialogue",
+          "phrase": "I speak Portuguese."
+        },
+        {
+          "id": 169390,
+          "order_index": 159,
+          "session_number": 8,
+          "type": "sequence_dialogue",
+          "phrase": "I speak Portuguese."
+        }
+      ]
+    },
+    {
+      "language": "en",
+      "phrase": "Where is the station?",
+      "count": 21,
+      "examples": [
+        {
+          "id": 169435,
+          "order_index": 204,
+          "session_number": 11,
+          "type": "choice",
+          "phrase": "Where is the station?"
+        },
+        {
+          "id": 169440,
+          "order_index": 209,
+          "session_number": 11,
+          "type": "sequence_dialogue",
+          "phrase": "Where is the station?"
+        },
+        {
+          "id": 169444,
+          "order_index": 213,
+          "session_number": 11,
+          "type": "choice",
+          "phrase": "Where is the station?"
+        },
+        {
+          "id": 169450,
+          "order_index": 219,
+          "session_number": 11,
+          "type": "sequence_dialogue",
+          "phrase": "Where is the station?"
+        },
+        {
+          "id": 169453,
+          "order_index": 222,
+          "session_number": 12,
+          "type": "choice",
+          "phrase": "Where is the station?"
+        },
+        {
+          "id": 169460,
+          "order_index": 229,
+          "session_number": 12,
+          "type": "sequence_dialogue",
+          "phrase": "Where is the station?"
+        },
+        {
+          "id": 169480,
+          "order_index": 249,
+          "session_number": 13,
+          "type": "sequence_dialogue",
+          "phrase": "Where is the station?"
+        },
+        {
+          "id": 169490,
+          "order_index": 259,
+          "session_number": 13,
+          "type": "sequence_dialogue",
+          "phrase": "Where is the station?"
+        }
+      ]
+    },
+    {
+      "language": "en",
+      "phrase": "I work at a school.",
+      "count": 21,
+      "examples": [
+        {
+          "id": 169833,
+          "order_index": 602,
+          "session_number": 31,
+          "type": "choice",
+          "phrase": "I work at a school."
+        },
+        {
+          "id": 169840,
+          "order_index": 609,
+          "session_number": 31,
+          "type": "sequence_dialogue",
+          "phrase": "I work at a school."
+        },
+        {
+          "id": 169850,
+          "order_index": 619,
+          "session_number": 31,
+          "type": "sequence_dialogue",
+          "phrase": "I work at a school."
+        },
+        {
+          "id": 169860,
+          "order_index": 629,
+          "session_number": 32,
+          "type": "sequence_dialogue",
+          "phrase": "I work at a school."
+        },
+        {
+          "id": 169870,
+          "order_index": 639,
+          "session_number": 32,
+          "type": "listen_build",
+          "phrase": "I work at a school."
+        },
+        {
+          "id": 169879,
+          "order_index": 648,
+          "session_number": 33,
+          "type": "listen_build",
+          "phrase": "I work at a school."
+        },
+        {
+          "id": 169880,
+          "order_index": 649,
+          "session_number": 33,
+          "type": "sequence_dialogue",
+          "phrase": "I work at a school."
+        },
+        {
+          "id": 169888,
+          "order_index": 657,
+          "session_number": 33,
+          "type": "context_choice",
+          "phrase": "I work at a school."
+        }
+      ]
+    },
+    {
+      "language": "fr",
+      "phrase": "C'est mon père.",
+      "count": 223,
+      "examples": [
+        {
+          "id": 165233,
+          "order_index": 502,
+          "session_number": 26,
+          "type": "choice",
+          "phrase": "C'est mon père."
+        },
+        {
+          "id": 165240,
+          "order_index": 509,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "C'est mon père."
+        },
+        {
+          "id": 165250,
+          "order_index": 519,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "C'est mon père."
+        },
+        {
+          "id": 165260,
+          "order_index": 529,
+          "session_number": 27,
+          "type": "sequence_dialogue",
+          "phrase": "C'est mon père."
+        },
+        {
+          "id": 165270,
+          "order_index": 539,
+          "session_number": 27,
+          "type": "listen_build",
+          "phrase": "C'est mon père."
+        },
+        {
+          "id": 165279,
+          "order_index": 548,
+          "session_number": 28,
+          "type": "listen_build",
+          "phrase": "C'est mon père."
+        },
+        {
+          "id": 165280,
+          "order_index": 549,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "C'est mon père."
+        },
+        {
+          "id": 165288,
+          "order_index": 557,
+          "session_number": 28,
+          "type": "context_choice",
+          "phrase": "C'est mon père."
+        }
+      ]
+    },
+    {
+      "language": "fr",
+      "phrase": "C'est ma mère.",
+      "count": 221,
+      "examples": [
+        {
+          "id": 165240,
+          "order_index": 509,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "C'est ma mère."
+        },
+        {
+          "id": 165250,
+          "order_index": 519,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "C'est ma mère."
+        },
+        {
+          "id": 165260,
+          "order_index": 529,
+          "session_number": 27,
+          "type": "sequence_dialogue",
+          "phrase": "C'est ma mère."
+        },
+        {
+          "id": 165269,
+          "order_index": 538,
+          "session_number": 27,
+          "type": "build",
+          "phrase": "C'est ma mère."
+        },
+        {
+          "id": 165280,
+          "order_index": 549,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "C'est ma mère."
+        },
+        {
+          "id": 165290,
+          "order_index": 559,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "C'est ma mère."
+        },
+        {
+          "id": 165296,
+          "order_index": 565,
+          "session_number": 29,
+          "type": "image_choice",
+          "phrase": "C'est ma mère."
+        },
+        {
+          "id": 165300,
+          "order_index": 569,
+          "session_number": 29,
+          "type": "sequence_dialogue",
+          "phrase": "C'est ma mère."
+        }
+      ]
+    },
+    {
+      "language": "fr",
+      "phrase": "J'ai une sœur.",
+      "count": 220,
+      "examples": [
+        {
+          "id": 165235,
+          "order_index": 504,
+          "session_number": 26,
+          "type": "choice",
+          "phrase": "J'ai une sœur."
+        },
+        {
+          "id": 165240,
+          "order_index": 509,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "J'ai une sœur."
+        },
+        {
+          "id": 165244,
+          "order_index": 513,
+          "session_number": 26,
+          "type": "choice",
+          "phrase": "J'ai une sœur."
+        },
+        {
+          "id": 165250,
+          "order_index": 519,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "J'ai une sœur."
+        },
+        {
+          "id": 165253,
+          "order_index": 522,
+          "session_number": 27,
+          "type": "choice",
+          "phrase": "J'ai une sœur."
+        },
+        {
+          "id": 165260,
+          "order_index": 529,
+          "session_number": 27,
+          "type": "sequence_dialogue",
+          "phrase": "J'ai une sœur."
+        },
+        {
+          "id": 165280,
+          "order_index": 549,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "J'ai une sœur."
+        },
+        {
+          "id": 165290,
+          "order_index": 559,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "J'ai une sœur."
+        }
+      ]
+    },
+    {
+      "language": "fr",
+      "phrase": "J'ai un frère.",
+      "count": 219,
+      "examples": [
+        {
+          "id": 165234,
+          "order_index": 503,
+          "session_number": 26,
+          "type": "listen_choice",
+          "phrase": "J'ai un frère."
+        },
+        {
+          "id": 165240,
+          "order_index": 509,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "J'ai un frère."
+        },
+        {
+          "id": 165243,
+          "order_index": 512,
+          "session_number": 26,
+          "type": "choice",
+          "phrase": "J'ai un frère."
+        },
+        {
+          "id": 165250,
+          "order_index": 519,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "J'ai un frère."
+        },
+        {
+          "id": 165260,
+          "order_index": 529,
+          "session_number": 27,
+          "type": "sequence_dialogue",
+          "phrase": "J'ai un frère."
+        },
+        {
+          "id": 165280,
+          "order_index": 549,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "J'ai un frère."
+        },
+        {
+          "id": 165289,
+          "order_index": 558,
+          "session_number": 28,
+          "type": "build",
+          "phrase": "J'ai un frère."
+        },
+        {
+          "id": 165290,
+          "order_index": 559,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "J'ai un frère."
+        }
+      ]
+    },
+    {
+      "language": "fr",
+      "phrase": "Mon fils est ici.",
+      "count": 212,
+      "examples": [
+        {
+          "id": 165236,
+          "order_index": 505,
+          "session_number": 26,
+          "type": "image_choice",
+          "phrase": "Mon fils est ici."
+        },
+        {
+          "id": 165245,
+          "order_index": 514,
+          "session_number": 26,
+          "type": "build",
+          "phrase": "Mon fils est ici."
+        },
+        {
+          "id": 165254,
+          "order_index": 523,
+          "session_number": 27,
+          "type": "listen_choice",
+          "phrase": "Mon fils est ici."
+        },
+        {
+          "id": 165263,
+          "order_index": 532,
+          "session_number": 27,
+          "type": "choice",
+          "phrase": "Mon fils est ici."
+        },
+        {
+          "id": 165309,
+          "order_index": 578,
+          "session_number": 29,
+          "type": "listen_build",
+          "phrase": "Mon fils est ici."
+        },
+        {
+          "id": 165318,
+          "order_index": 587,
+          "session_number": 30,
+          "type": "context_choice",
+          "phrase": "Mon fils est ici."
+        },
+        {
+          "id": 165327,
+          "order_index": 596,
+          "session_number": 30,
+          "type": "context_choice",
+          "phrase": "Mon fils est ici."
+        },
+        {
+          "id": 165816,
+          "order_index": 1085,
+          "session_number": 55,
+          "type": "context_choice",
+          "phrase": "Mon fils est ici."
+        }
+      ]
+    },
+    {
+      "language": "fr",
+      "phrase": "Je m'appelle Victor.",
+      "count": 46,
+      "examples": [
+        {
+          "id": 164840,
+          "order_index": 109,
+          "session_number": 6,
+          "type": "sequence_dialogue",
+          "phrase": "Je m'appelle Victor."
+        },
+        {
+          "id": 164850,
+          "order_index": 119,
+          "session_number": 6,
+          "type": "sequence_dialogue",
+          "phrase": "Je m'appelle Victor."
+        },
+        {
+          "id": 164859,
+          "order_index": 128,
+          "session_number": 7,
+          "type": "listen_build",
+          "phrase": "Je m'appelle Victor."
+        },
+        {
+          "id": 164860,
+          "order_index": 129,
+          "session_number": 7,
+          "type": "sequence_dialogue",
+          "phrase": "Je m'appelle Victor."
+        },
+        {
+          "id": 164869,
+          "order_index": 138,
+          "session_number": 7,
+          "type": "build",
+          "phrase": "Je m'appelle Victor."
+        },
+        {
+          "id": 164880,
+          "order_index": 149,
+          "session_number": 8,
+          "type": "sequence_dialogue",
+          "phrase": "Je m'appelle Victor."
+        },
+        {
+          "id": 164890,
+          "order_index": 159,
+          "session_number": 8,
+          "type": "sequence_dialogue",
+          "phrase": "Je m'appelle Victor."
+        },
+        {
+          "id": 164895,
+          "order_index": 164,
+          "session_number": 9,
+          "type": "build",
+          "phrase": "Je m'appelle Victor."
+        }
+      ]
+    },
+    {
+      "language": "fr",
+      "phrase": "Je suis professeur.",
+      "count": 30,
+      "examples": [
+        {
+          "id": 164836,
+          "order_index": 105,
+          "session_number": 6,
+          "type": "image_choice",
+          "phrase": "Je suis professeur."
+        },
+        {
+          "id": 164845,
+          "order_index": 114,
+          "session_number": 6,
+          "type": "build",
+          "phrase": "Je suis professeur."
+        },
+        {
+          "id": 164854,
+          "order_index": 123,
+          "session_number": 7,
+          "type": "listen_choice",
+          "phrase": "Je suis professeur."
+        },
+        {
+          "id": 164863,
+          "order_index": 132,
+          "session_number": 7,
+          "type": "choice",
+          "phrase": "Je suis professeur."
+        },
+        {
+          "id": 164873,
+          "order_index": 142,
+          "session_number": 8,
+          "type": "choice",
+          "phrase": "Je suis professeur."
+        },
+        {
+          "id": 164909,
+          "order_index": 178,
+          "session_number": 9,
+          "type": "listen_build",
+          "phrase": "Je suis professeur."
+        },
+        {
+          "id": 164918,
+          "order_index": 187,
+          "session_number": 10,
+          "type": "context_choice",
+          "phrase": "Je suis professeur."
+        },
+        {
+          "id": 164927,
+          "order_index": 196,
+          "session_number": 10,
+          "type": "context_choice",
+          "phrase": "Je suis professeur."
+        }
+      ]
+    },
+    {
+      "language": "fr",
+      "phrase": "Voici mon contact.",
+      "count": 27,
+      "examples": [
+        {
+          "id": 165140,
+          "order_index": 409,
+          "session_number": 21,
+          "type": "sequence_dialogue",
+          "phrase": "Voici mon contact."
+        },
+        {
+          "id": 165150,
+          "order_index": 419,
+          "session_number": 21,
+          "type": "sequence_dialogue",
+          "phrase": "Voici mon contact."
+        },
+        {
+          "id": 165159,
+          "order_index": 428,
+          "session_number": 22,
+          "type": "listen_build",
+          "phrase": "Voici mon contact."
+        },
+        {
+          "id": 165160,
+          "order_index": 429,
+          "session_number": 22,
+          "type": "sequence_dialogue",
+          "phrase": "Voici mon contact."
+        },
+        {
+          "id": 165168,
+          "order_index": 437,
+          "session_number": 22,
+          "type": "context_choice",
+          "phrase": "Voici mon contact."
+        },
+        {
+          "id": 165177,
+          "order_index": 446,
+          "session_number": 23,
+          "type": "context_choice",
+          "phrase": "Voici mon contact."
+        },
+        {
+          "id": 165180,
+          "order_index": 449,
+          "session_number": 23,
+          "type": "sequence_dialogue",
+          "phrase": "Voici mon contact."
+        },
+        {
+          "id": 165186,
+          "order_index": 455,
+          "session_number": 23,
+          "type": "image_choice",
+          "phrase": "Voici mon contact."
+        }
+      ]
+    },
+    {
+      "language": "fr",
+      "phrase": "L'addition, s'il vous plaît.",
+      "count": 26,
+      "examples": [
+        {
+          "id": 164739,
+          "order_index": 8,
+          "session_number": 1,
+          "type": "build",
+          "phrase": "L'addition, s'il vous plaît."
+        },
+        {
+          "id": 164766,
+          "order_index": 35,
+          "session_number": 2,
+          "type": "image_choice",
+          "phrase": "L'addition, s'il vous plaît."
+        },
+        {
+          "id": 164775,
+          "order_index": 44,
+          "session_number": 3,
+          "type": "choice",
+          "phrase": "L'addition, s'il vous plaît."
+        },
+        {
+          "id": 164784,
+          "order_index": 53,
+          "session_number": 3,
+          "type": "listen_choice",
+          "phrase": "L'addition, s'il vous plaît."
+        },
+        {
+          "id": 164793,
+          "order_index": 62,
+          "session_number": 4,
+          "type": "choice",
+          "phrase": "L'addition, s'il vous plaît."
+        },
+        {
+          "id": 165049,
+          "order_index": 318,
+          "session_number": 16,
+          "type": "listen_build",
+          "phrase": "L'addition, s'il vous plaît."
+        },
+        {
+          "id": 165058,
+          "order_index": 327,
+          "session_number": 17,
+          "type": "context_choice",
+          "phrase": "L'addition, s'il vous plaît."
+        },
+        {
+          "id": 165076,
+          "order_index": 345,
+          "session_number": 18,
+          "type": "image_choice",
+          "phrase": "L'addition, s'il vous plaît."
+        }
+      ]
+    },
+    {
+      "language": "fr",
+      "phrase": "Je viens du Brésil.",
+      "count": 25,
+      "examples": [
+        {
+          "id": 164833,
+          "order_index": 102,
+          "session_number": 6,
+          "type": "choice",
+          "phrase": "Je viens du Brésil."
+        },
+        {
+          "id": 164840,
+          "order_index": 109,
+          "session_number": 6,
+          "type": "sequence_dialogue",
+          "phrase": "Je viens du Brésil."
+        },
+        {
+          "id": 164850,
+          "order_index": 119,
+          "session_number": 6,
+          "type": "sequence_dialogue",
+          "phrase": "Je viens du Brésil."
+        },
+        {
+          "id": 164860,
+          "order_index": 129,
+          "session_number": 7,
+          "type": "sequence_dialogue",
+          "phrase": "Je viens du Brésil."
+        },
+        {
+          "id": 164870,
+          "order_index": 139,
+          "session_number": 7,
+          "type": "listen_build",
+          "phrase": "Je viens du Brésil."
+        },
+        {
+          "id": 164879,
+          "order_index": 148,
+          "session_number": 8,
+          "type": "listen_build",
+          "phrase": "Je viens du Brésil."
+        },
+        {
+          "id": 164880,
+          "order_index": 149,
+          "session_number": 8,
+          "type": "sequence_dialogue",
+          "phrase": "Je viens du Brésil."
+        },
+        {
+          "id": 164888,
+          "order_index": 157,
+          "session_number": 8,
+          "type": "context_choice",
+          "phrase": "Je viens du Brésil."
+        }
+      ]
+    },
+    {
+      "language": "fr",
+      "phrase": "J'ai besoin d'un billet.",
+      "count": 24,
+      "examples": [
+        {
+          "id": 164933,
+          "order_index": 202,
+          "session_number": 11,
+          "type": "choice",
+          "phrase": "J'ai besoin d'un billet."
+        },
+        {
+          "id": 164940,
+          "order_index": 209,
+          "session_number": 11,
+          "type": "sequence_dialogue",
+          "phrase": "J'ai besoin d'un billet."
+        },
+        {
+          "id": 164950,
+          "order_index": 219,
+          "session_number": 11,
+          "type": "sequence_dialogue",
+          "phrase": "J'ai besoin d'un billet."
+        },
+        {
+          "id": 164960,
+          "order_index": 229,
+          "session_number": 12,
+          "type": "sequence_dialogue",
+          "phrase": "J'ai besoin d'un billet."
+        },
+        {
+          "id": 164970,
+          "order_index": 239,
+          "session_number": 12,
+          "type": "listen_build",
+          "phrase": "J'ai besoin d'un billet."
+        },
+        {
+          "id": 164979,
+          "order_index": 248,
+          "session_number": 13,
+          "type": "listen_build",
+          "phrase": "J'ai besoin d'un billet."
+        },
+        {
+          "id": 164980,
+          "order_index": 249,
+          "session_number": 13,
+          "type": "sequence_dialogue",
+          "phrase": "J'ai besoin d'un billet."
+        },
+        {
+          "id": 164988,
+          "order_index": 257,
+          "session_number": 13,
+          "type": "context_choice",
+          "phrase": "J'ai besoin d'un billet."
+        }
+      ]
+    },
+    {
+      "language": "fr",
+      "phrase": "Le menu, s'il vous plaît.",
+      "count": 24,
+      "examples": [
+        {
+          "id": 165033,
+          "order_index": 302,
+          "session_number": 16,
+          "type": "choice",
+          "phrase": "Le menu, s'il vous plaît."
+        },
+        {
+          "id": 165040,
+          "order_index": 309,
+          "session_number": 16,
+          "type": "sequence_dialogue",
+          "phrase": "Le menu, s'il vous plaît."
+        },
+        {
+          "id": 165050,
+          "order_index": 319,
+          "session_number": 16,
+          "type": "sequence_dialogue",
+          "phrase": "Le menu, s'il vous plaît."
+        },
+        {
+          "id": 165060,
+          "order_index": 329,
+          "session_number": 17,
+          "type": "sequence_dialogue",
+          "phrase": "Le menu, s'il vous plaît."
+        },
+        {
+          "id": 165070,
+          "order_index": 339,
+          "session_number": 17,
+          "type": "listen_build",
+          "phrase": "Le menu, s'il vous plaît."
+        },
+        {
+          "id": 165079,
+          "order_index": 348,
+          "session_number": 18,
+          "type": "listen_build",
+          "phrase": "Le menu, s'il vous plaît."
+        },
+        {
+          "id": 165080,
+          "order_index": 349,
+          "session_number": 18,
+          "type": "sequence_dialogue",
+          "phrase": "Le menu, s'il vous plaît."
+        },
+        {
+          "id": 165088,
+          "order_index": 357,
+          "session_number": 18,
+          "type": "context_choice",
+          "phrase": "Le menu, s'il vous plaît."
+        }
+      ]
+    },
+    {
+      "language": "fr",
+      "phrase": "Je voudrais un café.",
+      "count": 23,
+      "examples": [
+        {
+          "id": 164733,
+          "order_index": 2,
+          "session_number": 1,
+          "type": "choice",
+          "phrase": "Je voudrais un café."
+        },
+        {
+          "id": 164740,
+          "order_index": 9,
+          "session_number": 1,
+          "type": "sequence_dialogue",
+          "phrase": "Je voudrais un café."
+        },
+        {
+          "id": 164750,
+          "order_index": 19,
+          "session_number": 1,
+          "type": "sequence_dialogue",
+          "phrase": "Je voudrais un café."
+        },
+        {
+          "id": 164760,
+          "order_index": 29,
+          "session_number": 2,
+          "type": "sequence_dialogue",
+          "phrase": "Je voudrais un café."
+        },
+        {
+          "id": 164769,
+          "order_index": 38,
+          "session_number": 2,
+          "type": "build",
+          "phrase": "Je voudrais un café."
+        },
+        {
+          "id": 164770,
+          "order_index": 39,
+          "session_number": 2,
+          "type": "listen_build",
+          "phrase": "Je voudrais un café."
+        },
+        {
+          "id": 164779,
+          "order_index": 48,
+          "session_number": 3,
+          "type": "listen_build",
+          "phrase": "Je voudrais un café."
+        },
+        {
+          "id": 164780,
+          "order_index": 49,
+          "session_number": 3,
+          "type": "sequence_dialogue",
+          "phrase": "Je voudrais un café."
+        }
+      ]
+    },
+    {
+      "language": "fr",
+      "phrase": "J'ai une table.",
+      "count": 23,
+      "examples": [
+        {
+          "id": 165040,
+          "order_index": 309,
+          "session_number": 16,
+          "type": "sequence_dialogue",
+          "phrase": "J'ai une table."
+        },
+        {
+          "id": 165050,
+          "order_index": 319,
+          "session_number": 16,
+          "type": "sequence_dialogue",
+          "phrase": "J'ai une table."
+        },
+        {
+          "id": 165060,
+          "order_index": 329,
+          "session_number": 17,
+          "type": "sequence_dialogue",
+          "phrase": "J'ai une table."
+        },
+        {
+          "id": 165069,
+          "order_index": 338,
+          "session_number": 17,
+          "type": "build",
+          "phrase": "J'ai une table."
+        },
+        {
+          "id": 165080,
+          "order_index": 349,
+          "session_number": 18,
+          "type": "sequence_dialogue",
+          "phrase": "J'ai une table."
+        },
+        {
+          "id": 165090,
+          "order_index": 359,
+          "session_number": 18,
+          "type": "sequence_dialogue",
+          "phrase": "J'ai une table."
+        },
+        {
+          "id": 165096,
+          "order_index": 365,
+          "session_number": 19,
+          "type": "image_choice",
+          "phrase": "J'ai une table."
+        },
+        {
+          "id": 165100,
+          "order_index": 369,
+          "session_number": 19,
+          "type": "sequence_dialogue",
+          "phrase": "J'ai une table."
+        }
+      ]
+    },
+    {
+      "language": "fr",
+      "phrase": "Mon numéro est un deux trois.",
+      "count": 23,
+      "examples": [
+        {
+          "id": 165140,
+          "order_index": 409,
+          "session_number": 21,
+          "type": "sequence_dialogue",
+          "phrase": "Mon numéro est un deux trois."
+        },
+        {
+          "id": 165150,
+          "order_index": 419,
+          "session_number": 21,
+          "type": "sequence_dialogue",
+          "phrase": "Mon numéro est un deux trois."
+        },
+        {
+          "id": 165160,
+          "order_index": 429,
+          "session_number": 22,
+          "type": "sequence_dialogue",
+          "phrase": "Mon numéro est un deux trois."
+        },
+        {
+          "id": 165169,
+          "order_index": 438,
+          "session_number": 22,
+          "type": "build",
+          "phrase": "Mon numéro est un deux trois."
+        },
+        {
+          "id": 165180,
+          "order_index": 449,
+          "session_number": 23,
+          "type": "sequence_dialogue",
+          "phrase": "Mon numéro est un deux trois."
+        },
+        {
+          "id": 165190,
+          "order_index": 459,
+          "session_number": 23,
+          "type": "sequence_dialogue",
+          "phrase": "Mon numéro est un deux trois."
+        },
+        {
+          "id": 165196,
+          "order_index": 465,
+          "session_number": 24,
+          "type": "image_choice",
+          "phrase": "Mon numéro est un deux trois."
+        },
+        {
+          "id": 165200,
+          "order_index": 469,
+          "session_number": 24,
+          "type": "sequence_dialogue",
+          "phrase": "Mon numéro est un deux trois."
+        }
+      ]
+    },
+    {
+      "language": "fr",
+      "phrase": "Je voyage à Berlin.",
+      "count": 22,
+      "examples": [
+        {
+          "id": 164940,
+          "order_index": 209,
+          "session_number": 11,
+          "type": "sequence_dialogue",
+          "phrase": "Je voyage à Berlin."
+        },
+        {
+          "id": 164950,
+          "order_index": 219,
+          "session_number": 11,
+          "type": "sequence_dialogue",
+          "phrase": "Je voyage à Berlin."
+        },
+        {
+          "id": 164960,
+          "order_index": 229,
+          "session_number": 12,
+          "type": "sequence_dialogue",
+          "phrase": "Je voyage à Berlin."
+        },
+        {
+          "id": 164969,
+          "order_index": 238,
+          "session_number": 12,
+          "type": "build",
+          "phrase": "Je voyage à Berlin."
+        },
+        {
+          "id": 164980,
+          "order_index": 249,
+          "session_number": 13,
+          "type": "sequence_dialogue",
+          "phrase": "Je voyage à Berlin."
+        },
+        {
+          "id": 164990,
+          "order_index": 259,
+          "session_number": 13,
+          "type": "sequence_dialogue",
+          "phrase": "Je voyage à Berlin."
+        },
+        {
+          "id": 164996,
+          "order_index": 265,
+          "session_number": 14,
+          "type": "image_choice",
+          "phrase": "Je voyage à Berlin."
+        },
+        {
+          "id": 165000,
+          "order_index": 269,
+          "session_number": 14,
+          "type": "sequence_dialogue",
+          "phrase": "Je voyage à Berlin."
+        }
+      ]
+    },
+    {
+      "language": "fr",
+      "phrase": "Je n'aime pas le poisson.",
+      "count": 22,
+      "examples": [
+        {
+          "id": 165633,
+          "order_index": 902,
+          "session_number": 46,
+          "type": "choice",
+          "phrase": "Je n'aime pas le poisson."
+        },
+        {
+          "id": 165640,
+          "order_index": 909,
+          "session_number": 46,
+          "type": "sequence_dialogue",
+          "phrase": "Je n'aime pas le poisson."
+        },
+        {
+          "id": 165650,
+          "order_index": 919,
+          "session_number": 46,
+          "type": "sequence_dialogue",
+          "phrase": "Je n'aime pas le poisson."
+        },
+        {
+          "id": 165660,
+          "order_index": 929,
+          "session_number": 47,
+          "type": "sequence_dialogue",
+          "phrase": "Je n'aime pas le poisson."
+        },
+        {
+          "id": 165670,
+          "order_index": 939,
+          "session_number": 47,
+          "type": "listen_build",
+          "phrase": "Je n'aime pas le poisson."
+        },
+        {
+          "id": 165679,
+          "order_index": 948,
+          "session_number": 48,
+          "type": "listen_build",
+          "phrase": "Je n'aime pas le poisson."
+        },
+        {
+          "id": 165680,
+          "order_index": 949,
+          "session_number": 48,
+          "type": "sequence_dialogue",
+          "phrase": "Je n'aime pas le poisson."
+        },
+        {
+          "id": 165688,
+          "order_index": 957,
+          "session_number": 48,
+          "type": "context_choice",
+          "phrase": "Je n'aime pas le poisson."
+        }
+      ]
+    },
+    {
+      "language": "fr",
+      "phrase": "Je parle portugais.",
+      "count": 21,
+      "examples": [
+        {
+          "id": 164835,
+          "order_index": 104,
+          "session_number": 6,
+          "type": "choice",
+          "phrase": "Je parle portugais."
+        },
+        {
+          "id": 164840,
+          "order_index": 109,
+          "session_number": 6,
+          "type": "sequence_dialogue",
+          "phrase": "Je parle portugais."
+        },
+        {
+          "id": 164844,
+          "order_index": 113,
+          "session_number": 6,
+          "type": "choice",
+          "phrase": "Je parle portugais."
+        },
+        {
+          "id": 164850,
+          "order_index": 119,
+          "session_number": 6,
+          "type": "sequence_dialogue",
+          "phrase": "Je parle portugais."
+        },
+        {
+          "id": 164853,
+          "order_index": 122,
+          "session_number": 7,
+          "type": "choice",
+          "phrase": "Je parle portugais."
+        },
+        {
+          "id": 164860,
+          "order_index": 129,
+          "session_number": 7,
+          "type": "sequence_dialogue",
+          "phrase": "Je parle portugais."
+        },
+        {
+          "id": 164880,
+          "order_index": 149,
+          "session_number": 8,
+          "type": "sequence_dialogue",
+          "phrase": "Je parle portugais."
+        },
+        {
+          "id": 164890,
+          "order_index": 159,
+          "session_number": 8,
+          "type": "sequence_dialogue",
+          "phrase": "Je parle portugais."
+        }
+      ]
+    },
+    {
+      "language": "fr",
+      "phrase": "Où est la gare ?",
+      "count": 21,
+      "examples": [
+        {
+          "id": 164935,
+          "order_index": 204,
+          "session_number": 11,
+          "type": "choice",
+          "phrase": "Où est la gare ?"
+        },
+        {
+          "id": 164940,
+          "order_index": 209,
+          "session_number": 11,
+          "type": "sequence_dialogue",
+          "phrase": "Où est la gare ?"
+        },
+        {
+          "id": 164944,
+          "order_index": 213,
+          "session_number": 11,
+          "type": "choice",
+          "phrase": "Où est la gare ?"
+        },
+        {
+          "id": 164950,
+          "order_index": 219,
+          "session_number": 11,
+          "type": "sequence_dialogue",
+          "phrase": "Où est la gare ?"
+        },
+        {
+          "id": 164953,
+          "order_index": 222,
+          "session_number": 12,
+          "type": "choice",
+          "phrase": "Où est la gare ?"
+        },
+        {
+          "id": 164960,
+          "order_index": 229,
+          "session_number": 12,
+          "type": "sequence_dialogue",
+          "phrase": "Où est la gare ?"
+        },
+        {
+          "id": 164980,
+          "order_index": 249,
+          "session_number": 13,
+          "type": "sequence_dialogue",
+          "phrase": "Où est la gare ?"
+        },
+        {
+          "id": 164990,
+          "order_index": 259,
+          "session_number": 13,
+          "type": "sequence_dialogue",
+          "phrase": "Où est la gare ?"
+        }
+      ]
+    },
+    {
+      "language": "fr",
+      "phrase": "Je travaille dans une école.",
+      "count": 21,
+      "examples": [
+        {
+          "id": 165333,
+          "order_index": 602,
+          "session_number": 31,
+          "type": "choice",
+          "phrase": "Je travaille dans une école."
+        },
+        {
+          "id": 165340,
+          "order_index": 609,
+          "session_number": 31,
+          "type": "sequence_dialogue",
+          "phrase": "Je travaille dans une école."
+        },
+        {
+          "id": 165350,
+          "order_index": 619,
+          "session_number": 31,
+          "type": "sequence_dialogue",
+          "phrase": "Je travaille dans une école."
+        },
+        {
+          "id": 165360,
+          "order_index": 629,
+          "session_number": 32,
+          "type": "sequence_dialogue",
+          "phrase": "Je travaille dans une école."
+        },
+        {
+          "id": 165370,
+          "order_index": 639,
+          "session_number": 32,
+          "type": "listen_build",
+          "phrase": "Je travaille dans une école."
+        },
+        {
+          "id": 165379,
+          "order_index": 648,
+          "session_number": 33,
+          "type": "listen_build",
+          "phrase": "Je travaille dans une école."
+        },
+        {
+          "id": 165380,
+          "order_index": 649,
+          "session_number": 33,
+          "type": "sequence_dialogue",
+          "phrase": "Je travaille dans une école."
+        },
+        {
+          "id": 165388,
+          "order_index": 657,
+          "session_number": 33,
+          "type": "context_choice",
+          "phrase": "Je travaille dans une école."
+        }
+      ]
+    },
+    {
+      "language": "jp",
+      "phrase": "これは私の父です。",
+      "count": 221,
+      "examples": [
+        {
+          "id": 168233,
+          "order_index": 502,
+          "session_number": 26,
+          "type": "choice",
+          "phrase": "これは私の父です。"
+        },
+        {
+          "id": 168240,
+          "order_index": 509,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "これは私の父です。"
+        },
+        {
+          "id": 168250,
+          "order_index": 519,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "これは私の父です。"
+        },
+        {
+          "id": 168260,
+          "order_index": 529,
+          "session_number": 27,
+          "type": "sequence_dialogue",
+          "phrase": "これは私の父です。"
+        },
+        {
+          "id": 168280,
+          "order_index": 549,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "これは私の父です。"
+        },
+        {
+          "id": 168288,
+          "order_index": 557,
+          "session_number": 28,
+          "type": "context_choice",
+          "phrase": "これは私の父です。"
+        },
+        {
+          "id": 168290,
+          "order_index": 559,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "これは私の父です。"
+        },
+        {
+          "id": 168297,
+          "order_index": 566,
+          "session_number": 29,
+          "type": "listen_choice",
+          "phrase": "これは私の父です。"
+        }
+      ]
+    },
+    {
+      "language": "jp",
+      "phrase": "これは私の母です。",
+      "count": 220,
+      "examples": [
+        {
+          "id": 168240,
+          "order_index": 509,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "これは私の母です。"
+        },
+        {
+          "id": 168250,
+          "order_index": 519,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "これは私の母です。"
+        },
+        {
+          "id": 168260,
+          "order_index": 529,
+          "session_number": 27,
+          "type": "sequence_dialogue",
+          "phrase": "これは私の母です。"
+        },
+        {
+          "id": 168280,
+          "order_index": 549,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "これは私の母です。"
+        },
+        {
+          "id": 168290,
+          "order_index": 559,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "これは私の母です。"
+        },
+        {
+          "id": 168296,
+          "order_index": 565,
+          "session_number": 29,
+          "type": "image_choice",
+          "phrase": "これは私の母です。"
+        },
+        {
+          "id": 168300,
+          "order_index": 569,
+          "session_number": 29,
+          "type": "sequence_dialogue",
+          "phrase": "これは私の母です。"
+        },
+        {
+          "id": 168305,
+          "order_index": 574,
+          "session_number": 29,
+          "type": "context_choice",
+          "phrase": "これは私の母です。"
+        }
+      ]
+    },
+    {
+      "language": "jp",
+      "phrase": "兄弟がいます。",
+      "count": 217,
+      "examples": [
+        {
+          "id": 168234,
+          "order_index": 503,
+          "session_number": 26,
+          "type": "listen_choice",
+          "phrase": "兄弟がいます。"
+        },
+        {
+          "id": 168240,
+          "order_index": 509,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "兄弟がいます。"
+        },
+        {
+          "id": 168243,
+          "order_index": 512,
+          "session_number": 26,
+          "type": "choice",
+          "phrase": "兄弟がいます。"
+        },
+        {
+          "id": 168250,
+          "order_index": 519,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "兄弟がいます。"
+        },
+        {
+          "id": 168260,
+          "order_index": 529,
+          "session_number": 27,
+          "type": "sequence_dialogue",
+          "phrase": "兄弟がいます。"
+        },
+        {
+          "id": 168280,
+          "order_index": 549,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "兄弟がいます。"
+        },
+        {
+          "id": 168290,
+          "order_index": 559,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "兄弟がいます。"
+        },
+        {
+          "id": 168300,
+          "order_index": 569,
+          "session_number": 29,
+          "type": "sequence_dialogue",
+          "phrase": "兄弟がいます。"
+        }
+      ]
+    },
+    {
+      "language": "jp",
+      "phrase": "息子はここにいます。",
+      "count": 210,
+      "examples": [
+        {
+          "id": 168236,
+          "order_index": 505,
+          "session_number": 26,
+          "type": "image_choice",
+          "phrase": "息子はここにいます。"
+        },
+        {
+          "id": 168254,
+          "order_index": 523,
+          "session_number": 27,
+          "type": "listen_choice",
+          "phrase": "息子はここにいます。"
+        },
+        {
+          "id": 168263,
+          "order_index": 532,
+          "session_number": 27,
+          "type": "choice",
+          "phrase": "息子はここにいます。"
+        },
+        {
+          "id": 168318,
+          "order_index": 587,
+          "session_number": 30,
+          "type": "context_choice",
+          "phrase": "息子はここにいます。"
+        },
+        {
+          "id": 168327,
+          "order_index": 596,
+          "session_number": 30,
+          "type": "context_choice",
+          "phrase": "息子はここにいます。"
+        },
+        {
+          "id": 168816,
+          "order_index": 1085,
+          "session_number": 55,
+          "type": "context_choice",
+          "phrase": "息子はここにいます。"
+        },
+        {
+          "id": 168822,
+          "order_index": 1091,
+          "session_number": 55,
+          "type": "choice",
+          "phrase": "息子はここにいます。"
+        },
+        {
+          "id": 169036,
+          "order_index": 1305,
+          "session_number": 66,
+          "type": "context_choice",
+          "phrase": "息子はここにいます。"
+        }
+      ]
+    },
+    {
+      "language": "jp",
+      "phrase": "姉 妹 が い ま す 。",
+      "count": 205,
+      "examples": [
+        {
+          "id": 168299,
+          "order_index": 568,
+          "session_number": 29,
+          "type": "listen_build",
+          "phrase": "姉 妹 が い ま す 。"
+        },
+        {
+          "id": 168815,
+          "order_index": 1084,
+          "session_number": 55,
+          "type": "build",
+          "phrase": "姉 妹 が い ま す 。"
+        },
+        {
+          "id": 169035,
+          "order_index": 1304,
+          "session_number": 66,
+          "type": "build",
+          "phrase": "姉 妹 が い ま す 。"
+        },
+        {
+          "id": 170750,
+          "order_index": 1504,
+          "session_number": 76,
+          "type": "build",
+          "phrase": "姉 妹 が い ま す 。"
+        },
+        {
+          "id": 170775,
+          "order_index": 1509,
+          "session_number": 76,
+          "type": "build",
+          "phrase": "姉 妹 が い ま す 。"
+        },
+        {
+          "id": 170800,
+          "order_index": 1514,
+          "session_number": 76,
+          "type": "build",
+          "phrase": "姉 妹 が い ま す 。"
+        },
+        {
+          "id": 170825,
+          "order_index": 1519,
+          "session_number": 76,
+          "type": "build",
+          "phrase": "姉 妹 が い ま す 。"
+        },
+        {
+          "id": 170850,
+          "order_index": 1524,
+          "session_number": 77,
+          "type": "build",
+          "phrase": "姉 妹 が い ま す 。"
+        }
+      ]
+    },
+    {
+      "language": "jp",
+      "phrase": "私の名前はビクトルです。",
+      "count": 27,
+      "examples": [
+        {
+          "id": 168135,
+          "order_index": 404,
+          "session_number": 21,
+          "type": "choice",
+          "phrase": "私の名前はビクトルです。"
+        },
+        {
+          "id": 168140,
+          "order_index": 409,
+          "session_number": 21,
+          "type": "sequence_dialogue",
+          "phrase": "私の名前はビクトルです。"
+        },
+        {
+          "id": 168144,
+          "order_index": 413,
+          "session_number": 21,
+          "type": "choice",
+          "phrase": "私の名前はビクトルです。"
+        },
+        {
+          "id": 168150,
+          "order_index": 419,
+          "session_number": 21,
+          "type": "sequence_dialogue",
+          "phrase": "私の名前はビクトルです。"
+        },
+        {
+          "id": 168153,
+          "order_index": 422,
+          "session_number": 22,
+          "type": "choice",
+          "phrase": "私の名前はビクトルです。"
+        },
+        {
+          "id": 168160,
+          "order_index": 429,
+          "session_number": 22,
+          "type": "sequence_dialogue",
+          "phrase": "私の名前はビクトルです。"
+        },
+        {
+          "id": 168180,
+          "order_index": 449,
+          "session_number": 23,
+          "type": "sequence_dialogue",
+          "phrase": "私の名前はビクトルです。"
+        },
+        {
+          "id": 168190,
+          "order_index": 459,
+          "session_number": 23,
+          "type": "sequence_dialogue",
+          "phrase": "私の名前はビクトルです。"
+        }
+      ]
+    },
+    {
+      "language": "jp",
+      "phrase": "これが私の連絡先です。",
+      "count": 25,
+      "examples": [
+        {
+          "id": 168140,
+          "order_index": 409,
+          "session_number": 21,
+          "type": "sequence_dialogue",
+          "phrase": "これが私の連絡先です。"
+        },
+        {
+          "id": 168150,
+          "order_index": 419,
+          "session_number": 21,
+          "type": "sequence_dialogue",
+          "phrase": "これが私の連絡先です。"
+        },
+        {
+          "id": 168160,
+          "order_index": 429,
+          "session_number": 22,
+          "type": "sequence_dialogue",
+          "phrase": "これが私の連絡先です。"
+        },
+        {
+          "id": 168168,
+          "order_index": 437,
+          "session_number": 22,
+          "type": "context_choice",
+          "phrase": "これが私の連絡先です。"
+        },
+        {
+          "id": 168177,
+          "order_index": 446,
+          "session_number": 23,
+          "type": "context_choice",
+          "phrase": "これが私の連絡先です。"
+        },
+        {
+          "id": 168180,
+          "order_index": 449,
+          "session_number": 23,
+          "type": "sequence_dialogue",
+          "phrase": "これが私の連絡先です。"
+        },
+        {
+          "id": 168186,
+          "order_index": 455,
+          "session_number": 23,
+          "type": "image_choice",
+          "phrase": "これが私の連絡先です。"
+        },
+        {
+          "id": 168190,
+          "order_index": 459,
+          "session_number": 23,
+          "type": "sequence_dialogue",
+          "phrase": "これが私の連絡先です。"
+        }
+      ]
+    },
+    {
+      "language": "jp",
+      "phrase": "切符が必要です。",
+      "count": 22,
+      "examples": [
+        {
+          "id": 167933,
+          "order_index": 202,
+          "session_number": 11,
+          "type": "choice",
+          "phrase": "切符が必要です。"
+        },
+        {
+          "id": 167940,
+          "order_index": 209,
+          "session_number": 11,
+          "type": "sequence_dialogue",
+          "phrase": "切符が必要です。"
+        },
+        {
+          "id": 167950,
+          "order_index": 219,
+          "session_number": 11,
+          "type": "sequence_dialogue",
+          "phrase": "切符が必要です。"
+        },
+        {
+          "id": 167960,
+          "order_index": 229,
+          "session_number": 12,
+          "type": "sequence_dialogue",
+          "phrase": "切符が必要です。"
+        },
+        {
+          "id": 167980,
+          "order_index": 249,
+          "session_number": 13,
+          "type": "sequence_dialogue",
+          "phrase": "切符が必要です。"
+        },
+        {
+          "id": 167988,
+          "order_index": 257,
+          "session_number": 13,
+          "type": "context_choice",
+          "phrase": "切符が必要です。"
+        },
+        {
+          "id": 167990,
+          "order_index": 259,
+          "session_number": 13,
+          "type": "sequence_dialogue",
+          "phrase": "切符が必要です。"
+        },
+        {
+          "id": 167997,
+          "order_index": 266,
+          "session_number": 14,
+          "type": "listen_choice",
+          "phrase": "切符が必要です。"
+        }
+      ]
+    },
+    {
+      "language": "jp",
+      "phrase": "メニューをお願いします。",
+      "count": 22,
+      "examples": [
+        {
+          "id": 168033,
+          "order_index": 302,
+          "session_number": 16,
+          "type": "choice",
+          "phrase": "メニューをお願いします。"
+        },
+        {
+          "id": 168040,
+          "order_index": 309,
+          "session_number": 16,
+          "type": "sequence_dialogue",
+          "phrase": "メニューをお願いします。"
+        },
+        {
+          "id": 168050,
+          "order_index": 319,
+          "session_number": 16,
+          "type": "sequence_dialogue",
+          "phrase": "メニューをお願いします。"
+        },
+        {
+          "id": 168060,
+          "order_index": 329,
+          "session_number": 17,
+          "type": "sequence_dialogue",
+          "phrase": "メニューをお願いします。"
+        },
+        {
+          "id": 168080,
+          "order_index": 349,
+          "session_number": 18,
+          "type": "sequence_dialogue",
+          "phrase": "メニューをお願いします。"
+        },
+        {
+          "id": 168088,
+          "order_index": 357,
+          "session_number": 18,
+          "type": "context_choice",
+          "phrase": "メニューをお願いします。"
+        },
+        {
+          "id": 168090,
+          "order_index": 359,
+          "session_number": 18,
+          "type": "sequence_dialogue",
+          "phrase": "メニューをお願いします。"
+        },
+        {
+          "id": 168097,
+          "order_index": 366,
+          "session_number": 19,
+          "type": "listen_choice",
+          "phrase": "メニューをお願いします。"
+        }
+      ]
+    },
+    {
+      "language": "jp",
+      "phrase": "席があります。",
+      "count": 22,
+      "examples": [
+        {
+          "id": 168040,
+          "order_index": 309,
+          "session_number": 16,
+          "type": "sequence_dialogue",
+          "phrase": "席があります。"
+        },
+        {
+          "id": 168050,
+          "order_index": 319,
+          "session_number": 16,
+          "type": "sequence_dialogue",
+          "phrase": "席があります。"
+        },
+        {
+          "id": 168060,
+          "order_index": 329,
+          "session_number": 17,
+          "type": "sequence_dialogue",
+          "phrase": "席があります。"
+        },
+        {
+          "id": 168080,
+          "order_index": 349,
+          "session_number": 18,
+          "type": "sequence_dialogue",
+          "phrase": "席があります。"
+        },
+        {
+          "id": 168090,
+          "order_index": 359,
+          "session_number": 18,
+          "type": "sequence_dialogue",
+          "phrase": "席があります。"
+        },
+        {
+          "id": 168096,
+          "order_index": 365,
+          "session_number": 19,
+          "type": "image_choice",
+          "phrase": "席があります。"
+        },
+        {
+          "id": 168100,
+          "order_index": 369,
+          "session_number": 19,
+          "type": "sequence_dialogue",
+          "phrase": "席があります。"
+        },
+        {
+          "id": 168105,
+          "order_index": 374,
+          "session_number": 19,
+          "type": "context_choice",
+          "phrase": "席があります。"
+        }
+      ]
+    },
+    {
+      "language": "jp",
+      "phrase": "私の電話番号は一二三です。",
+      "count": 22,
+      "examples": [
+        {
+          "id": 168140,
+          "order_index": 409,
+          "session_number": 21,
+          "type": "sequence_dialogue",
+          "phrase": "私の電話番号は一二三です。"
+        },
+        {
+          "id": 168150,
+          "order_index": 419,
+          "session_number": 21,
+          "type": "sequence_dialogue",
+          "phrase": "私の電話番号は一二三です。"
+        },
+        {
+          "id": 168160,
+          "order_index": 429,
+          "session_number": 22,
+          "type": "sequence_dialogue",
+          "phrase": "私の電話番号は一二三です。"
+        },
+        {
+          "id": 168180,
+          "order_index": 449,
+          "session_number": 23,
+          "type": "sequence_dialogue",
+          "phrase": "私の電話番号は一二三です。"
+        },
+        {
+          "id": 168190,
+          "order_index": 459,
+          "session_number": 23,
+          "type": "sequence_dialogue",
+          "phrase": "私の電話番号は一二三です。"
+        },
+        {
+          "id": 168196,
+          "order_index": 465,
+          "session_number": 24,
+          "type": "image_choice",
+          "phrase": "私の電話番号は一二三です。"
+        },
+        {
+          "id": 168200,
+          "order_index": 469,
+          "session_number": 24,
+          "type": "sequence_dialogue",
+          "phrase": "私の電話番号は一二三です。"
+        },
+        {
+          "id": 168205,
+          "order_index": 474,
+          "session_number": 24,
+          "type": "context_choice",
+          "phrase": "私の電話番号は一二三です。"
+        }
+      ]
+    },
+    {
+      "language": "jp",
+      "phrase": "ベルリンへ旅行します。",
+      "count": 21,
+      "examples": [
+        {
+          "id": 167940,
+          "order_index": 209,
+          "session_number": 11,
+          "type": "sequence_dialogue",
+          "phrase": "ベルリンへ旅行します。"
+        },
+        {
+          "id": 167950,
+          "order_index": 219,
+          "session_number": 11,
+          "type": "sequence_dialogue",
+          "phrase": "ベルリンへ旅行します。"
+        },
+        {
+          "id": 167960,
+          "order_index": 229,
+          "session_number": 12,
+          "type": "sequence_dialogue",
+          "phrase": "ベルリンへ旅行します。"
+        },
+        {
+          "id": 167980,
+          "order_index": 249,
+          "session_number": 13,
+          "type": "sequence_dialogue",
+          "phrase": "ベルリンへ旅行します。"
+        },
+        {
+          "id": 167990,
+          "order_index": 259,
+          "session_number": 13,
+          "type": "sequence_dialogue",
+          "phrase": "ベルリンへ旅行します。"
+        },
+        {
+          "id": 167996,
+          "order_index": 265,
+          "session_number": 14,
+          "type": "image_choice",
+          "phrase": "ベルリンへ旅行します。"
+        },
+        {
+          "id": 168000,
+          "order_index": 269,
+          "session_number": 14,
+          "type": "sequence_dialogue",
+          "phrase": "ベルリンへ旅行します。"
+        },
+        {
+          "id": 168005,
+          "order_index": 274,
+          "session_number": 14,
+          "type": "context_choice",
+          "phrase": "ベルリンへ旅行します。"
+        }
+      ]
+    },
+    {
+      "language": "jp",
+      "phrase": "私は先生です。",
+      "count": 21,
+      "examples": [
+        {
+          "id": 168340,
+          "order_index": 609,
+          "session_number": 31,
+          "type": "sequence_dialogue",
+          "phrase": "私は先生です。"
+        },
+        {
+          "id": 168350,
+          "order_index": 619,
+          "session_number": 31,
+          "type": "sequence_dialogue",
+          "phrase": "私は先生です。"
+        },
+        {
+          "id": 168360,
+          "order_index": 629,
+          "session_number": 32,
+          "type": "sequence_dialogue",
+          "phrase": "私は先生です。"
+        },
+        {
+          "id": 168380,
+          "order_index": 649,
+          "session_number": 33,
+          "type": "sequence_dialogue",
+          "phrase": "私は先生です。"
+        },
+        {
+          "id": 168390,
+          "order_index": 659,
+          "session_number": 33,
+          "type": "sequence_dialogue",
+          "phrase": "私は先生です。"
+        },
+        {
+          "id": 168396,
+          "order_index": 665,
+          "session_number": 34,
+          "type": "image_choice",
+          "phrase": "私は先生です。"
+        },
+        {
+          "id": 168400,
+          "order_index": 669,
+          "session_number": 34,
+          "type": "sequence_dialogue",
+          "phrase": "私は先生です。"
+        },
+        {
+          "id": 168405,
+          "order_index": 674,
+          "session_number": 34,
+          "type": "context_choice",
+          "phrase": "私は先生です。"
+        }
+      ]
+    },
+    {
+      "language": "jp",
+      "phrase": "魚が好きではありません。",
+      "count": 20,
+      "examples": [
+        {
+          "id": 168633,
+          "order_index": 902,
+          "session_number": 46,
+          "type": "choice",
+          "phrase": "魚が好きではありません。"
+        },
+        {
+          "id": 168640,
+          "order_index": 909,
+          "session_number": 46,
+          "type": "sequence_dialogue",
+          "phrase": "魚が好きではありません。"
+        },
+        {
+          "id": 168650,
+          "order_index": 919,
+          "session_number": 46,
+          "type": "sequence_dialogue",
+          "phrase": "魚が好きではありません。"
+        },
+        {
+          "id": 168660,
+          "order_index": 929,
+          "session_number": 47,
+          "type": "sequence_dialogue",
+          "phrase": "魚が好きではありません。"
+        },
+        {
+          "id": 168680,
+          "order_index": 949,
+          "session_number": 48,
+          "type": "sequence_dialogue",
+          "phrase": "魚が好きではありません。"
+        },
+        {
+          "id": 168688,
+          "order_index": 957,
+          "session_number": 48,
+          "type": "context_choice",
+          "phrase": "魚が好きではありません。"
+        },
+        {
+          "id": 168690,
+          "order_index": 959,
+          "session_number": 48,
+          "type": "sequence_dialogue",
+          "phrase": "魚が好きではありません。"
+        },
+        {
+          "id": 168697,
+          "order_index": 966,
+          "session_number": 49,
+          "type": "listen_choice",
+          "phrase": "魚が好きではありません。"
+        }
+      ]
+    },
+    {
+      "language": "jp",
+      "phrase": "コーヒーが好きです。",
+      "count": 20,
+      "examples": [
+        {
+          "id": 168640,
+          "order_index": 909,
+          "session_number": 46,
+          "type": "sequence_dialogue",
+          "phrase": "コーヒーが好きです。"
+        },
+        {
+          "id": 168650,
+          "order_index": 919,
+          "session_number": 46,
+          "type": "sequence_dialogue",
+          "phrase": "コーヒーが好きです。"
+        },
+        {
+          "id": 168660,
+          "order_index": 929,
+          "session_number": 47,
+          "type": "sequence_dialogue",
+          "phrase": "コーヒーが好きです。"
+        },
+        {
+          "id": 168680,
+          "order_index": 949,
+          "session_number": 48,
+          "type": "sequence_dialogue",
+          "phrase": "コーヒーが好きです。"
+        },
+        {
+          "id": 168690,
+          "order_index": 959,
+          "session_number": 48,
+          "type": "sequence_dialogue",
+          "phrase": "コーヒーが好きです。"
+        },
+        {
+          "id": 168696,
+          "order_index": 965,
+          "session_number": 49,
+          "type": "image_choice",
+          "phrase": "コーヒーが好きです。"
+        },
+        {
+          "id": 168700,
+          "order_index": 969,
+          "session_number": 49,
+          "type": "sequence_dialogue",
+          "phrase": "コーヒーが好きです。"
+        },
+        {
+          "id": 168705,
+          "order_index": 974,
+          "session_number": 49,
+          "type": "context_choice",
+          "phrase": "コーヒーが好きです。"
+        }
+      ]
+    },
+    {
+      "language": "jp",
+      "phrase": "学校で働いています。",
+      "count": 19,
+      "examples": [
+        {
+          "id": 168333,
+          "order_index": 602,
+          "session_number": 31,
+          "type": "choice",
+          "phrase": "学校で働いています。"
+        },
+        {
+          "id": 168340,
+          "order_index": 609,
+          "session_number": 31,
+          "type": "sequence_dialogue",
+          "phrase": "学校で働いています。"
+        },
+        {
+          "id": 168350,
+          "order_index": 619,
+          "session_number": 31,
+          "type": "sequence_dialogue",
+          "phrase": "学校で働いています。"
+        },
+        {
+          "id": 168360,
+          "order_index": 629,
+          "session_number": 32,
+          "type": "sequence_dialogue",
+          "phrase": "学校で働いています。"
+        },
+        {
+          "id": 168380,
+          "order_index": 649,
+          "session_number": 33,
+          "type": "sequence_dialogue",
+          "phrase": "学校で働いています。"
+        },
+        {
+          "id": 168388,
+          "order_index": 657,
+          "session_number": 33,
+          "type": "context_choice",
+          "phrase": "学校で働いています。"
+        },
+        {
+          "id": 168390,
+          "order_index": 659,
+          "session_number": 33,
+          "type": "sequence_dialogue",
+          "phrase": "学校で働いています。"
+        },
+        {
+          "id": 168397,
+          "order_index": 666,
+          "session_number": 34,
+          "type": "listen_choice",
+          "phrase": "学校で働いています。"
+        }
+      ]
+    },
+    {
+      "language": "jp",
+      "phrase": "シャツは青いです。",
+      "count": 19,
+      "examples": [
+        {
+          "id": 168440,
+          "order_index": 709,
+          "session_number": 36,
+          "type": "sequence_dialogue",
+          "phrase": "シャツは青いです。"
+        },
+        {
+          "id": 168450,
+          "order_index": 719,
+          "session_number": 36,
+          "type": "sequence_dialogue",
+          "phrase": "シャツは青いです。"
+        },
+        {
+          "id": 168460,
+          "order_index": 729,
+          "session_number": 37,
+          "type": "sequence_dialogue",
+          "phrase": "シャツは青いです。"
+        },
+        {
+          "id": 168480,
+          "order_index": 749,
+          "session_number": 38,
+          "type": "sequence_dialogue",
+          "phrase": "シャツは青いです。"
+        },
+        {
+          "id": 168490,
+          "order_index": 759,
+          "session_number": 38,
+          "type": "sequence_dialogue",
+          "phrase": "シャツは青いです。"
+        },
+        {
+          "id": 168496,
+          "order_index": 765,
+          "session_number": 39,
+          "type": "image_choice",
+          "phrase": "シャツは青いです。"
+        },
+        {
+          "id": 168500,
+          "order_index": 769,
+          "session_number": 39,
+          "type": "sequence_dialogue",
+          "phrase": "シャツは青いです。"
+        },
+        {
+          "id": 168505,
+          "order_index": 774,
+          "session_number": 39,
+          "type": "context_choice",
+          "phrase": "シャツは青いです。"
+        }
+      ]
+    },
+    {
+      "language": "jp",
+      "phrase": "八時に朝ご飯を食べます。",
+      "count": 19,
+      "examples": [
+        {
+          "id": 168533,
+          "order_index": 802,
+          "session_number": 41,
+          "type": "choice",
+          "phrase": "八時に朝ご飯を食べます。"
+        },
+        {
+          "id": 168540,
+          "order_index": 809,
+          "session_number": 41,
+          "type": "sequence_dialogue",
+          "phrase": "八時に朝ご飯を食べます。"
+        },
+        {
+          "id": 168550,
+          "order_index": 819,
+          "session_number": 41,
+          "type": "sequence_dialogue",
+          "phrase": "八時に朝ご飯を食べます。"
+        },
+        {
+          "id": 168560,
+          "order_index": 829,
+          "session_number": 42,
+          "type": "sequence_dialogue",
+          "phrase": "八時に朝ご飯を食べます。"
+        },
+        {
+          "id": 168580,
+          "order_index": 849,
+          "session_number": 43,
+          "type": "sequence_dialogue",
+          "phrase": "八時に朝ご飯を食べます。"
+        },
+        {
+          "id": 168588,
+          "order_index": 857,
+          "session_number": 43,
+          "type": "context_choice",
+          "phrase": "八時に朝ご飯を食べます。"
+        },
+        {
+          "id": 168590,
+          "order_index": 859,
+          "session_number": 43,
+          "type": "sequence_dialogue",
+          "phrase": "八時に朝ご飯を食べます。"
+        },
+        {
+          "id": 168597,
+          "order_index": 866,
+          "session_number": 44,
+          "type": "listen_choice",
+          "phrase": "八時に朝ご飯を食べます。"
+        }
+      ]
+    },
+    {
+      "language": "jp",
+      "phrase": "ありがとうございます。",
+      "count": 18,
+      "examples": [
+        {
+          "id": 168068,
+          "order_index": 337,
+          "session_number": 17,
+          "type": "context_choice",
+          "phrase": "ありがとうございます。"
+        },
+        {
+          "id": 168077,
+          "order_index": 346,
+          "session_number": 18,
+          "type": "context_choice",
+          "phrase": "ありがとうございます。"
+        },
+        {
+          "id": 168086,
+          "order_index": 355,
+          "session_number": 18,
+          "type": "image_choice",
+          "phrase": "ありがとうございます。"
+        },
+        {
+          "id": 168104,
+          "order_index": 373,
+          "session_number": 19,
+          "type": "listen_choice",
+          "phrase": "ありがとうございます。"
+        },
+        {
+          "id": 168113,
+          "order_index": 382,
+          "session_number": 20,
+          "type": "choice",
+          "phrase": "ありがとうございます。"
+        },
+        {
+          "id": 168781,
+          "order_index": 1050,
+          "session_number": 53,
+          "type": "context_choice",
+          "phrase": "ありがとうございます。"
+        },
+        {
+          "id": 168786,
+          "order_index": 1055,
+          "session_number": 53,
+          "type": "context_choice",
+          "phrase": "ありがとうございます。"
+        },
+        {
+          "id": 168791,
+          "order_index": 1060,
+          "session_number": 53,
+          "type": "context_choice",
+          "phrase": "ありがとうございます。"
+        }
+      ]
+    },
+    {
+      "language": "jp",
+      "phrase": "ズボンは黒いです。",
+      "count": 18,
+      "examples": [
+        {
+          "id": 168433,
+          "order_index": 702,
+          "session_number": 36,
+          "type": "choice",
+          "phrase": "ズボンは黒いです。"
+        },
+        {
+          "id": 168440,
+          "order_index": 709,
+          "session_number": 36,
+          "type": "sequence_dialogue",
+          "phrase": "ズボンは黒いです。"
+        },
+        {
+          "id": 168450,
+          "order_index": 719,
+          "session_number": 36,
+          "type": "sequence_dialogue",
+          "phrase": "ズボンは黒いです。"
+        },
+        {
+          "id": 168460,
+          "order_index": 729,
+          "session_number": 37,
+          "type": "sequence_dialogue",
+          "phrase": "ズボンは黒いです。"
+        },
+        {
+          "id": 168480,
+          "order_index": 749,
+          "session_number": 38,
+          "type": "sequence_dialogue",
+          "phrase": "ズボンは黒いです。"
+        },
+        {
+          "id": 168488,
+          "order_index": 757,
+          "session_number": 38,
+          "type": "context_choice",
+          "phrase": "ズボンは黒いです。"
+        },
+        {
+          "id": 168490,
+          "order_index": 759,
+          "session_number": 38,
+          "type": "sequence_dialogue",
+          "phrase": "ズボンは黒いです。"
+        },
+        {
+          "id": 168497,
+          "order_index": 766,
+          "session_number": 39,
+          "type": "listen_choice",
+          "phrase": "ズボンは黒いです。"
+        }
+      ]
+    },
+    {
+      "language": "ru",
+      "phrase": "Это мой папа.",
+      "count": 223,
+      "examples": [
+        {
+          "id": 166733,
+          "order_index": 502,
+          "session_number": 26,
+          "type": "choice",
+          "phrase": "Это мой папа."
+        },
+        {
+          "id": 166740,
+          "order_index": 509,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "Это мой папа."
+        },
+        {
+          "id": 166750,
+          "order_index": 519,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "Это мой папа."
+        },
+        {
+          "id": 166760,
+          "order_index": 529,
+          "session_number": 27,
+          "type": "sequence_dialogue",
+          "phrase": "Это мой папа."
+        },
+        {
+          "id": 166770,
+          "order_index": 539,
+          "session_number": 27,
+          "type": "listen_build",
+          "phrase": "Это мой папа."
+        },
+        {
+          "id": 166779,
+          "order_index": 548,
+          "session_number": 28,
+          "type": "listen_build",
+          "phrase": "Это мой папа."
+        },
+        {
+          "id": 166780,
+          "order_index": 549,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "Это мой папа."
+        },
+        {
+          "id": 166788,
+          "order_index": 557,
+          "session_number": 28,
+          "type": "context_choice",
+          "phrase": "Это мой папа."
+        }
+      ]
+    },
+    {
+      "language": "ru",
+      "phrase": "Это моя мама.",
+      "count": 221,
+      "examples": [
+        {
+          "id": 166740,
+          "order_index": 509,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "Это моя мама."
+        },
+        {
+          "id": 166750,
+          "order_index": 519,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "Это моя мама."
+        },
+        {
+          "id": 166760,
+          "order_index": 529,
+          "session_number": 27,
+          "type": "sequence_dialogue",
+          "phrase": "Это моя мама."
+        },
+        {
+          "id": 166769,
+          "order_index": 538,
+          "session_number": 27,
+          "type": "build",
+          "phrase": "Это моя мама."
+        },
+        {
+          "id": 166780,
+          "order_index": 549,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "Это моя мама."
+        },
+        {
+          "id": 166790,
+          "order_index": 559,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "Это моя мама."
+        },
+        {
+          "id": 166796,
+          "order_index": 565,
+          "session_number": 29,
+          "type": "image_choice",
+          "phrase": "Это моя мама."
+        },
+        {
+          "id": 166800,
+          "order_index": 569,
+          "session_number": 29,
+          "type": "sequence_dialogue",
+          "phrase": "Это моя мама."
+        }
+      ]
+    },
+    {
+      "language": "ru",
+      "phrase": "У меня есть сестра.",
+      "count": 220,
+      "examples": [
+        {
+          "id": 166735,
+          "order_index": 504,
+          "session_number": 26,
+          "type": "choice",
+          "phrase": "У меня есть сестра."
+        },
+        {
+          "id": 166740,
+          "order_index": 509,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "У меня есть сестра."
+        },
+        {
+          "id": 166744,
+          "order_index": 513,
+          "session_number": 26,
+          "type": "choice",
+          "phrase": "У меня есть сестра."
+        },
+        {
+          "id": 166750,
+          "order_index": 519,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "У меня есть сестра."
+        },
+        {
+          "id": 166753,
+          "order_index": 522,
+          "session_number": 27,
+          "type": "choice",
+          "phrase": "У меня есть сестра."
+        },
+        {
+          "id": 166760,
+          "order_index": 529,
+          "session_number": 27,
+          "type": "sequence_dialogue",
+          "phrase": "У меня есть сестра."
+        },
+        {
+          "id": 166780,
+          "order_index": 549,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "У меня есть сестра."
+        },
+        {
+          "id": 166790,
+          "order_index": 559,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "У меня есть сестра."
+        }
+      ]
+    },
+    {
+      "language": "ru",
+      "phrase": "У меня есть брат.",
+      "count": 219,
+      "examples": [
+        {
+          "id": 166734,
+          "order_index": 503,
+          "session_number": 26,
+          "type": "listen_choice",
+          "phrase": "У меня есть брат."
+        },
+        {
+          "id": 166740,
+          "order_index": 509,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "У меня есть брат."
+        },
+        {
+          "id": 166743,
+          "order_index": 512,
+          "session_number": 26,
+          "type": "choice",
+          "phrase": "У меня есть брат."
+        },
+        {
+          "id": 166750,
+          "order_index": 519,
+          "session_number": 26,
+          "type": "sequence_dialogue",
+          "phrase": "У меня есть брат."
+        },
+        {
+          "id": 166760,
+          "order_index": 529,
+          "session_number": 27,
+          "type": "sequence_dialogue",
+          "phrase": "У меня есть брат."
+        },
+        {
+          "id": 166780,
+          "order_index": 549,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "У меня есть брат."
+        },
+        {
+          "id": 166789,
+          "order_index": 558,
+          "session_number": 28,
+          "type": "build",
+          "phrase": "У меня есть брат."
+        },
+        {
+          "id": 166790,
+          "order_index": 559,
+          "session_number": 28,
+          "type": "sequence_dialogue",
+          "phrase": "У меня есть брат."
+        }
+      ]
+    },
+    {
+      "language": "ru",
+      "phrase": "Мой сын здесь.",
+      "count": 212,
+      "examples": [
+        {
+          "id": 166736,
+          "order_index": 505,
+          "session_number": 26,
+          "type": "image_choice",
+          "phrase": "Мой сын здесь."
+        },
+        {
+          "id": 166745,
+          "order_index": 514,
+          "session_number": 26,
+          "type": "build",
+          "phrase": "Мой сын здесь."
+        },
+        {
+          "id": 166754,
+          "order_index": 523,
+          "session_number": 27,
+          "type": "listen_choice",
+          "phrase": "Мой сын здесь."
+        },
+        {
+          "id": 166763,
+          "order_index": 532,
+          "session_number": 27,
+          "type": "choice",
+          "phrase": "Мой сын здесь."
+        },
+        {
+          "id": 166809,
+          "order_index": 578,
+          "session_number": 29,
+          "type": "listen_build",
+          "phrase": "Мой сын здесь."
+        },
+        {
+          "id": 166818,
+          "order_index": 587,
+          "session_number": 30,
+          "type": "context_choice",
+          "phrase": "Мой сын здесь."
+        },
+        {
+          "id": 166827,
+          "order_index": 596,
+          "session_number": 30,
+          "type": "context_choice",
+          "phrase": "Мой сын здесь."
+        },
+        {
+          "id": 167316,
+          "order_index": 1085,
+          "session_number": 55,
+          "type": "context_choice",
+          "phrase": "Мой сын здесь."
+        }
+      ]
+    },
+    {
+      "language": "ru",
+      "phrase": "Меня зовут Виктор.",
+      "count": 44,
+      "examples": [
+        {
+          "id": 166340,
+          "order_index": 109,
+          "session_number": 6,
+          "type": "sequence_dialogue",
+          "phrase": "Меня зовут Виктор."
+        },
+        {
+          "id": 166350,
+          "order_index": 119,
+          "session_number": 6,
+          "type": "sequence_dialogue",
+          "phrase": "Меня зовут Виктор."
+        },
+        {
+          "id": 166360,
+          "order_index": 129,
+          "session_number": 7,
+          "type": "sequence_dialogue",
+          "phrase": "Меня зовут Виктор."
+        },
+        {
+          "id": 166369,
+          "order_index": 138,
+          "session_number": 7,
+          "type": "build",
+          "phrase": "Меня зовут Виктор."
+        },
+        {
+          "id": 166380,
+          "order_index": 149,
+          "session_number": 8,
+          "type": "sequence_dialogue",
+          "phrase": "Меня зовут Виктор."
+        },
+        {
+          "id": 166390,
+          "order_index": 159,
+          "session_number": 8,
+          "type": "sequence_dialogue",
+          "phrase": "Меня зовут Виктор."
+        },
+        {
+          "id": 166396,
+          "order_index": 165,
+          "session_number": 9,
+          "type": "image_choice",
+          "phrase": "Меня зовут Виктор."
+        },
+        {
+          "id": 166400,
+          "order_index": 169,
+          "session_number": 9,
+          "type": "sequence_dialogue",
+          "phrase": "Меня зовут Виктор."
+        }
+      ]
+    },
+    {
+      "language": "ru",
+      "phrase": "Я преподаватель.",
+      "count": 30,
+      "examples": [
+        {
+          "id": 166336,
+          "order_index": 105,
+          "session_number": 6,
+          "type": "image_choice",
+          "phrase": "Я преподаватель."
+        },
+        {
+          "id": 166345,
+          "order_index": 114,
+          "session_number": 6,
+          "type": "build",
+          "phrase": "Я преподаватель."
+        },
+        {
+          "id": 166354,
+          "order_index": 123,
+          "session_number": 7,
+          "type": "listen_choice",
+          "phrase": "Я преподаватель."
+        },
+        {
+          "id": 166363,
+          "order_index": 132,
+          "session_number": 7,
+          "type": "choice",
+          "phrase": "Я преподаватель."
+        },
+        {
+          "id": 166373,
+          "order_index": 142,
+          "session_number": 8,
+          "type": "choice",
+          "phrase": "Я преподаватель."
+        },
+        {
+          "id": 166409,
+          "order_index": 178,
+          "session_number": 9,
+          "type": "listen_build",
+          "phrase": "Я преподаватель."
+        },
+        {
+          "id": 166418,
+          "order_index": 187,
+          "session_number": 10,
+          "type": "context_choice",
+          "phrase": "Я преподаватель."
+        },
+        {
+          "id": 166427,
+          "order_index": 196,
+          "session_number": 10,
+          "type": "context_choice",
+          "phrase": "Я преподаватель."
+        }
+      ]
+    },
+    {
+      "language": "ru",
+      "phrase": "Вот мой контакт.",
+      "count": 27,
+      "examples": [
+        {
+          "id": 166640,
+          "order_index": 409,
+          "session_number": 21,
+          "type": "sequence_dialogue",
+          "phrase": "Вот мой контакт."
+        },
+        {
+          "id": 166650,
+          "order_index": 419,
+          "session_number": 21,
+          "type": "sequence_dialogue",
+          "phrase": "Вот мой контакт."
+        },
+        {
+          "id": 166659,
+          "order_index": 428,
+          "session_number": 22,
+          "type": "listen_build",
+          "phrase": "Вот мой контакт."
+        },
+        {
+          "id": 166660,
+          "order_index": 429,
+          "session_number": 22,
+          "type": "sequence_dialogue",
+          "phrase": "Вот мой контакт."
+        },
+        {
+          "id": 166668,
+          "order_index": 437,
+          "session_number": 22,
+          "type": "context_choice",
+          "phrase": "Вот мой контакт."
+        },
+        {
+          "id": 166677,
+          "order_index": 446,
+          "session_number": 23,
+          "type": "context_choice",
+          "phrase": "Вот мой контакт."
+        },
+        {
+          "id": 166680,
+          "order_index": 449,
+          "session_number": 23,
+          "type": "sequence_dialogue",
+          "phrase": "Вот мой контакт."
+        },
+        {
+          "id": 166686,
+          "order_index": 455,
+          "session_number": 23,
+          "type": "image_choice",
+          "phrase": "Вот мой контакт."
+        }
+      ]
+    },
+    {
+      "language": "ru",
+      "phrase": "Я из Бразилии.",
+      "count": 25,
+      "examples": [
+        {
+          "id": 166333,
+          "order_index": 102,
+          "session_number": 6,
+          "type": "choice",
+          "phrase": "Я из Бразилии."
+        },
+        {
+          "id": 166340,
+          "order_index": 109,
+          "session_number": 6,
+          "type": "sequence_dialogue",
+          "phrase": "Я из Бразилии."
+        },
+        {
+          "id": 166350,
+          "order_index": 119,
+          "session_number": 6,
+          "type": "sequence_dialogue",
+          "phrase": "Я из Бразилии."
+        },
+        {
+          "id": 166360,
+          "order_index": 129,
+          "session_number": 7,
+          "type": "sequence_dialogue",
+          "phrase": "Я из Бразилии."
+        },
+        {
+          "id": 166370,
+          "order_index": 139,
+          "session_number": 7,
+          "type": "listen_build",
+          "phrase": "Я из Бразилии."
+        },
+        {
+          "id": 166379,
+          "order_index": 148,
+          "session_number": 8,
+          "type": "listen_build",
+          "phrase": "Я из Бразилии."
+        },
+        {
+          "id": 166380,
+          "order_index": 149,
+          "session_number": 8,
+          "type": "sequence_dialogue",
+          "phrase": "Я из Бразилии."
+        },
+        {
+          "id": 166388,
+          "order_index": 157,
+          "session_number": 8,
+          "type": "context_choice",
+          "phrase": "Я из Бразилии."
+        }
+      ]
+    },
+    {
+      "language": "ru",
+      "phrase": "Мне нужен билет.",
+      "count": 24,
+      "examples": [
+        {
+          "id": 166433,
+          "order_index": 202,
+          "session_number": 11,
+          "type": "choice",
+          "phrase": "Мне нужен билет."
+        },
+        {
+          "id": 166440,
+          "order_index": 209,
+          "session_number": 11,
+          "type": "sequence_dialogue",
+          "phrase": "Мне нужен билет."
+        },
+        {
+          "id": 166450,
+          "order_index": 219,
+          "session_number": 11,
+          "type": "sequence_dialogue",
+          "phrase": "Мне нужен билет."
+        },
+        {
+          "id": 166460,
+          "order_index": 229,
+          "session_number": 12,
+          "type": "sequence_dialogue",
+          "phrase": "Мне нужен билет."
+        },
+        {
+          "id": 166470,
+          "order_index": 239,
+          "session_number": 12,
+          "type": "listen_build",
+          "phrase": "Мне нужен билет."
+        },
+        {
+          "id": 166479,
+          "order_index": 248,
+          "session_number": 13,
+          "type": "listen_build",
+          "phrase": "Мне нужен билет."
+        },
+        {
+          "id": 166480,
+          "order_index": 249,
+          "session_number": 13,
+          "type": "sequence_dialogue",
+          "phrase": "Мне нужен билет."
+        },
+        {
+          "id": 166488,
+          "order_index": 257,
+          "session_number": 13,
+          "type": "context_choice",
+          "phrase": "Мне нужен билет."
+        }
+      ]
+    },
+    {
+      "language": "ru",
+      "phrase": "Меню, пожалуйста.",
+      "count": 24,
+      "examples": [
+        {
+          "id": 166533,
+          "order_index": 302,
+          "session_number": 16,
+          "type": "choice",
+          "phrase": "Меню, пожалуйста."
+        },
+        {
+          "id": 166540,
+          "order_index": 309,
+          "session_number": 16,
+          "type": "sequence_dialogue",
+          "phrase": "Меню, пожалуйста."
+        },
+        {
+          "id": 166550,
+          "order_index": 319,
+          "session_number": 16,
+          "type": "sequence_dialogue",
+          "phrase": "Меню, пожалуйста."
+        },
+        {
+          "id": 166560,
+          "order_index": 329,
+          "session_number": 17,
+          "type": "sequence_dialogue",
+          "phrase": "Меню, пожалуйста."
+        },
+        {
+          "id": 166570,
+          "order_index": 339,
+          "session_number": 17,
+          "type": "listen_build",
+          "phrase": "Меню, пожалуйста."
+        },
+        {
+          "id": 166579,
+          "order_index": 348,
+          "session_number": 18,
+          "type": "listen_build",
+          "phrase": "Меню, пожалуйста."
+        },
+        {
+          "id": 166580,
+          "order_index": 349,
+          "session_number": 18,
+          "type": "sequence_dialogue",
+          "phrase": "Меню, пожалуйста."
+        },
+        {
+          "id": 166588,
+          "order_index": 357,
+          "session_number": 18,
+          "type": "context_choice",
+          "phrase": "Меню, пожалуйста."
+        }
+      ]
+    },
+    {
+      "language": "ru",
+      "phrase": "У меня есть столик.",
+      "count": 23,
+      "examples": [
+        {
+          "id": 166540,
+          "order_index": 309,
+          "session_number": 16,
+          "type": "sequence_dialogue",
+          "phrase": "У меня есть столик."
+        },
+        {
+          "id": 166550,
+          "order_index": 319,
+          "session_number": 16,
+          "type": "sequence_dialogue",
+          "phrase": "У меня есть столик."
+        },
+        {
+          "id": 166560,
+          "order_index": 329,
+          "session_number": 17,
+          "type": "sequence_dialogue",
+          "phrase": "У меня есть столик."
+        },
+        {
+          "id": 166569,
+          "order_index": 338,
+          "session_number": 17,
+          "type": "build",
+          "phrase": "У меня есть столик."
+        },
+        {
+          "id": 166580,
+          "order_index": 349,
+          "session_number": 18,
+          "type": "sequence_dialogue",
+          "phrase": "У меня есть столик."
+        },
+        {
+          "id": 166590,
+          "order_index": 359,
+          "session_number": 18,
+          "type": "sequence_dialogue",
+          "phrase": "У меня есть столик."
+        },
+        {
+          "id": 166596,
+          "order_index": 365,
+          "session_number": 19,
+          "type": "image_choice",
+          "phrase": "У меня есть столик."
+        },
+        {
+          "id": 166600,
+          "order_index": 369,
+          "session_number": 19,
+          "type": "sequence_dialogue",
+          "phrase": "У меня есть столик."
+        }
+      ]
+    },
+    {
+      "language": "ru",
+      "phrase": "Мой номер один два три.",
+      "count": 23,
+      "examples": [
+        {
+          "id": 166640,
+          "order_index": 409,
+          "session_number": 21,
+          "type": "sequence_dialogue",
+          "phrase": "Мой номер один два три."
+        },
+        {
+          "id": 166650,
+          "order_index": 419,
+          "session_number": 21,
+          "type": "sequence_dialogue",
+          "phrase": "Мой номер один два три."
+        },
+        {
+          "id": 166660,
+          "order_index": 429,
+          "session_number": 22,
+          "type": "sequence_dialogue",
+          "phrase": "Мой номер один два три."
+        },
+        {
+          "id": 166669,
+          "order_index": 438,
+          "session_number": 22,
+          "type": "build",
+          "phrase": "Мой номер один два три."
+        },
+        {
+          "id": 166680,
+          "order_index": 449,
+          "session_number": 23,
+          "type": "sequence_dialogue",
+          "phrase": "Мой номер один два три."
+        },
+        {
+          "id": 166690,
+          "order_index": 459,
+          "session_number": 23,
+          "type": "sequence_dialogue",
+          "phrase": "Мой номер один два три."
+        },
+        {
+          "id": 166696,
+          "order_index": 465,
+          "session_number": 24,
+          "type": "image_choice",
+          "phrase": "Мой номер один два три."
+        },
+        {
+          "id": 166700,
+          "order_index": 469,
+          "session_number": 24,
+          "type": "sequence_dialogue",
+          "phrase": "Мой номер один два три."
+        }
+      ]
+    },
+    {
+      "language": "ru",
+      "phrase": "Я еду в Берлин.",
+      "count": 22,
+      "examples": [
+        {
+          "id": 166440,
+          "order_index": 209,
+          "session_number": 11,
+          "type": "sequence_dialogue",
+          "phrase": "Я еду в Берлин."
+        },
+        {
+          "id": 166450,
+          "order_index": 219,
+          "session_number": 11,
+          "type": "sequence_dialogue",
+          "phrase": "Я еду в Берлин."
+        },
+        {
+          "id": 166460,
+          "order_index": 229,
+          "session_number": 12,
+          "type": "sequence_dialogue",
+          "phrase": "Я еду в Берлин."
+        },
+        {
+          "id": 166469,
+          "order_index": 238,
+          "session_number": 12,
+          "type": "build",
+          "phrase": "Я еду в Берлин."
+        },
+        {
+          "id": 166480,
+          "order_index": 249,
+          "session_number": 13,
+          "type": "sequence_dialogue",
+          "phrase": "Я еду в Берлин."
+        },
+        {
+          "id": 166490,
+          "order_index": 259,
+          "session_number": 13,
+          "type": "sequence_dialogue",
+          "phrase": "Я еду в Берлин."
+        },
+        {
+          "id": 166496,
+          "order_index": 265,
+          "session_number": 14,
+          "type": "image_choice",
+          "phrase": "Я еду в Берлин."
+        },
+        {
+          "id": 166500,
+          "order_index": 269,
+          "session_number": 14,
+          "type": "sequence_dialogue",
+          "phrase": "Я еду в Берлин."
+        }
+      ]
+    },
+    {
+      "language": "ru",
+      "phrase": "Я не люблю рыбу.",
+      "count": 22,
+      "examples": [
+        {
+          "id": 167133,
+          "order_index": 902,
+          "session_number": 46,
+          "type": "choice",
+          "phrase": "Я не люблю рыбу."
+        },
+        {
+          "id": 167140,
+          "order_index": 909,
+          "session_number": 46,
+          "type": "sequence_dialogue",
+          "phrase": "Я не люблю рыбу."
+        },
+        {
+          "id": 167150,
+          "order_index": 919,
+          "session_number": 46,
+          "type": "sequence_dialogue",
+          "phrase": "Я не люблю рыбу."
+        },
+        {
+          "id": 167160,
+          "order_index": 929,
+          "session_number": 47,
+          "type": "sequence_dialogue",
+          "phrase": "Я не люблю рыбу."
+        },
+        {
+          "id": 167170,
+          "order_index": 939,
+          "session_number": 47,
+          "type": "listen_build",
+          "phrase": "Я не люблю рыбу."
+        },
+        {
+          "id": 167179,
+          "order_index": 948,
+          "session_number": 48,
+          "type": "listen_build",
+          "phrase": "Я не люблю рыбу."
+        },
+        {
+          "id": 167180,
+          "order_index": 949,
+          "session_number": 48,
+          "type": "sequence_dialogue",
+          "phrase": "Я не люблю рыбу."
+        },
+        {
+          "id": 167188,
+          "order_index": 957,
+          "session_number": 48,
+          "type": "context_choice",
+          "phrase": "Я не люблю рыбу."
+        }
+      ]
+    },
+    {
+      "language": "ru",
+      "phrase": "Я говорю по-португальски.",
+      "count": 21,
+      "examples": [
+        {
+          "id": 166335,
+          "order_index": 104,
+          "session_number": 6,
+          "type": "choice",
+          "phrase": "Я говорю по-португальски."
+        },
+        {
+          "id": 166340,
+          "order_index": 109,
+          "session_number": 6,
+          "type": "sequence_dialogue",
+          "phrase": "Я говорю по-португальски."
+        },
+        {
+          "id": 166344,
+          "order_index": 113,
+          "session_number": 6,
+          "type": "choice",
+          "phrase": "Я говорю по-португальски."
+        },
+        {
+          "id": 166350,
+          "order_index": 119,
+          "session_number": 6,
+          "type": "sequence_dialogue",
+          "phrase": "Я говорю по-португальски."
+        },
+        {
+          "id": 166353,
+          "order_index": 122,
+          "session_number": 7,
+          "type": "choice",
+          "phrase": "Я говорю по-португальски."
+        },
+        {
+          "id": 166360,
+          "order_index": 129,
+          "session_number": 7,
+          "type": "sequence_dialogue",
+          "phrase": "Я говорю по-португальски."
+        },
+        {
+          "id": 166380,
+          "order_index": 149,
+          "session_number": 8,
+          "type": "sequence_dialogue",
+          "phrase": "Я говорю по-португальски."
+        },
+        {
+          "id": 166390,
+          "order_index": 159,
+          "session_number": 8,
+          "type": "sequence_dialogue",
+          "phrase": "Я говорю по-португальски."
+        }
+      ]
+    },
+    {
+      "language": "ru",
+      "phrase": "Где вокзал?",
+      "count": 21,
+      "examples": [
+        {
+          "id": 166435,
+          "order_index": 204,
+          "session_number": 11,
+          "type": "choice",
+          "phrase": "Где вокзал?"
+        },
+        {
+          "id": 166440,
+          "order_index": 209,
+          "session_number": 11,
+          "type": "sequence_dialogue",
+          "phrase": "Где вокзал?"
+        },
+        {
+          "id": 166444,
+          "order_index": 213,
+          "session_number": 11,
+          "type": "choice",
+          "phrase": "Где вокзал?"
+        },
+        {
+          "id": 166450,
+          "order_index": 219,
+          "session_number": 11,
+          "type": "sequence_dialogue",
+          "phrase": "Где вокзал?"
+        },
+        {
+          "id": 166453,
+          "order_index": 222,
+          "session_number": 12,
+          "type": "choice",
+          "phrase": "Где вокзал?"
+        },
+        {
+          "id": 166460,
+          "order_index": 229,
+          "session_number": 12,
+          "type": "sequence_dialogue",
+          "phrase": "Где вокзал?"
+        },
+        {
+          "id": 166480,
+          "order_index": 249,
+          "session_number": 13,
+          "type": "sequence_dialogue",
+          "phrase": "Где вокзал?"
+        },
+        {
+          "id": 166490,
+          "order_index": 259,
+          "session_number": 13,
+          "type": "sequence_dialogue",
+          "phrase": "Где вокзал?"
+        }
+      ]
+    },
+    {
+      "language": "ru",
+      "phrase": "Счёт, пожалуйста.",
+      "count": 21,
+      "examples": [
+        {
+          "id": 166549,
+          "order_index": 318,
+          "session_number": 16,
+          "type": "listen_build",
+          "phrase": "Счёт, пожалуйста."
+        },
+        {
+          "id": 166558,
+          "order_index": 327,
+          "session_number": 17,
+          "type": "context_choice",
+          "phrase": "Счёт, пожалуйста."
+        },
+        {
+          "id": 166576,
+          "order_index": 345,
+          "session_number": 18,
+          "type": "image_choice",
+          "phrase": "Счёт, пожалуйста."
+        },
+        {
+          "id": 166585,
+          "order_index": 354,
+          "session_number": 18,
+          "type": "choice",
+          "phrase": "Счёт, пожалуйста."
+        },
+        {
+          "id": 166594,
+          "order_index": 363,
+          "session_number": 19,
+          "type": "choice",
+          "phrase": "Счёт, пожалуйста."
+        },
+        {
+          "id": 166603,
+          "order_index": 372,
+          "session_number": 19,
+          "type": "choice",
+          "phrase": "Счёт, пожалуйста."
+        },
+        {
+          "id": 167279,
+          "order_index": 1048,
+          "session_number": 53,
+          "type": "listen_build",
+          "phrase": "Счёт, пожалуйста."
+        },
+        {
+          "id": 167285,
+          "order_index": 1054,
+          "session_number": 53,
+          "type": "build",
+          "phrase": "Счёт, пожалуйста."
+        }
+      ]
+    },
+    {
+      "language": "ru",
+      "phrase": "Я работаю в школе.",
+      "count": 21,
+      "examples": [
+        {
+          "id": 166833,
+          "order_index": 602,
+          "session_number": 31,
+          "type": "choice",
+          "phrase": "Я работаю в школе."
+        },
+        {
+          "id": 166840,
+          "order_index": 609,
+          "session_number": 31,
+          "type": "sequence_dialogue",
+          "phrase": "Я работаю в школе."
+        },
+        {
+          "id": 166850,
+          "order_index": 619,
+          "session_number": 31,
+          "type": "sequence_dialogue",
+          "phrase": "Я работаю в школе."
+        },
+        {
+          "id": 166860,
+          "order_index": 629,
+          "session_number": 32,
+          "type": "sequence_dialogue",
+          "phrase": "Я работаю в школе."
+        },
+        {
+          "id": 166870,
+          "order_index": 639,
+          "session_number": 32,
+          "type": "listen_build",
+          "phrase": "Я работаю в школе."
+        },
+        {
+          "id": 166879,
+          "order_index": 648,
+          "session_number": 33,
+          "type": "listen_build",
+          "phrase": "Я работаю в школе."
+        },
+        {
+          "id": 166880,
+          "order_index": 649,
+          "session_number": 33,
+          "type": "sequence_dialogue",
+          "phrase": "Я работаю в школе."
+        },
+        {
+          "id": 166888,
+          "order_index": 657,
+          "session_number": 33,
+          "type": "context_choice",
+          "phrase": "Я работаю в школе."
+        }
+      ]
+    },
+    {
+      "language": "ru",
+      "phrase": "Я завтракаю в восемь.",
+      "count": 21,
+      "examples": [
+        {
+          "id": 167033,
+          "order_index": 802,
+          "session_number": 41,
+          "type": "choice",
+          "phrase": "Я завтракаю в восемь."
+        },
+        {
+          "id": 167040,
+          "order_index": 809,
+          "session_number": 41,
+          "type": "sequence_dialogue",
+          "phrase": "Я завтракаю в восемь."
+        },
+        {
+          "id": 167050,
+          "order_index": 819,
+          "session_number": 41,
+          "type": "sequence_dialogue",
+          "phrase": "Я завтракаю в восемь."
+        },
+        {
+          "id": 167060,
+          "order_index": 829,
+          "session_number": 42,
+          "type": "sequence_dialogue",
+          "phrase": "Я завтракаю в восемь."
+        },
+        {
+          "id": 167070,
+          "order_index": 839,
+          "session_number": 42,
+          "type": "listen_build",
+          "phrase": "Я завтракаю в восемь."
+        },
+        {
+          "id": 167079,
+          "order_index": 848,
+          "session_number": 43,
+          "type": "listen_build",
+          "phrase": "Я завтракаю в восемь."
+        },
+        {
+          "id": 167080,
+          "order_index": 849,
+          "session_number": 43,
+          "type": "sequence_dialogue",
+          "phrase": "Я завтракаю в восемь."
+        },
+        {
+          "id": 167088,
+          "order_index": 857,
+          "session_number": 43,
+          "type": "context_choice",
+          "phrase": "Я завтракаю в восемь."
+        }
+      ]
+    }
+  ]
+}
