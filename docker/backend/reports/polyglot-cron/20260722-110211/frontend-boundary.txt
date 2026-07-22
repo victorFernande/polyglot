@@ -1,0 +1,1 @@
+PASS: no forbidden frontend-only extra practice patterns in Exercises.jsx
