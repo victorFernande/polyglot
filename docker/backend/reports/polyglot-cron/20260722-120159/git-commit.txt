@@ -1,0 +1,16 @@
+[main 575c5d2] chore(polyglot): add hourly wave 1 exercises 20260722-120159
+ 19 files changed, 729 insertions(+), 31 deletions(-)
+ create mode 100644 docker/backend/reports/polyglot-cron/20260722-120159/audit_all_exercise_duplicates.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260722-120159/counts-after.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260722-120159/counts-before.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260722-120159/cron_incremental.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260722-120159/frontend-boundary.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260722-120159/git-fetch-before-commit.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260722-120159/git-status-before.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260722-120159/pytest-rerun.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260722-120159/pytest.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260722-120159/recent_review_30.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260722-120159/remote-ahead-before-commit.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260722-120159/review_all_exercise_items.txt
+ create mode 100644 docker/backend/reports/polyglot-cron/20260722-120159/run-id.txt
+ create mode 100644 reports/polyglot-cron/2026-07-22-120159-snapshot.json
