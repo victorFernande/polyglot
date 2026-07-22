@@ -1,0 +1,40 @@
+ M docker/backend/reports/polyglot-cron/20260721-150107/commit-sha-final.txt
+ M docker/backend/reports/polyglot-cron/20260721-150107/commit-sha.txt
+ M docker/backend/reports/polyglot-cron/20260721-150107/git-amend-evidence.txt
+ M docker/backend/reports/polyglot-cron/20260721-150107/git-commit.txt
+ M docker/backend/reports/polyglot-cron/20260721-150107/git-push-final.txt
+ M docker/backend/reports/polyglot-cron/20260721-150107/git-push.txt
+?? docker/backend/reports/polyglot-cron/2026-07-13-070243-snapshot.json
+?? docker/backend/reports/polyglot-cron/2026-07-13-100114-review-de.json
+?? docker/backend/reports/polyglot-cron/2026-07-13-100114-review-en.json
+?? docker/backend/reports/polyglot-cron/2026-07-13-100114-review-fr.json
+?? docker/backend/reports/polyglot-cron/2026-07-13-100114-review-jp.json
+?? docker/backend/reports/polyglot-cron/2026-07-13-100114-review-ru.json
+?? docker/backend/reports/polyglot-cron/2026-07-13-100114-snapshot.json
+?? docker/backend/reports/polyglot-cron/2026-07-13-140328-snapshot.json
+?? docker/backend/reports/polyglot-cron/2026-07-13-140916-snapshot.json
+?? docker/backend/reports/polyglot-cron/2026-07-13-140917-snapshot.json
+?? docker/backend/reports/polyglot-cron/2026-07-13-140952-snapshot.json
+?? docker/backend/reports/polyglot-cron/2026-07-13-140953-snapshot.json
+?? docker/backend/reports/polyglot-cron/2026-07-13-141008-snapshot.json
+?? docker/backend/reports/polyglot-cron/2026-07-13-141348-snapshot.json
+?? docker/backend/reports/polyglot-cron/2026-07-13-141357-snapshot.json
+?? docker/backend/reports/polyglot-cron/2026-07-13-160727-snapshot.json
+?? docker/backend/reports/polyglot-cron/2026-07-13-160728-snapshot.json
+?? docker/backend/reports/polyglot-cron/20260709-110322-add.txt
+?? docker/backend/reports/polyglot-cron/20260709-110322-after.txt
+?? docker/backend/reports/polyglot-cron/20260709-110322-before.txt
+?? docker/backend/reports/polyglot-cron/20260709-110322-review.txt
+?? docker/backend/reports/polyglot-cron/20260709-110322-summary.md
+?? docker/backend/reports/polyglot-cron/20260709-180141-add.txt
+?? docker/backend/reports/polyglot-cron/20260709-180141-after.txt
+?? docker/backend/reports/polyglot-cron/20260709-180141-before.txt
+?? docker/backend/reports/polyglot-cron/20260709-180141-review-after.txt
+?? docker/backend/reports/polyglot-cron/20260709-180141-review-before.txt
+?? docker/backend/reports/polyglot-cron/20260710-020123-add.txt
+?? docker/backend/reports/polyglot-cron/20260710-020123-after.json
+?? docker/backend/reports/polyglot-cron/20260710-020123-before.json
+?? docker/backend/reports/polyglot-cron/20260710-020123-frontend-boundary.txt
+?? docker/backend/reports/polyglot-cron/20260710-020123-pytest.txt
+?? docker/backend/reports/polyglot-cron/20260710-020123-quality-after-fix.txt
+?? docker/backend/reports/polyglot-cron/20260710-020123-quality-after-fix2.txt
