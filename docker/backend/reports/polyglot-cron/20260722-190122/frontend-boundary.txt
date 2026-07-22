@@ -1,0 +1,1 @@
+OK: sem padrões proibidos em Exercises.jsx
