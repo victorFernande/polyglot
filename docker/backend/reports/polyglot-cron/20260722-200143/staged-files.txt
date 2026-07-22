@@ -1,0 +1,7 @@
+docker/backend/polyglot.db
+docker/backend/reports/polyglot-cron/20260722-190122/git-rebase-after-stash.txt
+docker/backend/reports/polyglot-cron/20260722-200143/2026-07-22-200144-snapshot.json
+docker/backend/reports/polyglot-cron/20260722-200143/counts-final.txt
+docker/backend/reports/polyglot-cron/20260722-200143/cron_incremental.txt
+docker/backend/reports/polyglot-cron/20260722-200143/frontend-boundary.txt
+docker/backend/reports/polyglot-cron/20260722-200143/recent_review.json
