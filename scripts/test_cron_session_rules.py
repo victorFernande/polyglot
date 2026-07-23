@@ -47,6 +47,9 @@ class FakeDB:
                     return self._count
                 return self._count
 
+            def scalar(self):
+                return self._count
+
         return Q(self, self._item_count, model)
 
     def add(self, obj):
