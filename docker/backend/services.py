@@ -895,11 +895,12 @@ class ExerciseService:
         if current_count + max_new <= len(generated):
             return generated[current_count:current_count + max_new]
         items = generated[current_count:]
-        index = len(generated) + 1
+        next_index = current_count + len(items) + 1
         while len(items) < max_new:
-            block = ExerciseService._generic_review_block(code, index + len(items))
+            block = ExerciseService._generic_review_block(code, next_index)
             still_need = max_new - len(items)
             items.extend(block[:still_need])
+            next_index += len(block[:still_need])
         return items[:max_new]
 
     @staticmethod
@@ -914,14 +915,14 @@ class ExerciseService:
         lesson = db.query(ExerciseLesson).filter(ExerciseLesson.language_code == code, ExerciseLesson.active == True).first()
         if not lesson:
             return 0
-        current_count = db.query(func.max(ExerciseItem.order_index)).filter(
+        max_order = db.query(func.max(ExerciseItem.order_index)).filter(
             ExerciseItem.lesson_id == lesson.id
         ).scalar() or 0
-        target = ExerciseService.dynamic_target_for_language(code, current_count)
-        remaining_to_target = target - current_count
+        target = ExerciseService.dynamic_target_for_language(code, max_order)
+        remaining_to_target = target - max_order
         if remaining_to_target <= 0:
             return 0
-        last_block_size = current_count % ExerciseService.SESSION_SIZE
+        last_block_size = max_order % ExerciseService.SESSION_SIZE
         if last_block_size == 0:
             to_add = min(max_new, ExerciseService.SESSION_SIZE, remaining_to_target)
         elif last_block_size <= 15:
@@ -930,10 +931,10 @@ class ExerciseService:
             to_add = min(ExerciseService.SESSION_SIZE - last_block_size, remaining_to_target)
         if to_add <= 0:
             return 0
-        batch = ExerciseService.generate_incremental_batch(code, current_count, to_add)
+        batch = ExerciseService.generate_incremental_batch(code, max_order, to_add)
         if not batch:
             return 0
-        for idx, item in enumerate(batch, current_count + 1):
+        for idx, item in enumerate(batch, max_order + 1):
             db.add(ExerciseItem(
                 lesson_id=lesson.id,
                 order_index=idx,

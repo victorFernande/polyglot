@@ -105,6 +105,35 @@ def commit_cron_changes(snapshot_path: Path, message: str, include_db: bool = Fa
     return True
 
 
+def parse_sqlite_path(database_url: str) -> Path | None:
+    if not database_url.startswith("sqlite:///"):
+        return None
+    raw_path = database_url.removeprefix("sqlite:///")
+    if not raw_path:
+        return None
+    path = Path(raw_path)
+    if not path.is_absolute():
+        path = Path.cwd() / path
+    return path.resolve()
+
+
+def assert_canonical_database(database_url: str) -> None:
+    """Prevent cron runs from writing to a stale SQLite copy.
+
+    The production exercise corpus is tracked at docker/backend/polyglot.db.
+    A cron running from a different cwd with sqlite:///./polyglot.db can otherwise
+    generate, commit, and push an older/smaller DB over newer content.
+    """
+    sqlite_path = parse_sqlite_path(database_url)
+    canonical_path = Path(__file__).resolve().with_name("polyglot.db")
+    if sqlite_path is not None and sqlite_path != canonical_path:
+        raise SystemExit(
+            "Refusing to run incremental cron against non-canonical DB: "
+            f"{sqlite_path}. Expected: {canonical_path}. "
+            "Pass sqlite:///.../docker/backend/polyglot.db explicitly."
+        )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Polyglot incremental exercise cron")
     parser.add_argument(
@@ -140,6 +169,7 @@ def main() -> int:
     args = parser.parse_args()
 
     database_url = args.database_url
+    assert_canonical_database(database_url)
     snapshot_dir = Path(args.snapshot_dir)
     if not snapshot_dir.is_absolute():
         # cron_incremental.py lives in docker/backend, so relative paths should be
