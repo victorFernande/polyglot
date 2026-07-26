@@ -39,7 +39,15 @@ def run_cron(
         **os.environ,
         "DATABASE_URL": database_url,
     }
-    args = [str(BACKEND / ".venv" / "bin" / "python"), str(CRON), "--database-url", database_url, "--snapshot-dir", snapshot_dir]
+    args = [
+        str(BACKEND / ".venv" / "bin" / "python"),
+        str(CRON),
+        "--database-url",
+        database_url,
+        "--snapshot-dir",
+        snapshot_dir,
+        "--allow-test-database",
+    ]
     if bootstrap:
         args.append("--bootstrap")
     if commit:
@@ -149,6 +157,61 @@ def test_cron_incremental_exposes_commit_flag_without_staging_unrelated_paths():
     assert 'subprocess.run(["git", "add", "--", *paths]' in source
     assert 'subprocess.run(["git", "commit", "-m", message]' in source
     assert 'git_has_changes(paths)' in source
+
+
+def test_cron_refuses_non_canonical_database_for_production_runs():
+    db_path = Path(tempfile.NamedTemporaryFile(delete=False, suffix=".db").name)
+    snapshot_dir = Path(tempfile.mkdtemp())
+    database_url = f"sqlite:///{db_path}"
+
+    try:
+        env = {**os.environ, "DATABASE_URL": database_url}
+        result = subprocess.run(
+            [
+                str(BACKEND / ".venv" / "bin" / "python"),
+                str(CRON),
+                "--database-url",
+                database_url,
+                "--snapshot-dir",
+                str(snapshot_dir),
+            ],
+            capture_output=True,
+            text=True,
+            env=env,
+            cwd=str(ROOT),
+        )
+        assert result.returncode != 0
+        assert "Refusing to run incremental cron against non-canonical DB" in result.stderr
+    finally:
+        db_path.unlink(missing_ok=True)
+
+
+def test_cron_commit_cannot_bypass_canonical_guard_with_test_flag():
+    db_path = Path(tempfile.NamedTemporaryFile(delete=False, suffix=".db").name)
+    snapshot_dir = Path(tempfile.mkdtemp())
+    database_url = f"sqlite:///{db_path}"
+
+    try:
+        result = subprocess.run(
+            [
+                str(BACKEND / ".venv" / "bin" / "python"),
+                str(CRON),
+                "--database-url",
+                database_url,
+                "--snapshot-dir",
+                str(snapshot_dir),
+                "--allow-test-database",
+                "--commit",
+            ],
+            capture_output=True,
+            text=True,
+            env={**os.environ, "DATABASE_URL": database_url},
+            cwd=str(ROOT),
+        )
+        assert result.returncode != 0
+        assert "Refusing to run incremental cron against non-canonical DB" in result.stderr
+    finally:
+        db_path.unlink(missing_ok=True)
 
 
 def test_cron_incremental_grows_at_static_target():

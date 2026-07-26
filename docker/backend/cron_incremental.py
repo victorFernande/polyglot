@@ -117,16 +117,19 @@ def parse_sqlite_path(database_url: str) -> Path | None:
     return path.resolve()
 
 
-def assert_canonical_database(database_url: str) -> None:
-    """Prevent cron runs from writing to a stale SQLite copy.
+def assert_canonical_database(database_url: str, *, allow_test_database: bool = False) -> None:
+    """Prevent production cron runs from writing to a stale SQLite copy.
 
     The production exercise corpus is tracked at docker/backend/polyglot.db.
     A cron running from a different cwd with sqlite:///./polyglot.db can otherwise
     generate, commit, and push an older/smaller DB over newer content.
+
+    Tests may opt into temporary SQLite files, but commit/production runs must use
+    the canonical DB path only.
     """
     sqlite_path = parse_sqlite_path(database_url)
     canonical_path = Path(__file__).resolve().with_name("polyglot.db")
-    if sqlite_path is not None and sqlite_path != canonical_path:
+    if sqlite_path is not None and sqlite_path != canonical_path and not allow_test_database:
         raise SystemExit(
             "Refusing to run incremental cron against non-canonical DB: "
             f"{sqlite_path}. Expected: {canonical_path}. "
@@ -166,10 +169,15 @@ def main() -> int:
         default="Content QA(polyglot): add hourly incremental exercise items",
         help="Git commit message used with --commit",
     )
+    parser.add_argument(
+        "--allow-test-database",
+        action="store_true",
+        help=argparse.SUPPRESS,
+    )
     args = parser.parse_args()
 
     database_url = args.database_url
-    assert_canonical_database(database_url)
+    assert_canonical_database(database_url, allow_test_database=args.allow_test_database and not args.commit)
     snapshot_dir = Path(args.snapshot_dir)
     if not snapshot_dir.is_absolute():
         # cron_incremental.py lives in docker/backend, so relative paths should be
