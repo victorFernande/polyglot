@@ -421,14 +421,24 @@ def test_real_database_cron_round_uses_latest_snapshot():
             target = ExerciseService.dynamic_target_for_language(code, before)
             remaining_to_target = target - before
             last_block = before % ExerciseService.SESSION_SIZE
-            if last_block == 0:
-                expected = min(5, ExerciseService.SESSION_SIZE)
-            elif last_block <= 15:
-                expected = min(5, ExerciseService.SESSION_SIZE - last_block)
-            else:
-                expected = ExerciseService.SESSION_SIZE - last_block
-            # The cron never adds items beyond the per-language target.
-            expected = max(0, min(expected, remaining_to_target))
+            per_language_limit = raw_counts.get("per_language_limit", 100)
+            expected = 0
+            simulated_count = before
+            while expected < per_language_limit:
+                remaining_to_target = target - simulated_count
+                if remaining_to_target <= 0:
+                    break
+                last_block = simulated_count % ExerciseService.SESSION_SIZE
+                if last_block == 0:
+                    step = min(per_language_limit - expected, ExerciseService.SESSION_SIZE, remaining_to_target)
+                elif last_block <= 15:
+                    step = min(per_language_limit - expected, ExerciseService.SESSION_SIZE - last_block, remaining_to_target)
+                else:
+                    step = min(per_language_limit - expected, ExerciseService.SESSION_SIZE - last_block, remaining_to_target)
+                if step <= 0:
+                    break
+                expected += step
+                simulated_count += step
             assert after == before + expected, (
                 f"{code}: expected {before + expected} items after cron, got {after}"
             )

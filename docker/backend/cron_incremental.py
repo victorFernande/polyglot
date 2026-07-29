@@ -4,7 +4,7 @@
 Generates real ExerciseItem rows in the backend for every active language,
 respecting the 20-item session-size contract:
 
-- 0 or 1-15 items in the last block -> add at most 5
+- 0 or 1-15 items in the last block -> add up to the configured per-run limit
 - 16-19 items in the last block -> add only enough to close 20
 - never exceed 20 items per session
 
@@ -58,14 +58,21 @@ def take_snapshot(db) -> dict[str, int]:
     return snapshot
 
 
-def add_incremental_batches(db) -> dict[str, int]:
+def add_incremental_batches(db, per_language_limit: int) -> dict[str, int]:
     added: dict[str, int] = {}
     for code in LANGUAGES:
-        added[code] = ExerciseService.add_next_incremental_batch(db, code)
+        language_added = 0
+        while language_added < per_language_limit:
+            batch_limit = per_language_limit - language_added
+            batch_added = ExerciseService.add_next_incremental_batch(db, code, max_new=batch_limit)
+            if batch_added <= 0:
+                break
+            language_added += batch_added
+        added[code] = language_added
     return added
 
 
-def write_snapshot(snapshot: dict[str, int], after: dict[str, int], snapshot_dir: Path) -> Path:
+def write_snapshot(snapshot: dict[str, int], after: dict[str, int], snapshot_dir: Path, per_language_limit: int) -> Path:
     snapshot_dir.mkdir(parents=True, exist_ok=True)
     timestamp = datetime.now().strftime("%Y-%m-%d-%H%M%S")
     path = snapshot_dir / f"{timestamp}-snapshot.json"
@@ -73,6 +80,7 @@ def write_snapshot(snapshot: dict[str, int], after: dict[str, int], snapshot_dir
         "timestamp": timestamp,
         "before": snapshot,
         "after": after,
+        "per_language_limit": per_language_limit,
     }
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
     return path
@@ -150,6 +158,12 @@ def main() -> int:
         help="Directory to write the before/after snapshot JSON",
     )
     parser.add_argument(
+        "--per-language-limit",
+        type=int,
+        default=100,
+        help="Maximum questions to add per active language in one cron run",
+    )
+    parser.add_argument(
         "--bootstrap",
         action="store_true",
         help="Bootstrap active lessons if they do not exist",
@@ -193,10 +207,10 @@ def main() -> int:
             added = {code: 0 for code in LANGUAGES}
         else:
             before = take_snapshot(db)
-            added = add_incremental_batches(db)
+            added = add_incremental_batches(db, args.per_language_limit)
             after = take_snapshot(db)
 
-        snapshot_path = write_snapshot(before, after, snapshot_dir)
+        snapshot_path = write_snapshot(before, after, snapshot_dir, args.per_language_limit)
         committed = False
         if args.commit:
             committed = commit_cron_changes(

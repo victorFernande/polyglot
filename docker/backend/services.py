@@ -231,7 +231,7 @@ class ExerciseService:
     }
     SESSION_SIZE = 20
     TARGET_ITEMS = 1000
-    INCREMENTAL_ITEM_TARGETS = {"de": 1500, "fr": 1500, "ru": 1500, "jp": 1500, "en": 1500}
+    INCREMENTAL_ITEM_TARGETS = {"de": 3100, "fr": 3100, "ru": 3100, "jp": 3100, "en": 3100}
     JP_BEGINNER_KANA = {
         "私の名前はビクトルです。": "わたしのなまえはビクトルです。",
         "ブラジル出身です。": "ブラジルしゅっしんです。",
