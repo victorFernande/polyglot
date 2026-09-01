@@ -111,14 +111,24 @@ def item_counts(database_url: str) -> dict[str, int]:
         db.close()
 
 
-def expected_batch_size(before: int) -> int:
-    last_block = before % ExerciseService.SESSION_SIZE
-    if last_block == 0:
-        return min(5, ExerciseService.SESSION_SIZE)
-    elif last_block <= 15:
-        return min(5, ExerciseService.SESSION_SIZE - last_block)
-    else:
-        return ExerciseService.SESSION_SIZE - last_block
+def expected_batch_size(before: int, per_language_limit: int = 100) -> int:
+    remaining = per_language_limit
+    current = before
+    added = 0
+    while remaining > 0:
+        last_block = current % ExerciseService.SESSION_SIZE
+        if last_block == 0:
+            batch = min(remaining, ExerciseService.SESSION_SIZE)
+        elif last_block <= 15:
+            batch = min(remaining, ExerciseService.SESSION_SIZE - last_block)
+        else:
+            batch = min(remaining, ExerciseService.SESSION_SIZE - last_block)
+        if batch <= 0:
+            break
+        added += batch
+        current += batch
+        remaining -= batch
+    return added
 
 
 def test_cron_incremental_creates_snapshot_and_adds_items():
